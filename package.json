@@ -1,0 +1,32 @@
+{
+  "name": "gtaa-mica",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@coral-ai/react": "^0.6.1",
+    "@coral-ai/bundleicons": "^2.1.0",
+    "@fluentui/react-components": "^9.72.11",
+    "@fluentui/react-icons": "2.0.322",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "@coral-ai/markdown": "^0.6.0",
+    "@coral-ai/charts": "^3.10.1",
+    "@coral-ai/chat": "^0.6.0",
+    "@coral-ai/docs": "^0.6.0"
+  },
+  "devDependencies": {
+    "@coral-ai/cli": "^0.6.0",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "@types/node": "^24.10.1"
+  }
+}
