@@ -9,24 +9,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@coral-ai/react": "^0.6.1",
     "@coral-ai/bundleicons": "^2.1.0",
+    "@coral-ai/charts": "file:vendor/coral/coral-ai-charts-3.10.1.tgz",
+    "@coral-ai/chat": "file:vendor/coral/coral-ai-chat-0.6.0.tgz",
+    "@coral-ai/docs": "file:vendor/coral/coral-ai-docs-0.6.0.tgz",
+    "@coral-ai/markdown": "file:vendor/coral/coral-ai-markdown-0.6.0.tgz",
+    "@coral-ai/react": "file:vendor/coral/coral-ai-react-0.6.1.tgz",
     "@fluentui/react-components": "^9.72.11",
     "@fluentui/react-icons": "2.0.322",
     "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "@coral-ai/markdown": "^0.6.0",
-    "@coral-ai/charts": "^3.10.1",
-    "@coral-ai/chat": "^0.6.0",
-    "@coral-ai/docs": "^0.6.0"
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@coral-ai/cli": "^0.6.0",
+    "@coral-ai/cli": "file:vendor/coral/coral-ai-cli-0.6.0.tgz",
+    "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.1",
     "typescript": "~5.9.3",
-    "vite": "^7.2.4",
-    "@types/node": "^24.10.1"
+    "vite": "^7.2.4"
   }
 }
