@@ -1,0 +1,337 @@
+/*
+ * Chart-neutral defaults. Hosts theme the chart by overriding these --st-*
+ * variables (e.g. through the `style` prop). The chart has no backdrop of its
+ * own: root, plot and rows are transparent over whatever surface hosts it.
+ * Only the pinned stand column (and the header, when vertically scrolling)
+ * gets a local surface so bars scrolled beneath it stay hidden.
+ */
+.st-root {
+  --st-font-family: inherit;
+  --st-font-size: 12px;
+  --st-font-size-small: 10px;
+  --st-line-height: 16px;
+  --st-font-weight: 400;
+  --st-font-weight-strong: 600;
+  --st-space-xxs: 2px;
+  --st-space-xs: 4px;
+  --st-space-s: 8px;
+  --st-radius: 6px;
+  --st-radius-small: 3px;
+  --st-bar-radius: 3px;
+  --st-stroke: 1px;
+  --st-stroke-thick: 2px;
+  --st-stroke-focus: 2.5px;
+
+  --st-text: currentColor;
+  --st-text-muted: GrayText;
+  --st-border: rgba(128, 128, 128, 0.45);
+  --st-line: rgba(128, 128, 128, 0.22);
+  --st-line-strong: rgba(128, 128, 128, 0.45);
+  --st-grid-major: rgba(128, 128, 128, 0.28);
+  --st-grid-minor: rgba(128, 128, 128, 0.12);
+  --st-row-alt: rgba(128, 128, 128, 0.06);
+  --st-pinned-bg: Canvas;
+  --st-pinned-backdrop: none;
+  --st-zone-bg: rgba(128, 128, 128, 0.16);
+  --st-bar-fill: #5d7fa3;
+  --st-bar-stroke: transparent;
+  --st-bar-text: #ffffff;
+  --st-selected: currentColor;
+  --st-linked: currentColor;
+  --st-focus: Highlight;
+  --st-scrollbar-thumb: rgba(128, 128, 128, 0.5);
+  --st-scrollbar-thumb-hover: rgba(128, 128, 128, 0.7);
+  --st-scrollbar-track: transparent;
+
+  min-width: 0;
+  font-family: var(--st-font-family);
+  font-size: var(--st-font-size);
+  line-height: var(--st-line-height);
+  font-weight: var(--st-font-weight);
+  color: var(--st-text);
+  background: transparent;
+  border: var(--st-stroke) solid var(--st-border);
+  border-radius: var(--st-radius);
+  overflow: hidden;
+}
+
+.st-scroller {
+  overflow: auto;
+  /* Standard property (Firefox, Chromium 121+); WebKit fallback below. */
+  scrollbar-color: var(--st-scrollbar-thumb) var(--st-scrollbar-track);
+}
+
+/*
+ * fillHeight: the root fills its parent and the single scroller takes the
+ * remaining height. Header/footer are sticky inside that scroller
+ * (.st-root--vscroll), so rulers, gutter and body keep one shared
+ * horizontal scroll while only the rows scroll vertically between rulers.
+ */
+.st-root--fill {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.st-root--fill > .st-scroller {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.st-scroller::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.st-scroller::-webkit-scrollbar-track,
+.st-scroller::-webkit-scrollbar-corner {
+  background: var(--st-scrollbar-track);
+}
+
+.st-scroller::-webkit-scrollbar-thumb {
+  background: var(--st-scrollbar-thumb);
+  background-clip: padding-box;
+  border: 2px solid transparent;
+  border-radius: 999px;
+}
+
+.st-scroller::-webkit-scrollbar-thumb:hover {
+  background-color: var(--st-scrollbar-thumb-hover);
+}
+
+.st-canvas svg {
+  display: block;
+  flex: none;
+}
+
+/*
+ * Rulers are content-box so the inline height is the SVG's height and the
+ * border adds outside it (a border-box host reset would otherwise clip 1px
+ * and cause a spurious vertical scrollbar).
+ */
+.st-root .st-header,
+.st-root .st-footer {
+  box-sizing: content-box;
+}
+
+.st-header {
+  display: flex;
+  border-bottom: var(--st-stroke) solid var(--st-line-strong);
+}
+
+/* Header pins to the top only when the host limits height (rows scroll under it). */
+.st-root--vscroll .st-header {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--st-pinned-bg);
+  backdrop-filter: var(--st-pinned-backdrop);
+}
+
+.st-footer {
+  display: flex;
+  border-top: var(--st-stroke) solid var(--st-line-strong);
+}
+
+.st-root--vscroll .st-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background: var(--st-pinned-bg);
+  backdrop-filter: var(--st-pinned-backdrop);
+}
+
+.st-corner,
+.st-labels {
+  position: sticky;
+  left: 0;
+  flex: none;
+  box-sizing: border-box;
+  border-right: var(--st-stroke) solid var(--st-line-strong);
+  background: var(--st-pinned-bg);
+  backdrop-filter: var(--st-pinned-backdrop);
+}
+
+.st-corner {
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--st-space-xs);
+  padding: 0 var(--st-space-xxs) 0 var(--st-space-s);
+}
+
+.st-labels {
+  z-index: 2;
+}
+
+.st-corner-title {
+  font-weight: var(--st-font-weight-strong);
+}
+
+.st-zone {
+  margin-left: auto;
+  padding: 0 var(--st-space-xs);
+  border-radius: var(--st-radius-small);
+  background: var(--st-zone-bg);
+  color: var(--st-text-muted);
+  font-size: var(--st-font-size-small);
+  font-weight: var(--st-font-weight-strong);
+}
+
+.st-tick {
+  stroke: var(--st-line-strong);
+  stroke-width: var(--st-stroke);
+}
+
+/* Boundary ticks (e.g. whole hours) run the full axis height, unlabelled or not. */
+.st-tick--major {
+  stroke: var(--st-text-muted);
+}
+
+/* SVG text takes the same typography variables as HTML text. */
+.st-tick-label,
+.st-bar-label {
+  font-family: var(--st-font-family);
+  font-size: var(--st-font-size);
+  font-variant-numeric: tabular-nums;
+}
+
+.st-tick-label {
+  fill: var(--st-text);
+  font-weight: var(--st-font-weight-strong);
+}
+
+.st-body {
+  display: flex;
+}
+
+.st-row-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--st-space-xs);
+  padding: 0 var(--st-space-s);
+  box-sizing: border-box;
+  border-bottom: var(--st-stroke) solid var(--st-line);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Right-aligned stand IDs sitting just left of the plot edge. */
+.st-row-label--end {
+  justify-content: flex-end;
+  padding-right: var(--st-space-xxs);
+}
+
+.st-row-label--alt {
+  background: var(--st-row-alt);
+}
+
+.st-row-label--group-end {
+  border-bottom-color: var(--st-line-strong);
+}
+
+.st-row-name {
+  font-weight: var(--st-font-weight-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+.st-row-group {
+  color: var(--st-text-muted);
+  font-size: var(--st-font-size-small);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.st-row-band--alt {
+  fill: var(--st-row-alt);
+}
+
+.st-row-boundary {
+  opacity: 0.6;
+  stroke: var(--st-line);
+  stroke-width: var(--st-stroke);
+}
+
+/* Group dividers continue the gutter's group border across the plot, a little stronger. */
+.st-row-boundary--group {
+  opacity: 0.9;
+  stroke: var(--st-line-strong);
+}
+
+.st-grid-major {
+  opacity: 0.6;
+  stroke: var(--st-grid-major);
+  stroke-width: var(--st-stroke);
+}
+
+.st-grid-minor {
+  opacity: 0.4;
+  stroke: var(--st-grid-minor);
+  stroke-width: var(--st-stroke);
+}
+
+.st-bar {
+  color: var(--st-bar-text);
+  cursor: pointer;
+  outline: none;
+}
+
+.st-bar-rect {
+  fill: var(--st-bar-fill);
+  stroke: var(--st-bar-stroke);
+  stroke-width: var(--st-stroke);
+  rx: var(--st-bar-radius);
+  transition: filter 80ms;
+}
+
+.st-bar:hover .st-bar-rect {
+  filter: brightness(1.06) saturate(1.15);
+}
+
+/* Slot icons default to the bar text colour; BarLabels `color` overrides inline. */
+.st-bar-label-icon {
+  color: var(--st-bar-text);
+  overflow: visible;
+}
+
+/* Selection/focus outline shares the bar's corner radius. */
+.st-bar-outline {
+  rx: var(--st-bar-radius);
+  fill: none;
+  stroke: none;
+  pointer-events: none;
+}
+
+.st-bar--linked .st-bar-outline {
+  stroke: var(--st-linked);
+  stroke-width: var(--st-stroke);
+  stroke-dasharray: 3 2;
+}
+
+.st-bar--selected .st-bar-outline {
+  stroke: var(--st-selected);
+  stroke-width: var(--st-stroke-thick);
+}
+
+.st-bar:focus-visible .st-bar-outline {
+  stroke: var(--st-focus);
+  stroke-width: var(--st-stroke-focus);
+  stroke-dasharray: none;
+}
+
+.st-bar-label {
+  fill: var(--st-bar-text);
+  font-weight: var(--st-font-weight);
+}
+
+.st-bar-label--primary {
+  font-weight: var(--st-font-weight-strong);
+}
+
+.st-bar-label--secondary {
+  opacity: 0.85;
+}

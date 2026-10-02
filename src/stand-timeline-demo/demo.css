@@ -1,0 +1,192 @@
+/*
+ * Demo page layout. All values are Fluent v9 token CSS variables, provided by
+ * CoralProvider's FluentProvider. Surfaces stay transparent over the app shell.
+ */
+/*
+ * Bounded page: fills the host <main> (App.tsx) so the chart can take the
+ * remaining height; the header keeps its natural size and the selection
+ * detail shrinks (scrolling inside) only when space runs short.
+ */
+.demo-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingVerticalM);
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  width: 100%;
+  min-width: 0;
+  padding: var(--spacingVerticalL) var(--spacingHorizontalXL);
+  box-sizing: border-box;
+  font-family: var(--fontFamilyBase);
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  color: var(--colorNeutralForeground1);
+}
+
+.demo-header {
+  flex: none;
+}
+
+/*
+ * The selection detail may shrink on short viewports (it already scrolls
+ * inside its max-height) but keeps at least one line visible.
+ */
+.demo-detail {
+  flex: 0 1 auto;
+  min-height: calc(var(--lineHeightBase200) + 2 * var(--spacingVerticalS) + 2px);
+}
+
+/*
+ * The chart takes all remaining height (its own rows scroll inside).
+ * Minimum: both 30px rulers + borders + one 40px row + the horizontal
+ * scrollbar, so the rulers stay visible on short viewports without forcing
+ * the page to scroll.
+ */
+.demo-chart {
+  flex: 1 1 0;
+  min-height: 120px;
+}
+
+.demo-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacingVerticalS) var(--spacingHorizontalL);
+}
+
+/* Optional host toolbar at the header's right edge (e.g. Views / Filters). */
+.demo-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingHorizontalXS);
+}
+
+.demo-notice {
+  margin-top: var(--spacingVerticalXS);
+}
+
+.demo-title {
+  margin: 0;
+  font-size: var(--fontSizeBase400);
+  line-height: var(--lineHeightBase400);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.demo-subtitle {
+  margin: var(--spacingVerticalXXS) 0 0;
+  color: var(--colorNeutralForeground3);
+}
+
+.demo-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingVerticalXS);
+  padding: var(--spacingVerticalS) var(--spacingHorizontalM);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  border-radius: var(--borderRadiusMedium);
+  /* Many selected stays scroll here instead of squeezing the chart. */
+  max-height: 30%;
+  overflow-y: auto;
+}
+
+.demo-hint {
+  margin: 0;
+  color: var(--colorNeutralForeground3);
+}
+
+.demo-detail-head {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingHorizontalS);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.demo-detail-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingVerticalXXS);
+  padding-top: var(--spacingVerticalXS);
+  border-top: var(--strokeWidthThin) solid var(--colorNeutralStroke3);
+}
+
+.demo-detail-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--spacingVerticalXXS) var(--spacingHorizontalS);
+  font-variant-numeric: tabular-nums;
+}
+
+.demo-chip {
+  padding: 0 var(--spacingHorizontalXS);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  border-radius: var(--borderRadiusSmall);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.demo-muted {
+  color: var(--colorNeutralForeground3);
+}
+
+/*
+ * Flight-bar palette from the navy-to-teal base
+ *   #000b48 #00367a #0060a1 #008cb8 #00b7be #00e2b9
+ * Four carriers keep one hue identity in both modes:
+ *   XA deep navy-blue, XB blue, XC turquoise, XD aqua-mint.
+ * Text/icon colour is chosen per fill (white on navy/blue, base navy #000b48
+ * on bright fills); approximate WCAG contrast is noted per pair. Hatch
+ * stripes move away from the label colour so contrast only rises. Only flight
+ * bars change; app surfaces and branding keep Fluent tokens. CoralProvider
+ * currently follows the system color scheme, so the dark set uses the same
+ * prefers-color-scheme switch as before.
+ */
+.demo-chart {
+  --flight-xa: #00367a;           /* base */
+  --flight-xa-text: #ffffff;      /* ≈ 11.6:1 */
+  --flight-xa-hatch: rgba(0, 11, 72, 0.45);
+  --flight-xb: #0060a1;           /* base */
+  --flight-xb-text: #ffffff;      /* ≈ 6.6:1 */
+  --flight-xb-hatch: rgba(0, 11, 72, 0.35);
+  --flight-xc: #00b7be;           /* base */
+  --flight-xc-text: #000b48;      /* ≈ 7.5:1 */
+  --flight-xc-hatch: rgba(255, 255, 255, 0.35);
+  --flight-xd: #00e2b9;           /* base */
+  --flight-xd-text: #000b48;      /* ≈ 11.0:1 */
+  --flight-xd-hatch: rgba(255, 255, 255, 0.4);
+  --flight-outline: #000b48;      /* selected / linked / focus, on light surfaces */
+  /* Dimmed (non-matching but occupied) bars: faint tint + neutral outline/text. */
+  --flight-dim-surface: var(--colorNeutralBackground1);
+  --flight-dim-stroke: var(--colorNeutralStroke1);
+  --flight-dim-text: var(--colorNeutralForeground2);
+}
+
+@media (prefers-color-scheme: dark) {
+  .demo-chart {
+    /* Derived lighter navy-blue so XA separates from dark surfaces. */
+    --flight-xa: #2a6fc4;
+    --flight-xa-text: #ffffff;    /* ≈ 5.0:1 */
+    --flight-xa-hatch: rgba(0, 11, 72, 0.35);
+    --flight-xb: #008cb8;         /* base; one step lighter than light-mode XB */
+    --flight-xb-text: #000b48;    /* ≈ 4.8:1 */
+    --flight-xb-hatch: rgba(255, 255, 255, 0.3);
+    --flight-xc: #00b7be;         /* base */
+    --flight-xc-text: #000b48;    /* ≈ 7.5:1 */
+    --flight-xc-hatch: rgba(255, 255, 255, 0.35);
+    --flight-xd: #00e2b9;         /* base */
+    --flight-xd-text: #000b48;    /* ≈ 11.0:1 */
+    --flight-xd-hatch: rgba(255, 255, 255, 0.4);
+    --flight-outline: #ffffff;
+  }
+}
+
+/* Dimmed bars keep a 1px neutral outline so they still read as occupied. */
+.demo-chart .demo-bar--dimmed .st-bar-rect {
+  stroke-width: var(--st-stroke);
+}
+
+/* Secondary airport codes are normal-size text too. Full opacity keeps
+ * every label and its matching endpoint icon at its pair's contrast above.
+ */
+.demo-chart .st-bar-label--secondary { opacity: 1; }

@@ -1,0 +1,477 @@
+/*
+ * Operations panel. Fluent v9 token CSS variables only, so light/dark follow
+ * the CoralProvider theme. The panel stays on Coral's surface.
+ */
+
+/*
+ * Bounded layout: fill Coral's Panel.Left content area (a flex container of
+ * definite height) instead of overflowing it. Open groups share the remaining
+ * height and scroll individually; group headers and actions stay in view.
+ */
+.ops-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  font-family: var(--fontFamilyBase);
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  color: var(--colorNeutralForeground1);
+}
+
+.ops-panel-note {
+  flex: none;
+  padding: var(--spacingVerticalXS) var(--spacingHorizontalM);
+}
+
+.ops-groups {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  /*
+   * Last-resort fallback only: with the chrome-only section minimums below,
+   * this scrolls only if the panel is shorter than three groups' fixed parts
+   * (about 300px). Normally the groups fill the height and only their own
+   * content regions scroll.
+   */
+  overflow-y: auto;
+}
+
+/*
+ * Height chain: .ops-groups > headless Panel.NavSection (root, bordered by
+ * Coral) > its always-visible children div > Panel.NavGroup root > NavGroup
+ * item container > .ops-group-scroll. Open groups share the height; a
+ * collapsed group's section takes only its header plus Coral's padding.
+ * Only flex sizing is touched; Coral's display/padding/border stay intact.
+ */
+.ops-section {
+  flex: none;
+}
+
+/*
+ * Open groups split the height equally. The minimum covers only the
+ * non-scrolling parts, so the header never shrinks while the content region
+ * may go down to 0: Coral's 16px + 16px headless section padding, the ~56px
+ * two-line group header, the 8px content gap and its 4px bottom margin.
+ */
+.ops-section--open {
+  flex: 1 1 0;
+  min-height: 100px;
+}
+
+/* NavSection's children div (its only child when headless). */
+.ops-section > div {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ops-group {
+  flex: none;
+}
+
+.ops-group--open {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/*
+ * NavGroup header (a Fluent Button: Coral fixes height 36px; Fluent sets
+ * overflow:hidden and leaves flex-shrink at 1, so in a squeezed flex column
+ * it shrinks and clips). Grow to fit label + description, never shrink.
+ */
+.ops-group > button {
+  flex: none;
+  height: auto;
+  min-height: 36px;
+}
+
+/*
+ * Coral renders button > span.titleContent > [labelStack, chevron] (no icon
+ * here), so the chevron follows the label. Stretch the title row across the
+ * header and push the chevron to the trailing edge; the label stack takes
+ * the remaining width (its label/description already ellipsize).
+ */
+.ops-group > button > span:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ops-group > button > span:first-child > span:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ops-group > button > span:first-child > span:last-child {
+  flex: none;
+  margin-left: auto;
+}
+
+/*
+ * Panel.NavGroup's item container (its second child, after the header
+ * button): drop the nav-tree indent so the table keeps the panel width, and
+ * let it fill the group. `.ops-group > div` outranks its Griffel class.
+ */
+.ops-group > div {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding-left: 0;
+  /*
+   * 8px between the group header and its content. On this content box, so
+   * it only exists while expanded (Coral sets display:none when collapsed)
+   * and never moves the header or the section divider.
+   */
+  padding-top: 8px;
+  margin-bottom: var(--spacingVerticalXS);
+}
+
+/* Each open group scrolls on its own. */
+.ops-group-scroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 var(--spacingHorizontalXXS);
+  /* Rows reached by keyboard stay clear of the sticky table header. */
+  scroll-padding-top: 28px;
+}
+
+/*
+ * OverflowScroll wrapper: joins the flex height chain between NavGroup's
+ * item container and .ops-group-scroll, and positions the fade overlays.
+ * Fade colour matches the sticky table header surface (colorNeutralBackground4);
+ * override --ofs-fade-color if the panel surface changes.
+ */
+.ofs {
+  --ofs-fade-color: var(--colorNeutralBackground4);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ofs-fade {
+  position: absolute;
+  left: 0;
+  z-index: 2;
+  height: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.ofs-fade--on {
+  opacity: 1;
+}
+
+.ofs-fade--top {
+  background: linear-gradient(to bottom, var(--ofs-fade-color), transparent);
+}
+
+.ofs-fade--bottom {
+  background: linear-gradient(to top, var(--ofs-fade-color), transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ofs-fade {
+    transition: none;
+  }
+}
+
+/* Selection details popover (Fluent PopoverSurface, portalled to the body). */
+.ops-popover {
+  width: 280px;
+  max-width: calc(100vw - 32px);
+  font-family: var(--fontFamilyBase);
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  color: var(--colorNeutralForeground1);
+}
+
+.ops-popover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacingHorizontalS);
+  margin-bottom: var(--spacingVerticalXS);
+}
+
+.ops-popover-title {
+  margin: 0;
+  font-size: var(--fontSizeBase300);
+  line-height: var(--lineHeightBase300);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-footnote {
+  margin: 0;
+  padding: 0 var(--spacingHorizontalXS);
+  color: var(--colorNeutralForeground3);
+  font-size: var(--fontSizeBase100);
+  line-height: var(--lineHeightBase100);
+}
+
+.ops-empty {
+  margin: 0;
+  padding: var(--spacingVerticalS) var(--spacingHorizontalXS);
+  color: var(--colorNeutralForeground3);
+}
+
+.ops-muted {
+  color: var(--colorNeutralForeground3);
+}
+
+/* ------------------------------------------------------------- flight lists */
+
+/*
+ * Fluent Table with one <colgroup>: fixed layout, and identical padding,
+ * font and alignment on header and body cells so columns line up exactly.
+ * `.ops-list .ops-…` selectors outrank Fluent's single-class Griffel styles.
+ */
+.ops-list .ops-table {
+  width: 100%;
+  /*
+   * Four equal data columns + one compact icon column, using the cells'
+   * actual padding (.ops-cell: 0 var(--spacingHorizontalS)).
+   * - Data column minimum: widest data cell, "HH:MM −1d" or the small
+   *   "Unassigned" badge (about 64px at this font size, so 5.5em), plus padding.
+   * - Icon column: the 16px icon plus padding (FlightList COLUMNS uses it).
+   * Wider panels share the extra width equally among the data columns; only a
+   * narrower one scrolls horizontally rather than clipping.
+   */
+  --ops-data-col-min: calc(5.5em + 2 * var(--spacingHorizontalS));
+  --ops-icon-col: calc(16px + 2 * var(--spacingHorizontalS));
+  min-width: calc(3 * var(--ops-data-col-min) + var(--ops-icon-col));
+  table-layout: fixed;
+  font-family: var(--fontFamilyBase);
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  font-variant-numeric: tabular-nums;
+}
+
+.ops-list .ops-cell {
+  padding: 0 var(--spacingHorizontalS);
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ops-list .ops-head-row .ops-cell {
+  /* Header stays visible while the group scrolls; translucent local surface. */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--colorNeutralBackground4);
+  /* backdrop-filter: blur(12px); */
+  color: var(--colorNeutralForeground3);
+  font-size: var(--fontSizeBase100);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-list abbr {
+  text-decoration: none;
+}
+
+.ops-alert-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ops-list .ops-row {
+  cursor: pointer;
+}
+
+/*
+ * Body rows 28px (header rows keep Fluent's extra-small 24px). Overrides
+ * Fluent's extra-small TableCell `height: 24px`; 16px content (line height,
+ * small Badge, icon) is vertically centred by the cells' vertical-align.
+ */
+.ops-list .ops-row > .ops-cell {
+  height: 28px;
+}
+
+/*
+ * Whole-row hover/pressed/selected with 4px outer corners. A <tr> can't
+ * round its background, and Fluent's Table uses border-collapse: collapse
+ * (where cell radii may be ignored) and paints row :hover/:active on the
+ * <tr>. So: separate borders with zero spacing (visually identical; no cell
+ * borders), a transparent row, and the state colour painted on the cells,
+ * with the first/last cell rounding the outer corners.
+ */
+.ops-list .ops-table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.ops-list .ops-row,
+.ops-list .ops-row:hover,
+.ops-list .ops-row:active {
+  background: transparent;
+}
+
+.ops-list .ops-row:hover > .ops-cell {
+  background: var(--colorSubtleBackgroundHover);
+}
+
+.ops-list .ops-row:active > .ops-cell {
+  background: var(--colorSubtleBackgroundPressed);
+}
+
+.ops-list .ops-row[aria-selected="true"] > .ops-cell {
+  background: var(--colorSubtleBackgroundSelected);
+}
+
+.ops-list .ops-row > .ops-cell:first-child {
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+}
+
+.ops-list .ops-row > .ops-cell:last-child {
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+/* No table lines: remove Fluent's row dividers and any table/cell borders. */
+.ops-list .ops-table,
+.ops-list .ops-table tr,
+.ops-list .ops-table .ops-cell {
+  border: none;
+}
+
+.ops-list .ops-row:focus-visible {
+  outline: var(--strokeWidthThick) solid var(--colorStrokeFocus2);
+  outline-offset: -2px;
+}
+
+.ops-day {
+  margin-left: var(--spacingHorizontalXXS);
+  color: var(--colorNeutralForeground3);
+  font-size: var(--fontSizeBase100);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-flight {
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-stand {
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-list .ops-issue {
+  font-size: 16px;
+  line-height: 0;
+  text-align: center;
+}
+
+.ops-issue--warning {
+  color: var(--colorStatusWarningForeground1);
+}
+
+.ops-issue--info {
+  color: var(--colorNeutralForeground3);
+}
+
+/* ------------------------------------------------------------------ alerts */
+
+.ops-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingVerticalS);
+}
+
+.ops-subhead {
+  margin: 0;
+  padding: 0 var(--spacingHorizontalXS);
+  font-size: var(--fontSizeBase200);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--colorNeutralForeground2);
+}
+
+.ops-alert-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingVerticalXS);
+}
+
+.ops-alert {
+  display: flex;
+  gap: var(--spacingHorizontalS);
+  padding: var(--spacingVerticalS) var(--spacingHorizontalS);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  border-radius: var(--borderRadiusMedium);
+}
+
+.ops-alert--selected {
+  border-color: var(--colorNeutralStroke1Selected);
+  background: var(--colorSubtleBackgroundSelected);
+}
+
+.ops-alert--done {
+  opacity: 0.75;
+}
+
+.ops-alert-icon {
+  flex: none;
+  font-size: 16px;
+  margin-top: 1px;
+}
+
+.ops-alert-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingVerticalXXS);
+  min-width: 0;
+}
+
+.ops-alert-title {
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-alert-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacingHorizontalXS);
+  margin-left: calc(-1 * var(--spacingHorizontalS));
+}
+
+/* ----------------------------------------------------------------- actions */
+
+.ops-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingVerticalS);
+}
+
+.ops-details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingVerticalXXS);
+  max-height: 9.5em;
+  overflow-y: auto;
+  padding: 0 var(--spacingHorizontalXS);
+  font-variant-numeric: tabular-nums;
+}
+
+.ops-details-title {
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacingHorizontalXS);
+}
+
+.ops-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

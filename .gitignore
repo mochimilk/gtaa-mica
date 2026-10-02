@@ -8,3 +8,6 @@ dist-ssr
 .idea
 .DS_Store
 *.log
+
+# Unsigned local Electron bundles
+desktop-out/

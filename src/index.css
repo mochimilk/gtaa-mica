@@ -5,6 +5,49 @@ body,
   height: 100%;
 }
 
+/*
+ * Scrollbars, ported from the Coral playground
+ * (coral-ai/apps/playground/src/index.css, lines 17–50): thin, transparent
+ * until the scroll area is hovered, 6px WebKit bars, rounded thumb.
+ * Scoped to #root (the ID also outranks the chart's class-level defaults) and
+ * using Fluent neutral tokens so colours follow light/dark; the playground's
+ * grey values remain as fallbacks. Native scrolling is untouched.
+ */
+#root * {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+#root *:hover {
+  scrollbar-color: var(--colorNeutralStroke1, rgba(128, 128, 128, 0.4)) transparent;
+}
+
+#root ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#root ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#root ::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 999px;
+}
+
+#root *:hover::-webkit-scrollbar-thumb {
+  background: var(--colorNeutralStroke1, rgba(128, 128, 128, 0.4));
+}
+
+#root ::-webkit-scrollbar-thumb:hover {
+  background: var(--colorNeutralStrokeAccessible, rgba(128, 128, 128, 0.65));
+}
+
+#root ::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
 body {
   font-family:
     -apple-system,
