@@ -179,6 +179,46 @@
   }
 }
 
+/*
+ * Views / Filters menus (Fluent MenuPopover, portalled). The popover root's
+ * height limit comes from Fluent positioning `autoSize: "height"` (inline
+ * max-height = space left from the anchor to the viewport edge), so it fits
+ * short windows wherever the anchor sits. The root is a flex column so the
+ * MenuList inside shrinks to that limit; the list carries the 480px cap and
+ * is the only scroll container. Width stays constrained.
+ */
+div.ops-menu-popover {
+  width: min(320px, calc(100vw - 32px));
+  display: flex;
+  flex-direction: column;
+  max-width: min(320px, calc(100vw - 32px));
+  box-sizing: border-box;
+}
+
+div.ops-menu-popover > .ops-menu-list {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: hidden;
+  min-height: 0;
+  max-height: min(480px, calc(100dvh - 100px));
+  overflow-y: auto;
+}
+
+/* Fluent dividers bleed into popover padding by default; keep them inside
+ * the scrolling list so they do not create horizontal overflow. */
+.ops-menu-list > .fui-MenuDivider {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Status line under the chart title while a view or filter is active. */
+.ops-filter-status {
+  margin: 0;
+  color: var(--colorNeutralForeground2);
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+}
+
 /* Selection details popover (Fluent PopoverSurface, portalled to the body). */
 .ops-popover {
   width: 280px;

@@ -130,30 +130,29 @@ const TOW_OUT = "Tow-out";
  * @param isMatch Optional host predicate (views/filters). When given, bars it
  *   rejects are DIMMED, never removed: they stay occupied, focusable and
  *   selectable. Selected bars and their linked visit stays always stay at
- *   full prominence.
+ *   full prominence. With an active selection, unrelated stays are grey too.
  */
 export function makeDemoAccessors(
   turnsById: Map<string, SyntheticTurn>,
   stayPosition: Map<string, StayPosition>,
   endpoints: Map<string, StayEndpoints>,
   isMatch?: (occupancyId: string) => boolean,
+  hasSelection = false,
 ) {
   const turnOf = (bar: BarDatum) =>
     bar.occupancy.visitId ? turnsById.get(bar.occupancy.visitId) : undefined;
   const paletteOf = (bar: BarDatum) =>
     CARRIER_PALETTE[turnOf(bar)?.carrier ?? ""] ?? FALLBACK;
   const isDimmed = (bar: BarDatum) =>
-    !!isMatch && !bar.selected && !bar.linked && !isMatch(bar.occupancy.id);
+    !bar.selected && !bar.linked && (hasSelection || (!!isMatch && !isMatch(bar.occupancy.id)));
 
   const barStyle = (bar: BarDatum): BarStyle => {
     const p = paletteOf(bar);
     const carrier = turnOf(bar)?.carrier;
     if (isDimmed(bar)) {
-      // Faint carrier tint over the surface plus a neutral outline: still
-      // reads as an occupied stand, recedes behind matches. Labels switch to
-      // a neutral foreground (see labelColor) so they stay readable.
+      // Context stays occupied/selectable, but is neutral grey with no labels.
       return {
-        fill: `color-mix(in srgb, ${p.fill} 22%, var(--flight-dim-surface))`,
+        fill: "var(--flight-dim-surface)",
         stroke: "var(--flight-dim-stroke)",
         color: "var(--flight-dim-text)",
         className: "demo-bar--dimmed",
@@ -177,6 +176,7 @@ export function makeDemoAccessors(
    * Aircraft type is deliberately not a label; it is in the tooltip/detail.
    */
   const labelSlots = (bar: BarDatum): BarLabelSlots | undefined => {
+    if (isDimmed(bar)) return {}; // Suppress text and decorative endpoint icons.
     const t = turnOf(bar);
     const ep = endpoints.get(bar.occupancy.id);
     if (!t || !ep) return undefined;
@@ -237,7 +237,7 @@ export function makeDemoAccessors(
         : e.kind === "tow"
           ? `${TOW_OUT} (visit departs as ${t.depFlight} to ${to})`
           : `no departure flight or tow from this stand (visit departs as ${t.depFlight} to ${to})`;
-    const dimmed = isDimmed(bar) ? ". Outside the current view or filters; stand still occupied" : "";
+    const dimmed = isDimmed(bar) ? ". Outside the current selection, view or filters; stand still occupied" : "";
     return (
       `${arrival}, ${departure}, ${t.registration}, ${t.aircraftType}, ` +
       `${where}${stayText} (synthetic)${dimmed}`

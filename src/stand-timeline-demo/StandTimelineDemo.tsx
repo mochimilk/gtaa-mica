@@ -48,6 +48,8 @@ export interface StandTimelineDemoProps {
    * dimmed but stay on the chart, occupied and selectable. Omit for no dimming.
    */
   isMatch?: (occupancyId: string) => boolean;
+  /** Includes host selections with no chart occupancy, such as unassigned flights. */
+  selectionActive?: boolean;
   /** Optional controls rendered at the right of the header. */
   toolbar?: ReactNode;
   /** Optional status line rendered under the subtitle. */
@@ -59,16 +61,18 @@ export function StandTimelineDemo({
   onIntent: controlledOnIntent,
   showSelectionDetail = true,
   isMatch,
+  selectionActive,
   toolbar,
   notice,
 }: StandTimelineDemoProps = {}) {
-  const accessors = useMemo(
-    () => makeDemoAccessors(DATA.turnsById, DATA.stayPosition, DATA.endpoints, isMatch),
-    [isMatch],
-  );
   const [localIds, setLocalIds] = useState<string[]>([]);
   const controlled = controlledIds !== undefined;
   const selectedIds = controlled ? controlledIds : localIds;
+  const hasSelection = selectionActive ?? selectedIds.length > 0;
+  const accessors = useMemo(
+    () => makeDemoAccessors(DATA.turnsById, DATA.stayPosition, DATA.endpoints, isMatch, hasSelection),
+    [isMatch, hasSelection],
+  );
 
   const onIntent = useCallback(
     (intent: ChartIntent) => {

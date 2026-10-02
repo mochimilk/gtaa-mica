@@ -107,8 +107,14 @@ function anchorVisible(el: AnchorEl): boolean {
 }
 
 export function SelectionPopover() {
-  const { selection, detailsOpen, selectionSource, selectionRequest, clearSelection } =
-    useOperations();
+  const {
+    selection,
+    detailsOpen,
+    setDetailsOpen,
+    selectionSource,
+    selectionRequest,
+    clearSelection,
+  } = useOperations();
   const [anchor, setAnchor] = useState<AnchorEl | null>(null);
   const returnFocusRef = useRef<HTMLElement | SVGElement | null>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
@@ -185,13 +191,19 @@ export function SelectionPopover() {
   };
 
   // Every dismiss (close button, Escape, outside click/focus) clears the
-  // selection and closes the popover.
+  // selection and closes the popover, except the toolbar case below.
   const onOpenChange = (e: OpenPopoverEvents, data: OnOpenChangeData) => {
     if (data.open) return;
     // Clicking/focusing another bar, row or alert button re-targets instead:
     // its own handler sets the new selection, which must not be cleared.
     const t = e.target;
     if (t instanceof Element && t.closest(TRIGGERS)) return;
+    // Views/Filters toolbar and its menus: close the details so the menu can
+    // take focus, but keep the selection (filters never clear it either).
+    if (t instanceof Element && t.closest("[data-ops-keep-selection]")) {
+      setDetailsOpen(false);
+      return;
+    }
     clearSelection();
     if (e.type === "keydown") restoreFocus(); // Escape returns focus
   };

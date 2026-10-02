@@ -10,6 +10,8 @@ import { StandTimelineDemo } from "./stand-timeline-demo/StandTimelineDemo";
 import { OperationsPanel } from "./operations/OperationsPanel";
 import { OperationsProvider, useOperations } from "./operations/OperationsContext";
 import { SelectionPopover } from "./operations/SelectionPopover";
+import { ViewsFiltersToolbar } from "./operations/ViewsFiltersToolbar";
+import { FilterStatus } from "./operations/FilterStatus";
 import { TreeDeciduous } from "@coral-ai/bundleicons";
 
 /*
@@ -25,16 +27,21 @@ const useNavbarStyles = makeStyles({
   },
 });
 
-/** Chart wired to the shared operations selection. */
+/** Chart wired to the shared operations selection, views and filters. */
 function ConnectedTimeline() {
-  const { selection, applyChartIntent } = useOperations();
+  const { selection, applyChartIntent, matcher } = useOperations();
   return (
     <>
-      {/* Details show in SelectionPopover, so the demo's own detail strip is hidden here. */}
+      {/* Details show in SelectionPopover, so the demo's own detail strip is hidden here.
+          Non-matching bars are dimmed (still occupied/selectable), never removed. */}
       <StandTimelineDemo
         selectedIds={selection.occupancyIds}
         onIntent={applyChartIntent}
         showSelectionDetail={false}
+        isMatch={matcher.active ? matcher.occupancy : undefined}
+        selectionActive={selection.occupancyIds.length > 0 || !!selection.flightId}
+        toolbar={<ViewsFiltersToolbar />}
+        notice={<FilterStatus />}
       />
       <SelectionPopover />
     </>

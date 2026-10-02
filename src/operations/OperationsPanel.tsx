@@ -21,9 +21,20 @@ export function OperationsPanel() {
     departures: true,
     alerts: true,
   });
-  const { acknowledged } = useOperations();
-  const openAlerts = OPS_ALERTS.filter((a) => !acknowledged.has(a.id)).length;
-  const unassigned = (list: typeof ARRIVALS) => list.filter((f) => !f.standId).length;
+  const { acknowledged, matcher } = useOperations();
+  // Counts follow the current view/filters ("x of y" while one is active).
+  const openAlerts = OPS_ALERTS.filter((a) => !acknowledged.has(a.id));
+  const openShown = openAlerts.filter(matcher.alert).length;
+  const describe = (list: typeof ARRIVALS) => {
+    const shown = list.filter(matcher.flight);
+    const unassigned = shown.filter((f) => !f.standId).length;
+    const count = matcher.active ? `${shown.length} of ${list.length}` : `${list.length}`;
+    return `${count} flights · ${unassigned} unassigned`;
+  };
+  const alertsText =
+    matcher.active && openShown !== openAlerts.length
+      ? `${openShown} of ${openAlerts.length} open`
+      : `${openAlerts.length} open`;
 
   // Each group sits in its own headless Panel.NavSection: with no label the
   // section has no header and is always open, and `border` gives the bottom
@@ -47,19 +58,9 @@ export function OperationsPanel() {
     <div className="ops-panel">
 
       <div className="ops-groups">
-        {group(
-          "arrivals",
-          "Arrivals",
-          `${ARRIVALS.length} flights · ${unassigned(ARRIVALS)} unassigned`,
-          <ArrivalList />,
-        )}
-        {group(
-          "departures",
-          "Departures",
-          `${DEPARTURES.length} flights · ${unassigned(DEPARTURES)} unassigned`,
-          <DepartureList />,
-        )}
-        {group("alerts", "Alerts", `${openAlerts} open`, <Alerts />)}
+        {group("arrivals", "Arrivals", describe(ARRIVALS), <ArrivalList />)}
+        {group("departures", "Departures", describe(DEPARTURES), <DepartureList />)}
+        {group("alerts", "Alerts", alertsText, <Alerts />)}
       </div>
       {/* Selection details/actions now live in SelectionPopover, anchored to the selection. */}
     </div>

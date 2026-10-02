@@ -51,7 +51,8 @@
 .demo-header {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
+  align-items: center;
+  padding-block: var(--spacingVerticalM);
   justify-content: space-between;
   gap: var(--spacingVerticalS) var(--spacingHorizontalL);
 }
@@ -65,6 +66,11 @@
 
 .demo-notice {
   margin-top: var(--spacingVerticalXS);
+}
+
+/* A host notice component may render nothing (e.g. no active filter). */
+.demo-notice:empty {
+  display: none;
 }
 
 .demo-title {
@@ -156,8 +162,8 @@
   --flight-xd-text: #000b48;      /* ≈ 11.0:1 */
   --flight-xd-hatch: rgba(255, 255, 255, 0.4);
   --flight-outline: #000b48;      /* selected / linked / focus, on light surfaces */
-  /* Dimmed (non-matching but occupied) bars: faint tint + neutral outline/text. */
-  --flight-dim-surface: var(--colorNeutralBackground1);
+  /* Context bars: neutral grey silhouettes; labels/icons are omitted. */
+  --flight-dim-surface: #dedede;
   --flight-dim-stroke: var(--colorNeutralStroke1);
   --flight-dim-text: var(--colorNeutralForeground2);
 }
@@ -178,7 +184,24 @@
     --flight-xd-text: #000b48;    /* ≈ 11.0:1 */
     --flight-xd-hatch: rgba(255, 255, 255, 0.4);
     --flight-outline: #ffffff;
+    --flight-dim-surface: #3a3a3a;
   }
+}
+
+/*
+ * Hover: the chart's default brightness/saturate filter would lift white-text
+ * fills (e.g. dark-mode XA ≈ 5.0:1) toward 4.5:1. Here hover instead shows a
+ * thin outline on the chart's separate outline rect, so fills and label
+ * contrast never change. Selected/linked/focus outlines keep precedence.
+ */
+.demo-chart .st-bar:hover .st-bar-rect {
+  filter: none;
+}
+
+.demo-chart .st-bar:not(.st-bar--selected):not(.st-bar--linked):not(:focus-visible):hover
+  .st-bar-outline {
+  stroke: var(--flight-outline);
+  stroke-width: var(--st-stroke);
 }
 
 /* Dimmed bars keep a 1px neutral outline so they still read as occupied. */

@@ -6,14 +6,20 @@ import { isFlightSelected, useOperations } from "./OperationsContext";
 import { OPS_ALERTS, OPS_FLIGHTS_BY_ID, type OpsAlert } from "./operationsData";
 
 export function Alerts() {
-  const { acknowledged } = useOperations();
-  const open = OPS_ALERTS.filter((a) => !acknowledged.has(a.id));
-  const done = OPS_ALERTS.filter((a) => acknowledged.has(a.id));
+  const { acknowledged, matcher } = useOperations();
+  // Alerts follow the filters (not the view; see opsFilters.ts).
+  const shown = OPS_ALERTS.filter(matcher.alert);
+  const open = shown.filter((a) => !acknowledged.has(a.id));
+  const done = shown.filter((a) => acknowledged.has(a.id));
 
   return (
     <div className="ops-alerts">
       {open.length === 0 ? (
-        <p className="ops-empty">No open synthetic alerts.</p>
+        <p className="ops-empty">
+          {matcher.active && shown.length < OPS_ALERTS.length
+            ? "No open alerts match the current filters."
+            : "No open synthetic alerts."}
+        </p>
       ) : (
         <ul className="ops-alert-list" aria-label="Open alerts">
           {open.map((a) => (
