@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Planning.Application.Mcp</PackageId>
+    <RootNamespace>Planning.Application.Mcp</RootNamespace>
+    <Description>Schema-versioned MCP tool adapter over the authoritative planning HTTP API.</Description>
+  </PropertyGroup>
+
+</Project>

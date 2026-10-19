@@ -1,0 +1,44 @@
+{
+  "name": "@planning/timeline-review",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Exact-revision evidence and human review workspace for planning timelines.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/review.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "typecheck:tests": "tsc -p tsconfig.tests.json",
+    "test": "tsx --test tests/*.test.ts tests/*.test.tsx",
+    "check": "npm run build && npm run typecheck:tests && npm test"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@planning/timeline-application": "file:../Planning.Timeline.Application",
+    "@planning/timeline-core": "file:../Planning.Timeline",
+    "@planning/timeline-react": "file:../Planning.Timeline.React"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.0",
+    "@types/jsdom": "^30.0.0",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "jsdom": "^27.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.2"
+  }
+}

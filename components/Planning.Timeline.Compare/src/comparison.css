@@ -1,0 +1,75 @@
+.planning-timeline-comparison {
+    display: grid;
+    gap: 1rem;
+}
+
+.planning-timeline-comparison__summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.planning-timeline-comparison__summary div {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 0.5rem;
+    display: grid;
+    min-width: 5.5rem;
+    padding: 0.5rem 0.75rem;
+}
+
+.planning-timeline-comparison__summary span {
+    color: #4b5563;
+    text-transform: capitalize;
+}
+
+.planning-timeline-comparison__evidence {
+    border: 1px solid #d1d5db;
+    border-left: 0.35rem solid #b45309;
+    padding: 0.75rem;
+}
+
+.planning-timeline-comparison__evidence[data-comparable="true"] {
+    border-left-color: #047857;
+}
+
+.planning-timeline-comparison__evidence h2,
+.planning-timeline-comparison__revision h2 {
+    font-size: 1rem;
+    margin: 0 0 0.5rem;
+}
+
+.planning-timeline-comparison__evidence table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.planning-timeline-comparison__evidence th,
+.planning-timeline-comparison__evidence td {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 0.4rem;
+    text-align: left;
+}
+
+.planning-timeline__item[data-pattern^="comparison-added"] {
+    outline: 3px solid #047857;
+}
+
+.planning-timeline__item[data-pattern^="comparison-removed"] {
+    opacity: 0.5;
+    outline: 3px dashed #b91c1c;
+}
+
+.planning-timeline__item[data-pattern*="moved"] {
+    box-shadow: inset 0 0 0 3px #7c3aed;
+}
+
+.planning-timeline__item[data-pattern*="retimed"] {
+    background-image: repeating-linear-gradient(
+        135deg,
+        transparent,
+        transparent 6px,
+        rgb(255 255 255 / 28%) 6px,
+        rgb(255 255 255 / 28%) 12px
+    );
+}

@@ -1,0 +1,30 @@
+{
+  "name": "@planning/timeline-application",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Planning HTTP adapter for domain-neutral timeline move intents.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "typecheck:tests": "tsc -p tsconfig.tests.json",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "check": "npm run build && npm run typecheck:tests && npm test"
+  },
+  "dependencies": {
+    "@planning/timeline-core": "file:../Planning.Timeline"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "typescript": "~6.0.2"
+  }
+}

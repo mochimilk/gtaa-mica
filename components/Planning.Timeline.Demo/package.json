@@ -1,0 +1,29 @@
+{
+  "name": "@planning/timeline-demo",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Runnable synthetic timeline and authoritative planning workflow.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@planning/timeline-application": "file:../Planning.Timeline.Application",
+    "@planning/timeline-compare": "file:../Planning.Timeline.Compare",
+    "@planning/timeline-core": "file:../Planning.Timeline",
+    "@planning/timeline-react": "file:../Planning.Timeline.React",
+    "@planning/timeline-review": "file:../Planning.Timeline.Review",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.3",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1"
+  }
+}

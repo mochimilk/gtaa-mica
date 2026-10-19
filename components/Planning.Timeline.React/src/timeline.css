@@ -1,0 +1,202 @@
+.planning-timeline {
+    --timeline-background: #ffffff;
+    --timeline-border: #d6d9df;
+    --timeline-header-background: #f5f6f8;
+    --timeline-row-label-background: #ffffff;
+    --timeline-item-background: #2563eb;
+    --timeline-item-color: #ffffff;
+    --timeline-selected-outline: #111827;
+    --timeline-overlay-background: rgb(100 116 139 / 22%);
+    background: var(--timeline-background);
+    color: #111827;
+    font-family: system-ui, sans-serif;
+}
+
+.planning-timeline__toolbar {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    padding: 0.5rem;
+}
+
+.planning-timeline__toolbar button {
+    min-height: 2rem;
+    min-width: 2rem;
+}
+
+.planning-timeline__viewport {
+    border: 1px solid var(--timeline-border);
+    max-height: 32rem;
+    overflow: auto;
+}
+
+.planning-timeline__canvas {
+    min-width: 100%;
+}
+
+.planning-timeline__header,
+.planning-timeline__row {
+    display: flex;
+    position: relative;
+}
+
+.planning-timeline__header {
+    background: var(--timeline-header-background);
+    border-bottom: 1px solid var(--timeline-border);
+    height: 2.5rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.planning-timeline__corner,
+.planning-timeline__row-label {
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    left: 0;
+    overflow: hidden;
+    padding: 0.65rem 0.75rem;
+    position: sticky;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    z-index: 90;
+}
+
+.planning-timeline__corner {
+    background: var(--timeline-header-background);
+    font-weight: 700;
+}
+
+.planning-timeline__row-label {
+    background: var(--timeline-row-label-background);
+    border-bottom: 1px solid var(--timeline-border);
+    border-right: 1px solid var(--timeline-border);
+}
+
+.planning-timeline__time-header,
+.planning-timeline__track {
+    flex: 0 0 auto;
+    position: relative;
+}
+
+.planning-timeline__time-header time {
+    border-left: 1px solid var(--timeline-border);
+    bottom: 0;
+    font-size: 0.75rem;
+    padding: 0.25rem;
+    position: absolute;
+    top: 0;
+}
+
+.planning-timeline__track {
+    background-image: linear-gradient(to right, var(--timeline-border) 1px, transparent 1px);
+    background-size: 120px 100%;
+    border-bottom: 1px solid var(--timeline-border);
+}
+
+.planning-timeline__overlay,
+.planning-timeline__item {
+    box-sizing: border-box;
+    position: absolute;
+}
+
+.planning-timeline__overlay {
+    background: var(--timeline-overlay-background);
+    border: 0;
+    inset-block: 0;
+    padding: 0;
+}
+
+div.planning-timeline__overlay {
+    pointer-events: none;
+}
+
+.planning-timeline__item {
+    background: var(--timeline-item-background);
+    border: 0;
+    border-radius: 999px;
+    color: var(--timeline-item-color);
+    cursor: pointer;
+    height: 2rem;
+    overflow: visible;
+    padding: 0 0.625rem;
+    text-align: left;
+    top: 0.5rem;
+    z-index: 50;
+}
+
+.planning-timeline__item[data-editable="true"] {
+    cursor: grab;
+}
+
+.planning-timeline__item[data-dimmed="true"] {
+    opacity: 0.35;
+}
+
+.planning-timeline__item[aria-pressed="true"] {
+    outline: 3px solid var(--timeline-selected-outline);
+    outline-offset: 2px;
+}
+
+.planning-timeline__item-body {
+    align-items: center;
+    display: flex;
+    gap: 0.35rem;
+    height: 100%;
+    min-width: 0;
+}
+
+.planning-timeline__item-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.planning-timeline__item-badges {
+    display: flex;
+    gap: 0.2rem;
+    margin-left: auto;
+}
+
+.planning-timeline__item-details {
+    background: #111827;
+    border-radius: 0.25rem;
+    color: #ffffff;
+    display: none;
+    left: 0;
+    min-width: 12rem;
+    padding: 0.5rem;
+    position: absolute;
+    top: calc(100% + 0.35rem);
+    z-index: 200;
+}
+
+.planning-timeline__item:focus .planning-timeline__item-details,
+.planning-timeline__item:hover .planning-timeline__item-details {
+    display: block;
+}
+
+.planning-timeline__unassigned {
+    border: 1px solid var(--timeline-border);
+    border-top: 0;
+    padding: 0.75rem;
+}
+
+.planning-timeline__unassigned h3 {
+    font-size: 0.875rem;
+    margin: 0 0 0.5rem;
+}
+
+.planning-timeline__unassigned-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.planning-timeline__unassigned-list button {
+    background: var(--timeline-header-background);
+    border: 1px dashed var(--timeline-border);
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem;
+}

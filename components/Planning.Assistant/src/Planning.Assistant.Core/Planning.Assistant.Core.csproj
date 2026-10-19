@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Planning.Assistant.Core</PackageId>
+    <RootNamespace>Planning.Assistant</RootNamespace>
+    <Description>Provider-neutral assistant requests, responses, streaming, and runtime contracts.</Description>
+  </PropertyGroup>
+
+</Project>

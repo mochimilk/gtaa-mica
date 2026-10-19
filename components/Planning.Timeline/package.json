@@ -1,0 +1,27 @@
+{
+  "name": "@planning/timeline-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Domain-neutral timeline contracts, geometry, and interaction intents.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "typecheck:tests": "tsc -p tsconfig.tests.json",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "check": "npm run build && npm run typecheck:tests && npm test"
+  },
+  "devDependencies": {
+    "@types/node": "^24.13.3",
+    "typescript": "~6.0.2"
+  }
+}
