@@ -1,8 +1,8 @@
 {
   "$schema": "../../../schemas/stands.schema.json",
-  "schema_version": "1.0.0",
+  "schema_version": "2.0.0",
   "airport_id": "contoso",
-  "description": "Diagram-derived stand reference positions with authored aircraft, sector and occupancy-dependent permissions. Stand gate_ids are the authoritative gate associations. Positions are not stand pavement or clearance envelopes.",
+  "description": "Diagram-derived stand reference positions with authored aircraft, sector and occupancy-dependent permissions. Stand gate_ids are the authoritative gate associations. Add airline-groups to authorize operators; omitted or empty lists make a stand unavailable for assignment. Positions are not stand pavement or clearance envelopes.",
   "stands": [
     {
       "id": "t1:stand:101",
@@ -18,6 +18,7 @@
       "gate_ids": [
         "t1:gate:A1"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -61,6 +62,7 @@
       "gate_ids": [
         "t1:gate:A2"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -100,6 +102,7 @@
       "gate_ids": [
         "t1:gate:A3"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -143,6 +146,7 @@
       "gate_ids": [
         "t1:gate:A4"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -181,6 +185,7 @@
       "gate_ids": [
         "t1:gate:A5"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -219,6 +224,7 @@
       "gate_ids": [
         "t1:gate:A6"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -262,6 +268,7 @@
       "gate_ids": [
         "t1:gate:A7"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -300,6 +307,7 @@
       "gate_ids": [
         "t1:gate:A8"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -343,6 +351,7 @@
       "gate_ids": [
         "t1:gate:A9"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -381,6 +390,7 @@
       "gate_ids": [
         "t1:gate:A10"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -419,6 +429,7 @@
       "gate_ids": [
         "t1:gate:A11"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -462,6 +473,7 @@
       "gate_ids": [
         "t1:gate:A12"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -501,6 +513,7 @@
       "gate_ids": [
         "t1:gate:A13"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -544,6 +557,7 @@
       "gate_ids": [
         "t1:gate:B20"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -582,6 +596,7 @@
       "gate_ids": [
         "t1:gate:B21"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -625,6 +640,7 @@
       "gate_ids": [
         "t1:gate:B22"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -668,6 +684,7 @@
       "gate_ids": [
         "t1:gate:B23"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -706,6 +723,7 @@
       "gate_ids": [
         "t1:gate:B24"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -744,6 +762,7 @@
       "gate_ids": [
         "t1:gate:B25"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -782,6 +801,7 @@
       "gate_ids": [
         "t1:gate:B26"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -820,6 +840,7 @@
       "gate_ids": [
         "t1:gate:B27"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -858,6 +879,7 @@
       "gate_ids": [
         "t1:gate:B28"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -896,6 +918,7 @@
       "gate_ids": [
         "t1:gate:B29"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -934,6 +957,7 @@
       "gate_ids": [
         "t1:gate:B30"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -972,6 +996,7 @@
       "gate_ids": [
         "t1:gate:B31"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1010,6 +1035,7 @@
       "gate_ids": [
         "t1:gate:B32"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1048,6 +1074,7 @@
       "gate_ids": [
         "t1:gate:B33"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1086,6 +1113,7 @@
       "gate_ids": [
         "t1:gate:B34"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1124,6 +1152,7 @@
       "gate_ids": [
         "t1:gate:B35"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1162,6 +1191,7 @@
       "gate_ids": [
         "t1:gate:B36"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1200,6 +1230,7 @@
       "gate_ids": [
         "t1:gate:B37"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1238,6 +1269,7 @@
       "gate_ids": [
         "t1:gate:B38"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1276,6 +1308,7 @@
       "gate_ids": [
         "t1:gate:C2"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "international-general",
       "departure-sector-group": "international-general",
       "closed": false,
@@ -1314,6 +1347,7 @@
       "gate_ids": [
         "t1:gate:C3"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "international-general",
       "departure-sector-group": "international-general",
       "closed": false,
@@ -1352,6 +1386,7 @@
       "gate_ids": [
         "t1:gate:C4"
       ],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "international-general",
       "departure-sector-group": "international-general",
       "closed": false,
@@ -1390,6 +1425,7 @@
       "gate_ids": [
         "t1:gate:C5"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "international-general",
       "departure-sector-group": "international-general",
       "closed": false,
@@ -1428,6 +1464,7 @@
       "gate_ids": [
         "t1:gate:C6"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "international-general",
       "departure-sector-group": "international-general",
       "closed": false,
@@ -1466,6 +1503,7 @@
       "gate_ids": [
         "t1:gate:C7"
       ],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "international-general",
       "departure-sector-group": "international-general",
       "closed": false,
@@ -1491,9 +1529,9 @@
       }
     },
     {
-      "id": "t1:stand:H01",
-      "name": "Stand H01",
-      "code": "H01",
+      "id": "t1:stand:R01",
+      "name": "Stand R01",
+      "code": "R01",
       "associated_building_id": "t1",
       "pier": "remote",
       "contact": false,
@@ -1502,6 +1540,7 @@
         47.64669153
       ],
       "gate_ids": ["t1:gate:A1"],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1531,9 +1570,9 @@
       }
     },
     {
-      "id": "t1:stand:H02",
-      "name": "Stand H02",
-      "code": "H02",
+      "id": "t1:stand:R02",
+      "name": "Stand R02",
+      "code": "R02",
       "associated_building_id": "t1",
       "pier": "remote",
       "contact": false,
@@ -1542,6 +1581,7 @@
         47.6466915
       ],
       "gate_ids": ["t1:gate:A14"],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1567,9 +1607,9 @@
       }
     },
     {
-      "id": "t1:stand:H03",
-      "name": "Stand H03",
-      "code": "H03",
+      "id": "t1:stand:R03",
+      "name": "Stand R03",
+      "code": "R03",
       "associated_building_id": "t1",
       "pier": "remote",
       "contact": false,
@@ -1578,6 +1618,7 @@
         47.64597173
       ],
       "gate_ids": ["t1:gate:A3"],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1607,9 +1648,9 @@
       }
     },
     {
-      "id": "t1:stand:H04",
-      "name": "Stand H04",
-      "code": "H04",
+      "id": "t1:stand:R04",
+      "name": "Stand R04",
+      "code": "R04",
       "associated_building_id": "t1",
       "pier": "remote",
       "contact": false,
@@ -1618,6 +1659,7 @@
         47.64597171
       ],
       "gate_ids": ["t1:gate:A11"],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1633,7 +1675,7 @@
         "method": "aligned-aircraft-symbol-reference-point",
         "source_file": "Airport.pdf",
         "pdf_page": 1,
-        "description": "H04 positioned on the right-hand remote-stand row using the neighboring aircraft centers.",
+        "description": "R04 positioned on the right-hand remote-stand row using the neighboring aircraft centers.",
         "source_point": [
           1301.6163,
           728.2046
@@ -1645,9 +1687,9 @@
       }
     },
     {
-      "id": "t1:stand:H05",
-      "name": "Stand H05",
-      "code": "H05",
+      "id": "t1:stand:R05",
+      "name": "Stand R05",
+      "code": "R05",
       "associated_building_id": "t1",
       "pier": "remote",
       "contact": false,
@@ -1656,6 +1698,7 @@
         47.64525193
       ],
       "gate_ids": ["t1:gate:B39"],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1681,9 +1724,9 @@
       }
     },
     {
-      "id": "t1:stand:H06",
-      "name": "Stand H06",
-      "code": "H06",
+      "id": "t1:stand:R06",
+      "name": "Stand R06",
+      "code": "R06",
       "associated_building_id": "t1",
       "pier": "remote",
       "contact": false,
@@ -1692,6 +1735,7 @@
         47.64525191
       ],
       "gate_ids": ["t1:gate:B40"],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "domestic-general",
       "departure-sector-group": "domestic-general",
       "closed": false,
@@ -1717,9 +1761,9 @@
       }
     },
     {
-      "id": "t1:stand:H07",
-      "name": "Stand H07",
-      "code": "H07",
+      "id": "t1:stand:R07",
+      "name": "Stand R07",
+      "code": "R07",
       "associated_building_id": "t1",
       "pier": "remote",
       "contact": false,
@@ -1728,6 +1772,7 @@
         47.64453213
       ],
       "gate_ids": ["t1:gate:C1"],
+      "airline-groups": ["group:alliance:star", "group:alliance:skyteam"],
       "arrival-sector-group": "international-general",
       "departure-sector-group": "international-general",
       "closed": false,
@@ -1753,9 +1798,9 @@
       }
     },
     {
-      "id": "t1:stand:H08",
-      "name": "Stand H08",
-      "code": "H08",
+      "id": "t1:stand:R08",
+      "name": "Stand R08",
+      "code": "R08",
       "associated_building_id": "t1",
       "pier": "remote",
       "contact": false,
@@ -1764,6 +1809,7 @@
         47.64453211
       ],
       "gate_ids": ["t1:gate:C8"],
+      "airline-groups": ["group:alliance:oneworld"],
       "arrival-sector-group": "international-general",
       "departure-sector-group": "international-general",
       "closed": false,

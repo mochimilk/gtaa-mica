@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "airport_id": "contoso",
-  "description": "Gate markers projected onto the traced building outline. Authoritative stand associations are in stands.json gate_ids; stand_ids here are legacy inverse snapshots. Author-reviewed remote associations include the dedicated A14 bus gate for H02.",
+  "description": "Gate markers projected onto the traced building outline. Authoritative stand associations are in stands.json gate_ids; stand_ids here are legacy inverse snapshots. Author-reviewed remote associations include the dedicated A14 bus gate for R02.",
   "gates": [
     {
       "id": "t1:gate:A1",
@@ -15,7 +15,7 @@
       ],
       "stand_ids": [
         "t1:stand:101",
-        "t1:stand:H01"
+        "t1:stand:R01"
       ],
       "stand_link_status": "traced-bridge-association",
       "source": {
@@ -74,7 +74,7 @@
       ],
       "stand_ids": [
         "t1:stand:103",
-        "t1:stand:H03"
+        "t1:stand:R03"
       ],
       "stand_link_status": "traced-bridge-association",
       "source": {
@@ -307,7 +307,7 @@
       ],
       "stand_ids": [
         "t1:stand:111",
-        "t1:stand:H04"
+        "t1:stand:R04"
       ],
       "stand_link_status": "traced-bridge-association",
       "source": {
@@ -393,7 +393,7 @@
         -122.13677369,
         47.64964359
       ],
-      "stand_ids": ["t1:stand:H02"],
+      "stand_ids": ["t1:stand:R02"],
       "stand_link_status": "unresolved",
       "source": {
         "method": "label-projected-to-terminal-boundary",
@@ -971,7 +971,7 @@
         -122.14059021,
         47.64174834
       ],
-      "stand_ids": ["t1:stand:H05"],
+      "stand_ids": ["t1:stand:R05"],
       "stand_link_status": "unresolved",
       "source": {
         "method": "label-projected-to-terminal-boundary",
@@ -998,7 +998,7 @@
         -122.13938329,
         47.64174157
       ],
-      "stand_ids": ["t1:stand:H06"],
+      "stand_ids": ["t1:stand:R06"],
       "stand_link_status": "unresolved",
       "source": {
         "method": "label-projected-to-terminal-boundary",
@@ -1025,7 +1025,7 @@
         -122.14065351,
         47.64098297
       ],
-      "stand_ids": ["t1:stand:H07"],
+      "stand_ids": ["t1:stand:R07"],
       "stand_link_status": "unresolved",
       "source": {
         "method": "label-projected-to-terminal-boundary",
@@ -1226,7 +1226,7 @@
         -122.13931879,
         47.64097722
       ],
-      "stand_ids": ["t1:stand:H08"],
+      "stand_ids": ["t1:stand:R08"],
       "stand_link_status": "unresolved",
       "source": {
         "method": "label-projected-to-terminal-boundary",

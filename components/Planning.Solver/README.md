@@ -15,6 +15,13 @@ CP-SAT optimization for the currently supported objective and rule set.
 
 ## Included
 
+The repository now provides a
+[local airport assignment runner](../../docs/local-assignment.md).
+Scoped .NET 10 build/package configuration restores this imported component.
+The new CLI uses OR-Tools directly for atomic visit alternatives and compiled
+candidate-pair conflicts that the generic strategy does not yet express.
+It runs without cloud services and leaves the existing Gantt unchanged.
+
 - Canonical subjects, segments, resources, commitments, and time windows
 - Profile validation, executable compatibility checks, and stable fingerprints
 - Frozen run manifests with component versions, horizon, cutoff, search controls,

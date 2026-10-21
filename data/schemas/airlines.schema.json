@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:airlines:1.0.0",
+  "title": "Airline catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["airlines"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "description": { "type": "string" },
+    "airlines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "name"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^\\S+$" },
+          "name": { "type": "string", "pattern": "\\S" },
+          "icao": { "type": "string", "pattern": "^\\S+$" },
+          "iata": { "type": "string", "pattern": "^\\S+$" }
+        }
+      }
+    }
+  }
+}

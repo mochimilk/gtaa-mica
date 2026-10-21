@@ -1,13 +1,13 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "urn:gtaa-mica:stands:1.0.0",
+  "$id": "urn:gtaa-mica:stands:2.0.0",
   "title": "Airport stand configuration",
   "type": "object",
   "additionalProperties": false,
   "required": ["schema_version", "airport_id", "stands"],
   "properties": {
     "$schema": { "type": "string" },
-    "schema_version": { "const": "1.0.0" },
+    "schema_version": { "const": "2.0.0" },
     "airport_id": { "$ref": "#/definitions/id" },
     "description": { "type": "string" },
     "stands": {
@@ -98,6 +98,10 @@
         "arrival-sector-group": { "$ref": "#/definitions/id" },
         "departure-sector-group": { "$ref": "#/definitions/id" },
         "closed": { "type": "boolean" },
+        "airline-groups": {
+          "$ref": "#/definitions/ids",
+          "description": "Allowed airline groups, combined as a union. Omitted or empty means no authorized airlines and closes this stand to assignment."
+        },
         "aircraft-groups": { "$ref": "#/definitions/ids" },
         "close-conditions": {
           "type": "array",

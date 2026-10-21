@@ -55,6 +55,8 @@
     "precision_note": "Coordinate decimal places preserve diagram alignment, not surveyed accuracy."
   },
   "datasets": {
+    "operating_policy": "operating-policy.json",
+    "traffic_profile": "demand/traffic-profile.json",
     "buildings": "infrastructure/buildings.json",
     "stands": "infrastructure/stands.json",
     "gates": "infrastructure/gates.json",
@@ -75,6 +77,6 @@
     "All elevations, lower-level layouts, passenger zones, lane subdivisions and vertical connections are conceptual.",
     "Main baggage reclaim has twelve user-specified carousels. Three customs carousels are an explicitly unconfirmed illustrative count.",
     "No secure perimeter, real sanitization status, operational passenger access, complete route network, taxi routes or safety clearance is asserted.",
-    "Author-reviewed gate associations link A14, B39, B40, C1 and C8 to H02, H05, H06, H07 and H08 respectively. A14 is a dedicated bus gate; H02 can operate independently of stand 113."
+    "Author-reviewed gate associations link A14, B39, B40, C1 and C8 to R02, R05, R06, R07 and R08 respectively. A14 is a dedicated bus gate; R02 can operate independently of stand 113."
   ]
 }

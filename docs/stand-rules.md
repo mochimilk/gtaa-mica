@@ -1,7 +1,7 @@
 ---
 title: Stand configuration and occupancy-dependent rules
 description: Author airport stand permissions, closures and restrictions with worked Contoso examples and executable validation.
-ms.date: 2026-10-20
+ms.date: 2026-10-21
 ---
 
 ## Start here
@@ -48,7 +48,7 @@ windows. Those remain separate future planning concerns.
 
 ## File and identity conventions
 
-The stand document uses `schema_version: "1.0.0"`, an `airport_id`, and a `stands`
+The stand document uses `schema_version: "2.0.0"`, an `airport_id`, and a `stands`
 array. Its `$schema` reference enables compatible editors to offer validation.
 
 All IDs are case-sensitive strings without whitespace. Use descriptive,
@@ -62,11 +62,15 @@ Use these shared catalogs:
 * [Aircraft groups](../data/aircraft-groups.json)
 * [Sectors](../data/sectors.json)
 * [Sector groups](../data/sector-groups.json)
+* [Airlines](../data/airlines.json)
+* [Airline planning groups](../data/airline-groups.json)
 
 An aircraft matches a list of aircraft groups when it belongs to at least one
 listed group. A sector matches a sector group when it is a member of that group.
-Groups may overlap intentionally. Duplicate members produce a warning and are
-deduplicated in memory; unknown members are errors.
+Aircraft and sector groups may overlap intentionally. Duplicate members in those
+groups produce a warning and are deduplicated in memory; unknown members are
+errors. Airline groups must not overlap: each airline can belong to at most one
+planning group. Duplicate airline members are errors.
 
 Do not infer group membership from an aircraft's `ICAO-code`, its name, or the
 name of a group. Edit the group's members explicitly.
@@ -82,6 +86,7 @@ name of a group. Edit the group's members explicitly.
 | `contact`                | Contact versus remote aircraft position                        |
 | `gate_ids`               | Authoritative passenger gate associations; can be empty         |
 | `aircraft-groups`        | Base allowed aircraft groups                                   |
+| `airline-groups`         | Union of authorized airline groups; missing/empty closes stand  |
 | `arrival-sector-group`   | Base arrival permission                                        |
 | `departure-sector-group` | Base departure permission                                      |
 | `closed`                 | Unconditional closure                                          |
@@ -96,6 +101,11 @@ also supply all seven operational fields from `gate_ids` through
 `restriction-conditions`. Use empty arrays deliberately rather than leaving
 ready configuration incomplete.
 
+`airline-groups` may be omitted, but omission is not common-use permission.
+Omitted/empty lists, or groups containing no airlines, make the stand unavailable
+for every assignment, including parking without flight legs. `closed: false`
+does not override missing airline authorization.
+
 A `geometry-only` record may contain partially authored permissions, but the
 reference evaluator refuses to allocate occupancy to it. `ready` means the
 configuration is complete enough to evaluate, not that it has been certified.
@@ -106,9 +116,10 @@ explicit group IDs, not null or wildcard defaults.
 
 ### Example stand
 
-This is the configuration shape for 101, without its optional diagram provenance.
-It serves domestic legs, permits group C, and closes when a D/E aircraft occupies
-102.
+This is an example configuration for 101 after authorizing Star Alliance and
+Oneworld planning groups, without its optional diagram provenance. It serves
+domestic legs, permits aircraft group C, and closes when a D/E aircraft occupies
+102. These airline permissions are illustrative, not applied to the dataset.
 
 <!-- example: stand -->
 ```json
@@ -124,6 +135,7 @@ It serves domestic legs, permits group C, and closes when a D/E aircraft occupie
   "arrival-sector-group": "domestic-general",
   "departure-sector-group": "domestic-general",
   "aircraft-groups": ["C"],
+  "airline-groups": ["group:alliance:star", "group:alliance:oneworld"],
   "closed": false,
   "close-conditions": [
     {
@@ -137,6 +149,67 @@ It serves domestic legs, permits group C, and closes when a D/E aircraft occupie
   "configuration_status": "ready"
 }
 ```
+
+## Airline permissions
+
+Set `airline-groups` to an array of allowed planning group IDs. Multiple entries
+form a union, not an intersection:
+
+* Star only allows airlines in the Star planning group and excludes every other
+  group without needing an explicit deny list.
+* Star plus Oneworld allows members of either group.
+* To authorize all grouped airlines, list all group IDs. Do not create an
+  overlapping all-airlines group.
+* Airlines in the catalog but not in any group cannot use an authorized stand
+  until assigned to a group and that group is allowed on the stand.
+* An explicitly closed stand remains closed even when an airline is authorized.
+
+Use `arrival.operatingAirlineId` and `departure.operatingAirlineId` in reference
+occupancies. Each present leg must identify a known operating airline and satisfy
+the stand's allowed union. A turn can have different operating airlines on its
+two legs, but both must be permitted. A missing or unknown operator is an input
+error, not an unrestricted match. Marketing carriers and codeshares do not
+override the operating airline.
+
+An authorized stand can accept a parking-only occupancy without flight legs,
+subject to aircraft compatibility and other rules. Supply `operatingAirlineIds`
+to the reference evaluator to enforce all known parking operators; when present,
+the list must be nonempty and contain known airlines. The
+[tow-preparation adapter](tow-preparation.md#inspect-candidate-stands) always
+provides source operators, including parking without flight legs. Legacy
+callers omitting this optional field retain their prior behavior. No airline is
+inferred from registration or aircraft ownership.
+
+Airline permissions are base stand eligibility only. They are not supported
+trigger filters or `allow` dimensions in conditional rules at this stage.
+
+### Stand-level versus terminal-level assignment
+
+Stand-level permissions retain optimization freedom when every allowed stand
+is represented. They restrict the candidate set, not the flight-to-stand
+decision. A future terminal-level assignment can expand into the same stand
+permissions in memory. Terminal inheritance and gate-level overrides are not
+implemented now.
+
+Do not duplicate airline permission lists on passenger gates. Stand gate
+associations still describe where passengers are processed, including remote
+stands served by bus gates.
+
+### Version 2 migration and current Contoso state
+
+Version 1 had no airline-eligibility dimension. Version 2 deliberately fails
+closed when no airlines are authorized; version 1 documents are rejected rather
+than silently preserving common-use behavior.
+
+Change the stand document version to `2.0.0`, then assign allowed
+`airline-groups` to each stand that should accept aircraft. No automatic
+terminal, alliance or complement assignments are inferred.
+
+Stand airline allocations are authored in the dataset. The CLI reports the
+current number of stands without authorized airlines rather than inferring
+common-use permission.
+The physical compatibility and closure examples below assume suitable airline
+permissions have also been supplied.
 
 ## Base sector permissions and flight legs
 
@@ -161,6 +234,7 @@ Contoso's actual stand 302 policy.
   "contact": true,
   "gate_ids": ["t1:gate:C2"],
   "aircraft-groups": ["E", "F"],
+  "airline-groups": ["group:alliance:star", "group:alliance:oneworld", "group:alliance:skyteam"],
   "arrival-sector-group": "international-general",
   "departure-sector-group": "domestic-general",
   "closed": false,
@@ -207,15 +281,15 @@ For optional trigger filters:
 
 ### Close for any occupancy
 
-Place this condition in H01's `close-conditions`. It closes H01 whenever 101 is
+Place this condition in R01's `close-conditions`. It closes R01 whenever 101 is
 occupied, regardless of aircraft model or flight sector.
 
-<!-- example: closure t1:stand:H01 -->
+<!-- example: closure t1:stand:R01 -->
 ```json
 {
   "stand": "t1:stand:101",
   "category": "fit",
-  "description": "H01 is unavailable while 101 is occupied."
+  "description": "R01 is unavailable while 101 is occupied."
 }
 ```
 
@@ -366,6 +440,11 @@ Occupancy windows are half-open: `[start, end)`. A visit ending at 10:00 does no
 overlap one starting at 10:00. Any positive overlap activates a matching
 condition for that overlap. No buffer is added.
 
+Airport-configured [minimum leg handling windows](airport-characteristics.md#minimum-arrival-and-departure-handling-windows)
+are separate from neighbor-condition timing. They identify protected handling
+periods after arrival and before departure for future tow planning; they do not
+add implicit buffers to every stand condition.
+
 The current fixed-window reference evaluation rejects an assignment that breaks
 a condition during any part of its window. It does not shorten visits, split
 them, insert a tow, or search for alternate times.
@@ -385,8 +464,8 @@ There is no recursive closure cascade:
 1. A D/E aircraft occupies 102.
 2. 101 and 103 cannot receive overlapping aircraft assignments.
 3. Because 101 and 103 are unoccupied, their occupancy-only conditions do not
-   close H01 and H03.
-4. H01 and H03 can receive compatible aircraft, with passengers bussed through
+   close R01 and R03.
+4. R01 and R03 can receive compatible aircraft, with passengers bussed through
    A1 and A3.
 
 A plan that also assigns an aircraft to 101 remains invalid. Do not discard that
@@ -394,29 +473,30 @@ aircraft from validation because 101 should have been closed.
 
 ## Current Contoso use cases
 
-These are intentional authoring choices, not rules inferred from geometry:
+These are intentional authoring choices, not rules inferred from geometry.
+Their available-stand outcomes also require authored airline permissions:
 
 | Trigger or configuration | Effect                                                         |
 |--------------------------|----------------------------------------------------------------|
-| D/E occupies 102          | Close 101 and 103; H01/A1 and H03/A3 remain usable if unoccupied |
-| D/E occupies 112          | Close 111 and 113; H04/A11 remains usable if 111 is unoccupied   |
+| D/E occupies 102          | Close 101 and 103; R01/A1 and R03/A3 remain usable if unoccupied |
+| D/E occupies 112          | Close 111 and 113; R04/A11 remains usable if 111 is unoccupied   |
 | D/E occupies 105          | Close 106                                                      |
 | D/E occupies 109          | Close 108                                                      |
 | D/E occupies 223          | Close 221                                                      |
 | D/E occupies 224          | Close 222                                                      |
-| 101 is occupied          | Close H01                                                      |
-| 103 is occupied          | Close H03                                                      |
-| 111 is occupied          | Close H04                                                      |
-| H02 uses A14             | Dedicated bus gate; no closure coupling with 113                |
+| 101 is occupied          | Close R01                                                      |
+| 103 is occupied          | Close R03                                                      |
+| 111 is occupied          | Close R04                                                      |
+| R02 uses A14             | Dedicated bus gate; no closure coupling with 113                |
 | 107 and 220              | C-only tight positions, with no alternate-position complexity   |
 | 302 through 307          | E/F aircraft, international arrivals and departures             |
 
-H01, H03 and H04 share passenger gates with contact stands. They are not limited
+R01, R03 and R04 share passenger gates with contact stands. They are not limited
 to periods when 102 or 112 has a larger aircraft; their authored conditions allow
 them whenever the corresponding contact stand is unoccupied and all other rules
 are satisfied.
 
-H02 is a full-time remote hard stand with dedicated gate A14. It can operate
+R02 is a full-time remote hard stand with dedicated gate A14. It can operate
 concurrently with 113. Do not reintroduce that dependency.
 
 There are currently no conditional restrictions in Contoso. The restriction
@@ -458,10 +538,13 @@ The [validator and reference evaluator](../scripts/airport-model.mjs) check:
 * Stand field shapes, known properties, version, coordinate ranges and readiness
 * Unique IDs within each catalog and resolvable references
 * Aircraft/sector group membership references
+* Airline references, non-overlapping group membership and stand permissions
 * Gate, associated-building and gate-level references
 * Trigger references, self-trigger errors and allow references
 * Derived gate consistency warnings without requiring duplicate authoring
 * Reference plan windows, aircraft, legs, same-stand overlap and authored rules
+* Airport-local [traffic characteristics](airport-characteristics.md), independent
+  of assignment eligibility
 
 The [regression suite](../scripts/airport-model.test.mjs) validates every JSON
 configuration example above and exercises rule behavior, including ordering,
