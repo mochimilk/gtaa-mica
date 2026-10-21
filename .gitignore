@@ -52,3 +52,6 @@ components/**/.env.*
 !components/**/.env.example
 components/**/appsettings.*.local.json
 components/**/appsettings.Local.json
+
+# Data files
+data/samples/*

@@ -1,0 +1,1791 @@
+{
+  "schema_version": "1.0.0",
+  "airport_id": "contoso",
+  "description": "Diagram-derived stand reference positions, not stand pavement footprints. Aircraft groups, sectors and conditional rules are deliberately left for authoring; geometry-only records are not declarations of planning eligibility.",
+  "stands": [
+    {
+      "id": "t1:stand:101",
+      "name": "Stand 101",
+      "code": "101",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.14360092,
+        47.64948015
+      ],
+      "gate_ids": [
+        "t1:gate:A1"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 102 has wide-body aircraft.",
+        "stand": "t1:stand:102",
+        "aircraft-groups": ["D", "E"]
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2044
+        ],
+        "source_point": [
+          598.0552,
+          350.5215
+        ],
+        "label_point": [
+          605.6872,
+          327.0690999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:102",
+      "name": "Stand 102",
+      "code": "102",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.14382085,
+        47.64910482
+      ],
+      "gate_ids": [
+        "t1:gate:A2"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2048
+        ],
+        "source_point": [
+          582.0552,
+          390.9263
+        ],
+        "label_point": [
+          585.1472,
+          371.1609
+        ],
+        "description": "The drawing shows alternative small and large aircraft positions for this stand. This reference point uses the small-aircraft illustration; it is not a surveyed stop position."
+      }
+    },
+    {
+      "id": "t1:stand:103",
+      "name": "Stand 103",
+      "code": "103",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.14358962,
+        47.64876127
+      ],
+      "gate_ids": [
+        "t1:gate:A3"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 102 has wide-body aircraft.",
+        "stand": "t1:stand:102",
+        "aircraft-groups": ["D", "E"]
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2052
+        ],
+        "source_point": [
+          598.8742,
+          427.9109
+        ],
+        "label_point": [
+          602.5949999999999,
+          408.7068000000001
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:104",
+      "name": "Stand 104",
+      "code": "104",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.14364128,
+        47.64828118
+      ],
+      "gate_ids": [
+        "t1:gate:A4"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2104
+        ],
+        "source_point": [
+          595.1138000000001,
+          479.5943
+        ],
+        "label_point": [
+          591.5519999999999,
+          450.22829999999993
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:105",
+      "name": "Stand 105",
+      "code": "105",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.14268265,
+        47.64795371
+      ],
+      "gate_ids": [
+        "t1:gate:A5"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2100
+        ],
+        "source_point": [
+          664.8480999999999,
+          514.8505
+        ],
+        "label_point": [
+          646.3249,
+          483.7985999999998
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:106",
+      "name": "Stand 106",
+      "code": "106",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.14205387,
+        47.64824217
+      ],
+      "gate_ids": [
+        "t1:gate:A6"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 105 has wide-body aircraft.",
+        "stand": "t1:stand:105",
+        "aircraft-groups": ["D", "E"]
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2056
+        ],
+        "source_point": [
+          710.59,
+          483.7977
+        ],
+        "label_point": [
+          691.822,
+          469.2225
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:107",
+      "name": "Stand 107",
+      "code": "107",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.14134385,
+        47.64822234
+      ],
+      "gate_ids": [
+        "t1:gate:A7"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2060
+        ],
+        "source_point": [
+          762.2409,
+          485.9334
+        ],
+        "label_point": [
+          752.3376,
+          464.58380000000005
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:108",
+      "name": "Stand 108",
+      "code": "108",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.13793575,
+        47.64824048
+      ],
+      "gate_ids": [
+        "t1:gate:A8"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 109 has wide-body aircraft.",
+        "stand": "t1:stand:109",
+        "aircraft-groups": ["D", "E"]
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2801
+        ],
+        "source_point": [
+          1010.1648,
+          483.97950000000003
+        ],
+        "label_point": [
+          984.4978,
+          473.89529999999985
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:109",
+      "name": "Stand 109",
+      "code": "109",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.13728644,
+        47.6479475
+      ],
+      "gate_ids": [
+        "t1:gate:A9"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2817
+        ],
+        "source_point": [
+          1057.4003,
+          515.518
+        ],
+        "label_point": [
+          1030.3523,
+          494.0506000000002
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:110",
+      "name": "Stand 110",
+      "code": "110",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.1363373,
+        47.64828118
+      ],
+      "gate_ids": [
+        "t1:gate:A10"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1656
+        ],
+        "source_point": [
+          1126.4443999999999,
+          479.59439999999995
+        ],
+        "label_point": [
+          1086.7888,
+          479.43829999999997
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:111",
+      "name": "Stand 111",
+      "code": "111",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.13638896,
+        47.64876127
+      ],
+      "gate_ids": [
+        "t1:gate:A11"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 112 has wide-body aircraft.",
+        "stand": "t1:stand:112",
+        "aircraft-groups": ["D", "E"]
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1652
+        ],
+        "source_point": [
+          1122.6841,
+          427.9109
+        ],
+        "label_point": [
+          1116.7703,
+          449.4559000000001
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:112",
+      "name": "Stand 112",
+      "code": "112",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.13615773,
+        47.64910482
+      ],
+      "gate_ids": [
+        "t1:gate:A12"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1648
+        ],
+        "source_point": [
+          1139.5031,
+          390.9263
+        ],
+        "label_point": [
+          1132.6433,
+          412.67170000000004
+        ],
+        "description": "The drawing shows alternative small and large aircraft positions for this stand. This reference point uses the small-aircraft illustration; it is not a surveyed stop position."
+      }
+    },
+    {
+      "id": "t1:stand:113",
+      "name": "Stand 113",
+      "code": "113",
+      "associated_building_id": "t1",
+      "pier": "A",
+      "contact": true,
+      "coordinates": [
+        -122.13637765,
+        47.64948015
+      ],
+      "gate_ids": [
+        "t1:gate:A13"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 112 has wide-body aircraft.",
+        "stand": "t1:stand:112",
+        "aircraft-groups": ["D", "E"]
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1644
+        ],
+        "source_point": [
+          1123.5031,
+          350.5215
+        ],
+        "label_point": [
+          1115.7623999999998,
+          375.8875
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:220",
+      "name": "Stand 220",
+      "code": "220",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13865575,
+        47.64822234
+      ],
+      "gate_ids": [
+        "t1:gate:B20"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2805
+        ],
+        "source_point": [
+          957.7884,
+          485.9334
+        ],
+        "label_point": [
+          937.3834999999999,
+          496.0661999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:221",
+      "name": "Stand 221",
+      "code": "221",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.14121234,
+        47.64783732
+      ],
+      "gate_ids": [
+        "t1:gate:B21"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 223 has wide-body aircraft.",
+        "stand": "t1:stand:223",
+        "aircraft-groups": ["D", "E"]
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2064
+        ],
+        "source_point": [
+          771.8071,
+          527.3822
+        ],
+        "label_point": [
+          780.1658,
+          501.68829999999997
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:222",
+      "name": "Stand 222",
+      "code": "222",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13878726,
+        47.64783732
+      ],
+      "gate_ids": [
+        "t1:gate:B22"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 224 has wide-body aircraft.",
+        "stand": "t1:stand:224",
+        "aircraft-groups": ["D", "E"]
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2809
+        ],
+        "source_point": [
+          948.2222999999999,
+          527.3822
+        ],
+        "label_point": [
+          939.1472,
+          548.4714999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:223",
+      "name": "Stand 223",
+      "code": "223",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.14154617,
+        47.64739704
+      ],
+      "gate_ids": [
+        "t1:gate:B23"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2068
+        ],
+        "source_point": [
+          747.5213,
+          574.779
+        ],
+        "label_point": [
+          766.6931,
+          545.1980000000001
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:224",
+      "name": "Stand 224",
+      "code": "224",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13845343,
+        47.64739704
+      ],
+      "gate_ids": [
+        "t1:gate:B24"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2813
+        ],
+        "source_point": [
+          972.5081,
+          574.779
+        ],
+        "label_point": [
+          942.1623,
+          595.5789000000002
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:225",
+      "name": "Stand 225",
+      "code": "225",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.14139587,
+        47.64672313
+      ],
+      "gate_ids": [
+        "t1:gate:B25"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2072
+        ],
+        "source_point": [
+          758.454,
+          647.3281
+        ],
+        "label_point": [
+          778.178,
+          620.2898000000002
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:226",
+      "name": "Stand 226",
+      "code": "226",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13858271,
+        47.64672313
+      ],
+      "gate_ids": [
+        "t1:gate:B26"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1616
+        ],
+        "source_point": [
+          963.1043,
+          647.3281
+        ],
+        "label_point": [
+          942.1623,
+          674.7537
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:227",
+      "name": "Stand 227",
+      "code": "227",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.14139585,
+        47.64598767
+      ],
+      "gate_ids": [
+        "t1:gate:B27"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2076
+        ],
+        "source_point": [
+          758.454,
+          726.5029
+        ],
+        "label_point": [
+          778.178,
+          699.3572000000001
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:228",
+      "name": "Stand 228",
+      "code": "228",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13858273,
+        47.64598767
+      ],
+      "gate_ids": [
+        "t1:gate:B28"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1620
+        ],
+        "source_point": [
+          963.1043,
+          726.5029
+        ],
+        "label_point": [
+          942.1623,
+          753.9285000000002
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:229",
+      "name": "Stand 229",
+      "code": "229",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.14139583,
+        47.6452522
+      ],
+      "gate_ids": [
+        "t1:gate:B29"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2080
+        ],
+        "source_point": [
+          758.454,
+          805.6777
+        ],
+        "label_point": [
+          778.178,
+          778.4246
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:230",
+      "name": "Stand 230",
+      "code": "230",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13858275,
+        47.6452522
+      ],
+      "gate_ids": [
+        "t1:gate:B30"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1624
+        ],
+        "source_point": [
+          963.1043,
+          805.6777
+        ],
+        "label_point": [
+          942.1623,
+          833.1033
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:231",
+      "name": "Stand 231",
+      "code": "231",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.14139581,
+        47.64451673
+      ],
+      "gate_ids": [
+        "t1:gate:B31"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2084
+        ],
+        "source_point": [
+          758.454,
+          884.8528
+        ],
+        "label_point": [
+          778.178,
+          857.492
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:232",
+      "name": "Stand 232",
+      "code": "232",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13858277,
+        47.64451673
+      ],
+      "gate_ids": [
+        "t1:gate:B32"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1628
+        ],
+        "source_point": [
+          963.1043,
+          884.8528
+        ],
+        "label_point": [
+          942.1623,
+          912.2781000000002
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:233",
+      "name": "Stand 233",
+      "code": "233",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.14139579,
+        47.64378127
+      ],
+      "gate_ids": [
+        "t1:gate:B33"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2088
+        ],
+        "source_point": [
+          758.454,
+          964.0276
+        ],
+        "label_point": [
+          778.178,
+          936.5593999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:234",
+      "name": "Stand 234",
+      "code": "234",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13858279,
+        47.64378127
+      ],
+      "gate_ids": [
+        "t1:gate:B34"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1632
+        ],
+        "source_point": [
+          963.1043,
+          964.0276
+        ],
+        "label_point": [
+          942.1623,
+          991.4529
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:235",
+      "name": "Stand 235",
+      "code": "235",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.14139577,
+        47.64304581
+      ],
+      "gate_ids": [
+        "t1:gate:B35"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2092
+        ],
+        "source_point": [
+          758.454,
+          1043.2024
+        ],
+        "label_point": [
+          778.178,
+          1015.6268000000002
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:236",
+      "name": "Stand 236",
+      "code": "236",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13858281,
+        47.64304581
+      ],
+      "gate_ids": [
+        "t1:gate:B36"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1636
+        ],
+        "source_point": [
+          963.1043,
+          1043.2024
+        ],
+        "label_point": [
+          942.1623,
+          1070.6277000000002
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:237",
+      "name": "Stand 237",
+      "code": "237",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.14139575,
+        47.64231034
+      ],
+      "gate_ids": [
+        "t1:gate:B37"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2096
+        ],
+        "source_point": [
+          758.454,
+          1122.3772
+        ],
+        "label_point": [
+          778.178,
+          1094.6941
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:238",
+      "name": "Stand 238",
+      "code": "238",
+      "associated_building_id": "t1",
+      "pier": "B",
+      "contact": true,
+      "coordinates": [
+        -122.13858283,
+        47.64231034
+      ],
+      "gate_ids": [
+        "t1:gate:B38"
+      ],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1640
+        ],
+        "source_point": [
+          963.1043,
+          1122.3772
+        ],
+        "label_point": [
+          942.1623,
+          1149.8025
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:302",
+      "name": "Stand 302",
+      "code": "302",
+      "associated_building_id": "t1",
+      "pier": "C",
+      "contact": true,
+      "coordinates": [
+        -122.1417645,
+        47.6406749
+      ],
+      "gate_ids": [
+        "t1:gate:C2"
+      ],
+      "arrival-sector-group": "international-general",
+      "departure-sector-group": "international-general",
+      "closed": false,
+      "aircraft-groups": ["E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2116
+        ],
+        "source_point": [
+          731.6220000000001,
+          1298.4366
+        ],
+        "label_point": [
+          757.7453999999999,
+          1273.7039000000002
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:303",
+      "name": "Stand 303",
+      "code": "303",
+      "associated_building_id": "t1",
+      "pier": "C",
+      "contact": true,
+      "coordinates": [
+        -122.142152,
+        47.63965873
+      ],
+      "gate_ids": [
+        "t1:gate:C3"
+      ],
+      "arrival-sector-group": "international-general",
+      "departure-sector-group": "international-general",
+      "closed": false,
+      "aircraft-groups": ["E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2120
+        ],
+        "source_point": [
+          703.4258,
+          1407.8291
+        ],
+        "label_point": [
+          710.9231,
+          1375.2985999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:304",
+      "name": "Stand 304",
+      "code": "304",
+      "associated_building_id": "t1",
+      "pier": "C",
+      "contact": true,
+      "coordinates": [
+        -122.14083891,
+        47.6386814
+      ],
+      "gate_ids": [
+        "t1:gate:C4"
+      ],
+      "arrival-sector-group": "international-general",
+      "departure-sector-group": "international-general",
+      "closed": false,
+      "aircraft-groups": ["E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          2112
+        ],
+        "source_point": [
+          798.9618,
+          1513.0439000000001
+        ],
+        "label_point": [
+          777.1809,
+          1484.8455000000001
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:305",
+      "name": "Stand 305",
+      "code": "305",
+      "associated_building_id": "t1",
+      "pier": "C",
+      "contact": true,
+      "coordinates": [
+        -122.1391809,
+        47.63875571
+      ],
+      "gate_ids": [
+        "t1:gate:C5"
+      ],
+      "arrival-sector-group": "international-general",
+      "departure-sector-group": "international-general",
+      "closed": false,
+      "aircraft-groups": ["E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1680
+        ],
+        "source_point": [
+          919.5965,
+          1505.0437000000002
+        ],
+        "label_point": [
+          884.0763999999999,
+          1499.4217
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:306",
+      "name": "Stand 306",
+      "code": "306",
+      "associated_building_id": "t1",
+      "pier": "C",
+      "contact": true,
+      "coordinates": [
+        -122.13782658,
+        47.63965874
+      ],
+      "gate_ids": [
+        "t1:gate:C6"
+      ],
+      "arrival-sector-group": "international-general",
+      "departure-sector-group": "international-general",
+      "closed": false,
+      "aircraft-groups": ["E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1688
+        ],
+        "source_point": [
+          1018.1324999999999,
+          1407.8282
+        ],
+        "label_point": [
+          987.8801,
+          1432.7225
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:307",
+      "name": "Stand 307",
+      "code": "307",
+      "associated_building_id": "t1",
+      "pier": "C",
+      "contact": true,
+      "coordinates": [
+        -122.13821408,
+        47.6406749
+      ],
+      "gate_ids": [
+        "t1:gate:C7"
+      ],
+      "arrival-sector-group": "international-general",
+      "departure-sector-group": "international-general",
+      "closed": false,
+      "aircraft-groups": ["E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1684
+        ],
+        "source_point": [
+          989.9365,
+          1298.4369000000002
+        ],
+        "label_point": [
+          983.0211999999999,
+          1333.3356999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:H01",
+      "name": "Stand H01",
+      "code": "H01",
+      "associated_building_id": "t1",
+      "pier": "remote",
+      "contact": false,
+      "coordinates": [
+        -122.14565464,
+        47.64669153
+      ],
+      "gate_ids": ["t1:gate:A1"],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E", "F"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 101 is occupied.",
+        "stand": "t1:stand:101"
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1612
+        ],
+        "source_point": [
+          448.6381,
+          650.7163
+        ],
+        "label_point": [
+          411.6593,
+          633.8815999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:H02",
+      "name": "Stand H02",
+      "code": "H02",
+      "associated_building_id": "t1",
+      "pier": "remote",
+      "contact": false,
+      "coordinates": [
+        -122.13392948,
+        47.6466915
+      ],
+      "gate_ids": ["t1:gate:A14"],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1596
+        ],
+        "source_point": [
+          1301.6163,
+          650.7163
+        ],
+        "label_point": [
+          1339.4923,
+          633.8815999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:H03",
+      "name": "Stand H03",
+      "code": "H03",
+      "associated_building_id": "t1",
+      "pier": "remote",
+      "contact": false,
+      "coordinates": [
+        -122.14565456,
+        47.64597173
+      ],
+      "gate_ids": ["t1:gate:A3"],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E", "F"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 103 is occupied.",
+        "stand": "t1:stand:103"
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1608
+        ],
+        "source_point": [
+          448.6381,
+          728.2046
+        ],
+        "label_point": [
+          411.6593,
+          712.4871
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:H04",
+      "name": "Stand H04",
+      "code": "H04",
+      "associated_building_id": "t1",
+      "pier": "remote",
+      "contact": false,
+      "coordinates": [
+        -122.13392956,
+        47.64597171
+      ],
+      "gate_ids": ["t1:gate:A11"],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E", "F"],
+      "close-conditions": [{
+        "category": "fit",
+        "description": "The stand is closed if stand 111 is occupied.",
+        "stand": "t1:stand:111"
+      }],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aligned-aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "description": "H04 positioned on the right-hand remote-stand row using the neighboring aircraft centers.",
+        "source_point": [
+          1301.6163,
+          728.2046
+        ],
+        "label_point": [
+          1339.4923,
+          712.4871
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:H05",
+      "name": "Stand H05",
+      "code": "H05",
+      "associated_building_id": "t1",
+      "pier": "remote",
+      "contact": false,
+      "coordinates": [
+        -122.14565449,
+        47.64525193
+      ],
+      "gate_ids": ["t1:gate:B39"],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1604
+        ],
+        "source_point": [
+          448.6381,
+          805.6929
+        ],
+        "label_point": [
+          411.6593,
+          789.8356999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:H06",
+      "name": "Stand H06",
+      "code": "H06",
+      "associated_building_id": "t1",
+      "pier": "remote",
+      "contact": false,
+      "coordinates": [
+        -122.13392964,
+        47.64525191
+      ],
+      "gate_ids": ["t1:gate:B40"],
+      "arrival-sector-group": "domestic-general",
+      "departure-sector-group": "domestic-general",
+      "closed": false,
+      "aircraft-groups": ["C", "D", "E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1587
+        ],
+        "source_point": [
+          1301.6163,
+          805.6929
+        ],
+        "label_point": [
+          1339.4923,
+          789.8356999999999
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:H07",
+      "name": "Stand H07",
+      "code": "H07",
+      "associated_building_id": "t1",
+      "pier": "remote",
+      "contact": false,
+      "coordinates": [
+        -122.14565441,
+        47.64453213
+      ],
+      "gate_ids": ["t1:gate:C1"],
+      "arrival-sector-group": "international-general",
+      "departure-sector-group": "international-general",
+      "closed": false,
+      "aircraft-groups": ["E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1600
+        ],
+        "source_point": [
+          448.6381,
+          883.1812
+        ],
+        "label_point": [
+          411.6593,
+          867.6872999999998
+        ]
+      }
+    },
+    {
+      "id": "t1:stand:H08",
+      "name": "Stand H08",
+      "code": "H08",
+      "associated_building_id": "t1",
+      "pier": "remote",
+      "contact": false,
+      "coordinates": [
+        -122.13392973,
+        47.64453211
+      ],
+      "gate_ids": ["t1:gate:C8"],
+      "arrival-sector-group": "international-general",
+      "departure-sector-group": "international-general",
+      "closed": false,
+      "aircraft-groups": ["E", "F"],
+      "close-conditions": [],
+      "restriction-conditions": [],
+      "configuration_status": "ready",
+      "source": {
+        "method": "aircraft-symbol-reference-point",
+        "source_file": "Airport.pdf",
+        "pdf_page": 1,
+        "operator_indices": [
+          1583
+        ],
+        "source_point": [
+          1301.6163,
+          883.1812
+        ],
+        "label_point": [
+          1339.4923,
+          867.6872999999998
+        ]
+      }
+    }
+  ]
+}

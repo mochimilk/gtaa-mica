@@ -1,0 +1,1720 @@
+{
+  "type": "FeatureCollection",
+  "schema_version": "1.0.0",
+  "airport_id": "contoso",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "t1:node:main-entrance",
+      "properties": {
+        "name": "Main departures entrance",
+        "category": "entrance",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14,
+          47.64994951
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:screening-entry",
+      "properties": {
+        "name": "Screening queue entry",
+        "category": "screening-entry",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14075608,
+          47.64948505
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:screening-exit",
+      "properties": {
+        "name": "Screening exit",
+        "category": "screening-exit",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14075607,
+          47.64888126
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:domestic-exit",
+      "properties": {
+        "name": "Domestic one-way exit",
+        "category": "controlled-exit",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13883153,
+          47.6489277
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:main-lift-departures",
+      "properties": {
+        "name": "Main arrivals lift, departures landing",
+        "category": "lift-landing",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13883152,
+          47.64920637
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:main-lift-arrivals",
+      "properties": {
+        "name": "Main arrivals lift, baggage landing",
+        "category": "lift-landing",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13883152,
+          47.64920637
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:main-tunnel-arrivals",
+      "properties": {
+        "name": "Tunnel lift, main baggage landing",
+        "category": "lift-landing",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14,
+          47.64920638
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:main-tunnel-basement",
+      "properties": {
+        "name": "Tunnel lift, main tunnel landing",
+        "category": "lift-landing",
+        "building_id": "t1",
+        "level_id": "t1:b1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14,
+          47.64920638
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:customs-tunnel-basement",
+      "properties": {
+        "name": "Tunnel lift, customs tunnel landing",
+        "category": "lift-landing",
+        "building_id": "t1",
+        "level_id": "t1:b1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14,
+          47.64075328
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:customs-tunnel-arrivals",
+      "properties": {
+        "name": "Tunnel lift, customs landing",
+        "category": "lift-landing",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14,
+          47.64075328
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:customs-transfer-arrivals",
+      "properties": {
+        "name": "Customs transfer connection, arrivals",
+        "category": "transfer-landing",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14027489,
+          47.64066039
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:customs-transfer-departures",
+      "properties": {
+        "name": "Customs transfer connection, departures",
+        "category": "transfer-landing",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14027489,
+          47.64066039
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:main-baggage",
+      "properties": {
+        "name": "Main baggage reclaim",
+        "category": "destination",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14,
+          47.64888126
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:node:main-arrivals-exit",
+      "properties": {
+        "name": "Main arrivals exit",
+        "category": "exit",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual connection point; not a surveyed doorway or verified accessible route.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14,
+          47.64994951
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A1:node",
+      "properties": {
+        "name": "Gate A1",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A1",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            636.1025,
+            339.8943000000001
+          ],
+          "source_point": [
+            625.3681,
+            339.8943000000001
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14322546,
+          47.64957888
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A2:node",
+      "properties": {
+        "name": "Gate A2",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A2",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            636.1025,
+            378.93729999999977
+          ],
+          "source_point": [
+            625.3681,
+            378.93729999999977
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14322544,
+          47.6492162
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A3:node",
+      "properties": {
+        "name": "Gate A3",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A3",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            636.1025,
+            416.50960000000003
+          ],
+          "source_point": [
+            625.3681,
+            416.50960000000003
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14322542,
+          47.64886719
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A4:node",
+      "properties": {
+        "name": "Gate A4",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A4",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            636.1025,
+            434.9354
+          ],
+          "source_point": [
+            636.1025,
+            445.2593
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14307784,
+          47.64860014
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A5:node",
+      "properties": {
+        "name": "Gate A5",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A5",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            657.0562,
+            434.9354
+          ],
+          "source_point": [
+            657.0562,
+            445.2593
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.1427898,
+          47.64860014
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A6:node",
+      "properties": {
+        "name": "Gate A6",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A6",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            703.6606,
+            434.9354
+          ],
+          "source_point": [
+            703.6606,
+            445.2593
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14214914,
+          47.64860016
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A7:node",
+      "properties": {
+        "name": "Gate A7",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A7",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            767.9668,
+            434.9354
+          ],
+          "source_point": [
+            767.9668,
+            445.2593
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14126515,
+          47.64860017
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A8:node",
+      "properties": {
+        "name": "Gate A8",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A8",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            989.3105,
+            434.6902000000002
+          ],
+          "source_point": [
+            989.3105,
+            445.2593
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13822241,
+          47.64860016
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A9:node",
+      "properties": {
+        "name": "Gate A9",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A9",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            1032.6631,
+            434.6902000000002
+          ],
+          "source_point": [
+            1032.6631,
+            445.2593
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13762646,
+          47.64860015
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A10:node",
+      "properties": {
+        "name": "Gate A10",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A10",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            1064.8165999999999,
+            434.6902000000002
+          ],
+          "source_point": [
+            1064.8165999999999,
+            445.2593
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13718446,
+          47.64860014
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A11:node",
+      "properties": {
+        "name": "Gate A11",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A11",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            1084.6868,
+            434.6902000000002
+          ],
+          "source_point": [
+            1094.6931,
+            434.6902000000002
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13677375,
+          47.64869831
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A12:node",
+      "properties": {
+        "name": "Gate A12",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A12",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            1084.6868,
+            401.9314000000001
+          ],
+          "source_point": [
+            1094.6931,
+            401.9314000000001
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13677373,
+          47.64900261
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A13:node",
+      "properties": {
+        "name": "Gate A13",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A13",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            1084.6868,
+            361.0809000000001
+          ],
+          "source_point": [
+            1094.6931,
+            361.0809000000001
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13677371,
+          47.64938207
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:A14:node",
+      "properties": {
+        "name": "Gate A14",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:A14",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            1081.9127999999998,
+            332.92749999999995
+          ],
+          "source_point": [
+            1094.6931,
+            332.92749999999995
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13677369,
+          47.64964359
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B20:node",
+      "properties": {
+        "name": "Gate B20",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B20",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            895.3794,
+            474.4305000000001
+          ],
+          "source_point": [
+            904.8534271330952,
+            474.4302963224879
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938342,
+          47.6483292
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B21:node",
+      "properties": {
+        "name": "Gate B21",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B21",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            827.9380000000001,
+            505.02130000000005
+          ],
+          "source_point": [
+            817.3712925270843,
+            505.01643592117273
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.140586,
+          47.64804509
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B22:node",
+      "properties": {
+        "name": "Gate B22",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B22",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            893.9346,
+            538.7371
+          ],
+          "source_point": [
+            904.8548096288167,
+            538.736865231712
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938341,
+          47.64773185
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B23:node",
+      "properties": {
+        "name": "Gate B23",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B23",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            827.9380000000001,
+            541.5105000000001
+          ],
+          "source_point": [
+            817.3544957805107,
+            541.5056281892753
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14058622,
+          47.64770613
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B24:node",
+      "properties": {
+        "name": "Gate B24",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B24",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            893.9346,
+            575.2254
+          ],
+          "source_point": [
+            904.8555940730728,
+            575.2251652148477
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.1393834,
+          47.64739291
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B25:node",
+      "properties": {
+        "name": "Gate B25",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B25",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            827.9380000000001,
+            632.9118999999998
+          ],
+          "source_point": [
+            817.3124217928028,
+            632.907008821729
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14058679,
+          47.6468571
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B26:node",
+      "properties": {
+        "name": "Gate B26",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B26",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            893.9346,
+            666.6268000000002
+          ],
+          "source_point": [
+            904.8575590674196,
+            666.6265651726034
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938338,
+          47.64654387
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B27:node",
+      "properties": {
+        "name": "Gate B27",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B27",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            827.9380000000001,
+            702.9988000000001
+          ],
+          "source_point": [
+            817.2801593179491,
+            702.9938939706301
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14058723,
+          47.64620605
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B28:node",
+      "properties": {
+        "name": "Gate B28",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B28",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            893.9346,
+            736.7137
+          ],
+          "source_point": [
+            904.8590658316737,
+            736.71346514021
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938337,
+          47.64589283
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B29:node",
+      "properties": {
+        "name": "Gate B29",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B29",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            827.9380000000001,
+            793.0721000000001
+          ],
+          "source_point": [
+            817.2386966826174,
+            793.0671748845025
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14058779,
+          47.64536935
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B30:node",
+      "properties": {
+        "name": "Gate B30",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B30",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            893.9346,
+            826.7868999999998
+          ],
+          "source_point": [
+            904.8610022716933,
+            826.7866650985793
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938335,
+          47.64505612
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B31:node",
+      "properties": {
+        "name": "Gate B31",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B31",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            827.9380000000001,
+            861.3533
+          ],
+          "source_point": [
+            817.2072654094696,
+            861.3483604160228
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14058821,
+          47.64473508
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B32:node",
+      "properties": {
+        "name": "Gate B32",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B32",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            893.9346,
+            895.0681999999999
+          ],
+          "source_point": [
+            904.8624702182291,
+            895.0679650670206
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938334,
+          47.64442185
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B33:node",
+      "properties": {
+        "name": "Gate B33",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B33",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            827.9380000000001,
+            951.3093999999999
+          ],
+          "source_point": [
+            817.165856723764,
+            951.3044413547293
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14058877,
+          47.64389946
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B34:node",
+      "properties": {
+        "name": "Gate B34",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B34",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            893.9346,
+            985.0252000000003
+          ],
+          "source_point": [
+            904.8644041601212,
+            985.0249650254441
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938332,
+          47.64358623
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B35:node",
+      "properties": {
+        "name": "Gate B35",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B35",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            827.9380000000001,
+            1021.7576000000001
+          ],
+          "source_point": [
+            817.1334279349179,
+            1021.7526264270726
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14058921,
+          47.64324506
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B36:node",
+      "properties": {
+        "name": "Gate B36",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B36",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            893.9346,
+            1055.4725
+          ],
+          "source_point": [
+            904.8659186724401,
+            1055.4722649928842
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938331,
+          47.64293184
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B37:node",
+      "properties": {
+        "name": "Gate B37",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B37",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            827.9380000000001,
+            1112.0760000000002
+          ],
+          "source_point": [
+            817.0918524748987,
+            1112.0710072890095
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14058977,
+          47.64240608
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B38:node",
+      "properties": {
+        "name": "Gate B38",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B38",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            895.0181,
+            1144.2293000000002
+          ],
+          "source_point": [
+            904.8678268123156,
+            1144.229088245503
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938329,
+          47.64210736
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B39:node",
+      "properties": {
+        "name": "Gate B39",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B39",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            830.8286,
+            1182.8855
+          ],
+          "source_point": [
+            817.0592579845651,
+            1182.8791616807898
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14059021,
+          47.64174834
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:B40:node",
+      "properties": {
+        "name": "Gate B40",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:B40",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            891.522,
+            1183.6082
+          ],
+          "source_point": [
+            904.8686733985626,
+            1183.607913066345
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13938329,
+          47.64174157
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:C1:node",
+      "properties": {
+        "name": "Gate C1",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:C1",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            826.8543999999999,
+            1268.5066
+          ],
+          "source_point": [
+            812.4532743524068,
+            1265.2730157069404
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14065351,
+          47.64098297
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:C2:node",
+      "properties": {
+        "name": "Gate C2",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:C2",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            812.6478999999999,
+            1302.1053
+          ],
+          "source_point": [
+            802.6069260873032,
+            1298.7275846224338
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14078884,
+          47.64067221
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:C3:node",
+      "properties": {
+        "name": "Gate C3",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:C3",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            784.4687,
+            1376.8885000000002
+          ],
+          "source_point": [
+            775.0867075513745,
+            1373.7516972578992
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14116708,
+          47.6399753
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:C4:node",
+      "properties": {
+        "name": "Gate C4",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:C4",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            808.6741999999999,
+            1442.2791
+          ],
+          "source_point": [
+            805.2379356007019,
+            1452.1524172414922
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.14075266,
+          47.63924703
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:C5:node",
+      "properties": {
+        "name": "Gate C5",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:C5",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            875.1483999999999,
+            1450.2273000000002
+          ],
+          "source_point": [
+            875.8817590876811,
+            1460.1015396891714
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13978172,
+          47.63917319
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:C6:node",
+      "properties": {
+        "name": "Gate C6",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:C6",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            943.0672999999999,
+            1407.9588
+          ],
+          "source_point": [
+            953.7525396441891,
+            1407.735469515553
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13871144,
+          47.63965962
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:C7:node",
+      "properties": {
+        "name": "Gate C7",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:C7",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            921.0296999999999,
+            1337.1492
+          ],
+          "source_point": [
+            931.6361241042785,
+            1333.1509648827105
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.1390154,
+          47.64035244
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:gate:C8:node",
+      "properties": {
+        "name": "Gate C8",
+        "category": "gate-access",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "gate_id": "t1:gate:C8",
+        "source": {
+          "method": "label-projected-to-terminal-boundary",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "label_point": [
+            896.2187,
+            1268.8680000000002
+          ],
+          "source_point": [
+            909.5619491106448,
+            1265.8922464936425
+          ],
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.13931879,
+          47.64097722
+        ]
+      }
+    }
+  ],
+  "routing_status": "partial-conceptual-network-not-route-ready"
+}

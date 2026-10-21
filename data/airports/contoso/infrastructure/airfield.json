@@ -1,0 +1,281 @@
+{
+  "schema_version": "1.0.0",
+  "airport_id": "contoso",
+  "runways": [
+    {
+      "id": "runway:ns-west",
+      "name": "West north-south runway",
+      "footprint": {
+        "id": "runway:1:footprint",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -122.1230876,
+                47.64954757
+              ],
+              [
+                -122.12309631,
+                47.6225651
+              ],
+              [
+                -122.12251923,
+                47.62256501
+              ],
+              [
+                -122.12251023,
+                47.64954749
+              ],
+              [
+                -122.1230876,
+                47.64954757
+              ]
+            ]
+          ]
+        },
+        "source": {
+          "method": "vector-trace",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "operator_indices": [
+            4115
+          ]
+        }
+      },
+      "centerline": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.12279892,
+            47.64954753
+          ],
+          [
+            -122.12280777,
+            47.62256506
+          ]
+        ]
+      },
+      "length_m": 2999.999,
+      "width_m": 43.377,
+      "dimension_status": "derived-from-assumed-drawing-scale",
+      "description": "Rectangular schematic extent around the source centerline. No thresholds, declared distances, magnetic designators, pavement rating or operational certification are inferred."
+    },
+    {
+      "id": "runway:ns-east",
+      "name": "East north-south runway",
+      "footprint": {
+        "id": "runway:2:footprint",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -122.11507223,
+                47.64954611
+              ],
+              [
+                -122.11508506,
+                47.62256364
+              ],
+              [
+                -122.11450799,
+                47.62256351
+              ],
+              [
+                -122.11449486,
+                47.64954599
+              ],
+              [
+                -122.11507223,
+                47.64954611
+              ]
+            ]
+          ]
+        },
+        "source": {
+          "method": "vector-trace",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "operator_indices": [
+            4119
+          ]
+        }
+      },
+      "centerline": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.11478355,
+            47.64954605
+          ],
+          [
+            -122.11479653,
+            47.62256358
+          ]
+        ]
+      },
+      "length_m": 2999.999,
+      "width_m": 43.377,
+      "dimension_status": "derived-from-assumed-drawing-scale",
+      "description": "Rectangular schematic extent around the source centerline. No thresholds, declared distances, magnetic designators, pavement rating or operational certification are inferred."
+    },
+    {
+      "id": "runway:ew-north",
+      "name": "North east-west runway",
+      "footprint": {
+        "id": "runway:3:footprint",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -122.10949949,
+                47.620031
+              ],
+              [
+                -122.14940814,
+                47.62003469
+              ],
+              [
+                -122.14940807,
+                47.61964455
+              ],
+              [
+                -122.10949972,
+                47.61964085
+              ],
+              [
+                -122.10949949,
+                47.620031
+              ]
+            ]
+          ]
+        },
+        "source": {
+          "method": "vector-trace",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "operator_indices": [
+            4123
+          ]
+        }
+      },
+      "centerline": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.10949961,
+            47.61983592
+          ],
+          [
+            -122.14940811,
+            47.61983962
+          ]
+        ]
+      },
+      "length_m": 3000,
+      "width_m": 43.377,
+      "dimension_status": "derived-from-assumed-drawing-scale",
+      "description": "Rectangular schematic extent around the source centerline. No thresholds, declared distances, magnetic designators, pavement rating or operational certification are inferred."
+    },
+    {
+      "id": "runway:ew-south",
+      "name": "South east-west runway",
+      "footprint": {
+        "id": "runway:4:footprint",
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [
+            [
+              [
+                -122.10950222,
+                47.61535792
+              ],
+              [
+                -122.14940731,
+                47.61536162
+              ],
+              [
+                -122.14940724,
+                47.61497148
+              ],
+              [
+                -122.10950245,
+                47.61496778
+              ],
+              [
+                -122.10950222,
+                47.61535792
+              ]
+            ]
+          ]
+        },
+        "source": {
+          "method": "vector-trace",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "operator_indices": [
+            4127
+          ]
+        }
+      },
+      "centerline": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.10950234,
+            47.61516285
+          ],
+          [
+            -122.14940728,
+            47.61516655
+          ]
+        ]
+      },
+      "length_m": 3000,
+      "width_m": 43.377,
+      "dimension_status": "derived-from-assumed-drawing-scale",
+      "description": "Rectangular schematic extent around the source centerline. No thresholds, declared distances, magnetic designators, pavement rating or operational certification are inferred."
+    }
+  ],
+  "study_area": {
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            -122.15044778,
+            47.6502277
+          ],
+          [
+            -122.15044065,
+            47.61446453
+          ],
+          [
+            -122.10881542,
+            47.61446076
+          ],
+          [
+            -122.10879413,
+            47.65022394
+          ],
+          [
+            -122.15044778,
+            47.6502277
+          ]
+        ]
+      ]
+    },
+    "classification": "illustrative-study-area-not-security-boundary",
+    "source": {
+      "method": "inferred-layout",
+      "source_file": "Airport.pdf",
+      "pdf_page": 1,
+      "description": "Envelope for map framing. It is not an airport property line, airside fence, or secured perimeter.",
+      "requires_review": true
+    }
+  },
+  "taxiway_status": "not-traced",
+  "apron_boundary_status": "not-traced"
+}

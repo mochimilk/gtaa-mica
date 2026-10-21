@@ -1,0 +1,80 @@
+{
+  "schema_version": "1.0.0",
+  "id": "contoso",
+  "name": "Contoso International Airport",
+  "fictional": true,
+  "time_zone": "America/Los_Angeles",
+  "description": "Synthetic airport near Redmond/Bellevue, Washington. Geographic placement does not describe any real airport, property, facilities or authorized operation.",
+  "spatial_reference": {
+    "exchange_crs": "OGC:CRS84",
+    "coordinate_order": [
+      "longitude",
+      "latitude"
+    ],
+    "measurement_projection": "+proj=aeqd +lat_0=47.65 +lon_0=-122.14 +datum=WGS84 +units=m +no_defs",
+    "horizontal_unit": "metre",
+    "vertical_datum": "airport-local-assumed-zero",
+    "vertical_unit": "metre",
+    "level_elevations_m": {
+      "t1:b1": -4,
+      "t1:l1": 0,
+      "t1:l2": 4
+    },
+    "vertical_accuracy": "assumed-not-surveyed"
+  },
+  "source": {
+    "file": "../../samples/Airport.pdf",
+    "sha256": "dfdc58671ee5c7fff9d1d7d5cd2d2839d0619e26f2de95388295f0de1bc49130",
+    "extraction": {
+      "tool": "pdfjs-dist",
+      "version": "6.4.299"
+    },
+    "page": 1,
+    "page_width_points": 3200,
+    "page_height_points": 4200,
+    "source_origin": "top-left",
+    "source_y_direction": "down",
+    "north_direction": "page-up",
+    "anchor": {
+      "source_point": [
+        860,
+        294.5643
+      ],
+      "longitude": -122.14,
+      "latitude": 47.65,
+      "description": "Main terminal frontage midpoint."
+    },
+    "scale": {
+      "metres_per_source_point": 1.0327957046434253,
+      "calibration_operator_index": 4127,
+      "calibration_length_m": 3000,
+      "description": "The lower east-west runway is assigned a synthetic length of 3000 m. The original sketch is not true to scale; this uniform calibration does not make aircraft, vehicle, human or indoor dimensions realistic."
+    },
+    "curve_sampling": "Cubic Bezier segments sampled at sixteen intervals per segment.",
+    "boundary_normalization": "Space and zone polygons are clipped to their referenced level in exchange coordinates to keep shared boundaries consistent after projection.",
+    "precision_note": "Coordinate decimal places preserve diagram alignment, not surveyed accuracy."
+  },
+  "datasets": {
+    "buildings": "infrastructure/buildings.json",
+    "stands": "infrastructure/stands.json",
+    "gates": "infrastructure/gates.json",
+    "airfield": "infrastructure/airfield.json",
+    "spaces": "infrastructure/spaces.geojson",
+    "zones": "infrastructure/zones.geojson",
+    "pedestrian_nodes": "routing/pedestrian-nodes.geojson",
+    "pedestrian_edges": "routing/pedestrian-edges.geojson",
+    "taxi_nodes": "routing/taxi-nodes.geojson"
+  },
+  "planning_ready": false,
+  "routing_ready": false,
+  "assumptions": [
+    "Parking, car rental, approach roads, and source scale-marker examples are reference-only and excluded from modeled infrastructure.",
+    "Stand positions use aircraft-symbol bounding-box centers. They are not pavement boundaries, approved parking positions, clearance envelopes or aircraft capability evidence.",
+    "Gate positions use label locations projected to the terminal outline. Bridge associations are traced visually and require review.",
+    "The main building and curved pier outline come from vector paths; Bezier curves are approximated by polygon vertices.",
+    "All elevations, lower-level layouts, passenger zones, lane subdivisions and vertical connections are conceptual.",
+    "Main baggage reclaim has twelve user-specified carousels. Three customs carousels are an explicitly unconfirmed illustrative count.",
+    "No secure perimeter, real sanitization status, operational passenger access, complete route network, taxi routes or safety clearance is asserted.",
+    "A14, B39, B40, C1 and C8 remain gates without an inferred stand association."
+  ]
+}
