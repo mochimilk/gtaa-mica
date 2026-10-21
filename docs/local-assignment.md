@@ -209,6 +209,11 @@ A separate constrained integration fixture verifies that an admitted tow pair
 increases covered flight legs from four to six. Another fixture proves that a
 neighbor closure can veto a relaxed recommendation.
 
+For repeatable full demo days, use
+[scenario generation](scenario-generation.md). Its separate profile preserves
+this validation seed, supplies complete scheduled overnight context and checks
+the actual comfortable/constrained coverage and tow counts.
+
 | Exit code | Meaning |
 |-----------|---------|
 | `1` | Invalid input, build/native execution, validation or output I/O failure |
@@ -222,6 +227,7 @@ assignments take precedence over review-only status.
 
 The Gantt and its fixture are unchanged. This stage writes comparison JSON only.
 Before rendering generated assignments there, add an explicit data-source
-selector that preserves the existing demo. Initial/final state resolution,
-single-leg tow scheduling and explicit gate/towing resources remain separate
-modeling steps.
+selector that preserves the existing demo. The scenario runner resolves
+boundary state for its complete scheduled feed; generic initial-state
+overlays, single-leg tow scheduling and explicit gate/towing resources remain
+separate modeling steps.

@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:scenario:1.0.0",
+  "title": "Generated closed-feed airport scenario",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generator_version", "id", "profile", "case_id", "profile_fingerprint", "plan_window", "raw_demand", "expected_visit_count", "generation_trace", "initial_state", "final_state", "timing_complete", "limitations"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "generator_version": { "const": "seeded-joint-hourly-v1" },
+    "id": { "$ref": "#/definitions/id" },
+    "profile": { "$ref": "urn:gtaa-mica:scenario-profile:1.0.0" },
+    "case_id": { "$ref": "#/definitions/id" },
+    "profile_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "plan_window": { "$ref": "urn:gtaa-mica:linked-demand:2.0.0#/definitions/window" },
+    "raw_demand": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0" },
+    "expected_visit_count": { "type": "integer", "minimum": 1, "maximum": 200 },
+    "generation_trace": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["key", "aircraft_registration", "aircraft_id", "arrival_leg_id", "departure_leg_id", "timing_method", "scheduled_on_block", "scheduled_off_block"],
+        "properties": {
+          "key": { "$ref": "#/definitions/id" },
+          "aircraft_registration": { "$ref": "#/definitions/id" },
+          "aircraft_id": { "$ref": "#/definitions/id" },
+          "arrival_leg_id": { "$ref": "#/definitions/id" },
+          "departure_leg_id": { "$ref": "#/definitions/id" },
+          "timing_method": { "enum": ["joint-hourly-weighted", "explicit-boundary-context", "weighted-pressure-bank"] },
+          "scheduled_on_block": { "$ref": "#/definitions/instant" },
+          "scheduled_off_block": { "$ref": "#/definitions/instant" }
+        }
+      }
+    },
+    "initial_state": { "type": "array", "items": { "$ref": "#/definitions/state" } },
+    "final_state": { "type": "array", "items": { "$ref": "#/definitions/state" } },
+    "timing_complete": { "const": true },
+    "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+  },
+  "definitions": {
+    "id": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/id" },
+    "instant": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/instant" },
+    "state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["aircraft_registration", "aircraft_id", "arrival_leg_id", "departure_leg_id", "evidence", "stand_status"],
+      "properties": {
+        "aircraft_registration": { "$ref": "#/definitions/id" },
+        "aircraft_id": { "$ref": "#/definitions/id" },
+        "arrival_leg_id": { "$ref": "#/definitions/id" },
+        "departure_leg_id": { "$ref": "#/definitions/id" },
+        "evidence": { "const": "scheduled-source-legs" },
+        "stand_status": { "const": "unassigned" }
+      }
+    }
+  }
+}
