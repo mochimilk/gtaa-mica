@@ -1,0 +1,129 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:stands:1.0.0",
+  "title": "Airport stand configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "airport_id", "stands"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "airport_id": { "$ref": "#/definitions/id" },
+    "description": { "type": "string" },
+    "stands": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/stand" }
+    }
+  },
+  "definitions": {
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "ids": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/id" },
+      "uniqueItems": true
+    },
+    "filterGroups": {
+      "anyOf": [
+        { "type": "array", "$ref": "#/definitions/ids", "minItems": 1 },
+        { "type": "null" }
+      ]
+    },
+    "filterSector": {
+      "anyOf": [
+        { "$ref": "#/definitions/id" },
+        { "type": "null" }
+      ]
+    },
+    "coordinates": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        { "type": "number", "minimum": -180, "maximum": 180 },
+        { "type": "number", "minimum": -90, "maximum": 90 }
+      ],
+      "additionalItems": false
+    },
+    "allow": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "aircraft-groups": { "$ref": "#/definitions/ids" },
+        "arrival-sector-groups": { "$ref": "#/definitions/ids" },
+        "departure-sector-groups": { "$ref": "#/definitions/ids" }
+      }
+    },
+    "closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stand", "category", "description"],
+      "properties": {
+        "stand": { "$ref": "#/definitions/id" },
+        "category": { "$ref": "#/definitions/id" },
+        "description": { "type": "string", "pattern": "\\S" },
+        "aircraft-groups": { "$ref": "#/definitions/filterGroups" },
+        "arrival-sector-group": { "$ref": "#/definitions/filterSector" },
+        "departure-sector-group": { "$ref": "#/definitions/filterSector" }
+      }
+    },
+    "restriction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stand", "category", "description", "allow"],
+      "properties": {
+        "stand": { "$ref": "#/definitions/id" },
+        "category": { "$ref": "#/definitions/id" },
+        "description": { "type": "string", "pattern": "\\S" },
+        "aircraft-groups": { "$ref": "#/definitions/filterGroups" },
+        "arrival-sector-group": { "$ref": "#/definitions/filterSector" },
+        "departure-sector-group": { "$ref": "#/definitions/filterSector" },
+        "allow": { "$ref": "#/definitions/allow" }
+      }
+    },
+    "stand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "code", "contact", "coordinates", "configuration_status"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "name": { "type": "string", "pattern": "\\S" },
+        "code": { "$ref": "#/definitions/id" },
+        "description": { "type": "string" },
+        "associated_building_id": { "$ref": "#/definitions/id" },
+        "pier": { "$ref": "#/definitions/id" },
+        "contact": { "type": "boolean" },
+        "coordinates": { "$ref": "#/definitions/coordinates" },
+        "gate_ids": { "$ref": "#/definitions/ids" },
+        "arrival-sector-group": { "$ref": "#/definitions/id" },
+        "departure-sector-group": { "$ref": "#/definitions/id" },
+        "closed": { "type": "boolean" },
+        "aircraft-groups": { "$ref": "#/definitions/ids" },
+        "close-conditions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/closure" }
+        },
+        "restriction-conditions": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/restriction" }
+        },
+        "configuration_status": { "enum": ["geometry-only", "ready"] },
+        "source": { "type": "object" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "configuration_status": { "const": "ready" } },
+            "required": ["configuration_status"]
+          },
+          "then": {
+            "required": [
+              "gate_ids", "arrival-sector-group", "departure-sector-group",
+              "closed", "aircraft-groups", "close-conditions", "restriction-conditions"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

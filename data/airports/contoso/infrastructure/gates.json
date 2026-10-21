@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "airport_id": "contoso",
-  "description": "Gate markers projected onto the traced building outline. A14, B39, B40, C1 and C8 have no unambiguous numbered stand connection in the source, so no stand is invented.",
+  "description": "Gate markers projected onto the traced building outline. Authoritative stand associations are in stands.json gate_ids; stand_ids here are legacy inverse snapshots. Author-reviewed remote associations include the dedicated A14 bus gate for H02.",
   "gates": [
     {
       "id": "t1:gate:A1",

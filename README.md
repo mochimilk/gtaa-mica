@@ -1,4 +1,7 @@
-# Coral — base starter
+---
+title: Coral base starter
+description: Local airport planning prototype with a shared browser and Electron interface.
+---
 
 A minimal Vite + React app with all six Coral libraries installed:
 
@@ -30,6 +33,17 @@ npm run preview
 ```
 
 `build` checks TypeScript and creates the production output in `dist`.
+
+## Airport configuration
+
+See [Stand configuration and occupancy-dependent rules](docs/stand-rules.md)
+for the airport data contract, closure/restriction examples, Contoso remote-stand
+use cases, and the distinction between configuration validation and solver support.
+
+```sh
+npm run validate:airport
+npm run test:airport
+```
 
 ## Add recipes
 

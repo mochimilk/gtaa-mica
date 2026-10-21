@@ -1,7 +1,8 @@
 {
+  "$schema": "../../../schemas/stands.schema.json",
   "schema_version": "1.0.0",
   "airport_id": "contoso",
-  "description": "Diagram-derived stand reference positions, not stand pavement footprints. Aircraft groups, sectors and conditional rules are deliberately left for authoring; geometry-only records are not declarations of planning eligibility.",
+  "description": "Diagram-derived stand reference positions with authored aircraft, sector and occupancy-dependent permissions. Stand gate_ids are the authoritative gate associations. Positions are not stand pavement or clearance envelopes.",
   "stands": [
     {
       "id": "t1:stand:101",
