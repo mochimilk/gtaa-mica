@@ -27,18 +27,19 @@ export const formatUtc = (t: number) => utcTime.format(t);
 
 const DAY_START = utcAt(SYNTHETIC_DATE, "00:00");
 
-/** Whole UTC days between `t` and SYNTHETIC_DATE (0 on the demo date, −1 the day before). */
-export const dayOffset = (t: number) => Math.floor((t - DAY_START) / 86_400_000);
+/** Whole UTC days relative to the active date, defaulting to the original fixture. */
+export const dayOffset = (t: number, date?: string) =>
+  Math.floor((t - (date ? utcAt(date, "00:00") : DAY_START)) / 86_400_000);
 
 /** Compact day marker, "" on the demo date, otherwise e.g. "−1d" / "+1d". */
-export const dayOffsetLabel = (t: number) => {
-  const d = dayOffset(t);
+export const dayOffsetLabel = (t: number, date?: string) => {
+  const d = dayOffset(t, date);
   return d === 0 ? "" : `${d < 0 ? "−" : "+"}${Math.abs(d)}d`;
 };
 
 /** Compact time with a day marker when off the demo date, e.g. "22:30 −1d". */
-export const formatUtcWithDay = (t: number) => {
-  const day = dayOffsetLabel(t);
+export const formatUtcWithDay = (t: number, date?: string) => {
+  const day = dayOffsetLabel(t, date);
   return day ? `${formatUtc(t)} ${day}` : formatUtc(t);
 };
 

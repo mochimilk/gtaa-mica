@@ -14,6 +14,7 @@ import { DEMO_DATA as DATA, DEMO_DOMAIN as DOMAIN, formatUtcWithDay as fmt } fro
 import { airportLabel } from "./airports";
 import { applySelection } from "./selection";
 import { SYNTHETIC_DATE } from "./syntheticFixture";
+import { standLabel, type DemoTimelineData } from "./adapter";
 import {
   BAR_INSET,
   DemoPatternDefs,
@@ -35,6 +36,10 @@ const KIND_LABEL: Record<string, string> = {
 };
 
 export interface StandTimelineDemoProps {
+  data?: DemoTimelineData;
+  domain?: readonly [number, number];
+  date?: string;
+  subtitle?: string;
   /** Controlled selection. Omit both props to use the demo standalone. */
   selectedIds?: readonly string[];
   onIntent?: (intent: ChartIntent) => void;
@@ -57,6 +62,10 @@ export interface StandTimelineDemoProps {
 }
 
 export function StandTimelineDemo({
+  data = DATA,
+  domain = DOMAIN,
+  date = SYNTHETIC_DATE,
+  subtitle = "Generic stand-timeline starter. Not an ARIS or GateView replica.",
   selectedIds: controlledIds,
   onIntent: controlledOnIntent,
   showSelectionDetail = true,
@@ -70,8 +79,8 @@ export function StandTimelineDemo({
   const selectedIds = controlled ? controlledIds : localIds;
   const hasSelection = selectionActive ?? selectedIds.length > 0;
   const accessors = useMemo(
-    () => makeDemoAccessors(DATA.turnsById, DATA.stayPosition, DATA.endpoints, isMatch, hasSelection),
-    [isMatch, hasSelection],
+    () => makeDemoAccessors(data.turnsById, data.stayPosition, data.endpoints, isMatch, hasSelection),
+    [data, isMatch, hasSelection],
   );
 
   const onIntent = useCallback(
@@ -84,17 +93,17 @@ export function StandTimelineDemo({
   const clearSelection = () => onIntent({ type: "select", occupancyIds: [], mode: "replace" });
 
   const selected = useMemo(
-    () => DATA.occupancies.filter((o) => selectedIds.includes(o.id)),
-    [selectedIds],
+    () => data.occupancies.filter((o) => selectedIds.includes(o.id)),
+    [data, selectedIds],
   );
 
   return (
     <div className="demo-timeline">
       <header className="demo-header">
         <div>
-          <h1 className="demo-title">Stand occupancy · {SYNTHETIC_DATE}</h1>
+          <h1 className="demo-title">Stand occupancy · {date}</h1>
           <p className="demo-subtitle">
-            Generic stand-timeline starter. Not an ARIS or GateView replica.
+            {subtitle}
           </p>
           {notice && <div className="demo-notice">{notice}</div>}
         </div>
@@ -105,10 +114,10 @@ export function StandTimelineDemo({
         style={fluentChartTheme}
         className="demo-chart"
         fillHeight
-        rows={DATA.rows}
-        visits={DATA.visits}
-        occupancies={DATA.occupancies}
-        domain={DOMAIN}
+        rows={data.rows}
+        visits={data.visits}
+        occupancies={data.occupancies}
+        domain={domain}
         timeZone="UTC"
         rowHeight={ROW_HEIGHT}
         barInset={BAR_INSET}
@@ -153,7 +162,7 @@ export function StandTimelineDemo({
               </Button>
             </div>
             {selected.map((o) => (
-              <SelectedOccupancy key={o.id} occupancy={o} />
+              <SelectedOccupancy key={o.id} occupancy={o} data={data} date={date} />
             ))}
           </>
         )}
@@ -163,15 +172,15 @@ export function StandTimelineDemo({
   );
 }
 
-function SelectedOccupancy({ occupancy }: { occupancy: Occupancy }) {
-  const turn = occupancy.visitId ? DATA.turnsById.get(occupancy.visitId) : undefined;
-  const siblings = DATA.occupancies.filter((o) => o.visitId === occupancy.visitId);
+function SelectedOccupancy({ occupancy, data, date }: { occupancy: Occupancy; data: DemoTimelineData; date: string }) {
+  const turn = occupancy.visitId ? data.turnsById.get(occupancy.visitId) : undefined;
+  const siblings = data.occupancies.filter((o) => o.visitId === occupancy.visitId);
   return (
     <div className="demo-detail-card">
       <div className="demo-detail-line">
-        <span className="demo-chip">{occupancy.rowId}</span>
+        <span className="demo-chip">{standLabel(data, occupancy.rowId)}</span>
         <strong>
-          {fmt(occupancy.start)}–{fmt(occupancy.end)} UTC
+          {fmt(occupancy.start, date)}–{fmt(occupancy.end, date)} UTC
         </strong>
         <span>{KIND_LABEL[occupancy.kind ?? ""] ?? occupancy.kind}</span>
         {turn && (
@@ -185,7 +194,7 @@ function SelectedOccupancy({ occupancy }: { occupancy: Occupancy }) {
       {siblings.length > 1 && (
         <div className="demo-detail-line demo-muted">
           Visit {occupancy.visitId}: {siblings.length} stays —{" "}
-          {siblings.map((s) => `${s.rowId} ${fmt(s.start)}–${fmt(s.end)}`).join(" → ")}
+          {siblings.map((s) => `${standLabel(data, s.rowId)} ${fmt(s.start, date)}–${fmt(s.end, date)}`).join(" → ")}
         </div>
       )}
     </div>

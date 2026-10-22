@@ -9,7 +9,6 @@ import { ArrivalList } from "./ArrivalList";
 import { DepartureList } from "./DepartureList";
 import { useOperations } from "./OperationsContext";
 import { OverflowScroll } from "./OverflowScroll";
-import { ARRIVALS, DEPARTURES, OPS_ALERTS } from "./operationsData";
 import "./operations.css";
 
 type GroupKey = "arrivals" | "departures" | "alerts";
@@ -21,7 +20,7 @@ export function OperationsPanel() {
     departures: true,
     alerts: true,
   });
-  const { acknowledged, matcher } = useOperations();
+  const { acknowledged, matcher, dataset: { arrivals: ARRIVALS, departures: DEPARTURES, alerts: OPS_ALERTS } } = useOperations();
   // Counts follow the current view/filters ("x of y" while one is active).
   const openAlerts = OPS_ALERTS.filter((a) => !acknowledged.has(a.id));
   const openShown = openAlerts.filter(matcher.alert).length;

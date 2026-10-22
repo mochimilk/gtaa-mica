@@ -2,12 +2,10 @@
 // remain occupied, an explicit empty-match state, and a reset. Renders
 // nothing when no view or filter is active.
 import { Button } from "@fluentui/react-components";
-import { DEMO_DATA } from "../stand-timeline-demo/demoData";
 import { useOperations } from "./OperationsContext";
-import { OPS_FLIGHTS } from "./operationsData";
 
 export function FilterStatus() {
-  const { matcher, setView, resetFilters } = useOperations();
+  const { matcher, setView, resetFilters, dataset: { timeline: DEMO_DATA, flights: OPS_FLIGHTS } } = useOperations();
   if (!matcher.active) return null;
 
   const stays = DEMO_DATA.occupancies.filter((o) => matcher.occupancy(o.id)).length;

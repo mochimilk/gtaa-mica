@@ -23,7 +23,6 @@ import { ArrowResetRegular, EyeRegular, FilterRegular } from "@fluentui/react-ic
 import { useOperations } from "./OperationsContext";
 import {
   FILTER_LABELS,
-  FILTER_OPTIONS,
   UNASSIGNED_AREA,
   VIEWS,
   type FilterDim,
@@ -51,7 +50,7 @@ const optionLabel = (dim: FilterDim, value: string) =>
   dim === "area" && value === UNASSIGNED_AREA ? "Unassigned (no stand)" : value;
 
 export function ViewsFiltersToolbar() {
-  const { view, setView, filters, setFilter, resetFilters } = useOperations();
+  const { view, setView, filters, setFilter, resetFilters, filterOptions } = useOperations();
   const viewLabel = VIEWS.find((v) => v.value === view)?.label ?? "All activity";
   const viewActive = view !== "all";
   const filterCount = DIMS.reduce((n, d) => n + filters[d].length, 0);
@@ -120,7 +119,7 @@ export function ViewsFiltersToolbar() {
                 {i > 0 && <MenuDivider />}
                 <MenuGroup>
                   <MenuGroupHeader>{FILTER_LABELS[dim]} (none checked = all)</MenuGroupHeader>
-                  {FILTER_OPTIONS[dim].map((value) => (
+                  {filterOptions[dim].map((value) => (
                     <MenuItemCheckbox key={value} name={dim} value={value} persistOnClick>
                       {optionLabel(dim, value)}
                     </MenuItemCheckbox>

@@ -14,6 +14,7 @@ import {
 } from "@fluentui/react-components";
 import { InfoRegular, WarningRegular } from "@fluentui/react-icons";
 import { airportLabel } from "../stand-timeline-demo/airports";
+import { standLabel } from "../stand-timeline-demo/adapter";
 import { dayOffsetLabel, formatUtc, formatUtcFull } from "../stand-timeline-demo/demoData";
 import { isFlightSelected, useOperations } from "./OperationsContext";
 import { alertsForFlight, type OpsFlight } from "./operationsData";
@@ -54,7 +55,7 @@ export function FlightList({
   timeHeaderLabel,
   emptyMessage,
 }: FlightListProps) {
-  const { selection, selectFlight, acknowledged } = useOperations();
+  const { selection, selectFlight, acknowledged, dataset } = useOperations();
   const bodyRef = useRef<HTMLTableSectionElement>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -132,9 +133,9 @@ export function FlightList({
         <TableBody ref={bodyRef} onKeyDown={onKeyDown}>
           {flights.map((f) => {
             const selected = isFlightSelected(f, selection);
-            const alerts = alertsForFlight(f.id, acknowledged);
+            const alerts = alertsForFlight(f.id, acknowledged, dataset.alerts);
             const warning = alerts.some((a) => a.severity === "warning");
-            const day = dayOffsetLabel(f.estimate);
+            const day = dayOffsetLabel(f.estimate, dataset.date);
             return (
               <TableRow
                 key={f.id}
@@ -158,7 +159,7 @@ export function FlightList({
                 </TableCell>
                 <TableCell className="ops-cell">
                   {f.standId ? (
-                    <span className="ops-stand">{f.standId}</span>
+                    <span className="ops-stand">{standLabel(dataset.timeline, f.standId)}</span>
                   ) : (
                     <Badge appearance="tint" color="warning" size="small" shape="rounded">
                       Unassigned
@@ -185,8 +186,8 @@ export function FlightList({
         </TableBody>
       </Table>
       <p className="ops-footnote">
-        *{timeHeader} = {timeHeaderLabel.toLowerCase()}: synthetic estimate, UTC. "−1d"/"+1d"
-        marks a day before/after the demo date. Demo data only.
+        *{timeHeader} = {timeHeaderLabel.toLowerCase()}: synthetic {dataset.timeBasis === "scheduled" ? "schedule" : "estimate"}, UTC. "−1d"/"+1d"
+        marks a day before/after {dataset.date}. Demo data only.
       </p>
     </div>
   );

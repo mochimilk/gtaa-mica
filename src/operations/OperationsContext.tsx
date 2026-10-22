@@ -11,10 +11,12 @@ import {
 } from "react";
 import type { ChartIntent } from "../stand-timeline";
 import { applySelection } from "../stand-timeline-demo/selection";
-import { OPS_FLIGHTS_BY_ID, type OpsFlight } from "./operationsData";
+import type { OpsFlight } from "./operationsData";
+import type { DemoDataset } from "../demo/dataset";
 import {
   EMPTY_FILTERS,
   makeMatcher,
+  makeFilterOptions,
   type FilterDim,
   type OpsFilters,
   type OpsMatcher,
@@ -35,6 +37,8 @@ export interface OpsSelection {
 export type SelectionSource = "chart" | "list" | "alert";
 
 export interface OperationsValue {
+  dataset: DemoDataset;
+  filterOptions: Record<FilterDim, string[]>;
   selection: OpsSelection;
   applyChartIntent: (intent: ChartIntent) => void;
   selectFlight: (flight: OpsFlight, source?: SelectionSource) => void;
@@ -65,7 +69,7 @@ const OperationsContext = createContext<OperationsValue | null>(null);
 
 const EMPTY: OpsSelection = { occupancyIds: [], flightId: null };
 
-export function OperationsProvider({ children }: { children: ReactNode }) {
+export function OperationsProvider({ children, dataset }: { children: ReactNode; dataset: DemoDataset }) {
   const [selection, setSelection] = useState<OpsSelection>(EMPTY);
   const [acknowledged, setAck] = useState<ReadonlySet<string>>(new Set());
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -120,12 +124,15 @@ export function OperationsProvider({ children }: { children: ReactNode }) {
   // Recomputed when the view, filters or acknowledgements change ("Needs
   // attention" follows open alerts).
   const matcher = useMemo(
-    () => makeMatcher(view, filters, acknowledged),
-    [view, filters, acknowledged],
+    () => makeMatcher(dataset, view, filters, acknowledged),
+    [dataset, view, filters, acknowledged],
   );
+  const filterOptions = useMemo(() => makeFilterOptions(dataset), [dataset]);
 
   const value = useMemo(
     () => ({
+      dataset,
+      filterOptions,
       selection,
       applyChartIntent,
       selectFlight,
@@ -144,6 +151,8 @@ export function OperationsProvider({ children }: { children: ReactNode }) {
       matcher,
     }),
     [
+      dataset,
+      filterOptions,
       selection,
       applyChartIntent,
       selectFlight,
@@ -178,6 +187,6 @@ export function isFlightSelected(flight: OpsFlight, selection: OpsSelection): bo
   return !!flight.occupancyId && selection.occupancyIds.includes(flight.occupancyId);
 }
 
-export function selectedFlight(selection: OpsSelection): OpsFlight | undefined {
-  return selection.flightId ? OPS_FLIGHTS_BY_ID.get(selection.flightId) : undefined;
+export function selectedFlight(selection: OpsSelection, dataset: DemoDataset): OpsFlight | undefined {
+  return selection.flightId ? dataset.flightsById.get(selection.flightId) : undefined;
 }

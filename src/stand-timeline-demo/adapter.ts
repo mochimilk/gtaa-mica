@@ -25,12 +25,17 @@ export interface DemoTimelineData {
   rows: TimelineRow[];
   visits: Visit[];
   occupancies: Occupancy[];
-  turnsById: Map<string, SyntheticTurn>;
+  turnsById: Map<string, TimelineTurn>;
   /** Position of each occupancy within its visit's stays, in time order. */
   stayPosition: Map<string, StayPosition>;
   /** Actual start/end events (flight, tow or none) at each occupancy. */
   endpoints: Map<string, StayEndpoints>;
 }
+
+export type TimelineTurn = Omit<SyntheticTurn, "stays">;
+
+export const standLabel = (data: DemoTimelineData, standId: string) =>
+  data.rows.find(row => row.id === standId)?.label ?? standId;
 
 export interface StayPosition {
   index: number;

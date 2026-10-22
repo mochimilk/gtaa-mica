@@ -225,9 +225,9 @@ assignments take precedence over review-only status.
 
 ## Preserve the current Gantt
 
-The Gantt and its fixture are unchanged. This stage writes comparison JSON only.
-Before rendering generated assignments there, add an explicit data-source
-selector that preserves the existing demo. The scenario runner resolves
+The assignment runner writes comparison JSON only. The
+[demo data-source selector](demo-settings.md) separately renders prepared
+snapshots while preserving the original fixture. The scenario runner resolves
 boundary state for its complete scheduled feed; generic initial-state
 overlays, single-leg tow scheduling and explicit gate/towing resources remain
 separate modeling steps.

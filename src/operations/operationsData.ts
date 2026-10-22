@@ -16,12 +16,13 @@ export interface OpsFlight {
   /** Displayed route endpoint: origin for arrivals, destination for departures. */
   routeEnd: string;
   /**
-   * Synthetic estimate (UTC). For assigned flights it is the stay's on-block
-   * (arrival) or off-block (departure) time from the fixture.
+   * Display time (UTC): an estimate in the original fixture or a scheduled
+   * event in prepared plans. The dataset supplies the time-basis label.
    */
   estimate: Millis;
   registration?: string;
   aircraftType?: string;
+  carrier?: string;
   visitId?: string;
   /** The chart occupancy where this flight endpoint occurs; absent when unassigned. */
   occupancyId?: string;
@@ -131,6 +132,6 @@ export const OPS_ALERTS: OpsAlert[] = [
 ];
 
 /** Active alert count per flight, for list row issue markers. */
-export function alertsForFlight(flightId: string, acknowledged: ReadonlySet<string>) {
-  return OPS_ALERTS.filter((a) => a.flightId === flightId && !acknowledged.has(a.id));
+export function alertsForFlight(flightId: string, acknowledged: ReadonlySet<string>, alerts: readonly OpsAlert[] = OPS_ALERTS) {
+  return alerts.filter((a) => a.flightId === flightId && !acknowledged.has(a.id));
 }

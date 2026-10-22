@@ -114,13 +114,14 @@ export function SelectionPopover() {
     selectionSource,
     selectionRequest,
     clearSelection,
+    dataset,
   } = useOperations();
   const [anchor, setAnchor] = useState<AnchorEl | null>(null);
   const returnFocusRef = useRef<HTMLElement | SVGElement | null>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
   const positioningRef = useRef<PositioningImperativeRef>(null);
   const titleId = useId();
-  const flight = selectedFlight(selection);
+  const flight = selectedFlight(selection, dataset);
 
   // Resolve the anchor on every selection request (so reselecting the same
   // item reopens) and remember where focus was, for focus return on close.

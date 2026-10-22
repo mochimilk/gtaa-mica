@@ -7,14 +7,8 @@
 // - One view at a time (radio). "all" applies no view restriction.
 // - Filters: OR within a dimension, AND across dimensions.
 // - An empty dimension means "no restriction" (all values pass).
-import { DEMO_DATA } from "../stand-timeline-demo/demoData";
-import {
-  OPS_ALERTS,
-  OPS_FLIGHTS,
-  OPS_FLIGHTS_BY_ID,
-  type OpsAlert,
-  type OpsFlight,
-} from "./operationsData";
+import type { DemoDataset } from "../demo/dataset";
+import type { OpsAlert, OpsFlight } from "./operationsData";
 
 export type ViewKey = "all" | "attention" | "arrivals" | "departures" | "tows";
 
@@ -37,34 +31,32 @@ export const UNKNOWN_TYPE = "Not recorded";
 
 /* ------------------------------------------------------------- facts */
 
-const areaByStand = new Map(DEMO_DATA.rows.map((r) => [r.id, r.group ?? ""]));
-const carrierOfFlight = (f: OpsFlight) =>
-  (f.visitId && DEMO_DATA.turnsById.get(f.visitId)?.carrier) || f.flight.slice(0, 2);
-const areaOfFlight = (f: OpsFlight) =>
-  f.standId ? areaByStand.get(f.standId) ?? UNASSIGNED_AREA : UNASSIGNED_AREA;
 const typeOfFlight = (f: OpsFlight) => f.aircraftType ?? UNKNOWN_TYPE;
-
-/** Visits with at least one explicit tow endpoint. */
-const TOW_VISITS = new Set(
-  DEMO_DATA.occupancies
-    .filter((o) => {
-      const ep = DEMO_DATA.endpoints.get(o.id);
-      return ep && (ep.start.kind === "tow" || ep.end.kind === "tow");
-    })
-    .map((o) => o.visitId)
-    .filter((v): v is string => !!v),
-);
+function factsFor(dataset: DemoDataset) {
+  const areaByStand = new Map(dataset.timeline.rows.map(row => [row.id, row.group ?? ""]));
+  const carrierOfFlight = (flight: OpsFlight) =>
+    flight.carrier || (flight.visitId && dataset.timeline.turnsById.get(flight.visitId)?.carrier) || flight.flight.slice(0, 2);
+  const areaOfFlight = (flight: OpsFlight) =>
+    flight.standId ? areaByStand.get(flight.standId) ?? UNASSIGNED_AREA : UNASSIGNED_AREA;
+  const towVisits = new Set(dataset.timeline.occupancies.filter(occupancy => {
+    const endpoints = dataset.timeline.endpoints.get(occupancy.id);
+    return endpoints && (endpoints.start.kind === "tow" || endpoints.end.kind === "tow");
+  }).flatMap(occupancy => occupancy.visitId ? [occupancy.visitId] : []));
+  return { areaByStand, carrierOfFlight, areaOfFlight, towVisits };
+}
 
 /* ------------------------------------------------- option lists (sorted) */
 
 const uniq = (xs: string[]) => [...new Set(xs)].sort((a, b) => a.localeCompare(b));
 
-export const FILTER_OPTIONS: Record<FilterDim, string[]> = {
-  carrier: uniq(OPS_FLIGHTS.map(carrierOfFlight)),
-  // Stand areas in chart row order, then the explicit no-stand option.
-  area: [...new Set(DEMO_DATA.rows.map((r) => r.group ?? ""))].filter(Boolean).concat(UNASSIGNED_AREA),
-  type: uniq(OPS_FLIGHTS.map(typeOfFlight)),
-};
+export function makeFilterOptions(dataset: DemoDataset): Record<FilterDim, string[]> {
+  const { carrierOfFlight } = factsFor(dataset);
+  return {
+    carrier: uniq(dataset.flights.map(carrierOfFlight)),
+    area: [...new Set(dataset.timeline.rows.map(row => row.group ?? ""))].filter(Boolean).concat(UNASSIGNED_AREA),
+    type: uniq(dataset.flights.map(typeOfFlight)),
+  };
+}
 
 export const FILTER_LABELS: Record<FilterDim, string> = {
   carrier: "Carrier",
@@ -77,13 +69,13 @@ export const FILTER_LABELS: Record<FilterDim, string> = {
 const passes = (set: string[], value: string) => set.length === 0 || set.includes(value);
 
 /** Visits/flights referenced by currently open (unacknowledged) alerts. */
-function openAlertScope(acknowledged: ReadonlySet<string>) {
+function openAlertScope(acknowledged: ReadonlySet<string>, dataset: DemoDataset) {
   const flights = new Set<string>();
   const visits = new Set<string>();
-  for (const a of OPS_ALERTS) {
+  for (const a of dataset.alerts) {
     if (acknowledged.has(a.id)) continue;
     flights.add(a.flightId);
-    const visit = OPS_FLIGHTS_BY_ID.get(a.flightId)?.visitId;
+    const visit = dataset.flightsById.get(a.flightId)?.visitId;
     if (visit) visits.add(visit);
   }
   return { flights, visits };
@@ -98,13 +90,16 @@ export interface OpsMatcher {
 }
 
 export function makeMatcher(
+  dataset: DemoDataset,
   view: ViewKey,
   filters: OpsFilters,
   acknowledged: ReadonlySet<string>,
 ): OpsMatcher {
   const active =
     view !== "all" || filters.carrier.length + filters.area.length + filters.type.length > 0;
-  const scope = openAlertScope(acknowledged);
+  const { timeline: DEMO_DATA } = dataset;
+  const { areaByStand, carrierOfFlight, areaOfFlight, towVisits } = factsFor(dataset);
+  const scope = openAlertScope(acknowledged, dataset);
   const occById = new Map(DEMO_DATA.occupancies.map((o) => [o.id, o]));
 
   const occupancy = (id: string) => {
@@ -140,14 +135,14 @@ export function makeMatcher(
         (scope.flights.has(f.id) || (!!f.visitId && scope.visits.has(f.visitId)))) ||
       (view === "arrivals" && f.direction === "arrival") ||
       (view === "departures" && f.direction === "departure") ||
-      (view === "tows" && !!f.visitId && TOW_VISITS.has(f.visitId));
+      (view === "tows" && !!f.visitId && towVisits.has(f.visitId));
     return inView && flightPassesFilters(f);
   };
 
   // Alerts follow the filter dimensions but not the view, so acknowledged
   // alerts stay reachable (and reopenable) under "Needs attention".
   const alert = (a: OpsAlert) => {
-    const f = OPS_FLIGHTS_BY_ID.get(a.flightId);
+    const f = dataset.flightsById.get(a.flightId);
     return !f || flightPassesFilters(f);
   };
 

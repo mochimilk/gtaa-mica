@@ -23,6 +23,8 @@
     "generate:scenario": "node scripts/generate-scenario.mjs",
     "run:scenario": "node scripts/generate-scenario.mjs --solve",
     "test:scenarios": "npm run build:solver && node --test scripts/scenario-generator.test.mjs",
+    "prepare:demo": "npm run build:solver && node scripts/prepare-demo.mjs",
+    "test:demo": "node --disallow-code-generation-from-strings --test scripts/demo-dataset.test.mjs",
     "dev:desktop": "node scripts/desktop-dev.mjs",
     "check:desktop": "tsc -p tsconfig.electron.json",
     "build:desktop": "npm run check:desktop && npm run build",

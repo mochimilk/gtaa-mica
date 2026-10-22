@@ -19,9 +19,8 @@ import {
   type TickLabel,
   type TimeAxisProps,
 } from "../stand-timeline";
-import type { StayEndpoints, StayPosition } from "./adapter";
+import type { StayEndpoints, StayPosition, TimelineTurn } from "./adapter";
 import { airportLabel } from "./airports";
-import type { SyntheticTurn } from "./syntheticFixture";
 
 /** Chart theme: typography, spacing, strokes and neutral colours from Fluent tokens. */
 export const fluentChartTheme = {
@@ -83,6 +82,8 @@ export const CARRIER_PALETTE: Record<string, CarrierPalette> = {
   XB: carrier("xb"),
   XC: carrier("xc"),
   XD: carrier("xd"),
+  UAL: carrier("xa"),
+  AAL: carrier("xb"),
 };
 
 const FALLBACK: CarrierPalette = {
@@ -133,7 +134,7 @@ const TOW_OUT = "Tow-out";
  *   full prominence. With an active selection, unrelated stays are grey too.
  */
 export function makeDemoAccessors(
-  turnsById: Map<string, SyntheticTurn>,
+  turnsById: Map<string, TimelineTurn>,
   stayPosition: Map<string, StayPosition>,
   endpoints: Map<string, StayEndpoints>,
   isMatch?: (occupancyId: string) => boolean,

@@ -189,6 +189,8 @@ Without `--output`, JSON goes to stdout and diagnostics go to stderr. Invoke
 requires stdout without npm's banner. Extract `raw_demand` from the standalone
 package to use it with the existing raw-demand commands.
 
-The Gantt, existing fixture, airport rules and UI are unchanged. An explicit
-data-source selector is still required before displaying generated plans.
-Historical delay distributions and day-of actuals are not generated here.
+The generator does not alter the Gantt, existing fixture or airport rules.
+[Demo settings](demo-settings.md) now provide an explicit switch between the
+original fixture and compact prepared plans. Arbitrary command-line review
+files are not imported automatically. Historical delay distributions and
+day-of actuals are not generated here.

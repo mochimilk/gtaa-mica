@@ -3,10 +3,10 @@
 import { Button } from "@fluentui/react-components";
 import { InfoRegular, WarningRegular } from "@fluentui/react-icons";
 import { isFlightSelected, useOperations } from "./OperationsContext";
-import { OPS_ALERTS, OPS_FLIGHTS_BY_ID, type OpsAlert } from "./operationsData";
+import type { OpsAlert } from "./operationsData";
 
 export function Alerts() {
-  const { acknowledged, matcher } = useOperations();
+  const { acknowledged, matcher, dataset: { alerts: OPS_ALERTS } } = useOperations();
   // Alerts follow the filters (not the view; see opsFilters.ts).
   const shown = OPS_ALERTS.filter(matcher.alert);
   const open = shown.filter((a) => !acknowledged.has(a.id));
@@ -46,8 +46,8 @@ export function Alerts() {
 }
 
 function AlertItem({ alert, acknowledged = false }: { alert: OpsAlert; acknowledged?: boolean }) {
-  const { selection, selectFlight, setAcknowledged } = useOperations();
-  const flight = OPS_FLIGHTS_BY_ID.get(alert.flightId);
+  const { selection, selectFlight, setAcknowledged, dataset } = useOperations();
+  const flight = dataset.flightsById.get(alert.flightId);
   const selected = !!flight && isFlightSelected(flight, selection);
   const Icon = alert.severity === "warning" ? WarningRegular : InfoRegular;
 

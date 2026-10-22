@@ -3,13 +3,14 @@
 // here is the backend-dependent one, disabled with a visible explanation.
 import { Button } from "@fluentui/react-components";
 import { airportLabel } from "../stand-timeline-demo/airports";
-import { DEMO_DATA, formatUtcFull, formatUtcWithDay } from "../stand-timeline-demo/demoData";
+import { standLabel } from "../stand-timeline-demo/adapter";
+import { formatUtcFull, formatUtcWithDay } from "../stand-timeline-demo/demoData";
 import { selectedFlight, useOperations } from "./OperationsContext";
-import { OPS_FLIGHTS, type OpsFlight } from "./operationsData";
+import type { OpsFlight } from "./operationsData";
 
 export function FlightActions() {
-  const { selection } = useOperations();
-  const flight = selectedFlight(selection);
+  const { selection, dataset } = useOperations();
+  const flight = selectedFlight(selection, dataset);
 
   return (
     <div className="ops-actions">
@@ -28,7 +29,7 @@ export function FlightActions() {
         </Button>
       </div>
       <p id="ops-assign-note" className="ops-footnote">
-        Assign stand is unavailable: this demo has no allocation backend.
+        Assign stand is unavailable: this viewer does not execute allocation changes.
       </p>
     </div>
   );
@@ -41,6 +42,7 @@ export function selectionTitle(occupancyIds: readonly string[], flight?: OpsFlig
 }
 
 function FlightDetails({ flight: f }: { flight: OpsFlight }) {
+  const { dataset: { timeline: DEMO_DATA, date, timeBasis } } = useOperations();
   const turn = f.visitId ? DEMO_DATA.turnsById.get(f.visitId) : undefined;
   const stays = f.visitId ? DEMO_DATA.occupancies.filter((o) => o.visitId === f.visitId) : [];
   return (
@@ -49,11 +51,11 @@ function FlightDetails({ flight: f }: { flight: OpsFlight }) {
         {f.direction === "arrival" ? "From" : "To"} {airportLabel(f.routeEnd)}
       </div>
       <div>
-        Est. {formatUtcFull(f.estimate)} <span className="ops-muted">(synthetic)</span>
+        {timeBasis === "scheduled" ? "Scheduled" : "Est."} {formatUtcFull(f.estimate)} <span className="ops-muted">(synthetic)</span>
       </div>
       <div>
         {f.standId ? (
-          <>Stand {f.standId}</>
+          <>Stand {standLabel(DEMO_DATA, f.standId)}</>
         ) : (
           <span className="ops-muted">No stand assigned, so this flight is not on the chart.</span>
         )}
@@ -69,7 +71,7 @@ function FlightDetails({ flight: f }: { flight: OpsFlight }) {
         <div className="ops-muted">
           Visit stays:{" "}
           {stays
-            .map((s) => `${s.rowId} ${formatUtcWithDay(s.start)}–${formatUtcWithDay(s.end)}`)
+            .map((s) => `${standLabel(DEMO_DATA, s.rowId)} ${formatUtcWithDay(s.start, date)}–${formatUtcWithDay(s.end, date)}`)
             .join(" → ")}
         </div>
       )}
@@ -78,6 +80,7 @@ function FlightDetails({ flight: f }: { flight: OpsFlight }) {
 }
 
 function StaySummary({ occupancyIds }: { occupancyIds: string[] }) {
+  const { dataset: { timeline: DEMO_DATA, flights: OPS_FLIGHTS, date } } = useOperations();
   const stays = DEMO_DATA.occupancies.filter((o) => occupancyIds.includes(o.id));
   return (
     <>
@@ -85,7 +88,7 @@ function StaySummary({ occupancyIds }: { occupancyIds: string[] }) {
         const flights = OPS_FLIGHTS.filter((f) => f.occupancyId === s.id);
         return (
           <div key={s.id}>
-            {s.rowId} {formatUtcWithDay(s.start)}–{formatUtcWithDay(s.end)}{" "}
+            {standLabel(DEMO_DATA, s.rowId)} {formatUtcWithDay(s.start, date)}–{formatUtcWithDay(s.end, date)}{" "}
             <span className="ops-muted">
               {flights.length
                 ? flights.map((f) => `${f.direction === "arrival" ? "arr" : "dep"} ${f.flight}`).join(", ")

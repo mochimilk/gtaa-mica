@@ -58,7 +58,10 @@ See [Local stand assignment with CP-SAT](docs/local-assignment.md) for local
 enforcement. No hosted infrastructure is needed.
 See [Repeatable airport demo scenarios](docs/scenario-generation.md) for seeded
 comfortable/constrained demand, overnight context and measured assignment/tow
-comparisons. Generated output remains separate from the Gantt.
+comparisons.
+Use [Demo settings](docs/demo-settings.md) beside the chart controls to switch
+between the original fixture and prepared Contoso plans without restarting.
+Only the selected source/case/plan preferences are saved locally.
 
 ```sh
 npm run validate:airport
@@ -70,6 +73,7 @@ npm run test:occupancy
 npm run test:tows
 npm run test:assignments
 npm run test:scenarios
+npm run test:demo
 ```
 
 ## Add recipes
