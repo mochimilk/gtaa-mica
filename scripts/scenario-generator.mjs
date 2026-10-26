@@ -19,7 +19,7 @@ const sorted = rows => rows.slice().sort((a, b) => compareIds(a.id, b.id));
 const minute = 60_000;
 export const loadScenarioProfile = (path = fileURLToPath(new URL('../data/airports/contoso/demand/scenario-profile.json', import.meta.url))) => readJson(path);
 
-function randomStream(seed, key) {
+export function randomStream(seed, key) {
   let state = Number.parseInt(digest(JSON.stringify([seed, key])).slice(0, 8), 16);
   return () => {
     state = (state + 0x6D2B79F5) >>> 0;

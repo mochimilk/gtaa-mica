@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:capacity-atlas-profile:1.0.0",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "id", "seed", "start_date", "day_count", "planned_shift_minutes", "planned_scale_basis_points", "outcome_shift_minutes", "outcome_scale_basis_points"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "seed": { "type": "string", "pattern": "\\S" },
+    "start_date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "day_count": { "type": "integer", "minimum": 1, "maximum": 31 },
+    "planned_shift_minutes": { "$ref": "#/definitions/shift" },
+    "planned_scale_basis_points": { "$ref": "#/definitions/scale" },
+    "outcome_shift_minutes": { "$ref": "#/definitions/shift" },
+    "outcome_scale_basis_points": { "$ref": "#/definitions/scale" }
+  },
+  "definitions": {
+    "shift": {
+      "type": "array", "minItems": 2, "maxItems": 2, "additionalItems": false,
+      "items": [{ "type": "integer", "minimum": -120, "maximum": 120 }, { "type": "integer", "minimum": -120, "maximum": 120 }]
+    },
+    "scale": {
+      "type": "array", "minItems": 2, "maxItems": 2, "additionalItems": false,
+      "items": [{ "type": "integer", "minimum": 9500, "maximum": 10500 }, { "type": "integer", "minimum": 9500, "maximum": 10500 }]
+    }
+  }
+}

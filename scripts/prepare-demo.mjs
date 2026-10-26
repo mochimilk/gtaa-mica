@@ -7,6 +7,8 @@ import { isUtcInstant } from './demand-model.mjs';
 import { generateScenario, loadScenarioProfile } from './scenario-generator.mjs';
 import { solveAirport } from './local-assignment.mjs';
 import { summarizeScenario } from './scenario-report.mjs';
+import { loadCapacityProfile, prepareCapacitySnapshot } from './capacity-probe.mjs';
+import { writeCapacityArtifacts } from './prepare-capacity.mjs';
 
 export function prepareDemoSnapshot(scenario, comparison, airport) {
   const summary = summarizeScenario(scenario, comparison, airport);
@@ -59,7 +61,7 @@ export function prepareDemoSnapshot(scenario, comparison, airport) {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   try {
     if (process.argv.length !== 2) throw new Error('Usage: npm run prepare:demo (regenerates all checked-in demo snapshots)');
-    const airport = loadAirport(), profile = loadScenarioProfile();
+    const airport = loadAirport(), profile = loadScenarioProfile(), capacityProfile = loadCapacityProfile();
     const fullDay = loadScenarioProfile(fileURLToPath(new URL('../data/airports/contoso/demand/full-day-profile.json', import.meta.url)));
     const snapshots = [['comfortable', profile], ['constrained', profile], ['full-day', fullDay]].map(([caseId, input]) => {
       const scenario = generateScenario(input, airport, caseId);
@@ -68,7 +70,8 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
       for (const [variant, metrics] of Object.entries(summarizeScenario(scenario, comparison, airport).metrics)) {
         console.log(`${caseId}/${variant}: ${metrics.assigned_visits}/${scenario.expected_visit_count} visits; ${metrics.generated_tows} generated tows; ${metrics.solver_status}.`);
       }
-      return { snapshot: prepareDemoSnapshot(scenario, comparison, airport), raw: scenario.raw_demand };
+      const snapshot = prepareDemoSnapshot(scenario, comparison, airport);
+      return { snapshot, raw: scenario.raw_demand, capacity: prepareCapacitySnapshot(snapshot, scenario.raw_demand, airport, capacityProfile) };
     });
     const directory = fileURLToPath(new URL('../src/demo/prepared/', import.meta.url));
     mkdirSync(directory, { recursive: true });
@@ -82,6 +85,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
         console.log(`Generated full-day raw demand: ${demandPath}`);
       }
     }
+    writeCapacityArtifacts(snapshots.map(item => item.capacity));
     const ajv = new Ajv({ allErrors: true, code: { source: true, esm: true } });
     ajv.addFormat('date-time', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/);
     const validate = ajv.compile(readJson(fileURLToPath(new URL('../data/schemas/demo-scenario.schema.json', import.meta.url))));

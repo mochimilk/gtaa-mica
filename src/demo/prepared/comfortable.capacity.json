@@ -1,0 +1,4023 @@
+{
+  "schema_version": "1.0.0",
+  "metric_id": "airport-single-turn-capacity",
+  "metric_version": "1.0.0",
+  "airport_id": "contoso",
+  "case_id": "comfortable",
+  "demand_id": "scenario:contoso%3Ademo-days%3Av1/comfortable/615c38547254d0fc51ff7b0d51b80b8249160faa029878532a2f229fc471de4f",
+  "snapshot_fingerprint": "05bcd30088027e1251b68c84bebe37ffa2e51564a9398a99a1506c75f66103bc",
+  "airport_fingerprint": "e336107b35c9bb391b87b17a51a01efc72b644ace45cfc92da1d8219616b3b5e",
+  "demand_fingerprint": "22e2ba5f2e17572853dde3767ab122b6198b428757c98a374cac22ab4c8bd67e",
+  "plan_window": {
+    "start": "2026-10-21T14:00:00Z",
+    "end": "2026-10-22T14:00:00Z"
+  },
+  "profile": {
+    "$schema": "../../../schemas/capacity-profile.schema.json",
+    "schema_version": "1.0.0",
+    "id": "contoso:single-turn-capacity:v1",
+    "metric_id": "airport-single-turn-capacity",
+    "metric_version": "1.0.0",
+    "default_probe_id": "aal-domestic",
+    "probes": [
+      {
+        "id": "aal-domestic",
+        "label": "American · B738 · domestic",
+        "aircraft_id": "B738",
+        "operating_airline_id": "airline:AAL",
+        "arrival_sector_id": "domestic",
+        "departure_sector_id": "domestic",
+        "default_duration_minutes": 75,
+        "separation_minutes": 0
+      },
+      {
+        "id": "ual-domestic",
+        "label": "United · A320 · domestic",
+        "aircraft_id": "A320",
+        "operating_airline_id": "airline:UAL",
+        "arrival_sector_id": "domestic",
+        "departure_sector_id": "domestic",
+        "default_duration_minutes": 75,
+        "separation_minutes": 0
+      },
+      {
+        "id": "baw-international",
+        "label": "British Airways · B789 · international",
+        "aircraft_id": "B789",
+        "operating_airline_id": "airline:BAW",
+        "arrival_sector_id": "international",
+        "departure_sector_id": "international",
+        "default_duration_minutes": 120,
+        "separation_minutes": 0
+      }
+    ]
+  },
+  "variants": {
+    "baseline": {
+      "request_fingerprint": "e64c1f285c461beca8d3f4ddf492809f7d76f13c8bc049ce8ecc7ec5cdb0d666",
+      "probes": [
+        {
+          "id": "aal-domestic",
+          "rows": [
+            {
+              "stand_id": "t1:stand:108",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T16:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T18:17:00.000Z",
+                  "end": "2026-10-21T22:00:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T23:11:00.000Z",
+                  "end": "2026-10-22T00:45:00.000Z",
+                  "before": 1,
+                  "after": 2
+                },
+                {
+                  "start": "2026-10-22T02:29:00.000Z",
+                  "end": "2026-10-22T12:00:00.000Z",
+                  "before": 2,
+                  "after": 3
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T16:30:00.000Z",
+                  "end": "2026-10-21T18:17:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T22:00:00.000Z",
+                  "end": "2026-10-21T23:11:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T00:45:00.000Z",
+                  "end": "2026-10-22T02:29:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T12:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:109",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T21:00:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T22:46:00.000Z",
+                  "end": "2026-10-22T00:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-22T01:49:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 1,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T21:00:00.000Z",
+                  "end": "2026-10-21T22:46:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T00:15:00.000Z",
+                  "end": "2026-10-22T01:49:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T23:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T00:46:00.000Z",
+                  "end": "2026-10-22T12:30:00.000Z",
+                  "before": 0,
+                  "after": 1
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T23:30:00.000Z",
+                  "end": "2026-10-22T00:46:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T12:30:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:00:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T23:39:00.000Z",
+                  "end": "2026-10-22T02:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-22T03:24:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 1,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:00:00.000Z",
+                  "end": "2026-10-21T23:39:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T02:15:00.000Z",
+                  "end": "2026-10-22T03:24:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:00:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T23:45:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:00:00.000Z",
+                  "end": "2026-10-21T23:45:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T01:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T02:50:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-22T01:30:00.000Z",
+                  "end": "2026-10-22T02:50:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T00:07:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:45:00.000Z",
+                  "end": "2026-10-22T00:07:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            }
+          ],
+          "excluded_stands": [
+            {
+              "stand_id": "t1:stand:101",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:102",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:105",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:302",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:303",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:304",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:305",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:306",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:307",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R07",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ual-domestic",
+          "rows": [
+            {
+              "stand_id": "t1:stand:101",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T16:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T17:56:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T16:45:00.000Z",
+                  "end": "2026-10-21T17:56:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:102",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T14:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T15:45:00.000Z",
+                  "end": "2026-10-21T18:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T19:41:00.000Z",
+                  "end": "2026-10-21T20:15:00.000Z",
+                  "before": 1,
+                  "after": 2
+                },
+                {
+                  "start": "2026-10-21T21:49:00.000Z",
+                  "end": "2026-10-22T01:00:00.000Z",
+                  "before": 2,
+                  "after": 3
+                },
+                {
+                  "start": "2026-10-22T02:02:00.000Z",
+                  "end": "2026-10-22T02:45:00.000Z",
+                  "before": 3,
+                  "after": 4
+                },
+                {
+                  "start": "2026-10-22T03:48:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 4,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T14:45:00.000Z",
+                  "end": "2026-10-21T15:45:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T18:15:00.000Z",
+                  "end": "2026-10-21T19:41:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T20:15:00.000Z",
+                  "end": "2026-10-21T21:49:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T01:00:00.000Z",
+                  "end": "2026-10-22T02:02:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T02:45:00.000Z",
+                  "end": "2026-10-22T03:48:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "windows": [
+                {
+                  "start": "2026-10-21T16:00:00.000Z",
+                  "end": "2026-10-21T20:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T21:31:00.000Z",
+                  "end": "2026-10-21T22:30:00.000Z",
+                  "before": 1,
+                  "after": 2
+                },
+                {
+                  "start": "2026-10-21T23:48:00.000Z",
+                  "end": "2026-10-22T00:15:00.000Z",
+                  "before": 2,
+                  "after": 3
+                },
+                {
+                  "start": "2026-10-22T01:34:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 3,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T16:00:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T20:15:00.000Z",
+                  "end": "2026-10-21T21:31:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T22:30:00.000Z",
+                  "end": "2026-10-21T23:48:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T00:15:00.000Z",
+                  "end": "2026-10-22T01:34:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:105",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T19:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T21:03:00.000Z",
+                  "end": "2026-10-21T22:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T23:54:00.000Z",
+                  "end": "2026-10-22T00:30:00.000Z",
+                  "before": 1,
+                  "after": 2
+                },
+                {
+                  "start": "2026-10-22T01:35:00.000Z",
+                  "end": "2026-10-22T03:30:00.000Z",
+                  "before": 2,
+                  "after": 3
+                },
+                {
+                  "start": "2026-10-22T07:55:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 3,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T19:30:00.000Z",
+                  "end": "2026-10-21T21:03:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T22:15:00.000Z",
+                  "end": "2026-10-21T23:54:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T00:30:00.000Z",
+                  "end": "2026-10-22T01:35:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T03:30:00.000Z",
+                  "end": "2026-10-22T07:55:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T19:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T01:02:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T19:45:00.000Z",
+                  "end": "2026-10-22T01:02:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T00:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T02:05:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-22T00:30:00.000Z",
+                  "end": "2026-10-22T02:05:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T01:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T02:59:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-22T01:45:00.000Z",
+                  "end": "2026-10-22T02:59:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T16:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T17:56:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T16:45:00.000Z",
+                  "end": "2026-10-21T17:56:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "conditional-closure"
+                  ],
+                  "rule_paths": [
+                    "stands/t1:stand:R01/close-conditions/0"
+                  ]
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T15:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T16:32:00.000Z",
+                  "end": "2026-10-21T22:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T23:31:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 1,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T15:30:00.000Z",
+                  "end": "2026-10-21T16:32:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T22:15:00.000Z",
+                  "end": "2026-10-21T23:31:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            }
+          ],
+          "excluded_stands": [
+            {
+              "stand_id": "t1:stand:108",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:109",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:302",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:303",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:304",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:305",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:306",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:307",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R07",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "baw-international",
+          "rows": [
+            {
+              "stand_id": "t1:stand:305",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T19:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T21:04:00.000Z",
+                  "end": "2026-10-21T21:30:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T23:11:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 1,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T19:30:00.000Z",
+                  "end": "2026-10-21T21:04:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T21:30:00.000Z",
+                  "end": "2026-10-21T23:11:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:306",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:15:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T00:28:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:15:00.000Z",
+                  "end": "2026-10-22T00:28:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:307",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T01:15:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:45:00.000Z",
+                  "end": "2026-10-22T01:15:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            }
+          ],
+          "excluded_stands": [
+            {
+              "stand_id": "t1:stand:101",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:102",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:105",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:108",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:109",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:302",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:303",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:304",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R07",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "tow-options": {
+      "request_fingerprint": "e64c1f285c461beca8d3f4ddf492809f7d76f13c8bc049ce8ecc7ec5cdb0d666",
+      "probes": [
+        {
+          "id": "aal-domestic",
+          "rows": [
+            {
+              "stand_id": "t1:stand:108",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T16:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T18:17:00.000Z",
+                  "end": "2026-10-21T22:00:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T23:11:00.000Z",
+                  "end": "2026-10-22T00:45:00.000Z",
+                  "before": 1,
+                  "after": 2
+                },
+                {
+                  "start": "2026-10-22T02:29:00.000Z",
+                  "end": "2026-10-22T12:00:00.000Z",
+                  "before": 2,
+                  "after": 3
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T16:30:00.000Z",
+                  "end": "2026-10-21T18:17:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T22:00:00.000Z",
+                  "end": "2026-10-21T23:11:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T00:45:00.000Z",
+                  "end": "2026-10-22T02:29:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T12:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:109",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T21:00:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T22:46:00.000Z",
+                  "end": "2026-10-22T00:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-22T01:49:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 1,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T21:00:00.000Z",
+                  "end": "2026-10-21T22:46:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T00:15:00.000Z",
+                  "end": "2026-10-22T01:49:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T23:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T00:46:00.000Z",
+                  "end": "2026-10-22T12:30:00.000Z",
+                  "before": 0,
+                  "after": 1
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T23:30:00.000Z",
+                  "end": "2026-10-22T00:46:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T12:30:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:00:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T23:39:00.000Z",
+                  "end": "2026-10-22T02:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-22T03:24:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 1,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:00:00.000Z",
+                  "end": "2026-10-21T23:39:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T02:15:00.000Z",
+                  "end": "2026-10-22T03:24:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:00:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T23:45:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:00:00.000Z",
+                  "end": "2026-10-21T23:45:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T01:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T02:50:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-22T01:30:00.000Z",
+                  "end": "2026-10-22T02:50:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T00:07:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:45:00.000Z",
+                  "end": "2026-10-22T00:07:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            }
+          ],
+          "excluded_stands": [
+            {
+              "stand_id": "t1:stand:101",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:102",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:105",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:302",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:303",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:304",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:305",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:306",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:307",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R07",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "ual-domestic",
+          "rows": [
+            {
+              "stand_id": "t1:stand:101",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T16:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T17:56:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T16:45:00.000Z",
+                  "end": "2026-10-21T17:56:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:102",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T14:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T15:45:00.000Z",
+                  "end": "2026-10-21T18:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T19:41:00.000Z",
+                  "end": "2026-10-21T20:15:00.000Z",
+                  "before": 1,
+                  "after": 2
+                },
+                {
+                  "start": "2026-10-21T21:49:00.000Z",
+                  "end": "2026-10-22T01:00:00.000Z",
+                  "before": 2,
+                  "after": 3
+                },
+                {
+                  "start": "2026-10-22T02:02:00.000Z",
+                  "end": "2026-10-22T02:45:00.000Z",
+                  "before": 3,
+                  "after": 4
+                },
+                {
+                  "start": "2026-10-22T03:48:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 4,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T14:45:00.000Z",
+                  "end": "2026-10-21T15:45:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T18:15:00.000Z",
+                  "end": "2026-10-21T19:41:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T20:15:00.000Z",
+                  "end": "2026-10-21T21:49:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T01:00:00.000Z",
+                  "end": "2026-10-22T02:02:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T02:45:00.000Z",
+                  "end": "2026-10-22T03:48:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "windows": [
+                {
+                  "start": "2026-10-21T16:00:00.000Z",
+                  "end": "2026-10-21T20:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T21:31:00.000Z",
+                  "end": "2026-10-21T22:30:00.000Z",
+                  "before": 1,
+                  "after": 2
+                },
+                {
+                  "start": "2026-10-21T23:48:00.000Z",
+                  "end": "2026-10-22T00:15:00.000Z",
+                  "before": 2,
+                  "after": 3
+                },
+                {
+                  "start": "2026-10-22T01:34:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 3,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T16:00:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T20:15:00.000Z",
+                  "end": "2026-10-21T21:31:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T22:30:00.000Z",
+                  "end": "2026-10-21T23:48:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T00:15:00.000Z",
+                  "end": "2026-10-22T01:34:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:105",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T19:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T21:03:00.000Z",
+                  "end": "2026-10-21T22:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T23:54:00.000Z",
+                  "end": "2026-10-22T00:30:00.000Z",
+                  "before": 1,
+                  "after": 2
+                },
+                {
+                  "start": "2026-10-22T01:35:00.000Z",
+                  "end": "2026-10-22T03:30:00.000Z",
+                  "before": 2,
+                  "after": 3
+                },
+                {
+                  "start": "2026-10-22T07:55:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 3,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T19:30:00.000Z",
+                  "end": "2026-10-21T21:03:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T22:15:00.000Z",
+                  "end": "2026-10-21T23:54:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T00:30:00.000Z",
+                  "end": "2026-10-22T01:35:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-22T03:30:00.000Z",
+                  "end": "2026-10-22T07:55:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T19:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T01:02:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T19:45:00.000Z",
+                  "end": "2026-10-22T01:02:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T00:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T02:05:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-22T00:30:00.000Z",
+                  "end": "2026-10-22T02:05:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T01:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T02:59:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-22T01:45:00.000Z",
+                  "end": "2026-10-22T02:59:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T16:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T17:56:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T16:45:00.000Z",
+                  "end": "2026-10-21T17:56:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "conditional-closure"
+                  ],
+                  "rule_paths": [
+                    "stands/t1:stand:R01/close-conditions/0"
+                  ]
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T15:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T16:32:00.000Z",
+                  "end": "2026-10-21T22:15:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T23:31:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 1,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T15:30:00.000Z",
+                  "end": "2026-10-21T16:32:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T22:15:00.000Z",
+                  "end": "2026-10-21T23:31:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            }
+          ],
+          "excluded_stands": [
+            {
+              "stand_id": "t1:stand:108",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:109",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:302",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:303",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:304",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:305",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:306",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:307",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R07",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "baw-international",
+          "rows": [
+            {
+              "stand_id": "t1:stand:305",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T19:30:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-21T21:04:00.000Z",
+                  "end": "2026-10-21T21:30:00.000Z",
+                  "before": 0,
+                  "after": 1
+                },
+                {
+                  "start": "2026-10-21T23:11:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 1,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T19:30:00.000Z",
+                  "end": "2026-10-21T21:04:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                },
+                {
+                  "start": "2026-10-21T21:30:00.000Z",
+                  "end": "2026-10-21T23:11:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:306",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:15:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T00:28:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:15:00.000Z",
+                  "end": "2026-10-22T00:28:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            },
+            {
+              "stand_id": "t1:stand:307",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": null,
+                  "after": null
+                }
+              ],
+              "blocks": []
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "windows": [
+                {
+                  "start": "2026-10-21T14:00:00.000Z",
+                  "end": "2026-10-21T22:45:00.000Z",
+                  "before": null,
+                  "after": 0
+                },
+                {
+                  "start": "2026-10-22T01:15:00.000Z",
+                  "end": "2026-10-22T14:00:00.000Z",
+                  "before": 0,
+                  "after": null
+                }
+              ],
+              "blocks": [
+                {
+                  "start": "2026-10-21T22:45:00.000Z",
+                  "end": "2026-10-22T01:15:00.000Z",
+                  "assignment_ids": [
+                    "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture"
+                  ],
+                  "reasons": [
+                    "stand-overlap"
+                  ],
+                  "rule_paths": []
+                }
+              ]
+            }
+          ],
+          "excluded_stands": [
+            {
+              "stand_id": "t1:stand:101",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:102",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:105",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:108",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:109",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "reasons": [
+                "aircraft-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:302",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:303",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:304",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "arrival-sector-not-allowed",
+                "departure-airline-not-allowed",
+                "departure-sector-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "reasons": [
+                "arrival-sector-not-allowed",
+                "departure-sector-not-allowed"
+              ]
+            },
+            {
+              "stand_id": "t1:stand:R07",
+              "reasons": [
+                "arrival-airline-not-allowed",
+                "departure-airline-not-allowed",
+                "occupancy-airline-not-allowed"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

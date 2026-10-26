@@ -2,6 +2,8 @@ import type { DemoTimelineData, TimelineTurn } from "../stand-timeline-demo/adap
 import type { TimelineRow } from "../stand-timeline";
 import type { OpsAlert, OpsFlight } from "../operations/operationsData";
 import type { PlanVariant, ScenarioId } from "./preferences";
+import type { PreparedCapacity } from "./capacity-evaluation";
+import type { PreparedAtlas } from "./atlas-evaluation";
 
 export interface DemoDataset {
   id: string;
@@ -16,7 +18,7 @@ export interface DemoDataset {
   arrivals: OpsFlight[];
   departures: OpsFlight[];
   alerts: OpsAlert[];
-  prepared?: { snapshot: PreparedScenario; variant: PlanVariant };
+  prepared?: { snapshot: PreparedScenario; variant: PlanVariant; capacity?: PreparedCapacity; atlas?: PreparedAtlas };
 }
 
 export interface PreparedFlight {

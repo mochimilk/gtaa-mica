@@ -42,6 +42,13 @@ and can highlight tight handovers without changing occupancy or solver settings.
 The adjacent **Gate waiting** control adds
 [synthetic point-estimate waiting](gate-wait-evaluation.md), with explicit
 delay assumptions and inspectable blue arrival markers in the same review dialog.
+The **Capacity** control opens a [single-turn capacity probe](capacity-probe.md)
+with editable duration and UTC search bounds. Colored borders show individually
+feasible arrival starts against the fixed plan, not additional assigned flights.
+Show all three probes together, then choose planned, modeled end-of-day or
+retention intensity from an explicitly synthetic 30-day timing replay.
+Click a segment to inspect its exact start and all daily assessments.
+These are not observed actuals or independently solved operating days.
 
 ## State and persistence
 

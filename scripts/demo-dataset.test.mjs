@@ -37,11 +37,138 @@ const { OPS_FLIGHTS, OPS_ALERTS } = await load('src\\operations\\operationsData.
 const { standLabel } = await load('src\\stand-timeline-demo\\adapter.ts');
 const { BUFFER_METRIC, DEFAULT_BUFFER_PROFILE, parseBufferProfile, calculateStandBuffers, evaluateBufferPlans } = await load('src\\demo\\buffer-evaluation.ts');
 const { GATE_WAIT_METRIC, DEFAULT_GATE_WAIT_PROFILE, parseGateWaitProfile, evaluateGateWaitPlans } = await load('src\\demo\\gate-wait-evaluation.ts');
+const { validateCapacitySnapshot, queryCapacity, evaluateCapacityQuery } = await load('src\\demo\\capacity-evaluation.ts');
+const { validateAtlas, atlasFrequency, atlasSegments } = await load('src\\demo\\atlas-evaluation.ts');
 const readSnapshot = caseId => validatePreparedSnapshot(JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.json`), 'utf8')));
 
 const bufferStay = (id, start, end, rowId = 'stand:1', visitId = id) =>
   ({ id, rowId, visitId, start: start * 60_000, end: end * 60_000 });
 const bufferHorizon = [0, 200 * 60_000];
+
+test('all atlas sidecars verify source, dates, complete assessments and exact non-touching windows under CSP', async () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) {
+    const capacity = JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.capacity.json`), 'utf8'));
+    const raw = JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.atlas.json`), 'utf8'));
+    assert.equal(await validateAtlas(raw, capacity), raw);
+    const changed = structuredClone(capacity);
+    changed.profile.probes[0].default_duration_minutes++;
+    await assert.rejects(validateAtlas(raw, changed), /does not match/);
+    for (const mutate of [
+      value => { value.metric_version = '2'; },
+      value => { value.days.pop(); },
+      value => { value.profile.start_date = '2026-02-30'; },
+      value => { value.days[1].date = value.days[0].date; },
+      value => { value.days[0].parameters.planned_shift_minutes = 31; },
+      value => { value.horizon_duration_ms++; },
+      value => { value.days[0].variants.baseline.planned.pop(); },
+      value => { value.days[0].variants.baseline.planned[0].rows.pop(); },
+      value => { value.days[0].variants.baseline.planned[0].rows[0].stand_id = 'unknown'; },
+      value => { value.days[0].variants.baseline.planned[0].rows[0].windows = [[10, 10]]; },
+      value => { value.days[0].variants.baseline.planned[0].rows[0].windows = [[0, 10], [10, 20]]; },
+      value => { value.days[0].variants.baseline.planned[0].rows[0].windows = [[0, value.horizon_duration_ms + 1]]; },
+    ]) {
+      const broken = structuredClone(raw);
+      mutate(broken);
+      await assert.rejects(validateAtlas(broken, capacity), /atlas|Atlas/);
+    }
+  }
+});
+
+function atlasFixture() {
+  const probes = windows => [{ id: 'probe', rows: [{ stand_id: 'stand', windows }] }];
+  const phase = (planned, outcome) => ({ planned: probes(planned), end_of_day: probes(outcome) });
+  return { horizon_duration_ms: 10 * 60000, days: [
+    { date: '2026-09-24', variants: { baseline: phase([[0, 120000]], [[60000, 180000]]) } },
+    { date: '2026-09-25', variants: { baseline: phase([[0, 120000]], []) } },
+    { date: '2026-09-26', variants: { baseline: phase([], [[60000, 180000]]) } },
+  ] };
+}
+test('recurrence and retention use different denominators, exclude newly emerged space and preserve exact fits', () => {
+  const atlas = atlasFixture();
+  const frequency = atlasFrequency(atlas, 'baseline', 'probe', 'stand', 60000, 1);
+  assert.equal(frequency.planned_rate, 2 / 3);
+  assert.equal(frequency.end_of_day_rate, 2 / 3);
+  assert.equal(frequency.retention_rate, 1 / 2);
+  assert.equal(frequency.retained_days, 1);
+  assert.equal(frequency.days.length, 3);
+  const absent = atlasFrequency(atlas, 'baseline', 'probe', 'stand', 60001, 1);
+  assert.equal(absent.planned_days, 0);
+  assert.equal(absent.retention_rate, null);
+  assert.equal(absent.end_of_day_rate, 2 / 3);
+  assert.equal(atlasFrequency(atlas, 'baseline', 'probe', 'stand', 0, 2).planned_days, 2);
+  for (const [start, duration] of [[-1, 1], [0, 0], [0, 1.5], [600000, 1]]) {
+    assert.throws(() => atlasFrequency(atlas, 'baseline', 'probe', 'stand', start, duration), /query/);
+  }
+  assert.throws(() => atlasFrequency(atlas, 'baseline', 'unknown', 'stand', 0, 1), /Unknown/);
+});
+test('heat partitions include inclusive latest starts without interpolating unsupported times', () => {
+  const atlas = atlasFixture();
+  const item = { rowId: 'stand', earliest: 0, latest: 180000 };
+  const segments = atlasSegments(atlas, 'baseline', 'probe', item, 1, 0);
+  assert.deepEqual(segments.map(segment => [segment.start, segment.end, segment.frequency.planned_days, segment.frequency.retained_days]), [
+    [0, 60000, 2, 0], [60000, 60001, 2, 1], [60001, 120001, 0, 0], [120001, 180001, 0, 0],
+  ]);
+  for (const segment of segments) for (const time of [segment.start, segment.end - 1]) {
+    const actual = atlasFrequency(atlas, 'baseline', 'probe', 'stand', time, 1);
+    assert.equal(actual.planned_days, segment.frequency.planned_days);
+    assert.equal(actual.end_of_day_days, segment.frequency.end_of_day_days);
+    assert.equal(actual.retained_days, segment.frequency.retained_days);
+  }
+  assert.equal(atlasSegments(atlas, 'baseline', 'probe', { ...item, earliest: 60000, latest: 60000 }, 1, 0).length, 1);
+});
+
+test('capacity sidecars verify exact source identities and partition every assessed stand', async () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) {
+    const snapshot = readSnapshot(caseId);
+    const raw = JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.capacity.json`), 'utf8'));
+    const before = JSON.stringify(raw);
+    const capacity = await validateCapacitySnapshot(raw, snapshot);
+    for (const variant of ['baseline', 'tow-options']) {
+      const result = queryCapacity(capacity, variant, capacity.profile.default_probe_id, 75, Date.parse(snapshot.plan_window.start), Date.parse(snapshot.plan_window.end));
+      for (const item of result.opportunities) {
+        assert.ok(item.earliest <= item.latest);
+        assert.ok(item.latest + 75 * 60_000 <= Date.parse(snapshot.plan_window.end));
+      }
+    }
+    assert.equal(JSON.stringify(raw), before);
+    const changed = structuredClone(snapshot);
+    changed.variants.baseline.stays[0].rowId = 'changed';
+    await assert.rejects(validateCapacitySnapshot(raw, changed), /does not match/);
+    for (const mutate of [
+      value => { value.schema_version = '2'; },
+      value => { value.profile.default_probe_id = 'unknown'; },
+      value => { value.variants.baseline.request_fingerprint = '0'.repeat(64); },
+      value => { value.variants.baseline.probes[0].rows.pop(); },
+      value => { value.variants.baseline.probes[0].rows[0].windows.push({ start: snapshot.plan_window.start, end: snapshot.plan_window.end, before: null, after: null }); },
+      value => { value.variants.baseline.probes[0].rows.find(row => row.blocks.length).blocks[0].assignment_ids = ['missing']; },
+    ]) {
+      const invalid = structuredClone(raw); mutate(invalid);
+      await assert.rejects(validateCapacitySnapshot(invalid, snapshot), /capacity|Capacity/);
+    }
+  }
+});
+
+test('capacity queries include exact-fit instants, clip both horizon edges and reject invalid input explicitly', async () => {
+  const snapshot = readSnapshot('comfortable');
+  const raw = JSON.parse(readFileSync(resolve(root, 'src\\demo\\prepared\\comfortable.capacity.json'), 'utf8'));
+  const capacity = await validateCapacitySnapshot(raw, snapshot);
+  const start = Date.parse(snapshot.plan_window.start), end = Date.parse(snapshot.plan_window.end), probe = capacity.profile.default_probe_id;
+  const complete = queryCapacity(capacity, 'baseline', probe, 75, start, end);
+  const item = complete.opportunities[0];
+  const exact = queryCapacity(capacity, 'baseline', probe, 75, item.earliest, item.earliest + 75 * 60_000);
+  assert.ok(exact.opportunities.some(value => value.rowId === item.rowId && value.earliest === value.latest));
+  const tooShort = queryCapacity(capacity, 'baseline', probe, 75, item.earliest, item.earliest + 75 * 60_000 - 1);
+  assert.equal(tooShort.opportunities.length, 0);
+  for (const duration of [0, -1, NaN, 0.5, 1441]) assert.throws(() => queryCapacity(capacity, 'baseline', probe, duration, start, end), /Invalid/);
+  assert.throws(() => queryCapacity(capacity, 'baseline', 'unknown', 75, start, end), /Unknown/);
+  assert.throws(() => queryCapacity(capacity, 'baseline', probe, 75, start - 1, end), /Invalid/);
+  assert.throws(() => queryCapacity(capacity, 'baseline', probe, 75, start, end + 1), /Invalid/);
+  const local = value => new Date(value).toISOString().slice(0, 16);
+  assert.match(evaluateCapacityQuery(capacity, probe, '', local(start), local(end)).error, /duration/);
+  assert.match(evaluateCapacityQuery(capacity, probe, '75', local(end), local(start)).error, /positive UTC/);
+  assert.match(evaluateCapacityQuery(capacity, probe, '75', local(start - 60_000), local(end)).error, /inside/);
+  assert.equal(evaluateCapacityQuery(capacity, probe, '75', local(start), local(end)).error, null);
+});
 
 const waitInstant = minute => new Date(Date.parse('2026-10-24T07:00:00Z') + minute * 60_000).toISOString();
 function waitingSnapshot(specs = [[0, 10, 'stand:1'], [20, 30, 'stand:1'], [40, 50, 'stand:1']]) {

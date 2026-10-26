@@ -19,6 +19,8 @@ import { DemoSettings, DemoSettingsButton, DemoStatus } from "./demo/DemoSetting
 import { DEFAULT_BUFFER_PROFILE, evaluateBufferPlans } from "./demo/buffer-evaluation";
 import { BufferOverlay, PlanReview, type ReviewMetric } from "./demo/PlanReview";
 import { DEFAULT_GATE_WAIT_PROFILE, evaluateGateWaitPlans } from "./demo/gate-wait-evaluation";
+import { evaluateCapacityQuery } from "./demo/capacity-evaluation";
+import { CapacityOverlay, CapacityReview, capacityColor, initialCapacityReview } from "./demo/CapacityReview";
 
 /*
  * GTAA-only Navbar height. Coral's Navbar root is 44px (Griffel); passing a
@@ -43,6 +45,22 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
   const [reviewMetric, setReviewMetric] = useState<ReviewMetric>("buffers");
   const [showWaiting, setShowWaiting] = useState(false);
   const [assumptionId, setAssumptionId] = useState(DEFAULT_GATE_WAIT_PROFILE.default_assumption_id);
+  const capacity = dataset.prepared?.capacity;
+  const [capacityState, setCapacityState] = useState(() => initialCapacityReview(dataset.prepared?.snapshot, capacity));
+  const capacityQuery = useMemo(() => capacity
+    ? evaluateCapacityQuery(capacity, capacityState.probeId, capacityState.duration, capacityState.start, capacityState.end)
+    : null, [capacity, capacityState.probeId, capacityState.duration, capacityState.start, capacityState.end]);
+  const opportunities = dataset.prepared && capacityQuery?.variants?.[dataset.prepared.variant].opportunities;
+  const capacityLayers = useMemo(() => {
+    const prepared = dataset.prepared;
+    if (!capacity || !prepared) return [];
+    return capacity.profile.probes.flatMap((probe, index) => {
+      if (!capacityState.allProbes && probe.id !== capacityState.probeId) return [];
+      const duration = capacityState.allProbes ? probe.default_duration_minutes : Number(capacityState.duration);
+      const result = evaluateCapacityQuery(capacity, probe.id, String(duration), capacityState.start, capacityState.end);
+      return [{ probe, duration, color: capacityColor(index), opportunities: result.variants?.[prepared.variant].opportunities ?? [] }];
+    });
+  }, [capacity, dataset.prepared, capacityState.allProbes, capacityState.probeId, capacityState.duration, capacityState.start, capacityState.end]);
   const evaluation = useMemo(() => dataset.prepared
     ? evaluateBufferPlans(dataset.prepared.snapshot, { ...DEFAULT_BUFFER_PROFILE, threshold_minutes: threshold })
     : null, [dataset, threshold]);
@@ -72,6 +90,11 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
             gateEvaluation={gateEvaluation} metric={reviewMetric} setMetric={setReviewMetric}
             showWaiting={showWaiting} setShowWaiting={setShowWaiting} setAssumption={setAssumptionId}
           />}
+          {capacity && capacityQuery && dataset.prepared && <CapacityReview
+            snapshot={dataset.prepared.snapshot} capacity={capacity} variant={dataset.prepared.variant}
+            state={capacityState} setState={setCapacityState} query={capacityQuery}
+            atlas={dataset.prepared.atlas} layers={capacityLayers}
+          />}
           <DemoSettingsButton onClick={openDemoSettings} />
         </>}
         notice={<><DemoStatus /><FilterStatus />{showBuffers && evaluation && dataset.prepared && <p className="ops-filter-status" role="status">
@@ -84,14 +107,30 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
             ? gateEvaluation.variants[dataset.prepared.variant].waiting.availability
             : `${Number(gateEvaluation.variants[dataset.prepared.variant].waiting.summary.total_wait_minutes?.toFixed(2))} min`}.
           {" "}Blue dots mark positive arrival estimates, not added occupancy. Whole-plan review; not a solver objective.
+        </p>}{capacityState.show && capacity && <p className="ops-filter-status" role="status">
+          Single-turn capacity v{capacity.metric_version}: {capacityQuery?.error ?? (capacityState.allProbes
+            ? `${capacityLayers.reduce((count, layer) => count + layer.opportunities.length, 0)} alternative arrival-start ranges across ${capacityLayers.length} probes`
+            : `${opportunities?.length ?? 0} feasible arrival-start ranges`)}.
+          {" "}{capacityState.allProbes ? `${capacityLayers.length} colored probes shown. ` : ""}
+          Colored borders are alternative start times, not occupancy or additive slots.
+          {" "}{capacityState.mode !== "current" && `Intensity: synthetic ${capacityState.mode === "end_of_day" ? "modeled end-of-day" : capacityState.mode}; not observed history or an accommodation probability. `}
+          Whole-plan rules; filters do not change this query.
         </p>}</>}
-        plotLayers={(showBuffers || showWaiting) && evaluation && gateEvaluation && dataset.prepared ? <BufferOverlay
+        plotLayers={<>{(showBuffers || showWaiting) && evaluation && gateEvaluation && dataset.prepared ? <BufferOverlay
           snapshot={dataset.prepared.snapshot} result={evaluation.variants[dataset.prepared.variant].buffers}
           waiting={gateEvaluation.variants[dataset.prepared.variant].waiting}
           showBuffers={showBuffers} showWaiting={showWaiting}
           isMatch={matcher.active ? matcher.occupancy : undefined}
           onInspect={(id, metric) => { setSelectedBufferId(id); setReviewMetric(metric); setBufferReviewOpen(true); }}
         /> : undefined}
+          {capacityState.show && opportunities && dataset.prepared && <CapacityOverlay
+            layers={capacityLayers} snapshot={dataset.prepared.snapshot}
+            atlas={dataset.prepared.atlas} variant={dataset.prepared.variant} mode={capacityState.mode}
+            onInspect={(id, probe, start) => setCapacityState({ ...capacityState, probeId: probe.id,
+              duration: capacityState.allProbes ? String(probe.default_duration_minutes) : capacityState.duration,
+              selectedId: id, selectedStart: start, open: true })}
+          />}
+        </>}
       />
       <SelectionPopover />
     </>

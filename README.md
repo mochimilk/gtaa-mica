@@ -76,6 +76,13 @@ baseline/tow comparison. It does not change solver objectives or assignments.
 The same review supports [synthetic predicted gate waiting](docs/gate-wait-evaluation.md)
 with versioned release-delay assumptions, per-arrival evidence and separate
 arrival markers. Missing assessments are not treated as zero waiting.
+The [single-turn capacity probe](docs/capacity-probe.md) highlights feasible
+arrival-start ranges for a specified aircraft/operator/sector, duration and UTC
+window. It reuses locally prepared stand-rule evidence; ranges are alternatives,
+not additive turn slots.
+Its opportunity atlas can show all three colored probes and an explicitly
+synthetic month of planned/end-of-day recurrence and conditional retention,
+with exact-start daily evidence rather than an airport-wide capacity score.
 
 ```sh
 npm run validate:airport
