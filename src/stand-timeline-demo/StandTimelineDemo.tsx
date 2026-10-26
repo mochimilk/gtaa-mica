@@ -59,6 +59,8 @@ export interface StandTimelineDemoProps {
   toolbar?: ReactNode;
   /** Optional status line rendered under the subtitle. */
   notice?: ReactNode;
+  /** Optional host-owned plot annotations; these are not chart occupancy. */
+  plotLayers?: ReactNode;
 }
 
 export function StandTimelineDemo({
@@ -73,6 +75,7 @@ export function StandTimelineDemo({
   selectionActive,
   toolbar,
   notice,
+  plotLayers,
 }: StandTimelineDemoProps = {}) {
   const [localIds, setLocalIds] = useState<string[]>([]);
   const controlled = controlledIds !== undefined;
@@ -139,6 +142,7 @@ export function StandTimelineDemo({
           priority={["start", "end", "center"]}
           {...LABEL_METRICS}
         />
+        {plotLayers}
         <TimeAxis position="top" zoneLabel="UTC" {...QUARTER_RULER} />
         <TimeAxis position="bottom" zoneLabel="UTC" {...QUARTER_RULER} />
       </StandTimeline>

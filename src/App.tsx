@@ -6,7 +6,7 @@ import {
   Panel,
 } from "@coral-ai/react";
 import { makeStyles } from "@fluentui/react-components";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StandTimelineDemo } from "./stand-timeline-demo/StandTimelineDemo";
 import { OperationsPanel } from "./operations/OperationsPanel";
 import { OperationsProvider, useOperations } from "./operations/OperationsContext";
@@ -16,6 +16,8 @@ import { FilterStatus } from "./operations/FilterStatus";
 import { TreeDeciduous } from "@coral-ai/bundleicons";
 import { DemoProvider, useDemo } from "./demo/DemoContext";
 import { DemoSettings, DemoSettingsButton, DemoStatus } from "./demo/DemoSettings";
+import { DEFAULT_BUFFER_PROFILE, evaluateBufferPlans } from "./demo/buffer-evaluation";
+import { BufferOverlay, BufferReview } from "./demo/BufferReview";
 
 /*
  * GTAA-only Navbar height. Coral's Navbar root is 44px (Griffel); passing a
@@ -33,6 +35,13 @@ const useNavbarStyles = makeStyles({
 /** Chart wired to the shared operations selection, views and filters. */
 function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void }) {
   const { selection, applyChartIntent, matcher, dataset } = useOperations();
+  const [threshold, setThreshold] = useState(DEFAULT_BUFFER_PROFILE.threshold_minutes);
+  const [showBuffers, setShowBuffers] = useState(false);
+  const [bufferReviewOpen, setBufferReviewOpen] = useState(false);
+  const [selectedBufferId, setSelectedBufferId] = useState("");
+  const evaluation = useMemo(() => dataset.prepared
+    ? evaluateBufferPlans(dataset.prepared.snapshot, { ...DEFAULT_BUFFER_PROFILE, threshold_minutes: threshold })
+    : null, [dataset, threshold]);
   return (
     <>
       {/* Details show in SelectionPopover, so the demo's own detail strip is hidden here.
@@ -47,8 +56,26 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
         showSelectionDetail={false}
         isMatch={matcher.active ? matcher.occupancy : undefined}
         selectionActive={selection.occupancyIds.length > 0 || !!selection.flightId}
-        toolbar={<><ViewsFiltersToolbar /><DemoSettingsButton onClick={openDemoSettings} /></>}
-        notice={<><DemoStatus /><FilterStatus /></>}
+        toolbar={<>
+          <ViewsFiltersToolbar />
+          {evaluation && dataset.prepared && <BufferReview
+            snapshot={dataset.prepared.snapshot} evaluation={evaluation} variant={dataset.prepared.variant}
+            open={bufferReviewOpen} setOpen={setBufferReviewOpen} showOverlay={showBuffers} setShowOverlay={setShowBuffers}
+            setThreshold={setThreshold} selectedId={selectedBufferId} setSelectedId={setSelectedBufferId}
+          />}
+          <DemoSettingsButton onClick={openDemoSettings} />
+        </>}
+        notice={<><DemoStatus /><FilterStatus />{showBuffers && evaluation && dataset.prepared && <p className="ops-filter-status" role="status">
+          Scheduled buffers v{evaluation.metric.version}: {evaluation.variants[dataset.prepared.variant].buffers.availability === "invalid"
+            ? "invalid due to overlapping occupancy"
+            : `${evaluation.variants[dataset.prepared.variant].buffers.summary.tight_count} handovers below ${threshold} min`}.
+          {" "}Whole-plan review; not a solver objective. Dashed amber intervals are buffers, not occupancy.
+        </p>}</>}
+        plotLayers={showBuffers && evaluation && dataset.prepared ? <BufferOverlay
+          snapshot={dataset.prepared.snapshot} result={evaluation.variants[dataset.prepared.variant].buffers}
+          isMatch={matcher.active ? matcher.occupancy : undefined}
+          onInspect={id => { setSelectedBufferId(id); setBufferReviewOpen(true); }}
+        /> : undefined}
       />
       <SelectionPopover />
     </>

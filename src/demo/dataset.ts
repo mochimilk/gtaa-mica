@@ -16,6 +16,7 @@ export interface DemoDataset {
   arrivals: OpsFlight[];
   departures: OpsFlight[];
   alerts: OpsAlert[];
+  prepared?: { snapshot: PreparedScenario; variant: PlanVariant };
 }
 
 export interface PreparedFlight {

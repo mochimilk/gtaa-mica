@@ -103,6 +103,7 @@ export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanV
     id: `${snapshot.demand_id}/${variant}`, label: `Contoso · ${SCENARIO_LABELS[snapshot.case_id]} · ${variant === "baseline" ? "Baseline" : "Tow options"}`,
     date: snapshot.plan_window.start.slice(0, 10), timeBasis: "scheduled",
     subtitle: `${plan.covered_flight_count}/${flights.length} represented flight legs assigned · ${plan.generated_movement_count} generated tow movements · ${plan.solver_status}. Scheduled context included; not operationally certified.`,
+    prepared: { snapshot, variant },
     domain: [start, end], timeline: {
       rows: snapshot.rows, visits: snapshot.visits.map(visit => ({ id: visit.turnId, label: `${visit.arrFlight}/${visit.depFlight}` })),
       turnsById: visits, occupancies, endpoints, stayPosition,

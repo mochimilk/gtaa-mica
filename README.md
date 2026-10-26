@@ -70,6 +70,10 @@ Use [Demo settings](docs/demo-settings.md) beside the chart controls to switch
 between the original fixture and prepared Contoso plans without restarting.
 Only the selected source/case/plan preferences are saved locally.
 
+Prepared Contoso plans also offer a [scheduled buffer review](docs/buffer-evaluation.md)
+with a configurable reporting threshold, inspectable handover overlay and
+baseline/tow comparison. It does not change solver objectives or assignments.
+
 ```sh
 npm run validate:airport
 npm run test:airport

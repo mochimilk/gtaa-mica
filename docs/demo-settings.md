@@ -36,6 +36,10 @@ An unassigned visit stays in the flight lists and produces unassigned-flight
 alerts; no chart stay is invented for it. Explicit tow endpoints are drawn on
 the selected plan's arrival, parking and departure stays.
 
+Prepared plans expose a **Buffers** control for
+[scheduled buffer review](buffer-evaluation.md). It compares baseline/tow plans
+and can highlight tight handovers without changing occupancy or solver settings.
+
 ## State and persistence
 
 The chart, lists, filters, alerts and selection details consume one shared
