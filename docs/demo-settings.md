@@ -39,6 +39,9 @@ the selected plan's arrival, parking and departure stays.
 Prepared plans expose a **Buffers** control for
 [scheduled buffer review](buffer-evaluation.md). It compares baseline/tow plans
 and can highlight tight handovers without changing occupancy or solver settings.
+The adjacent **Gate waiting** control adds
+[synthetic point-estimate waiting](gate-wait-evaluation.md), with explicit
+delay assumptions and inspectable blue arrival markers in the same review dialog.
 
 ## State and persistence
 

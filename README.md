@@ -73,6 +73,9 @@ Only the selected source/case/plan preferences are saved locally.
 Prepared Contoso plans also offer a [scheduled buffer review](docs/buffer-evaluation.md)
 with a configurable reporting threshold, inspectable handover overlay and
 baseline/tow comparison. It does not change solver objectives or assignments.
+The same review supports [synthetic predicted gate waiting](docs/gate-wait-evaluation.md)
+with versioned release-delay assumptions, per-arrival evidence and separate
+arrival markers. Missing assessments are not treated as zero waiting.
 
 ```sh
 npm run validate:airport

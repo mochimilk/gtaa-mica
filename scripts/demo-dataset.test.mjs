@@ -36,11 +36,230 @@ const { DEMO_DATA, DEMO_DOMAIN, dayOffsetLabel, formatUtcWithDay } = await load(
 const { OPS_FLIGHTS, OPS_ALERTS } = await load('src\\operations\\operationsData.ts');
 const { standLabel } = await load('src\\stand-timeline-demo\\adapter.ts');
 const { BUFFER_METRIC, DEFAULT_BUFFER_PROFILE, parseBufferProfile, calculateStandBuffers, evaluateBufferPlans } = await load('src\\demo\\buffer-evaluation.ts');
+const { GATE_WAIT_METRIC, DEFAULT_GATE_WAIT_PROFILE, parseGateWaitProfile, evaluateGateWaitPlans } = await load('src\\demo\\gate-wait-evaluation.ts');
 const readSnapshot = caseId => validatePreparedSnapshot(JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.json`), 'utf8')));
 
 const bufferStay = (id, start, end, rowId = 'stand:1', visitId = id) =>
   ({ id, rowId, visitId, start: start * 60_000, end: end * 60_000 });
 const bufferHorizon = [0, 200 * 60_000];
+
+const waitInstant = minute => new Date(Date.parse('2026-10-24T07:00:00Z') + minute * 60_000).toISOString();
+function waitingSnapshot(specs = [[0, 10, 'stand:1'], [20, 30, 'stand:1'], [40, 50, 'stand:1']]) {
+  const template = readSnapshot('comfortable');
+  const visits = specs.map((_, index) => ({
+    ...template.visits[index], turnId: `v${index}`, arrFlight: `AA${101 + index * 2}`, depFlight: `AA${102 + index * 2}`,
+  }));
+  const flights = specs.flatMap(([start, end], index) => [
+    { id: `arr:v${index}`, visitId: `v${index}`, direction: 'arrival', flight: visits[index].arrFlight, routeEnd: 'LAX', scheduled: waitInstant(start) },
+    { id: `dep:v${index}`, visitId: `v${index}`, direction: 'departure', flight: visits[index].depFlight, routeEnd: 'LAX', scheduled: waitInstant(end) },
+  ]);
+  const stays = specs.map(([start, end, rowId], index) => ({
+    id: `stay:v${index}`, visitId: `v${index}`, rowId, start: waitInstant(start), end: waitInstant(end),
+    arrivalFlightId: `arr:v${index}`, departureFlightId: `dep:v${index}`, towIn: false, towOut: false,
+  }));
+  const plan = { ...template.variants.baseline, stays, covered_flight_count: flights.length, generated_movement_count: 0 };
+  return validatePreparedSnapshot({
+    ...template, demand_id: 'synthetic:waiting-test', plan_window: { start: waitInstant(0), end: waitInstant(200) },
+    rows: [...new Set(specs.map(item => item[2]))].map(id => ({ id, label: id })), visits, flights,
+    variants: { baseline: plan, 'tow-options': structuredClone(plan) },
+  });
+}
+
+test('gate-wait profiles explicitly version synthetic prediction assumptions and reject unsupported data', () => {
+  assert.equal(GATE_WAIT_METRIC.valueKind, 'predicted');
+  assert.equal(GATE_WAIT_METRIC.optimizationKind, 'scoring-only');
+  assert.equal(DEFAULT_GATE_WAIT_PROFILE.source, 'synthetic');
+  assert.equal(DEFAULT_GATE_WAIT_PROFILE.default_assumption_id, 'routine');
+  assert.deepEqual(parseGateWaitProfile(DEFAULT_GATE_WAIT_PROFILE), DEFAULT_GATE_WAIT_PROFILE);
+  const invalid = [
+    null, [], {}, { ...DEFAULT_GATE_WAIT_PROFILE, source: 'observed' },
+    { ...DEFAULT_GATE_WAIT_PROFILE, metric_version: '2.0.0' }, { ...DEFAULT_GATE_WAIT_PROFILE, model_version: '2.0.0' },
+    { ...DEFAULT_GATE_WAIT_PROFILE, model_id: ' ' }, { ...DEFAULT_GATE_WAIT_PROFILE, assumptions: [] },
+    { ...DEFAULT_GATE_WAIT_PROFILE, default_assumption_id: 'missing' }, { ...DEFAULT_GATE_WAIT_PROFILE, weight: 2 },
+    { ...DEFAULT_GATE_WAIT_PROFILE, assumptions: [DEFAULT_GATE_WAIT_PROFILE.assumptions[0], DEFAULT_GATE_WAIT_PROFILE.assumptions[0]] },
+    ...[-0.1, 1.1, NaN, Infinity, '0.25'].map(release_delay_probability => ({
+      ...DEFAULT_GATE_WAIT_PROFILE, assumptions: [{ ...DEFAULT_GATE_WAIT_PROFILE.assumptions[0], release_delay_probability }],
+    })),
+    ...[-1, 241, NaN, Infinity, '20'].map(expected_release_delay_minutes_given_delay => ({
+      ...DEFAULT_GATE_WAIT_PROFILE, assumptions: [{ ...DEFAULT_GATE_WAIT_PROFILE.assumptions[0], expected_release_delay_minutes_given_delay }],
+    })),
+  ];
+  for (const value of invalid) assert.throws(() => parseGateWaitProfile(value), /profile|assumption/);
+  assert.throws(() => evaluateGateWaitPlans(waitingSnapshot(), DEFAULT_GATE_WAIT_PROFILE, 'missing'), /Unknown/);
+  assert.throws(() => evaluateGateWaitPlans(waitingSnapshot(), null), /profile/);
+});
+
+test('hand-calculated waiting uses the predecessor release delay and preserves unassessed arrivals', () => {
+  const snapshot = waitingSnapshot(), before = structuredClone(snapshot);
+  const result = evaluateGateWaitPlans(snapshot);
+  const waiting = result.variants.baseline.waiting;
+  assert.equal(waiting.availability, 'available');
+  assert.deepEqual(waiting.summary, {
+    assigned_arrivals_in_horizon: 3, assessed_arrivals: 2, unassessed_arrivals: 1,
+    context_arrivals: 0, arrivals_with_positive_estimate: 2, total_wait_minutes: 5, maximum_arrival_wait_minutes: 2.5,
+  });
+  assert.deepEqual(waiting.contributions.map(item => [item.arrival_id, item.gap_minutes, item.estimated_wait_minutes]),
+    [['arr:v1', 10, 2.5], ['arr:v2', 10, 2.5]]);
+  assert.deepEqual(waiting.unassessed, [{ arrival_id: 'arr:v0', reason: 'no-complete-predecessor-handover' }]);
+  assert.equal(result.comparison.wait_delta_minutes, 0);
+  assert.equal(result.profile.model_id, DEFAULT_GATE_WAIT_PROFILE.model_id);
+  assert.equal(result.assumption.id, 'routine');
+  assert.deepEqual(snapshot, before);
+});
+
+test('zero delay probability, zero conditional delay and gaps at or above the mean give valid zero estimates', () => {
+  const base = DEFAULT_GATE_WAIT_PROFILE.assumptions[0];
+  for (const assumption of [
+    { ...base, release_delay_probability: 0 },
+    { ...base, expected_release_delay_minutes_given_delay: 0 },
+    { ...base, expected_release_delay_minutes_given_delay: 10 },
+  ]) {
+    const profile = { ...DEFAULT_GATE_WAIT_PROFILE, assumptions: [assumption] };
+    const result = evaluateGateWaitPlans(waitingSnapshot(), profile).variants.baseline.waiting;
+    assert.equal(result.availability, 'available');
+    assert.equal(result.summary.total_wait_minutes, 0);
+    assert.equal(result.summary.arrivals_with_positive_estimate, 0);
+    assert.equal(result.summary.unassessed_arrivals, 1);
+  }
+  const zeroGap = evaluateGateWaitPlans(waitingSnapshot([[0, 10, 'stand:1'], [10, 20, 'stand:1']]));
+  assert.equal(zeroGap.variants.baseline.waiting.summary.total_wait_minutes, 5);
+  const largerGap = evaluateGateWaitPlans(waitingSnapshot([[0, 10, 'stand:1'], [40, 50, 'stand:1']]));
+  assert.equal(largerGap.variants.baseline.waiting.summary.total_wait_minutes, 0);
+});
+
+test('fractional assumptions retain arithmetic precision, and stressed inputs do not change placements', () => {
+  const snapshot = waitingSnapshot([[0, 10, 'stand:1'], [15.25, 25, 'stand:1']]);
+  const assumption = { ...DEFAULT_GATE_WAIT_PROFILE.assumptions[0], release_delay_probability: 0.1, expected_release_delay_minutes_given_delay: 10.5 };
+  const result = evaluateGateWaitPlans(snapshot, { ...DEFAULT_GATE_WAIT_PROFILE, assumptions: [assumption] });
+  assert.ok(Math.abs(result.variants.baseline.waiting.summary.total_wait_minutes - 0.525) < 1e-12);
+  const stressed = evaluateGateWaitPlans(waitingSnapshot(), DEFAULT_GATE_WAIT_PROFILE, 'stressed');
+  assert.equal(stressed.variants.baseline.waiting.summary.total_wait_minutes, 30);
+  assert.equal(stressed.variants.baseline.waiting.summary.maximum_arrival_wait_minutes, 15);
+  assert.equal(stressed.variants.baseline.request_fingerprint, waitingSnapshot().variants.baseline.request_fingerprint);
+});
+
+test('only arrival handovers contribute, while predecessor tow releases remain explicit', () => {
+  const snapshot = waitingSnapshot([[0, 10, 'stand:1'], [20, 30, 'stand:1'], [60, 70, 'stand:1']]);
+  snapshot.flights.find(flight => flight.id === 'dep:v1').scheduled = waitInstant(90);
+  for (const plan of Object.values(snapshot.variants)) {
+    const service = plan.stays.find(stay => stay.visitId === 'v1');
+    delete service.departureFlightId;
+    service.towOut = true;
+    plan.stays.push({
+      id: 'v1-parking', visitId: 'v1', rowId: 'stand:1', start: waitInstant(40), end: waitInstant(50), towIn: true, towOut: true,
+    }, {
+      id: 'v1-departure', visitId: 'v1', rowId: 'stand:1', start: waitInstant(80), end: waitInstant(90),
+      departureFlightId: 'dep:v1', towIn: true, towOut: false,
+    });
+    plan.generated_movement_count = 2;
+  }
+  const result = evaluateGateWaitPlans(snapshot).variants.baseline.waiting;
+  assert.deepEqual(result.contributions.map(item => [item.arrival_id, item.predecessor_release_kind]),
+    [['arr:v1', 'departure'], ['arr:v2', 'tow']]);
+  assert.equal(result.summary.assessed_arrivals, 2);
+  assert.equal(result.summary.total_wait_minutes, 5);
+  assert.ok(result.contributions.every(item => item.handover.next.id !== 'v1-parking' && item.handover.next.id !== 'v1-departure'));
+});
+
+test('boundary context is separate from unassessed in-horizon arrivals, without imaginary predecessors', () => {
+  const result = evaluateGateWaitPlans(waitingSnapshot([[-20, 10, 'stand:1'], [20, 30, 'stand:1'], [200, 210, 'stand:1']]));
+  const waiting = result.variants.baseline.waiting;
+  assert.deepEqual(waiting.context_arrival_ids, ['arr:v0', 'arr:v2']);
+  assert.equal(waiting.summary.assigned_arrivals_in_horizon, 1);
+  assert.equal(waiting.summary.assessed_arrivals, 1);
+  assert.equal(waiting.summary.unassessed_arrivals, 0);
+  assert.equal(waiting.summary.total_wait_minutes, 2.5);
+  const noPredecessor = evaluateGateWaitPlans(waitingSnapshot([[10, 20, 'stand:1']])).variants.baseline.waiting;
+  assert.equal(noPredecessor.availability, 'not-applicable');
+  assert.equal(noPredecessor.summary.total_wait_minutes, null);
+  assert.equal(noPredecessor.summary.maximum_arrival_wait_minutes, null);
+  assert.equal(noPredecessor.summary.unassessed_arrivals, 1);
+});
+
+test('overlapping plans are invalid rather than false zero-wait predictions', () => {
+  const result = evaluateGateWaitPlans(waitingSnapshot([[0, 30, 'stand:1'], [20, 40, 'stand:1']]));
+  for (const plan of Object.values(result.variants)) {
+    assert.equal(plan.waiting.availability, 'invalid');
+    assert.equal(plan.waiting.summary.total_wait_minutes, null);
+    assert.equal(plan.waiting.summary.maximum_arrival_wait_minutes, null);
+    assert.equal(plan.waiting.contributions.length, 0);
+    assert.equal(plan.waiting.unassessed.length, 2);
+    assert.ok(plan.waiting.unassessed.every(item => item.reason === 'overlapping-occupancy'));
+  }
+  assert.equal(result.comparison.wait_delta_minutes, null);
+});
+
+test('empty assignments and parking-only handovers are not applicable, not measured zero waiting', () => {
+  const snapshot = waitingSnapshot();
+  for (const plan of Object.values(snapshot.variants)) plan.stays.forEach(stay => { delete stay.arrivalFlightId; stay.towIn = true; });
+  let result = evaluateGateWaitPlans(snapshot);
+  assert.equal(result.variants.baseline.waiting.availability, 'not-applicable');
+  assert.equal(result.variants.baseline.waiting.summary.total_wait_minutes, null);
+  for (const plan of Object.values(snapshot.variants)) plan.stays = [];
+  result = evaluateGateWaitPlans(snapshot);
+  assert.equal(result.variants.baseline.waiting.summary.assigned_arrivals_in_horizon, 0);
+  assert.equal(result.comparison.wait_delta_minutes, null);
+});
+
+test('equal assessed counts do not hide different assessed arrival sets', () => {
+  const snapshot = waitingSnapshot([[0, 10, 'stand:1'], [20, 30, 'stand:1'], [40, 50, 'stand:2']]);
+  snapshot.variants['tow-options'].stays[0].rowId = 'stand:2';
+  const result = evaluateGateWaitPlans(snapshot);
+  assert.equal(result.comparison.assigned_sets_differ, false);
+  assert.equal(result.variants.baseline.waiting.summary.assessed_arrivals, 1);
+  assert.equal(result.variants['tow-options'].waiting.summary.assessed_arrivals, 1);
+  assert.equal(result.comparison.assessed_sets_differ, true);
+  assert.equal(result.comparison.wait_delta_minutes, null);
+});
+
+test('gate-wait source endpoints fail explicitly on invalid or duplicate arrival references', () => {
+  for (const mutate of [
+    snapshot => { snapshot.variants.baseline.stays[0].arrivalFlightId = 'missing'; },
+    snapshot => { snapshot.variants.baseline.stays[0].arrivalFlightId = 'dep:v0'; },
+    snapshot => { snapshot.flights[0].scheduled = waitInstant(1); },
+    snapshot => { snapshot.flights.push({ ...snapshot.flights[0] }); },
+    snapshot => { snapshot.variants.baseline.stays[0].towIn = true; },
+    snapshot => { snapshot.variants.baseline.stays[0].departureFlightId = 'missing'; },
+    snapshot => { snapshot.variants.baseline.stays[0].departureFlightId = 'arr:v0'; },
+    snapshot => { snapshot.variants.baseline.stays[0].towOut = true; },
+    snapshot => { snapshot.flights.find(flight => flight.id === 'dep:v0').scheduled = waitInstant(11); },
+  ]) {
+    const snapshot = waitingSnapshot();
+    mutate(snapshot);
+    assert.throws(() => evaluateGateWaitPlans(snapshot), /gate-wait|Duplicate/);
+  }
+});
+
+test('all prepared plans reconcile assessed arrivals, retain provenance and preserve source and buffer results', () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) {
+    const snapshot = readSnapshot(caseId), before = structuredClone(snapshot);
+    const buffers = evaluateBufferPlans(snapshot);
+    const result = evaluateGateWaitPlans(snapshot);
+    const stressed = evaluateGateWaitPlans(snapshot, DEFAULT_GATE_WAIT_PROFILE, 'stressed');
+    assert.equal(result.demand_id, snapshot.demand_id);
+    for (const variant of ['baseline', 'tow-options']) {
+      const plan = result.variants[variant], summary = plan.waiting.summary;
+      assert.equal(plan.waiting.availability, 'available');
+      assert.equal(summary.assessed_arrivals + summary.unassessed_arrivals, summary.assigned_arrivals_in_horizon);
+      assert.equal(summary.assigned_arrivals_in_horizon + summary.context_arrivals,
+        snapshot.variants[variant].stays.filter(stay => stay.arrivalFlightId).length);
+      assert.equal(plan.assigned_visits, buffers.variants[variant].assigned_visits);
+      assert.equal(plan.request_fingerprint, snapshot.variants[variant].request_fingerprint);
+      assert.equal(summary.total_wait_minutes, plan.waiting.contributions.reduce((sum, item) =>
+        sum + 0.25 * Math.max(0, 20 - item.gap_minutes), 0));
+      assert.ok(stressed.variants[variant].waiting.summary.total_wait_minutes >= summary.total_wait_minutes);
+    }
+    assert.deepEqual(snapshot, before);
+    assert.deepEqual(evaluateBufferPlans(snapshot), buffers);
+    const reordered = structuredClone(snapshot);
+    reordered.flights.reverse(); reordered.visits.reverse();
+    for (const plan of Object.values(reordered.variants)) plan.stays.reverse();
+    assert.deepEqual(evaluateGateWaitPlans(reordered), result);
+  }
+  const constrained = evaluateGateWaitPlans(readSnapshot('constrained'));
+  assert.equal(constrained.comparison.assigned_sets_differ, true);
+  assert.equal(constrained.comparison.wait_delta_minutes, null);
+});
 
 test('buffer review has a versioned derived, reporting-only contract and strict profile parameters', () => {
   assert.equal(BUFFER_METRIC.valueKind, 'derived');

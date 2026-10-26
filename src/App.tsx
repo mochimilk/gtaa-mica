@@ -17,7 +17,8 @@ import { TreeDeciduous } from "@coral-ai/bundleicons";
 import { DemoProvider, useDemo } from "./demo/DemoContext";
 import { DemoSettings, DemoSettingsButton, DemoStatus } from "./demo/DemoSettings";
 import { DEFAULT_BUFFER_PROFILE, evaluateBufferPlans } from "./demo/buffer-evaluation";
-import { BufferOverlay, BufferReview } from "./demo/BufferReview";
+import { BufferOverlay, PlanReview, type ReviewMetric } from "./demo/PlanReview";
+import { DEFAULT_GATE_WAIT_PROFILE, evaluateGateWaitPlans } from "./demo/gate-wait-evaluation";
 
 /*
  * GTAA-only Navbar height. Coral's Navbar root is 44px (Griffel); passing a
@@ -39,9 +40,15 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
   const [showBuffers, setShowBuffers] = useState(false);
   const [bufferReviewOpen, setBufferReviewOpen] = useState(false);
   const [selectedBufferId, setSelectedBufferId] = useState("");
+  const [reviewMetric, setReviewMetric] = useState<ReviewMetric>("buffers");
+  const [showWaiting, setShowWaiting] = useState(false);
+  const [assumptionId, setAssumptionId] = useState(DEFAULT_GATE_WAIT_PROFILE.default_assumption_id);
   const evaluation = useMemo(() => dataset.prepared
     ? evaluateBufferPlans(dataset.prepared.snapshot, { ...DEFAULT_BUFFER_PROFILE, threshold_minutes: threshold })
     : null, [dataset, threshold]);
+  const gateEvaluation = useMemo(() => dataset.prepared
+    ? evaluateGateWaitPlans(dataset.prepared.snapshot, DEFAULT_GATE_WAIT_PROFILE, assumptionId)
+    : null, [dataset, assumptionId]);
   return (
     <>
       {/* Details show in SelectionPopover, so the demo's own detail strip is hidden here.
@@ -58,10 +65,12 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
         selectionActive={selection.occupancyIds.length > 0 || !!selection.flightId}
         toolbar={<>
           <ViewsFiltersToolbar />
-          {evaluation && dataset.prepared && <BufferReview
+          {evaluation && gateEvaluation && dataset.prepared && <PlanReview
             snapshot={dataset.prepared.snapshot} evaluation={evaluation} variant={dataset.prepared.variant}
             open={bufferReviewOpen} setOpen={setBufferReviewOpen} showOverlay={showBuffers} setShowOverlay={setShowBuffers}
             setThreshold={setThreshold} selectedId={selectedBufferId} setSelectedId={setSelectedBufferId}
+            gateEvaluation={gateEvaluation} metric={reviewMetric} setMetric={setReviewMetric}
+            showWaiting={showWaiting} setShowWaiting={setShowWaiting} setAssumption={setAssumptionId}
           />}
           <DemoSettingsButton onClick={openDemoSettings} />
         </>}
@@ -70,11 +79,18 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
             ? "invalid due to overlapping occupancy"
             : `${evaluation.variants[dataset.prepared.variant].buffers.summary.tight_count} handovers below ${threshold} min`}.
           {" "}Whole-plan review; not a solver objective. Dashed amber intervals are buffers, not occupancy.
+        </p>}{showWaiting && gateEvaluation && dataset.prepared && <p className="ops-filter-status" role="status">
+          Predicted gate waiting (synthetic, {gateEvaluation.assumption.label}): {gateEvaluation.variants[dataset.prepared.variant].waiting.summary.total_wait_minutes === null
+            ? gateEvaluation.variants[dataset.prepared.variant].waiting.availability
+            : `${Number(gateEvaluation.variants[dataset.prepared.variant].waiting.summary.total_wait_minutes?.toFixed(2))} min`}.
+          {" "}Blue dots mark positive arrival estimates, not added occupancy. Whole-plan review; not a solver objective.
         </p>}</>}
-        plotLayers={showBuffers && evaluation && dataset.prepared ? <BufferOverlay
+        plotLayers={(showBuffers || showWaiting) && evaluation && gateEvaluation && dataset.prepared ? <BufferOverlay
           snapshot={dataset.prepared.snapshot} result={evaluation.variants[dataset.prepared.variant].buffers}
+          waiting={gateEvaluation.variants[dataset.prepared.variant].waiting}
+          showBuffers={showBuffers} showWaiting={showWaiting}
           isMatch={matcher.active ? matcher.occupancy : undefined}
-          onInspect={id => { setSelectedBufferId(id); setBufferReviewOpen(true); }}
+          onInspect={(id, metric) => { setSelectedBufferId(id); setReviewMetric(metric); setBufferReviewOpen(true); }}
         /> : undefined}
       />
       <SelectionPopover />

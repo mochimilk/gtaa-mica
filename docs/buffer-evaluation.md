@@ -9,6 +9,10 @@ Choose a prepared Contoso plan in [Demo settings](demo-settings.md), then select
 **Buffers** beside the chart controls. The original fixture has no buffer-review
 controls and remains unchanged.
 
+The same dialog also offers [synthetic gate-wait review](gate-wait-evaluation.md)
+through **Gate waiting** or the **Review metric** selector. Its model assumptions
+and blue arrival markers are separate from the buffer threshold and gap overlay.
+
 The review compares baseline and tow options from the same prepared snapshot.
 Select **Tight below (minutes)** and enable **Show tight handovers on the chart**.
 Close the dialog to inspect dashed amber gap intervals. Click a marker, or focus
