@@ -1,0 +1,644 @@
+{
+  "$schema": "schemas/airports.schema.json",
+  "description": "Reference airports for synthetic route generation. Optional airline rosters are illustrative, not verified airport service.",
+  "airports": [
+    {
+      "code": "SFO",
+      "name": "San Francisco International",
+      "city": "San Francisco",
+      "country": "United States"
+    },
+    {
+      "code": "LAX",
+      "name": "Los Angeles International",
+      "city": "Los Angeles",
+      "country": "United States"
+    },
+    {
+      "code" : "SEA",
+      "name": "Seattle–Tacoma International",
+      "city": "Seattle",
+      "country": "United States"
+    },
+    {
+      "code": "JFK",
+      "name": "New York John F. Kennedy International",
+      "city": "New York",
+      "country": "United States"
+    },
+    {
+      "code": "BOS",
+      "name": "Boston Logan International",
+      "city": "Boston",
+      "country": "United States"
+    },
+    {
+      "code": "ORD",
+      "name": "Chicago O'Hare International",
+      "city": "Chicago",
+      "country": "United States"
+    },
+    {
+      "code": "YVR",
+      "name": "Vancouver International",
+      "city": "Vancouver",
+      "country": "Canada"
+    },
+    {
+      "code": "YUL",
+      "name": "Montréal–Trudeau International",
+      "city": "Montréal",
+      "country": "Canada"
+    },
+    {
+      "code": "LHR",
+      "name": "London Heathrow",
+      "city": "London",
+      "country": "United Kingdom"
+    },
+    {
+      "code": "CDG",
+      "name": "Charles de Gaulle",
+      "city": "Paris",
+      "country": "France"
+    },
+    {
+      "code": "FRA",
+      "name": "Frankfurt am Main",
+      "city": "Frankfurt",
+      "country": "Germany"
+    },
+    {
+      "code": "AMS",
+      "name": "Amsterdam Airport Schiphol",
+      "city": "Amsterdam",
+      "country": "Netherlands"
+    },
+    {
+      "code": "DXB",
+      "name": "Dubai International",
+      "city": "Dubai",
+      "country": "United Arab Emirates"
+    },
+    {
+      "code": "HND",
+      "name": "Tokyo Haneda",
+      "city": "Tokyo",
+      "country": "Japan"
+    },
+    {
+      "code": "HKG",
+      "name": "Hong Kong International",
+      "city": "Hong Kong",
+      "country": "Hong Kong"
+    },
+    {
+      "code": "SIN",
+      "name": "Singapore Changi",
+      "city": "Singapore",
+      "country": "Singapore"
+    },
+    {
+      "code": "ICN",
+      "name": "Incheon International",
+      "city": "Seoul",
+      "country": "South Korea"
+    },
+    {
+      "code": "SYD",
+      "name": "Sydney Kingsford Smith",
+      "city": "Sydney",
+      "country": "Australia"
+    },
+    {
+      "code": "MEL",
+      "name": "Melbourne Airport",
+      "city": "Melbourne",
+      "country": "Australia"
+    },
+    {
+      "code": "AKL",
+      "name": "Auckland Airport",
+      "city": "Auckland",
+      "country": "New Zealand"
+    },
+    {
+      "code": "NRT",
+      "name": "Narita International",
+      "city": "Tokyo",
+      "country": "Japan"
+    },
+    {
+      "code": "YYZ",
+      "name": "Toronto Pearson International",
+      "city": "Toronto",
+      "country": "Canada",
+      "airlines": [
+        { "airline_id": "airline:ACA", "weight": 8 },
+        { "airline_id": "airline:WJA", "weight": 4 },
+        { "airline_id": "airline:UAL", "weight": 2 },
+        { "airline_id": "airline:AAL", "weight": 2 },
+        { "airline_id": "airline:BAW" },
+        { "airline_id": "airline:AFR" }
+      ]
+    },
+    {
+      "code": "MEX",
+      "name": "Mexico City International",
+      "city": "Mexico City",
+      "country": "Mexico"
+    },
+    {
+      "code": "GRU",
+      "name": "São Paulo–Guarulhos International",
+      "city": "São Paulo",
+      "country": "Brazil"
+    },
+    {
+      "code": "EZE",
+      "name": "Ministro Pistarini International",
+      "city": "Buenos Aires",
+      "country": "Argentina"
+    },
+    {
+      "code": "FCO",
+      "name": "Leonardo da Vinci–Fiumicino Airport",
+      "city": "Rome",
+      "country": "Italy"
+    },
+    {
+      "code": "ATL",
+      "name": "Hartsfield–Jackson Atlanta International",
+      "city": "Atlanta",
+      "country": "United States"
+    },
+    {
+      "code": "AUS",
+      "name": "Austin-Bergstrom International",
+      "city": "Austin",
+      "country": "United States"
+    },
+    {
+      "code": "DEN",
+      "name": "Denver International",
+      "city": "Denver",
+      "country": "United States"
+    },
+    {
+      "code": "DFW",
+      "name": "Dallas/Fort Worth International",
+      "city": "Dallas",
+      "country": "United States"
+    },
+    {
+      "code": "DTW",
+      "name": "Detroit Metropolitan Wayne County",
+      "city": "Detroit",
+      "country": "United States"
+    },
+    {
+      "code": "MIA",
+      "name": "Miami International",
+      "city": "Miami",
+      "country": "United States"
+    },
+    {
+      "code": "LGA",
+      "name": "LaGuardia Airport",
+      "city": "New York",
+      "country": "United States"
+    },
+    {
+      "code": "MCO",
+      "name": "Orlando International",
+      "city": "Orlando",
+      "country": "United States"
+    },
+    {
+      "code": "PHX",
+      "name": "Phoenix Sky Harbor International",
+      "city": "Phoenix",
+      "country": "United States"
+    },
+    {
+      "code": "PHL",
+      "name": "Philadelphia International",
+      "city": "Philadelphia",
+      "country": "United States"
+    },
+    {
+      "code": "SLC",
+      "name": "Salt Lake City International",
+      "city": "Salt Lake City",
+      "country": "United States"
+    },
+    {
+      "code": "SAN",
+      "name": "San Diego International",
+      "city": "San Diego",
+      "country": "United States"
+    },
+    {
+      "code": "DCA",
+      "name": "Ronald Reagan Washington National",
+      "city": "Washington",
+      "country": "United States"
+    },
+    {
+      "code": "IAD",
+      "name": "Washington Dulles International",
+      "city": "Washington",
+      "country": "United States"
+    },
+    {
+      "code": "EWR",
+      "name": "Newark Liberty International",
+      "city": "Newark",
+      "country": "United States"
+    },
+    {
+      "code": "MSP",
+      "name": "Minneapolis−Saint Paul International",
+      "city": "Minneapolis",
+      "country": "United States"
+    },
+    {
+      "code": "CLT",
+      "name": "Charlotte Douglas International",
+      "city": "Charlotte",
+      "country": "United States"
+    },
+    {
+      "code": "AUH",
+      "name": "Abu Dhabi International",
+      "city": "Abu Dhabi",
+      "country": "United Arab Emirates"
+    },
+    {
+      "code": "ATH",
+      "name": "Athens International",
+      "city": "Athens",
+      "country": "Greece"
+    },
+    {
+      "code": "BCN",
+      "name": "Barcelona–El Prat Airport",
+      "city": "Barcelona",
+      "country": "Spain"
+    },
+    {
+      "code": "BOG",
+      "name": "El Dorado International",
+      "city": "Bogotá",
+      "country": "Colombia"
+    },
+    {
+      "code": "CUN",
+      "name": "Cancún International",
+      "city": "Cancún",
+      "country": "Mexico"
+    },
+    {
+      "code": "CPH",
+      "name": "Copenhagen Airport",
+      "city": "Copenhagen",
+      "country": "Denmark"  
+    },
+    {
+      "code": "DEL",
+      "name": "Indira Gandhi International",
+      "city": "New Delhi",
+      "country": "India"
+    },
+    {
+      "code": "DOH",
+      "name": "Hamad International",
+      "city": "Doha",
+      "country": "Qatar"
+    },
+    {
+      "code": "DUB",
+      "name": "Dublin Airport",
+      "city": "Dublin",
+      "country": "Ireland"  
+    },
+    {
+      "code": "EDI",
+      "name": "Edinburgh Airport",
+      "city": "Edinburgh",
+      "country": "United Kingdom"
+    },
+    {
+      "code": "GCM",
+      "name": "Owen Roberts International",
+      "city": "George Town",
+      "country": "Cayman Islands"
+    },
+    {
+      "code": "HEL",
+      "name": "Helsinki Airport",
+      "city": "Helsinki",
+      "country": "Finland"
+    },
+    {
+      "code": "IST",
+      "name": "Istanbul Airport",
+      "city": "Istanbul",
+      "country": "Turkey"
+    },
+    {
+      "code": "KEF",
+      "name": "Keflavík International",
+      "city": "Reykjavík",
+      "country": "Iceland"
+    },
+    {
+      "code": "KIN",
+      "name": "Norman Manley International",
+      "city": "Kingston",
+      "country": "Jamaica"
+    },
+    {
+      "code": "LIS",
+      "name": "Humberto Delgado Airport",
+      "city": "Lisbon",
+      "country": "Portugal"
+    },
+    {
+      "code": "MAD",
+      "name": "Adolfo Suárez Madrid–Barajas Airport",
+      "city": "Madrid",
+      "country": "Spain"
+    },
+    {
+      "code": "MNL",
+      "name": "Ninoy Aquino International",
+      "city": "Manila",
+      "country": "Philippines"
+    },
+    {
+      "code": "MBJ",
+      "name": "Sangster International",
+      "city": "Montego Bay",
+      "country": "Jamaica"
+    },
+    {
+      "code": "MUC",
+      "name": "Munich Airport",
+      "city": "Munich",
+      "country": "Germany"
+    },
+    {
+      "code": "NAS",
+      "name": "Lynden Pindling International",
+      "city": "Nassau",
+      "country": "Bahamas"
+    },
+    {
+      "code": "PDL",
+      "name": "João Paulo II Airport",
+      "city": "Ponta Delgada",
+      "country": "Portugal"
+    },
+    {
+      "code": "POS",
+      "name": "Piarco International",
+      "city": "Port of Spain",
+      "country": "Trinidad and Tobago"
+    },
+    {
+      "code": "PVR",
+      "name": "Licenciado Gustavo Díaz Ordaz International",
+      "city": "Puerto Vallarta",
+      "country": "Mexico"
+    },
+    {
+      "code": "PUJ",
+      "name": "Punta Cana International",
+      "city": "Punta Cana",
+      "country": "Dominican Republic"
+    },
+    {
+      "code": "TPE",
+      "name": "Taiwan Taoyuan International",
+      "city": "Taipei",
+      "country": "Taiwan"
+    },
+    {
+      "code": "TQO",
+      "name": "Tres Arroyos Airport",
+      "city": "Tres Arroyos",
+      "country": "Argentina"
+    },
+    {
+      "code": "VCE",
+      "name": "Venice Marco Polo Airport",
+      "city": "Venice",
+      "country": "Italy"
+    },
+    {
+      "code": "VIE",
+      "name": "Vienna International",
+      "city": "Vienna",
+      "country": "Austria"
+    },
+    {
+      "code": "WAW",
+      "name": "Warsaw Chopin Airport",
+      "city": "Warsaw",
+      "country": "Poland"
+    },
+    {
+      "code": "ZRH",
+      "name": "Zurich Airport",
+      "city": "Zurich",
+      "country": "Switzerland"
+    },
+    {
+      "code": "LIM",
+      "name": "Jorge Chávez International",
+      "city": "Lima",
+      "country": "Peru"
+    },
+    {
+      "code": "YYC",
+      "name": "Calgary International",
+      "city": "Calgary",
+      "country": "Canada"
+    },
+    {
+      "code": "YEG",
+      "name": "Edmonton International",
+      "city": "Edmonton",
+      "country": "Canada"
+    },
+    {
+      "code": "YHZ",
+      "name": "Halifax Stanfield International",
+      "city": "Halifax",
+      "country": "Canada"
+    },
+    {
+      "code": "YOW",
+      "name": "Ottawa Macdonald-Cartier International",
+      "city": "Ottawa",
+      "country": "Canada"
+    },
+    {
+      "code": "YWG",
+      "name": "Winnipeg James Armstrong Richardson International",
+      "city": "Winnipeg",
+      "country": "Canada"
+    },
+    {
+      "code": "HNL",
+      "name": "Daniel K. Inouye International",
+      "city": "Honolulu",
+      "country": "United States"
+    },
+    {
+      "code": "OGG",
+      "name": "Kahului Airport",
+      "city": "Kahului",
+      "country": "United States"
+    },
+    {
+      "code": "KOA",
+      "name": "Kona International",
+      "city": "Kailua-Kona",
+      "country": "United States"
+    },
+    {
+      "code": "ITO",
+      "name": "Hilo International",
+      "city": "Hilo",
+      "country": "United States"
+    },
+    {
+      "code": "LIH",
+      "name": "Lihue Airport",
+      "city": "Lihue",
+      "country": "United States"
+    },
+    {
+      "code": "PEK",
+      "name": "Beijing Capital International",
+      "city": "Beijing",
+      "country": "China"
+    },
+    {
+      "code": "PVG",
+      "name": "Shanghai Pudong International",
+      "city": "Shanghai",
+      "country": "China"
+    },
+    {
+      "code": "CAN",
+      "name": "Guangzhou Baiyun International",
+      "city": "Guangzhou",
+      "country": "China"
+    },
+    {
+      "code": "HAK",
+      "name": "Haikou Meilan International",
+      "city": "Haikou",
+      "country": "China"
+    },
+    {
+      "code": "BEG",
+      "name": "Belgrade Nikola Tesla",
+      "city": "Belgrade",
+      "country": "Serbia"
+    },
+    {
+      "code": "BDA",
+      "name": "L.F. Wade International",
+      "city": "Bermuda",
+      "country": "Bermuda"
+    },
+    {
+      "code": "DAC",
+      "name": "Shahjalal International",
+      "city": "Dhaka",
+      "country": "Bangladesh"
+    },
+    {
+      "code": "PTY",
+      "name": "Tocumen International",
+      "city": "Panama City",
+      "country": "Panama"
+    },
+    {
+      "code": "CAI",
+      "name": "Cairo International",
+      "city": "Cairo",
+      "country": "Egypt"
+    },
+    {
+      "code": "ADD",
+      "name": "Addis Ababa Bole International",
+      "city": "Addis Ababa",
+      "country": "Ethiopia"
+    },
+    {
+      "code": "KUL",
+      "name": "Kuala Lumpur International",
+      "city": "Kuala Lumpur",
+      "country": "Malaysia"
+    },
+    {
+      "code": "ISB",
+      "name": "Islamabad International",
+      "city": "Islamabad",
+      "country": "Pakistan"
+    },
+    {
+      "code": "KHI",
+      "name": "Jinnah International",
+      "city": "Karachi",
+      "country": "Pakistan"
+    },
+    {
+      "code": "CMN",
+      "name": "Mohammed V International",
+      "city": "Casablanca",
+      "country": "Morocco"
+    },
+    {
+      "code": "AMM",
+      "name": "Queen Alia International",
+      "city": "Amman",
+      "country": "Jordan"
+    },
+    {
+      "code": "JED",
+      "name": "King Abdulaziz International",
+      "city": "Jeddah",
+      "country": "Saudi Arabia"
+    },
+    {
+      "code": "RUH",
+      "name": "King Khalid International",
+      "city": "Riyadh",
+      "country": "Saudi Arabia"
+    },
+    {
+      "code": "ARN",
+      "name": "Stockholm Arlanda",
+      "city": "Stockholm",
+      "country": "Sweden"
+    },
+    {
+      "code": "YXY",
+      "name": "Whitehorse International",
+      "city": "Whitehorse",
+      "country": "Canada"
+    },
+    {
+      "code": "ANC",
+      "name": "Ted Stevens Anchorage International",
+      "city": "Anchorage",
+      "country": "United States"
+    }
+  ]
+}

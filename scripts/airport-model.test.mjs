@@ -34,9 +34,9 @@ const fixture = () => ({
     { id: 'both', sectors: ['domestic', 'international'] },
   ] },
   airlines: { airlines: [
-    { id: 'airline:ACA', name: 'Air Canada' },
-    { id: 'airline:UAL', name: 'United' },
-    { id: 'airline:AAL', name: 'American' },
+    { id: 'airline:ACA', name: 'Air Canada', country: 'Canada' },
+    { id: 'airline:UAL', name: 'United', country: 'United States' },
+    { id: 'airline:AAL', name: 'American', country: 'United States' },
   ] },
   airlineGroups: { groups: [
     { id: 'group:alliance:star', name: 'Star test pool', airlines: ['airline:ACA', 'airline:UAL'] },
@@ -104,7 +104,7 @@ test('omitted, empty and empty-member airline permissions close the stand, inclu
 
 test('an ungrouped catalog airline cannot use a stand with allowed groups', () => {
   const data = fixture();
-  data.airlines.airlines.push({ id: 'ungrouped', name: 'Ungrouped' });
+  data.airlines.airlines.push({ id: 'ungrouped', name: 'Ungrouped', country: 'Canada' });
   const findings = run(data, [occupancy('target', 'A', {
     arrival: { sectorId: 'domestic', operatingAirlineId: 'ungrouped' }, departure: undefined,
   })]);
@@ -370,7 +370,7 @@ test('reference validation rejects broken relationships', async t => {
     ['false readiness', data => { data.airport.planning_ready = true; data.stands.stands[0].configuration_status = 'geometry-only'; }],
     ['unknown airline group', data => { data.stands.stands[0]['airline-groups'] = ['missing']; }],
     ['unknown airline member', data => { data.airlineGroups.groups[0].airlines.push('missing'); }],
-    ['duplicate airline', data => { data.airlines.airlines.push({ id: 'airline:ACA', name: 'Duplicate' }); }],
+    ['duplicate airline', data => { data.airlines.airlines.push({ id: 'airline:ACA', name: 'Duplicate', country: 'Canada' }); }],
     ['duplicate airline group', data => { data.airlineGroups.groups.push(structuredClone(data.airlineGroups.groups[0])); }],
     ['overlapping airline groups', data => { data.airlineGroups.groups[1].airlines.push('airline:ACA'); }],
   ];

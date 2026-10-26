@@ -15,9 +15,10 @@ import { summarizeScenario } from './scenario-report.mjs';
 
 const airport = loadAirport();
 const profile = loadScenarioProfile();
+const fullDayProfile = loadScenarioProfile(fileURLToPath(new URL('../data/airports/contoso/demand/full-day-profile.json', import.meta.url)));
 const ajv = new Ajv({ allErrors: true, strictRequired: false });
 ajv.addFormat('date-time', isUtcInstant);
-for (const name of ['raw-demand', 'linked-demand', 'occupancy', 'tow-profile', 'tow-preparation', 'local-solver-request', 'local-assignment', 'scenario-profile', 'scenario', 'scenario-run']) {
+for (const name of ['raw-demand', 'linked-demand', 'occupancy', 'tow-profile', 'tow-preparation', 'local-solver-request', 'local-assignment', 'route-generation', 'scenario-profile', 'scenario', 'scenario-run']) {
   ajv.addSchema(readJson(fileURLToPath(new URL(`../data/schemas/${name}.schema.json`, import.meta.url))));
 }
 const shape = ajv.getSchema('urn:gtaa-mica:scenario:1.0.0');
@@ -57,6 +58,144 @@ const solve = (scenario, data = airport) => {
   assert.ok(runShape(result), ajv.errorsText(runShape.errors));
   return result;
 };
+
+test('full day has exactly 160 visits, 320 in-horizon legs and the requested market/pool split', () => {
+  const scenario = generate('full-day', fullDayProfile);
+  assert.equal(scenario.expected_visit_count, 160);
+  assert.equal(scenario.raw_demand.legs.length, 320);
+  assert.equal(Date.parse(scenario.plan_window.end) - Date.parse(scenario.plan_window.start), 24 * 60 * 60_000);
+  assert.deepEqual(scenario.initial_state, []);
+  assert.deepEqual(scenario.final_state, []);
+  const markets = {};
+  for (const trace of scenario.generation_trace) {
+    assert.equal(trace.arrival_market_id, trace.departure_market_id);
+    markets[trace.arrival_market_id] = (markets[trace.arrival_market_id] ?? 0) + 1;
+  }
+  assert.deepEqual(markets, { asia: 12, domestic: 136, europe: 12 });
+  const totals = {};
+  for (const row of scenario.traffic_allocation) totals[row.planning_group_id] = (totals[row.planning_group_id] ?? 0) + row.visit_count;
+  assert.deepEqual(totals, {
+    'group:alliance:oneworld': 80, 'group:alliance:skyteam': 40, 'group:alliance:star': 40,
+  });
+  for (const target of fullDayProfile.traffic_targets) {
+    const rows = scenario.traffic_allocation.filter(row => row.target_id === target.id);
+    assert.equal(rows.reduce((sum, row) => sum + row.visit_count, 0), target.count);
+    assert.equal(rows.reduce((sum, row) => sum + row.stand_credit, 0), target.sector_id === 'domestic' ? 38 : 8);
+  }
+  assert.ok(scenario.raw_demand.legs.every(leg => {
+    const time = Date.parse(leg.scheduled_on_block ?? leg.scheduled_off_block);
+    return Date.parse(scenario.plan_window.start) <= time && time < Date.parse(scenario.plan_window.end);
+  }));
+});
+
+test('catalog flights use unique readable IATA numbers, compatible geography and primarily US operators', () => {
+  const scenario = generate('full-day', fullDayProfile);
+  const catalog = readJson(fileURLToPath(new URL('../data/airports.json', import.meta.url)));
+  const airports = new Map(catalog.airports.map(airport => [airport.code, airport]));
+  const airlines = new Map(airport.airlines.airlines.map(airline => [airline.id, airline]));
+  assert.equal(new Set(scenario.raw_demand.legs.map(leg => leg.flight_number)).size, 320);
+  let us = 0;
+  for (const leg of scenario.raw_demand.legs) {
+    const airline = airlines.get(leg.operating_airline_id);
+    assert.match(leg.flight_number, new RegExp(`^${airline.iata}[1-9][0-9]{2,3}$`));
+    const code = leg.type === 'arrival' ? leg.origin_airport_id : leg.destination_airport_id;
+    assert.ok(airports.has(code));
+    assert.equal(airports.get(code).country === 'United States', leg.sector_id === 'domestic');
+    if (airline.country === 'United States') us++;
+  }
+  assert.equal(us, 308);
+  const source = new Map(scenario.raw_demand.legs.map(leg => [leg.id, leg]));
+  for (const trace of scenario.generation_trace) {
+    const arrival = source.get(trace.arrival_leg_id);
+    const departure = source.get(trace.departure_leg_id);
+    const market = fullDayProfile.route_generation.markets.find(market => market.id === trace.arrival_market_id);
+    if (market) {
+      assert.ok(market.airports.some(endpoint => endpoint.airport_code === arrival.origin_airport_id));
+      assert.ok(market.airports.some(endpoint => endpoint.airport_code === departure.destination_airport_id));
+      const airline = airlines.get(arrival.operating_airline_id);
+      if (airline.country !== 'United States') {
+        const choices = airline.hub_airports ?? catalog.airports.filter(airport => airport.country === airline.country).map(airport => airport.code);
+        assert.ok(choices.includes(arrival.origin_airport_id));
+        assert.ok(choices.includes(departure.destination_airport_id));
+      }
+    }
+  }
+});
+
+test('route enrichment preserves legacy source IDs, registrations, timing and passenger draws', () => {
+  const legacy = structuredClone(profile);
+  delete legacy.route_generation;
+  const project = scenario => scenario.raw_demand.legs.map(({ flight_number, origin_airport_id, destination_airport_id, ...rest }) => rest);
+  assert.deepEqual(project(generate('constrained')), project(generate('constrained', legacy)));
+  assert.equal(generate('comfortable', legacy).generator_version, 'seeded-joint-hourly-v1');
+});
+
+test('full-day allocation and endpoints are independent of catalog/profile row ordering', () => {
+  const reordered = structuredClone(fullDayProfile);
+  reordered.traffic_mix.reverse();
+  reordered.traffic_targets.reverse();
+  reordered.route_generation.markets.reverse();
+  for (const market of reordered.route_generation.markets) market.airports.reverse();
+  const data = structuredClone(airport);
+  data.stands.stands.reverse();
+  data.airlineGroups.groups.reverse();
+  assert.equal(JSON.stringify(generate('full-day', reordered, data)), JSON.stringify(generate('full-day', fullDayProfile)));
+});
+
+test('closing an eligible stand changes derived shares instead of retaining hardcoded quotas', () => {
+  const data = structuredClone(airport);
+  data.stands.stands.find(stand => stand.code === 'R08').closed = true;
+  const scenario = generate('full-day', fullDayProfile, data);
+  for (const target of ['asia', 'europe']) {
+    const rows = scenario.traffic_allocation.filter(row => row.target_id === target);
+    assert.equal(rows.reduce((sum, row) => sum + row.stand_credit, 0), 7);
+    assert.equal(rows.find(row => row.planning_group_id === 'group:alliance:oneworld').visit_count, 5);
+  }
+});
+
+test('invalid traffic targets, market references and domestic/foreign endpoint mixes are explicit errors', () => {
+  for (const [mutate, message] of [
+    [input => { input.traffic_targets.push(input.traffic_targets[0]); }, /Duplicate traffic target/],
+    [input => { input.traffic_mix[0].target_id = 'missing'; }, /Unknown traffic target/],
+    [input => { input.traffic_targets[0].market_id = 'europe'; }, /Domestic traffic target/],
+    [input => { input.traffic_targets[1].market_id = 'missing'; }, /Unknown route market/],
+    [input => { input.traffic_mix[0].count = 1; }, /Invalid scenario profile/],
+    [input => { input.traffic_targets[0].count = 200; }, /1 through 200/],
+    [input => { input.route_generation.markets[0].airports[0].airport_code = 'SFO'; }, /host country/],
+    [input => { input.route_generation.markets[0].airports[0].airport_code = 'XXX'; }, /Unknown market airport/],
+    [input => { input.route_generation.markets[0].airports.push(input.route_generation.markets[0].airports[0]); }, /Duplicate airport/],
+    [input => { input.route_generation.markets.push(input.route_generation.markets[0]); }, /Duplicate route market/],
+  ]) {
+    const input = structuredClone(fullDayProfile);
+    mutate(input);
+    assert.throws(() => generateScenario(input, airport, 'full-day'), message);
+  }
+  const noCountry = structuredClone(airport);
+  delete noCountry.airport.country;
+  assert.throws(() => generateScenario(fullDayProfile, noCountry, 'full-day'), /explicit host airport country/);
+});
+
+test('flight number collision probing stays unique at the 200-visit workload ceiling', () => {
+  const input = smallProfile();
+  input.traffic_mix[0].count = 200;
+  const scenario = generate('comfortable', input);
+  assert.equal(new Set(scenario.raw_demand.legs.map(leg => leg.flight_number)).size, 400);
+});
+
+test('native full day keeps all demand visible and reports actual congestion without fabricated assignments', () => {
+  const result = solve(generate('full-day', fullDayProfile));
+  assert.equal(result.summary.expectations_passed, true);
+  assert.equal(result.summary.in_horizon_flight_legs, 320);
+  assert.equal(result.summary.context_flight_legs, 0);
+  for (const metrics of Object.values(result.summary.metrics)) {
+    assert.equal(metrics.solver_status, 'optimal');
+    assert.equal(metrics.assigned_visits, 149);
+    assert.equal(metrics.assigned_flight_legs, 298);
+    assert.equal(metrics.unassigned_visits, 11);
+    assert.equal(metrics.generated_tows, 0);
+    assert.equal(metrics.stand_validation_passed, true);
+  }
+});
 
 test('comfortable day has exact traffic counts, short/long stays and explicit complete overnight context', () => {
   const scenario = generate();

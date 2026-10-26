@@ -42,6 +42,10 @@ try {
   if (values.output === undefined) process.stdout.write(json);
   else writeFileSync(values.output, json, { flag: 'wx' });
   console.error(`Generated ${scenario.case_id}: ${scenario.expected_visit_count} complete scheduled visits, ${scenario.raw_demand.legs.length} raw legs; ${scenario.initial_state.length} initial and ${scenario.final_state.length} final aircraft.`);
+  for (const warning of scenario.routing_warnings ?? []) console.error(`WARNING ${warning}`);
+  for (const allocation of scenario.traffic_allocation ?? []) {
+    console.error(`${allocation.target_id} / ${allocation.planning_group_id}: ${allocation.visit_count} visits; ${allocation.stand_credit} shared-stand credits.`);
+  }
   if (values.output !== undefined) console.error(`Scenario ${values.solve ? 'review' : 'demand'} written to ${values.output}`);
   console.error('Synthetic closed-feed scenario only. Airport configuration, validation seed and Gantt are unchanged.');
 } catch (error) {

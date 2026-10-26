@@ -7,7 +7,21 @@
   "required": ["schema_version", "generator_version", "id", "profile", "case_id", "profile_fingerprint", "plan_window", "raw_demand", "expected_visit_count", "generation_trace", "initial_state", "final_state", "timing_complete", "limitations"],
   "properties": {
     "schema_version": { "const": "1.0.0" },
-    "generator_version": { "const": "seeded-joint-hourly-v1" },
+    "generator_version": { "enum": ["seeded-joint-hourly-v1", "catalog-stand-share-v2"] },
+    "routing_warnings": { "type": "array", "items": { "type": "string" } },
+    "traffic_allocation": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["target_id", "planning_group_id", "stand_credit", "visit_count"],
+        "properties": {
+          "target_id": { "$ref": "#/definitions/id" },
+          "planning_group_id": { "$ref": "#/definitions/id" },
+          "stand_credit": { "type": "number", "exclusiveMinimum": 0 },
+          "visit_count": { "type": "integer", "minimum": 0, "maximum": 200 }
+        }
+      }
+    },
     "id": { "$ref": "#/definitions/id" },
     "profile": { "$ref": "urn:gtaa-mica:scenario-profile:1.0.0" },
     "case_id": { "$ref": "#/definitions/id" },
@@ -28,7 +42,9 @@
           "departure_leg_id": { "$ref": "#/definitions/id" },
           "timing_method": { "enum": ["joint-hourly-weighted", "explicit-boundary-context", "weighted-pressure-bank"] },
           "scheduled_on_block": { "$ref": "#/definitions/instant" },
-          "scheduled_off_block": { "$ref": "#/definitions/instant" }
+          "scheduled_off_block": { "$ref": "#/definitions/instant" },
+          "arrival_market_id": { "$ref": "#/definitions/id" },
+          "departure_market_id": { "$ref": "#/definitions/id" }
         }
       }
     },

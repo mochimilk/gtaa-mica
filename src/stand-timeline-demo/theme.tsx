@@ -84,6 +84,14 @@ export const CARRIER_PALETTE: Record<string, CarrierPalette> = {
   XD: carrier("xd"),
   UAL: carrier("xa"),
   AAL: carrier("xb"),
+  ASA: carrier("xb"),
+  BAW: carrier("xb"),
+  JAL: carrier("xb"),
+  DLH: carrier("xa"),
+  EVA: carrier("xa"),
+  DAL: carrier("xc"),
+  AFR: carrier("xc"),
+  CES: carrier("xc"),
 };
 
 const FALLBACK: CarrierPalette = {

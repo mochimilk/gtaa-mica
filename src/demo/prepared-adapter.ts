@@ -4,6 +4,7 @@ import type { Occupancy } from "../stand-timeline";
 import type { OpsAlert, OpsFlight } from "../operations/operationsData";
 import type { DemoDataset, PreparedScenario } from "./dataset";
 import type { PlanVariant } from "./preferences";
+import { SCENARIO_LABELS } from "./preferences";
 
 const instant = (value: string) => {
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(value) || !Number.isFinite(Date.parse(value))) {
@@ -99,7 +100,7 @@ export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanV
   }));
   const byTime = (a: OpsFlight, b: OpsFlight) => a.estimate - b.estimate || a.flight.localeCompare(b.flight);
   return {
-    id: `${snapshot.demand_id}/${variant}`, label: `Contoso · ${snapshot.case_id === "comfortable" ? "Comfortable" : "Constrained"} · ${variant === "baseline" ? "Baseline" : "Tow options"}`,
+    id: `${snapshot.demand_id}/${variant}`, label: `Contoso · ${SCENARIO_LABELS[snapshot.case_id]} · ${variant === "baseline" ? "Baseline" : "Tow options"}`,
     date: snapshot.plan_window.start.slice(0, 10), timeBasis: "scheduled",
     subtitle: `${plan.covered_flight_count}/${flights.length} represented flight legs assigned · ${plan.generated_movement_count} generated tow movements · ${plan.solver_status}. Scheduled context included; not operationally certified.`,
     domain: [start, end], timeline: {

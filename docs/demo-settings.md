@@ -7,7 +7,7 @@ description: Use local demo settings to switch the complete workspace between th
 
 Open **Demo** beside the chart's Views and Filters controls.
 Choose **Existing demo** or **Contoso scenarios**. For Contoso, choose
-**Comfortable** or **Constrained**, then **Baseline** or **Tow options**.
+**Comfortable**, **Constrained** or **Full day**, then **Baseline** or **Tow options**.
 Select **Apply** to change the whole workspace. **Cancel** leaves it unchanged.
 **Reset to original demo** restores the original source and default preferences.
 
@@ -24,6 +24,13 @@ context outside the visible horizon, remain available in the lists.
 |---------------|------------------------------|--------------------------------|
 | Comfortable   | 36 visits, no added movements | 36 visits, no added movements |
 | Constrained   | 40 of 41 visits assigned      | 41 assigned with 2 movements  |
+| Full day      | 149 of 160 visits assigned    | 149 assigned, no added movements |
+
+Full day represents October 24, 2026 in Contoso's local US time zone:
+136 domestic visits, 12 Europe visits and 12 Asia visits. It retains all
+320 source legs, including 22 legs from 11 unassigned visits. These appear
+as alerts and list entries, not invented chart occupancy. Market weights
+are illustrative. See the [full-day configuration and measured results](scenario-generation.md#generate-a-full-contoso-day).
 
 An unassigned visit stays in the flight lists and produces unassigned-flight
 alerts; no chart stay is invented for it. Explicit tow endpoints are drawn on
@@ -62,7 +69,7 @@ dataset still works for the session, with an explicit persistence warning.
 
 ## Prepared snapshots and developer maintenance
 
-The two [prepared snapshots](../src/demo/prepared) are checked-in, compact
+The three [prepared snapshots](../src/demo/prepared) are checked-in, compact
 viewer projections of the existing
 [scenario generation and local solver](scenario-generation.md).
 They contain source flights, visits, stand rows, fixed selected stays, explicit
@@ -74,7 +81,7 @@ backend, native bridge, network solver or .NET process is used by the viewer.
 The reusable [timeline renderer](../src/stand-timeline) is unchanged; adapters
 provide its chart-neutral rows, visits and intervals.
 
-Developers can regenerate both checked-in snapshots after intentionally
+Developers can regenerate all checked-in snapshots after intentionally
 changing the airport or scenario profile:
 
 ```powershell
@@ -84,9 +91,10 @@ npm run build
 ```
 
 Regeneration requires the local .NET 10 solver and existing dependencies.
-It runs both cases, checks scenario expectations and the
+It runs all three cases, checks scenario expectations and the
 [snapshot schema](../data/schemas/demo-scenario.schema.json), then replaces
-the two known snapshot files and their generated standalone validator.
+three known snapshot files and their generated standalone validator.
+It also writes the generated [full-day raw demand](../data/airports/contoso/demand/full-day-demand.json).
 The validator requires no runtime code generation, preserving the packaged
 Electron app's content security policy. Presenters do not need this command.
 Airport configuration changes do not silently change the prepared viewer plans.

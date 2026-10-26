@@ -14,7 +14,8 @@ export const ORIGINAL_DATASET: DemoDataset = {
 export async function loadDemoDataset(preferences: DemoPreferences): Promise<DemoDataset> {
   if (preferences.source === "original") return ORIGINAL_DATASET;
   const [module, { validatePreparedSnapshot }, { adaptPreparedScenario }] = await Promise.all([
-    preferences.scenario === "comfortable" ? import("./prepared/comfortable.json") : import("./prepared/constrained.json"),
+    preferences.scenario === "comfortable" ? import("./prepared/comfortable.json")
+      : preferences.scenario === "constrained" ? import("./prepared/constrained.json") : import("./prepared/full-day.json"),
     import("./validate-prepared"), import("./prepared-adapter"),
   ]);
   const snapshot = validatePreparedSnapshot(module.default);

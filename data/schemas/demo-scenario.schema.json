@@ -7,7 +7,7 @@
   "required": ["schema_version", "case_id", "demand_id", "plan_window", "rows", "visits", "flights", "variants"],
   "properties": {
     "schema_version": { "const": "1.0.0" },
-    "case_id": { "enum": ["comfortable", "constrained"] },
+    "case_id": { "enum": ["comfortable", "constrained", "full-day"] },
     "demand_id": { "$ref": "#/definitions/id" },
     "plan_window": {
       "type": "object", "additionalProperties": false, "required": ["start", "end"],

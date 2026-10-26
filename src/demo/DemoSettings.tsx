@@ -52,6 +52,7 @@ export function DemoSettings({ open, setOpen }: { open: boolean; setOpen: (open:
                 }}>
                   <option value="comfortable">Comfortable</option>
                   <option value="constrained">Constrained</option>
+                  <option value="full-day">Full day · 160 visits</option>
                 </Select>
               </Field>
               <Field label={{ children: "Plan", htmlFor: variantId }}>

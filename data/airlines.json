@@ -1,353 +1,443 @@
 {
   "$schema": "schemas/airlines.schema.json",
+  "description": "Airline identities and home countries with optional illustrative synthetic hub preferences. Hub hints are not a verified current network.",
   "airlines": [
     {
       "id": "airline:EIN",
       "name": "Aer Lingus",
       "icao": "EIN",
-      "iata": "EI"
+      "iata": "EI",
+      "country": "Ireland"
     },
     {
       "id": "airline:AMX",
       "name": "AeroMexico",
       "icao": "AMX",
-      "iata": "AM"
+      "hub_airports": ["MEX"],
+      "iata": "AM",
+      "country": "Mexico"
     },
     {
       "id": "airline:ACA",
       "name": "Air Canada",
       "icao": "ACA",
-      "iata": "AC"
+      "hub_airports": ["YYZ", "YUL", "YVR"],
+      "iata": "AC",
+      "country": "Canada"
     },
     {
       "id": "airline:CCA",
       "name": "Air China",
       "icao": "CCA",
-      "iata": "CA"
+      "hub_airports": ["PEK"],
+      "iata": "CA",
+      "country": "China"
     },
     {
       "id": "airline:AFR",
       "name": "Air France",
       "icao": "AFR",
-      "iata": "AF"
+      "iata": "AF",
+      "country": "France"
     },
     {
       "id": "airline:AIC",
       "name": "Air India",
       "icao": "AIC",
-      "iata": "AI"
+      "iata": "AI",
+      "country": "India"
     },
     {
       "id": "airline:ANT",
       "name": "Air North",
       "icao": "ANT",
-      "iata": "4N"
+      "hub_airports": ["YXY"],
+      "iata": "4N",
+      "country": "Canada"
     },
     {
       "id": "airline:ASL",
       "name": "Air Serbia",
       "icao": "ASL",
-      "iata": "JU"
+      "iata": "JU",
+      "country": "Serbia"
     },
     {
       "id": "airline:TSC",
       "name": "Air Transat",
       "icao": "TSC",
-      "iata": "TS"
+      "hub_airports": ["YUL", "YYZ"],
+      "iata": "TS",
+      "country": "Canada"
     },
     {
       "id": "airline:ASA",
       "name": "Alaska Airlines",
       "icao": "ASA",
-      "iata": "AS"
+      "hub_airports": ["SEA", "ANC"],
+      "iata": "AS",
+      "country": "United States"
     },
     {
       "id": "airline:AAL",
       "name": "American Airlines",
       "icao": "AAL",
-      "iata": "AA"
+      "hub_airports": ["DFW", "CLT", "MIA", "ORD", "PHL", "PHX", "DCA", "JFK", "LAX"],
+      "iata": "AA",
+      "country": "United States"
     },
     {
       "id": "airline:DWI",
       "name": "Arajet",
       "icao": "DWI",
-      "iata": "DM"
+      "iata": "DM",
+      "country": "Dominican Republic"
     },
     {
       "id": "airline:AVA",
       "name": "Avianca Airlines",
       "icao": "AVA",
-      "iata": "AV"
+      "iata": "AV",
+      "country": "Colombia"
     },
     {
       "id": "airline:RZO",
       "name": "Azores Airlines",
       "icao": "RZO",
-      "iata": "S4"
+      "hub_airports": ["PDL"],
+      "iata": "S4",
+      "country": "Portugal"
     },
     {
       "id": "airline:BMA",
       "name": "BermudAir",
       "icao": "BMA",
-      "iata": "2T"
+      "iata": "2T",
+      "country": "Bermuda"
     },
     {
       "id": "airline:BBC",
       "name": "Biman Bangladesh Airlines",
       "icao": "BBC",
-      "iata": "BG"
+      "iata": "BG",
+      "country": "Bangladesh"
     },
     {
       "id": "airline:BAW",
       "name": "British Airways",
       "icao": "BAW",
-      "iata": "BA"
+      "hub_airports": ["LHR"],
+      "iata": "BA",
+      "country": "United Kingdom"
     },
     {
       "id": "airline:BWA",
       "name": "Caribbean Airlines",
       "icao": "BWA",
-      "iata": "BW"
+      "iata": "BW",
+      "country": "Trinidad and Tobago"
     },
     {
       "id": "airline:CPA",
       "name": "Cathay Pacific",
       "icao": "CPA",
-      "iata": "CX"
+      "iata": "CX",
+      "country": "Hong Kong"
     },
     {
       "id": "airline:CES",
       "name": "China Eastern",
       "icao": "CES",
-      "iata": "MU"
+      "hub_airports": ["PVG"],
+      "iata": "MU",
+      "country": "China"
     },
     {
       "id": "airline:CSN",
       "name": "China Southern",
       "icao": "CSN",
-      "iata": "CZ"
+      "hub_airports": ["CAN"],
+      "iata": "CZ",
+      "country": "China"
     },
     {
       "id": "airline:CFG",
       "name": "Condor",
       "icao": "CFG",
-      "iata": "DE"
+      "hub_airports": ["FRA"],
+      "iata": "DE",
+      "country": "Germany"
     },
     {
       "id": "airline:CMP",
       "name": "Copa Airlines",
       "icao": "CMP",
-      "iata": "CM"
+      "iata": "CM",
+      "country": "Panama"
     },
     {
       "id": "airline:DAL",
       "name": "Delta",
       "icao": "DAL",
-      "iata": "DL"
+      "hub_airports": ["ATL", "DTW", "MSP", "SLC", "JFK", "BOS", "SEA", "LAX"],
+      "iata": "DL",
+      "country": "United States"
     },
     {
       "id": "airline:MSR",
       "name": "Egyptair",
       "icao": "MSR",
-      "iata": "MS"
+      "iata": "MS",
+      "country": "Egypt"
     },
     {
       "id": "airline:UAE",
       "name": "Emirates",
       "icao": "UAE",
-      "iata": "EK"
+      "hub_airports": ["DXB"],
+      "iata": "EK",
+      "country": "United Arab Emirates"
     },
     {
       "id": "airline:ETH",
       "name": "Ethiopian",
       "icao": "ETH",
-      "iata": "ET"
+      "iata": "ET",
+      "country": "Ethiopia"
     },
     {
       "id": "airline:ETD",
       "name": "Etihad",
       "icao": "ETD",
-      "iata": "EY"
+      "hub_airports": ["AUH"],
+      "iata": "EY",
+      "country": "United Arab Emirates"
     },
     {
       "id": "airline:EVA",
       "name": "Eva Air",
       "icao": "EVA",
-      "iata": "BR"
+      "iata": "BR",
+      "country": "Taiwan"
     },
     {
       "id": "airline:FIN",
       "name": "Finnair",
       "icao": "FIN",
-      "iata": "AY"
+      "iata": "AY",
+      "country": "Finland"
     },
     {
       "id": "airline:FLE",
       "name": "Flair Airlines",
       "icao": "FLE",
-      "iata": "F8"
+      "hub_airports": ["YEG", "YVR"],
+      "iata": "F8",
+      "country": "Canada"
     },
     {
       "id": "airline:CHH",
       "name": "Hainan Airlines",
       "icao": "CHH",
-      "iata": "HU"
+      "hub_airports": ["HAK", "PEK"],
+      "iata": "HU",
+      "country": "China"
     },
     {
       "id": "airline:HA",
       "name": "Hawaiian Airlines",
       "icao": "HA",
-      "iata": "HA"
+      "hub_airports": ["HNL", "OGG"],
+      "iata": "HA",
+      "country": "United States"
     },
     {
       "id": "airline:IBE",
       "name": "Iberia",
       "icao": "IBE",
-      "iata": "IB"
+      "hub_airports": ["MAD"],
+      "iata": "IB",
+      "country": "Spain"
     },
     {
       "id": "airline:ICE",
       "name": "Icelandair",
       "icao": "ICE",
-      "iata": "FI"
+      "iata": "FI",
+      "country": "Iceland"
     },
     {
       "id": "airline:ITY",
       "name": "ITA Airways",
       "icao": "ITY",
-      "iata": "AZ"
+      "hub_airports": ["FCO"],
+      "iata": "AZ",
+      "country": "Italy"
     },
     {
       "id": "airline:JAL",
       "name": "Japan Airlines",
       "icao": "JAL",
-      "iata": "JL"
+      "hub_airports": ["HND", "NRT"],
+      "iata": "JL",
+      "country": "Japan"
     },
     {
       "id": "airline:KLM",
       "name": "KLM",
       "icao": "KLM",
-      "iata": "KL"
+      "iata": "KL",
+      "country": "Netherlands"
     },
     {
       "id": "airline:KAL",
       "name": "Korean Air",
       "icao": "KAL",
-      "iata": "KE"
+      "iata": "KE",
+      "country": "South Korea"
     },
     {
       "id": "airline:LOT",
       "name": "LOT Polish Airlines",
       "icao": "LOT",
-      "iata": "LO"
+      "iata": "LO",
+      "country": "Poland"
     },
     {
       "id": "airline:DLH",
       "name": "Lufthansa",
       "icao": "DLH",
-      "iata": "LH"
+      "hub_airports": ["FRA", "MUC"],
+      "iata": "LH",
+      "country": "Germany"
     },
     {
       "id": "airline:MAS",
       "name": "Malaysia Airlines",
       "icao": "MAS",
-      "iata": "MH"
+      "iata": "MH",
+      "country": "Malaysia"
     },
     {
       "id": "airline:PIA",
       "name": "Pakistan International Airlines",
       "icao": "PIA",
-      "iata": "PK"
+      "hub_airports": ["ISB", "KHI"],
+      "iata": "PK",
+      "country": "Pakistan"
     },
     {
       "id": "airline:PAL",
       "name": "Philippine Airlines",
       "icao": "PAL",
-      "iata": "PR"
+      "iata": "PR",
+      "country": "Philippines"
     },
     {
       "id": "airline:POE",
       "name": "Porter Airlines",
       "icao": "POE",
-      "iata": "PD"
+      "hub_airports": ["YYZ", "YOW"],
+      "iata": "PD",
+      "country": "Canada"
     },
     {
       "id": "airline:QFA",
       "name": "Qantas",
       "icao": "QFA",
-      "iata": "QF"
+      "hub_airports": ["SYD", "MEL"],
+      "iata": "QF",
+      "country": "Australia"
     },
     {
       "id": "airline:QTR",
       "name": "Qatar Airways",
       "icao": "QTR",
-      "iata": "QR"
+      "iata": "QR",
+      "country": "Qatar"
     },
     {
       "id": "airline:RAM",
       "name": "Royal Air Maroc",
       "icao": "RAM",
-      "iata": "AT"
+      "iata": "AT",
+      "country": "Morocco"
     },
     {
       "id": "airline:RJA",
       "name": "Royal Jordanian",
       "icao": "RJA",
-      "iata": "RJ"
+      "iata": "RJ",
+      "country": "Jordan"
     },
     {
       "id": "airline:SVA",
       "name": "Saudia",
       "icao": "SVA",
-      "iata": "SV"
+      "hub_airports": ["JED", "RUH"],
+      "iata": "SV",
+      "country": "Saudi Arabia"
     },
     {
       "id": "airline:SAS",
       "name": "Scandinavian Airlines",
       "icao": "SAS",
-      "iata": "SK"
+      "hub_airports": ["ARN", "CPH"],
+      "iata": "SK",
+      "country": "Sweden"
     },
     {
       "id": "airline:SCX",
       "name": "Sun Country Airlines",
       "icao": "SCX",
-      "iata": "SY"
+      "hub_airports": ["MSP"],
+      "iata": "SY",
+      "country": "United States"
     },
     {
       "id": "airline:SWR",
       "name": "Swiss International Air Lines",
       "icao": "SWR",
-      "iata": "LX"
+      "iata": "LX",
+      "country": "Switzerland"
     },
     {
       "id": "airline:TAP",
       "name": "TAP Air Portugal",
       "icao": "TAP",
-      "iata": "TP"
+      "iata": "TP",
+      "country": "Portugal"
     },
     {
       "id": "airline:THY",
       "name": "Turkish Airlines",
       "icao": "THY",
-      "iata": "TK"
+      "iata": "TK",
+      "country": "Turkey"
     },
     {
       "id": "airline:UAL",
       "name": "United Airlines",
       "icao": "UAL",
-      "iata": "UA"
+      "hub_airports": ["ORD", "DEN", "EWR", "IAD", "SFO", "LAX"],
+      "iata": "UA",
+      "country": "United States"
     },
     {
       "id": "airline:VIR",
       "name": "Virgin Atlantic",
       "icao": "VIR",
-      "iata": "VS"
+      "hub_airports": ["LHR"],
+      "iata": "VS",
+      "country": "United Kingdom"
     },
     {
       "id": "airline:WJA",
       "name": "Westjet",
       "icao": "WJA",
-      "iata": "WS"
+      "hub_airports": ["YYC", "YVR", "YYZ"],
+      "iata": "WS",
+      "country": "Canada"
     }
   ]
 }

@@ -13,12 +13,20 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["id", "name"],
+        "required": ["id", "name", "country"],
         "properties": {
           "id": { "type": "string", "pattern": "^\\S+$" },
           "name": { "type": "string", "pattern": "\\S" },
           "icao": { "type": "string", "pattern": "^\\S+$" },
-          "iata": { "type": "string", "pattern": "^\\S+$" }
+          "iata": { "type": "string", "pattern": "^\\S+$" },
+          "country": { "type": "string", "pattern": "\\S", "not": { "pattern": "^\\s|\\s$" } },
+          "hub_airports": {
+            "description": "Illustrative synthetic hub preferences, not a verified current route network. Omission derives home-country choices.",
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^[A-Z]{3}$" }
+          }
         }
       }
     }

@@ -4,7 +4,8 @@
   "title": "Seeded airport demand scenario suite",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schema_version", "id", "airport_id", "seed", "plan_window", "sampling_step_minutes", "external_airport_ids", "traffic_mix", "boundary_visits", "cases"],
+  "required": ["schema_version", "id", "airport_id", "seed", "plan_window", "sampling_step_minutes", "traffic_mix", "boundary_visits", "cases"],
+  "anyOf": [{ "required": ["external_airport_ids"] }, { "required": ["route_generation"] }],
   "properties": {
     "$schema": { "type": "string" },
     "schema_version": { "const": "1.0.0" },
@@ -15,11 +16,28 @@
     "plan_window": { "$ref": "urn:gtaa-mica:linked-demand:2.0.0#/definitions/window" },
     "sampling_step_minutes": { "type": "integer", "minimum": 5, "maximum": 120 },
     "external_airport_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } },
+    "route_generation": { "$ref": "urn:gtaa-mica:route-generation:1.0.0" },
+    "traffic_targets": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "count", "sector_id"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "count": { "type": "integer", "minimum": 1, "maximum": 200 },
+          "sector_id": { "enum": ["domestic", "international"] },
+          "market_id": { "$ref": "#/definitions/id" }
+        }
+      }
+    },
     "traffic_mix": {
       "type": "array",
       "items": {
         "type": "object", "additionalProperties": false,
-        "required": ["id", "aircraft_id", "operating_airline_id", "arrival_sector_id", "departure_sector_id", "passenger_min", "passenger_max", "count", "minimum_stay_minutes", "maximum_stay_minutes"],
+        "required": ["id", "aircraft_id", "operating_airline_id", "arrival_sector_id", "departure_sector_id", "passenger_min", "passenger_max", "minimum_stay_minutes", "maximum_stay_minutes"],
+        "oneOf": [
+          { "required": ["count"], "not": { "anyOf": [{ "required": ["target_id"] }, { "required": ["weight"] }] } },
+          { "required": ["target_id", "weight"], "not": { "required": ["count"] } }
+        ],
         "properties": {
           "id": { "$ref": "#/definitions/id" },
           "aircraft_id": { "$ref": "#/definitions/id" },
@@ -29,6 +47,8 @@
           "passenger_min": { "$ref": "#/definitions/pax" },
           "passenger_max": { "$ref": "#/definitions/pax" },
           "count": { "type": "integer", "minimum": 0, "maximum": 200 },
+          "target_id": { "$ref": "#/definitions/id" },
+          "weight": { "type": "integer", "minimum": 1, "maximum": 1000000 },
           "minimum_stay_minutes": { "$ref": "#/definitions/minutes" },
           "maximum_stay_minutes": { "$ref": "#/definitions/minutes" }
         }

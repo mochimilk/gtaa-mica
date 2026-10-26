@@ -58,19 +58,29 @@ export function prepareDemoSnapshot(scenario, comparison, airport) {
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   try {
-    if (process.argv.length !== 2) throw new Error('Usage: npm run prepare:demo (regenerates both checked-in demo snapshots)');
+    if (process.argv.length !== 2) throw new Error('Usage: npm run prepare:demo (regenerates all checked-in demo snapshots)');
     const airport = loadAirport(), profile = loadScenarioProfile();
-    const snapshots = ['comfortable', 'constrained'].map(caseId => {
-      const scenario = generateScenario(profile, airport, caseId);
+    const fullDay = loadScenarioProfile(fileURLToPath(new URL('../data/airports/contoso/demand/full-day-profile.json', import.meta.url)));
+    const snapshots = [['comfortable', profile], ['constrained', profile], ['full-day', fullDay]].map(([caseId, input]) => {
+      const scenario = generateScenario(input, airport, caseId);
+      for (const warning of scenario.routing_warnings ?? []) console.warn(`WARNING ${warning}`);
       const comparison = solveAirport(scenario.raw_demand, airport, { planStart: scenario.plan_window.start, planEnd: scenario.plan_window.end });
-      return prepareDemoSnapshot(scenario, comparison, airport);
+      for (const [variant, metrics] of Object.entries(summarizeScenario(scenario, comparison, airport).metrics)) {
+        console.log(`${caseId}/${variant}: ${metrics.assigned_visits}/${scenario.expected_visit_count} visits; ${metrics.generated_tows} generated tows; ${metrics.solver_status}.`);
+      }
+      return { snapshot: prepareDemoSnapshot(scenario, comparison, airport), raw: scenario.raw_demand };
     });
     const directory = fileURLToPath(new URL('../src/demo/prepared/', import.meta.url));
     mkdirSync(directory, { recursive: true });
-    for (const snapshot of snapshots) {
+    for (const { snapshot, raw } of snapshots) {
       const path = fileURLToPath(new URL(`../src/demo/prepared/${snapshot.case_id}.json`, import.meta.url));
       writeFileSync(path, `${JSON.stringify(snapshot, null, 2)}\n`);
       console.log(`Prepared ${snapshot.case_id}: ${snapshot.visits.length} visits, ${snapshot.flights.length} flight legs. ${path}`);
+      if (snapshot.case_id === 'full-day') {
+        const demandPath = fileURLToPath(new URL('../data/airports/contoso/demand/full-day-demand.json', import.meta.url));
+        writeFileSync(demandPath, `${JSON.stringify(raw, null, 2)}\n`);
+        console.log(`Generated full-day raw demand: ${demandPath}`);
+      }
     }
     const ajv = new Ajv({ allErrors: true, code: { source: true, esm: true } });
     ajv.addFormat('date-time', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/);

@@ -50,7 +50,7 @@ test('fresh-install defaults retain the exact existing chart, panel and alert ob
 
 test('versioned preferences round-trip and reject malformed, unsupported or stale selections', () => {
   for (const source of ['original', 'contoso']) {
-    for (const scenario of ['comfortable', 'constrained']) {
+    for (const scenario of ['comfortable', 'constrained', 'full-day']) {
       for (const variant of ['baseline', 'tow-options']) {
         const preferences = { version: 1, source, scenario, variant };
         assert.deepEqual(parseDemoPreferences(JSON.parse(JSON.stringify(preferences))), preferences);
@@ -97,6 +97,27 @@ test('constrained baseline retains both flights of its unassigned visit without 
   assert.ok(dataset.alerts.every(alert => unassigned.some(flight => flight.id === alert.flightId)));
 });
 
+test('full day displays all 320 source legs, ten operators and its measured unassigned flights', () => {
+  const snapshot = readSnapshot('full-day');
+  for (const variant of ['baseline', 'tow-options']) {
+    const dataset = adaptPreparedScenario(snapshot, variant);
+    assert.match(dataset.label, /Full day/);
+    assert.equal(dataset.date, '2026-10-24');
+    assert.equal(dataset.domain[1] - dataset.domain[0], 24 * 60 * 60_000);
+    assert.equal(dataset.flights.length, 320);
+    assert.equal(dataset.arrivals.length, 160);
+    assert.equal(dataset.departures.length, 160);
+    assert.equal(dataset.timeline.occupancies.length, 149);
+    assert.equal(dataset.flights.filter(flight => !flight.standId).length, 22);
+    assert.equal(dataset.alerts.length, 22);
+    assert.deepEqual(makeFilterOptions(dataset).carrier, ['AAL', 'AFR', 'ASA', 'BAW', 'CES', 'DAL', 'DLH', 'EVA', 'JAL', 'UAL']);
+    assert.ok(dataset.flights.every(flight => /^[A-Z0-9]{2}[1-9][0-9]{2,3}$/.test(flight.flight)));
+    assert.ok(dataset.flights.every(flight => /^[A-Z]{3}$/.test(flight.routeEnd)));
+    const dal = makeMatcher(dataset, 'all', { ...EMPTY_FILTERS, carrier: ['DAL'] }, new Set());
+    assert.equal(dataset.flights.filter(dal.flight).length, 76);
+  }
+});
+
 test('constrained tow plan preserves exact fixed intervals, true endpoints and linked visit selection', () => {
   const snapshot = readSnapshot('constrained');
   const dataset = adaptPreparedScenario(snapshot, 'tow-options');
@@ -119,7 +140,7 @@ test('constrained tow plan preserves exact fixed intervals, true endpoints and l
 
 test('all UI lookup IDs are scoped to their dataset, never the original fixture', () => {
   const originalIds = new Set(ORIGINAL_DATASET.flights.map(flight => flight.id));
-  for (const caseId of ['comfortable', 'constrained']) {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) {
     for (const variant of ['baseline', 'tow-options']) {
       const dataset = adaptPreparedScenario(readSnapshot(caseId), variant);
       assert.ok(dataset.flights.every(flight => dataset.flightsById.get(flight.id) === flight && !originalIds.has(flight.id)));

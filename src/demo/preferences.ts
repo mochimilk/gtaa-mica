@@ -1,4 +1,7 @@
-export type ScenarioId = "comfortable" | "constrained";
+export type ScenarioId = "comfortable" | "constrained" | "full-day";
+export const SCENARIO_LABELS: Record<ScenarioId, string> = {
+  comfortable: "Comfortable", constrained: "Constrained", "full-day": "Full day",
+};
 export type PlanVariant = "baseline" | "tow-options";
 export interface DemoPreferences {
   version: 1;
@@ -12,7 +15,7 @@ export const DEFAULT_DEMO_PREFERENCES: DemoPreferences = {
   version: 1, source: "original", scenario: "comfortable", variant: "baseline",
 };
 export const isScenarioId = (value: string): value is ScenarioId =>
-  value === "comfortable" || value === "constrained";
+  value === "comfortable" || value === "constrained" || value === "full-day";
 export const isPlanVariant = (value: string): value is PlanVariant =>
   value === "baseline" || value === "tow-options";
 

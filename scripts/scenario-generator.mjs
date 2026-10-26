@@ -5,10 +5,12 @@ import { compileAirport, getHourlyDistribution, readJson } from './airport-model
 import { formatUtcInstant, isUtcInstant, parseUtcInstant, validateDemand } from './demand-model.mjs';
 import { deriveOccupancy } from './occupancy-model.mjs';
 import { compareIds, standCandidates } from './stand-pressure.mjs';
+import { createDemandRouteSampler, loadCatalogs } from './airport-catalogs.mjs';
+import { allocateTraffic } from './traffic-allocation.mjs';
 
 const ajv = new Ajv({ allErrors: true, strictRequired: false });
 ajv.addFormat('date-time', isUtcInstant);
-for (const name of ['raw-demand', 'linked-demand', 'scenario-profile']) {
+for (const name of ['raw-demand', 'linked-demand', 'route-generation', 'scenario-profile']) {
   ajv.addSchema(readJson(fileURLToPath(new URL(`../data/schemas/${name}.schema.json`, import.meta.url))));
 }
 const shape = ajv.getSchema('urn:gtaa-mica:scenario-profile:1.0.0');
@@ -33,6 +35,12 @@ export function generateScenario(profile, airport, caseId) {
   if (!shape(profile)) throw new Error(`Invalid scenario profile: ${ajv.errorsText(shape.errors)}`);
   const model = compileAirport(airport);
   if (profile.airport_id !== airport.airport.id) throw new Error('Scenario airport_id must match the airport manifest');
+  const routes = profile.route_generation
+    ? createDemandRouteSampler({ ...loadCatalogs(), airlines: airport.airlines }, airport.airport, profile.route_generation)
+    : undefined;
+  if (!routes && profile.traffic_targets?.some(target => target.market_id !== undefined)) {
+    throw new Error('Traffic market targets require catalog route generation');
+  }
   const ids = new Set();
   const unique = (rows, label) => {
     for (const row of rows) {
@@ -53,8 +61,9 @@ export function generateScenario(profile, airport, caseId) {
   if (duration < 60 * minute || duration > 2880 * minute || start % minute || end % minute) {
     throw new Error('Scenario window must span 1 through 48 elapsed hours and use whole-minute boundaries');
   }
-  if (profile.external_airport_ids.includes(profile.airport_id)) throw new Error('External route airports cannot equal the scenario airport');
-  const count = profile.traffic_mix.reduce((sum, row) => sum + row.count, 0) + profile.boundary_visits.length +
+  if (profile.external_airport_ids?.includes(profile.airport_id)) throw new Error('External route airports cannot equal the scenario airport');
+  const traffic = allocateTraffic(profile, airport, model);
+  const count = traffic.rows.reduce((sum, row) => sum + row.count, 0) + profile.boundary_visits.length +
     selectedCase.pressure_banks.reduce((sum, row) => sum + row.long_count + row.short_count, 0);
   if (!count || count > 200) throw new Error('Prototype scenarios require 1 through 200 visits');
   if (selectedCase.expectations.minimum_generated_movements > selectedCase.expectations.maximum_generated_movements) {
@@ -63,12 +72,34 @@ export function generateScenario(profile, airport, caseId) {
   const canonicalProfile = structuredClone({
     ...profile, traffic_mix: sorted(profile.traffic_mix), boundary_visits: sorted(profile.boundary_visits),
     cases: sorted(profile.cases).map(item => ({ ...item, pressure_banks: sorted(item.pressure_banks) })),
+    ...(profile.traffic_targets ? { traffic_targets: sorted(profile.traffic_targets) } : {}),
+    ...(profile.route_generation ? { route_generation: {
+      markets: sorted(profile.route_generation.markets).map(market => ({
+        ...market, airports: market.airports.slice().sort((a, b) => compareIds(a.airport_code, b.airport_code)),
+      })),
+    } } : {}),
   });
   const clock = new Intl.DateTimeFormat('en-US', { timeZone: model.timeZone, hour: '2-digit', hourCycle: 'h23' });
   const hourAt = time => Number(clock.formatToParts(time).find(part => part.type === 'hour').value);
   const legs = [];
   const trace = [];
   const registrations = new Set();
+  const flightNumbers = new Map();
+  const flightPrefixes = new Map(airport.airlines.airlines.map(airline => [airline.id, airline.iata]));
+  const flightNumber = (airlineId, legId) => {
+    const prefix = flightPrefixes.get(airlineId);
+    if (!flightNumbers.has(airlineId)) flightNumbers.set(airlineId, new Set());
+    const used = flightNumbers.get(airlineId);
+    const initial = Number.parseInt(digest(JSON.stringify([profile.seed, legId, 'flight-number'])).slice(0, 8), 16);
+    for (let probe = 0; probe < 9900; probe++) {
+      const number = 100 + (initial + probe) % 9900;
+      if (!used.has(number)) {
+        used.add(number);
+        return `${prefix}${number}`;
+      }
+    }
+    throw new Error(`Synthetic flight-number range exhausted for ${airlineId}`);
+  };
   const checkRow = row => {
     const aircraft = airport.aircraft.aircraft.find(item => item.id === row.aircraft_id);
     if (!aircraft) throw new Error(`Unknown scenario aircraft: ${row.aircraft_id}`);
@@ -84,6 +115,8 @@ export function generateScenario(profile, airport, caseId) {
       start: profile.plan_window.start, end: profile.plan_window.end, stand_kind: 'any',
     });
     if (!candidates.candidate_stand_ids.length) throw new Error(`Scenario mix has no compatible continuous-stay stand: ${row.id}`);
+    routes?.validateRow(row.operating_airline_id, row.arrival_sector_id, row.market_id);
+    routes?.validateRow(row.operating_airline_id, row.departure_sector_id, row.market_id);
     return [
       getHourlyDistribution(model, row.arrival_sector_id, 'arrival'),
       getHourlyDistribution(model, row.departure_sector_id, 'departure'),
@@ -112,26 +145,36 @@ export function generateScenario(profile, airport, caseId) {
     const registration = `SYN-${digest(JSON.stringify([profile.seed, profile.id, key])).slice(0, 12).toUpperCase()}`;
     if (registrations.has(registration)) throw new Error(`Synthetic registration collision: ${registration}`);
     registrations.add(registration);
-    const route = profile.external_airport_ids[integer(random, 0, profile.external_airport_ids.length - 1)];
+    // Retain the legacy draw so catalog enrichment does not resample existing PAX.
+    const legacyRoute = profile.external_airport_ids
+      ? profile.external_airport_ids[integer(random, 0, profile.external_airport_ids.length - 1)] : undefined;
     const common = { aircraft_id: row.aircraft_id, aircraft_registration: registration, operating_airline_id: row.operating_airline_id };
     const arrivalId = `${identity}/arrival`;
     const departureId = `${identity}/departure`;
+    const endpoint = (key, sector) => routes?.sample({
+      seed: profile.seed, key, airline_id: row.operating_airline_id, sector_id: sector, market_id: row.market_id,
+    });
+    const origin = endpoint(arrivalId, row.arrival_sector_id);
+    const destination = endpoint(departureId, row.departure_sector_id);
     legs.push({
-      ...common, id: arrivalId, type: 'arrival', flight_number: `SYN-${digest(arrivalId).slice(0, 10).toUpperCase()}`,
-      sector_id: row.arrival_sector_id, origin_airport_id: route, destination_airport_id: profile.airport_id,
+      ...common, id: arrivalId, type: 'arrival',
+      flight_number: routes ? flightNumber(row.operating_airline_id, arrivalId) : `SYN-${digest(arrivalId).slice(0, 10).toUpperCase()}`,
+      sector_id: row.arrival_sector_id, origin_airport_id: origin?.airport_code ?? legacyRoute, destination_airport_id: profile.airport_id,
       passenger_count: integer(random, row.passenger_min, row.passenger_max), scheduled_on_block: formatUtcInstant(arrival),
     }, {
-      ...common, id: departureId, type: 'departure', flight_number: `SYN-${digest(departureId).slice(0, 10).toUpperCase()}`,
-      sector_id: row.departure_sector_id, origin_airport_id: profile.airport_id, destination_airport_id: route,
+      ...common, id: departureId, type: 'departure',
+      flight_number: routes ? flightNumber(row.operating_airline_id, departureId) : `SYN-${digest(departureId).slice(0, 10).toUpperCase()}`,
+      sector_id: row.departure_sector_id, origin_airport_id: profile.airport_id, destination_airport_id: destination?.airport_code ?? legacyRoute,
       passenger_count: integer(random, row.passenger_min, row.passenger_max), scheduled_off_block: formatUtcInstant(departure),
     });
     trace.push({
       key, aircraft_registration: registration, aircraft_id: row.aircraft_id,
       arrival_leg_id: arrivalId, departure_leg_id: departureId, timing_method: timingMethod,
       scheduled_on_block: formatUtcInstant(arrival), scheduled_off_block: formatUtcInstant(departure),
+      ...(routes ? { arrival_market_id: origin.market_id, departure_market_id: destination.market_id } : {}),
     });
   };
-  for (const row of sorted(profile.traffic_mix)) {
+  for (const row of sorted(traffic.rows)) {
     const distributions = checkRow(row);
     if (row.minimum_stay_minutes > row.maximum_stay_minutes || row.maximum_stay_minutes * minute > duration) {
       throw new Error(`Invalid scenario stay range: ${row.id}`);
@@ -140,7 +183,7 @@ export function generateScenario(profile, airport, caseId) {
       const key = `mix:${row.id}:${index + 1}`;
       const random = randomStream(profile.seed, key);
       const stay = integer(random, row.minimum_stay_minutes, row.maximum_stay_minutes) * minute;
-      const arrival = sampleTime(row, random, start, end - stay, stay, distributions);
+      const arrival = sampleTime(row, random, start, end - stay - (row.target_id ? minute : 0), stay, distributions);
       addVisit(row, key, arrival, arrival + stay, 'joint-hourly-weighted');
     }
   }
@@ -187,7 +230,9 @@ export function generateScenario(profile, airport, caseId) {
       evidence: 'scheduled-source-legs', stand_status: 'unassigned',
     }));
   return {
-    schema_version: '1.0.0', generator_version: 'seeded-joint-hourly-v1',
+    schema_version: '1.0.0', generator_version: routes || profile.traffic_targets ? 'catalog-stand-share-v2' : 'seeded-joint-hourly-v1',
+    ...(routes ? { routing_warnings: routes.warnings } : {}),
+    ...(profile.traffic_targets ? { traffic_allocation: traffic.allocation } : {}),
     id: raw.id, profile: canonicalProfile, case_id: caseId, profile_fingerprint: fingerprint,
     plan_window: { ...profile.plan_window }, raw_demand: raw,
     expected_visit_count: count, generation_trace: trace,
@@ -198,6 +243,7 @@ export function generateScenario(profile, airport, caseId) {
       'Boundary presence is backed by scheduled context legs. Stands are unassigned until solving; no unknown parking boundary is filled.',
       'Joint arrival/departure hourly weights shape synthetic timing, not exact marginal counts, observed volumes or stand capacity.',
       'The deliberate pressure bank is a configured stress case, not evidence of real congestion.',
+      ...(routes ? ['Catalog market weights are illustrative, not measured market rankings, verified airline service, fleet range or operating rights.'] : []),
     ],
   };
 }

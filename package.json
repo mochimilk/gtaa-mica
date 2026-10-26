@@ -9,6 +9,8 @@
     "preview": "vite preview",
     "validate:airport": "node scripts/validate-airport.mjs",
     "test:airport": "node --test scripts/airport-model.test.mjs",
+    "validate:catalogs": "node scripts/validate-catalogs.mjs",
+    "test:catalogs": "node --test scripts/airport-catalogs.test.mjs",
     "validate:demand": "node scripts/validate-demand.mjs",
     "test:demand": "node --test scripts/demand-model.test.mjs",
     "link:demand": "node scripts/link-demand.mjs",

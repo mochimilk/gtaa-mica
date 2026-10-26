@@ -8,6 +8,28 @@
   "plan_window": { "start": "2026-10-21T14:00:00Z", "end": "2026-10-22T14:00:00Z" },
   "sampling_step_minutes": 15,
   "external_airport_ids": ["synthetic:airport:north", "synthetic:airport:south", "synthetic:airport:east"],
+  "route_generation": {
+    "markets": [
+      {
+        "id": "europe", "weight": 1,
+        "airports": [
+          { "airport_code": "LHR", "weight": 5 },
+          { "airport_code": "FRA", "weight": 3 },
+          { "airport_code": "CDG", "weight": 3 }
+        ]
+      },
+      {
+        "id": "asia", "weight": 1,
+        "airports": [
+          { "airport_code": "HND", "weight": 5 },
+          { "airport_code": "ICN", "weight": 3 },
+          { "airport_code": "PVG", "weight": 2 },
+          { "airport_code": "HKG", "weight": 2 },
+          { "airport_code": "TPE", "weight": 1 }
+        ]
+      }
+    ]
+  },
   "traffic_mix": [
     {
       "id": "star-domestic-short", "aircraft_id": "A320", "operating_airline_id": "airline:UAL",

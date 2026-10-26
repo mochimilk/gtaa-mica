@@ -3,6 +3,7 @@
   "id": "contoso",
   "name": "Contoso International Airport",
   "fictional": true,
+  "country": "United States",
   "time_zone": "America/Los_Angeles",
   "description": "Synthetic airport near Redmond/Bellevue, Washington. Geographic placement does not describe any real airport, property, facilities or authorized operation.",
   "spatial_reference": {

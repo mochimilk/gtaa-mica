@@ -42,6 +42,13 @@ use cases, and the distinction between configuration validation and solver suppo
 See [Airport characteristics and operating policies](docs/airport-characteristics.md)
 for local-time sector demand weights, non-overlapping airline planning groups,
 and minimum arrival/departure handling windows.
+See [Airport catalogs and synthetic route preferences](docs/synthetic-routes.md)
+for reference validation, minimal airline hub hints and deterministic host-weighted
+endpoint sampling. The [full-day profile](data/airports/contoso/demand/full-day-profile.json)
+and generated [raw demand](data/airports/contoso/demand/full-day-demand.json)
+provide 160 visits/320 legs with US-heavy, stand-share-weighted traffic and an
+even Europe/Asia international split. Choose **Full day** in the existing demo
+settings to inspect its prepared plan, including unassigned flights.
 See [Raw airport demand legs](docs/raw-demand.md) for the leg-first input contract,
 fixed Contoso seed, linking cases and validation commands.
 See [Visit linking and provisional tow requirements](docs/visit-linking.md) for
@@ -66,6 +73,8 @@ Only the selected source/case/plan preferences are saved locally.
 ```sh
 npm run validate:airport
 npm run test:airport
+npm run validate:catalogs
+npm run test:catalogs
 npm run validate:demand
 npm run test:demand
 npm run test:linking
