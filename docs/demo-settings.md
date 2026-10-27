@@ -49,6 +49,13 @@ Show all three probes together, then choose planned, modeled end-of-day or
 retention intensity from an explicitly synthetic 30-day timing replay.
 Click a segment to inspect its exact start and all daily assessments.
 These are not observed actuals or independently solved operating days.
+The **Late request** control adds a
+[post-approval accommodation rehearsal](accommodation.md): preview a direct fit
+or one-turn stand repair, inspect consequences and explicitly accept a
+session-only choice. Restore the approved reference from the same control.
+Reload and dataset/plan switching clear acceptance. Reference capacity/atlas
+and paired reviews are hidden while amended assignments are active rather
+than displaying stale evidence.
 
 ## State and persistence
 

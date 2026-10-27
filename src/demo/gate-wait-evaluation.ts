@@ -1,6 +1,6 @@
 import configuredProfile from "../../data/airports/contoso/evaluation/gate-wait-profile.json";
 import { evaluateBufferPlans, type BufferEvidence, type BufferResult, type EvaluatedBufferPlan } from "./buffer-evaluation";
-import type { PreparedScenario } from "./dataset";
+import type { PreparedScenario, PreparedPlan } from "./dataset";
 import type { PlanVariant } from "./preferences";
 
 export const GATE_WAIT_METRIC = {
@@ -122,11 +122,11 @@ export interface GateWaitEvaluation {
   };
 }
 
-function calculateWaiting(
-  snapshot: PreparedScenario, variant: PlanVariant, buffers: BufferResult, assumption: ReleaseDelayAssumption,
+export function calculateWaiting(
+  snapshot: Pick<PreparedScenario, "plan_window" | "flights">, plan: Pick<PreparedPlan, "stays">,
+  buffers: BufferResult, assumption: ReleaseDelayAssumption,
 ): GateWaitResult {
   const [start, end] = [Date.parse(snapshot.plan_window.start), Date.parse(snapshot.plan_window.end)];
-  const plan = snapshot.variants[variant];
   const flights = new Map(snapshot.flights.map(flight => [flight.id, flight]));
   if (flights.size !== snapshot.flights.length) throw new Error("Duplicate gate-wait source flights.");
   const stays = new Map(plan.stays.map(stay => [stay.id, stay]));
@@ -202,7 +202,7 @@ export function evaluateGateWaitPlans(
   const buffers = evaluateBufferPlans(snapshot);
   const evaluate = (variant: PlanVariant): GateWaitPlan => {
     const { buffers: evidence, ...plan } = buffers.variants[variant];
-    return { ...plan, waiting: calculateWaiting(snapshot, variant, evidence, assumption) };
+    return { ...plan, waiting: calculateWaiting(snapshot, snapshot.variants[variant], evidence, assumption) };
   };
   const baseline = evaluate("baseline"), variant = evaluate("tow-options");
   const original = baseline.waiting.contributions.map(item => item.arrival_id).sort();

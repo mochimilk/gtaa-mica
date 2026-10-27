@@ -1,0 +1,602 @@
+{
+  "schema_version": "1.0.0",
+  "id": "late-request:comfortable",
+  "source": "synthetic",
+  "snapshot_fingerprint": "05bcd30088027e1251b68c84bebe37ffa2e51564a9398a99a1506c75f66103bc",
+  "airport_fingerprint": "e336107b35c9bb391b87b17a51a01efc72b644ace45cfc92da1d8219616b3b5e",
+  "demand_fingerprint": "22e2ba5f2e17572853dde3767ab122b6198b428757c98a374cac22ab4c8bd67e",
+  "profile": {
+    "$schema": "../../../schemas/accommodation-profile.schema.json",
+    "schema_version": "1.0.0",
+    "id": "contoso:late-service-request:v1",
+    "max_changed_visits": 1,
+    "max_displayed_options": 3,
+    "cases": [
+      {
+        "case_id": "comfortable",
+        "probe_id": "aal-domestic",
+        "start_offset_minutes": 60,
+        "duration_minutes": 75
+      },
+      {
+        "case_id": "constrained",
+        "probe_id": "baw-international",
+        "start_offset_minutes": 240,
+        "duration_minutes": 120
+      },
+      {
+        "case_id": "full-day",
+        "probe_id": "aal-domestic",
+        "start_offset_minutes": 870,
+        "duration_minutes": 120
+      }
+    ]
+  },
+  "approved_at": "2026-10-20T14:00:00.000Z",
+  "received_at": "2026-10-21T02:00:00.000Z",
+  "request": {
+    "id": "late-request:comfortable",
+    "reason": "post-approval-service-request",
+    "probe": {
+      "id": "aal-domestic",
+      "label": "American · B738 · domestic",
+      "aircraft_id": "B738",
+      "operating_airline_id": "airline:AAL",
+      "arrival_sector_id": "domestic",
+      "departure_sector_id": "domestic",
+      "default_duration_minutes": 75,
+      "separation_minutes": 0
+    },
+    "start": "2026-10-21T15:00:00.000Z",
+    "end": "2026-10-21T16:15:00.000Z",
+    "stay_id": "late-request:comfortable/stay",
+    "visit": {
+      "turnId": "late-request:comfortable/visit",
+      "carrier": "AAL",
+      "arrFlight": "AA9901",
+      "depFlight": "AA9902",
+      "origin": "ORD",
+      "destination": "CLT",
+      "registration": "SYN-LATE-AAL",
+      "aircraftType": "B738"
+    },
+    "flights": [
+      {
+        "id": "late-request:comfortable/arrival",
+        "visitId": "late-request:comfortable/visit",
+        "direction": "arrival",
+        "flight": "AA9901",
+        "routeEnd": "ORD",
+        "scheduled": "2026-10-21T15:00:00.000Z"
+      },
+      {
+        "id": "late-request:comfortable/departure",
+        "visitId": "late-request:comfortable/visit",
+        "direction": "departure",
+        "flight": "AA9902",
+        "routeEnd": "CLT",
+        "scheduled": "2026-10-21T16:15:00.000Z"
+      }
+    ]
+  },
+  "variants": {
+    "baseline": {
+      "status": "options-found",
+      "search": "direct-placement",
+      "total_options_found": 19,
+      "options": [
+        {
+          "id": "accommodation:f849448e3d4b1c28f9c052c9f796efe7b5f260d3ee6c37c4daaf258e30450fba",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:108",
+          "moves": [],
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:6e48179efae2e60386d821d470e6198f20b1e9c882ed79e5e6d8f7e1db435ff8",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:109",
+          "moves": [],
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:9330c523b6e7d0cfea243ca09e0751d8bba780ae53d24191728e3650fd0ab2b7",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:110",
+          "moves": [],
+          "stand_validation_passed": true
+        }
+      ],
+      "excluded_stands": [
+        {
+          "stand_id": "t1:stand:101",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:102",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:103",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:104",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:105",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:106",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:107",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:221",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:223",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:225",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:227",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:229",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:231",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:233",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:235",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:237",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:302",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-airline-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-airline-not-allowed",
+            "departure-sector-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:303",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-airline-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-airline-not-allowed",
+            "departure-sector-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:304",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-airline-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-airline-not-allowed",
+            "departure-sector-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:305",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-sector-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:306",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-sector-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:307",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-sector-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R01",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R03",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R05",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R07",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-airline-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-airline-not-allowed",
+            "departure-sector-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R08",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-sector-not-allowed"
+          ]
+        }
+      ],
+      "blocked_stands": []
+    },
+    "tow-options": {
+      "status": "options-found",
+      "search": "direct-placement",
+      "total_options_found": 19,
+      "options": [
+        {
+          "id": "accommodation:f849448e3d4b1c28f9c052c9f796efe7b5f260d3ee6c37c4daaf258e30450fba",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:108",
+          "moves": [],
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:6e48179efae2e60386d821d470e6198f20b1e9c882ed79e5e6d8f7e1db435ff8",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:109",
+          "moves": [],
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:9330c523b6e7d0cfea243ca09e0751d8bba780ae53d24191728e3650fd0ab2b7",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:110",
+          "moves": [],
+          "stand_validation_passed": true
+        }
+      ],
+      "excluded_stands": [
+        {
+          "stand_id": "t1:stand:101",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:102",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:103",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:104",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:105",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:106",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:107",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:221",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:223",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:225",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:227",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:229",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:231",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:233",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:235",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:237",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:302",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-airline-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-airline-not-allowed",
+            "departure-sector-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:303",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-airline-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-airline-not-allowed",
+            "departure-sector-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:304",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-airline-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-airline-not-allowed",
+            "departure-sector-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:305",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-sector-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:306",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-sector-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:307",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-sector-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R01",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R03",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R05",
+          "reasons": [
+            "arrival-airline-not-allowed",
+            "departure-airline-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R07",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-airline-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-airline-not-allowed",
+            "departure-sector-not-allowed",
+            "occupancy-airline-not-allowed"
+          ]
+        },
+        {
+          "stand_id": "t1:stand:R08",
+          "reasons": [
+            "aircraft-not-allowed",
+            "arrival-sector-not-allowed",
+            "departure-sector-not-allowed"
+          ]
+        }
+      ],
+      "blocked_stands": []
+    }
+  }
+}

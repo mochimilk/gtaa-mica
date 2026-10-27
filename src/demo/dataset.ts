@@ -4,6 +4,7 @@ import type { OpsAlert, OpsFlight } from "../operations/operationsData";
 import type { PlanVariant, ScenarioId } from "./preferences";
 import type { PreparedCapacity } from "./capacity-evaluation";
 import type { PreparedAtlas } from "./atlas-evaluation";
+import type { PreparedAccommodation } from "./accommodation-evaluation";
 
 export interface DemoDataset {
   id: string;
@@ -18,7 +19,7 @@ export interface DemoDataset {
   arrivals: OpsFlight[];
   departures: OpsFlight[];
   alerts: OpsAlert[];
-  prepared?: { snapshot: PreparedScenario; variant: PlanVariant; capacity?: PreparedCapacity; atlas?: PreparedAtlas };
+  prepared?: { snapshot: PreparedScenario; variant: PlanVariant; capacity?: PreparedCapacity; atlas?: PreparedAtlas; accommodation?: PreparedAccommodation };
 }
 
 export interface PreparedFlight {

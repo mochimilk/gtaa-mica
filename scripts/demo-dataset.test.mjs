@@ -39,11 +39,109 @@ const { BUFFER_METRIC, DEFAULT_BUFFER_PROFILE, parseBufferProfile, calculateStan
 const { GATE_WAIT_METRIC, DEFAULT_GATE_WAIT_PROFILE, parseGateWaitProfile, evaluateGateWaitPlans } = await load('src\\demo\\gate-wait-evaluation.ts');
 const { validateCapacitySnapshot, queryCapacity, evaluateCapacityQuery } = await load('src\\demo\\capacity-evaluation.ts');
 const { validateAtlas, atlasFrequency, atlasSegments } = await load('src\\demo\\atlas-evaluation.ts');
+const { validateAccommodation, accommodationView, accommodationImpact, acceptAccommodation } = await load('src\\demo\\accommodation-evaluation.ts');
 const readSnapshot = caseId => validatePreparedSnapshot(JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.json`), 'utf8')));
 
 const bufferStay = (id, start, end, rowId = 'stand:1', visitId = id) =>
   ({ id, rowId, visitId, start: start * 60_000, end: end * 60_000 });
 const bufferHorizon = [0, 200 * 60_000];
+
+const readAccommodation = caseId => JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.accommodation.json`), 'utf8'));
+const readCapacity = caseId => JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.capacity.json`), 'utf8'));
+
+test('accommodation sidecars are CSP-safe, verify exact approved sources and reject broken request or repair links', async () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) {
+    const snapshot = readSnapshot(caseId), capacity = readCapacity(caseId), evidence = readAccommodation(caseId);
+    assert.equal(await validateAccommodation(evidence, snapshot, capacity), evidence);
+    const changed = structuredClone(snapshot);
+    changed.variants.baseline.request_fingerprint = '0'.repeat(64);
+    await assert.rejects(validateAccommodation(evidence, changed, capacity), /does not match/);
+    for (const mutate of [
+      value => { value.schema_version = '2'; },
+      value => { value.airport_fingerprint = '0'.repeat(64); },
+      value => { value.request.start = '2026-02-30T00:00:00Z'; },
+      value => { value.received_at = value.approved_at; },
+      value => { value.request.flights[0].id = value.request.flights[1].id; },
+      value => { value.request.visit.aircraftType = 'unknown'; },
+      value => { value.request.probe.operating_airline_id = 'airline:OTHER'; },
+      value => { value.request.flights[1].scheduled = value.request.start; },
+      value => { value.request.stay_id = snapshot.variants.baseline.stays[0].id; },
+      value => { value.variants.baseline.status = 'no-acceptable-option-found'; },
+      value => { value.variants.baseline.options.pop(); },
+      value => { value.variants.baseline.options[0].target_stand_id = 'unknown'; },
+      value => { value.variants.baseline.options[0].kind = value.variants.baseline.options[0].kind === 'direct' ? 'localized-repair' : 'direct'; },
+      value => { value.variants.baseline.blocked_stands.push({ stand_id: 'unknown', blocking_stay_ids: [], reasons: [], rule_paths: [] }); },
+    ]) {
+      const broken = structuredClone(evidence);
+      mutate(broken);
+      await assert.rejects(validateAccommodation(broken, snapshot, capacity), /accommodation|Accommodation/);
+    }
+  }
+  const snapshot = readSnapshot('full-day'), capacity = readCapacity('full-day'), evidence = readAccommodation('full-day');
+  for (const mutate of [
+    value => { value.variants.baseline.options[0].moves[0].stay_id = 'unknown'; },
+    value => { value.variants.baseline.options[0].moves[0].from_stand_id = 'unknown'; },
+    value => { value.variants.baseline.options[0].moves[0].to_stand_id = value.variants.baseline.options[0].moves[0].from_stand_id; },
+    value => { value.variants.baseline.options[0].moves[0].to_stand_id = 'unknown'; },
+    value => { value.variants.baseline.options[0].moves.push(value.variants.baseline.options[0].moves[0]); },
+  ]) {
+    const broken = structuredClone(evidence);
+    mutate(broken);
+    await assert.rejects(validateAccommodation(broken, snapshot, capacity), /accommodation|Accommodation/);
+  }
+});
+
+test('acceptance adds only the late service, preserves unresolved traffic, updates every operational surface and drops stale review evidence', async () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) for (const variant of ['baseline', 'tow-options']) {
+    const snapshot = readSnapshot(caseId), evidence = await validateAccommodation(readAccommodation(caseId), snapshot, readCapacity(caseId));
+    const base = { ...adaptPreparedScenario(snapshot, variant), prepared: { snapshot, variant, accommodation: evidence, capacity: readCapacity(caseId) } };
+    const frozen = JSON.stringify(base);
+    const unresolved = base.flights.filter(flight => !flight.occupancyId).map(flight => flight.id);
+    for (const option of evidence.variants[variant].options) {
+      const view = accommodationView(snapshot, evidence, variant, option.id);
+      const working = acceptAccommodation(base, option.id);
+      assert.equal(working.flights.length, base.flights.length + 2);
+      assert.equal(working.timeline.occupancies.length, base.timeline.occupancies.length + 1);
+      assert.equal(working.arrivals.length, base.arrivals.length + 1);
+      assert.equal(working.departures.length, base.departures.length + 1);
+      assert.deepEqual(working.flights.filter(flight => !flight.occupancyId).map(flight => flight.id), unresolved);
+      assert.deepEqual(working.alerts, base.alerts);
+      assert.equal(working.prepared, undefined);
+      assert.match(working.subtitle, /not a new solver run/);
+      assert.ok(working.flightsById.get(evidence.request.flights[0].id).occupancyId);
+      assert.ok(working.timeline.turnsById.has(evidence.request.visit.turnId));
+      assert.equal(view.plan.covered_flight_count, snapshot.variants[variant].covered_flight_count + 2);
+      for (const original of base.timeline.occupancies) {
+        const current = working.timeline.occupancies.find(item => item.id === original.id);
+        assert.deepEqual({ ...current, rowId: original.rowId }, original);
+      }
+      assert.equal(JSON.stringify(base), frozen);
+      assert.throws(() => acceptAccommodation(working, option.id), /No validated/);
+    }
+    assert.throws(() => acceptAccommodation(base, 'unknown'), /Unknown/);
+  }
+});
+
+test('accommodation consequences reuse versioned buffers and waiting with common-existing-arrival comparisons', () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) for (const variant of ['baseline', 'tow-options']) {
+    const snapshot = readSnapshot(caseId), evidence = readAccommodation(caseId), frozen = JSON.stringify({ snapshot, evidence });
+    for (const assumption of DEFAULT_GATE_WAIT_PROFILE.assumptions) for (const option of evidence.variants[variant].options) {
+      const impact = accommodationImpact(snapshot, evidence, variant, option.id, assumption);
+      assert.equal(impact.beforeBuffers.overlaps.length, 0);
+      assert.equal(impact.afterBuffers.overlaps.length, 0);
+      const existing = new Set(impact.beforeWaiting.contributions.map(item => item.arrival_id));
+      const common = impact.afterWaiting.contributions.filter(item => existing.has(item.arrival_id));
+      assert.equal(impact.commonExistingArrivals, common.length);
+      assert.equal(impact.afterCommonWait, common.length ? common.reduce((sum, item) => sum + item.estimated_wait_minutes, 0) : null);
+      assert.ok(!existing.has(evidence.request.flights[0].id));
+      const incoming = impact.afterWaiting.contributions.find(item => item.arrival_id === evidence.request.flights[0].id);
+      assert.equal(impact.incomingWait, incoming?.estimated_wait_minutes ?? null);
+      assert.equal(impact.view.option.moves.length, option.moves.length);
+      assert.equal(impact.view.plan.generated_movement_count, snapshot.variants[variant].generated_movement_count);
+    }
+    assert.equal(JSON.stringify({ snapshot, evidence }), frozen);
+  }
+});
 
 test('all atlas sidecars verify source, dates, complete assessments and exact non-touching windows under CSP', async () => {
   for (const caseId of ['comfortable', 'constrained', 'full-day']) {

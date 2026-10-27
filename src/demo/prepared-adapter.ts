@@ -2,7 +2,7 @@ import { stayKind } from "../stand-timeline-demo/adapter";
 import type { StayEndpoints, StayPosition } from "../stand-timeline-demo/adapter";
 import type { Occupancy } from "../stand-timeline";
 import type { OpsAlert, OpsFlight } from "../operations/operationsData";
-import type { DemoDataset, PreparedScenario } from "./dataset";
+import type { DemoDataset, PreparedScenario, PreparedPlan } from "./dataset";
 import type { PlanVariant } from "./preferences";
 import { SCENARIO_LABELS } from "./preferences";
 
@@ -22,6 +22,18 @@ function indexById<T extends { id: string }>(items: T[], label: string) {
 }
 
 export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanVariant): DemoDataset {
+  const plan = snapshot.variants[variant];
+  return {
+    ...adaptScenarioPlan(snapshot, variant, plan,
+      `${plan.covered_flight_count}/${snapshot.flights.length} represented flight legs assigned · ${plan.generated_movement_count} generated tow movements · ${plan.solver_status}. Scheduled context included; not operationally certified.`),
+    prepared: { snapshot, variant },
+  };
+}
+
+export function adaptScenarioPlan(
+  snapshot: Omit<PreparedScenario, "variants">, variant: PlanVariant,
+  plan: Pick<PreparedPlan, "stays" | "covered_flight_count" | "generated_movement_count">, subtitle: string,
+): DemoDataset {
   const start = instant(snapshot.plan_window.start);
   const end = instant(snapshot.plan_window.end);
   if (start >= end) throw new Error("Prepared plan window must be positive.");
@@ -29,7 +41,6 @@ export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanV
   const visits = new Map(snapshot.visits.map(visit => [visit.turnId, visit]));
   if (visits.size !== snapshot.visits.length) throw new Error("Duplicate prepared visits.");
   const sourceFlights = indexById(snapshot.flights, "flight");
-  const plan = snapshot.variants[variant];
   const stays = indexById(plan.stays, "stay");
   const endpoints = new Map<string, StayEndpoints>();
   const stayPosition = new Map<string, StayPosition>();
@@ -102,8 +113,7 @@ export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanV
   return {
     id: `${snapshot.demand_id}/${variant}`, label: `Contoso · ${SCENARIO_LABELS[snapshot.case_id]} · ${variant === "baseline" ? "Baseline" : "Tow options"}`,
     date: snapshot.plan_window.start.slice(0, 10), timeBasis: "scheduled",
-    subtitle: `${plan.covered_flight_count}/${flights.length} represented flight legs assigned · ${plan.generated_movement_count} generated tow movements · ${plan.solver_status}. Scheduled context included; not operationally certified.`,
-    prepared: { snapshot, variant },
+    subtitle,
     domain: [start, end], timeline: {
       rows: snapshot.rows, visits: snapshot.visits.map(visit => ({ id: visit.turnId, label: `${visit.arrFlight}/${visit.depFlight}` })),
       turnsById: visits, occupancies, endpoints, stayPosition,

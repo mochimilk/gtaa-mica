@@ -21,6 +21,7 @@ import { BufferOverlay, PlanReview, type ReviewMetric } from "./demo/PlanReview"
 import { DEFAULT_GATE_WAIT_PROFILE, evaluateGateWaitPlans } from "./demo/gate-wait-evaluation";
 import { evaluateCapacityQuery } from "./demo/capacity-evaluation";
 import { CapacityOverlay, CapacityReview, capacityColor, initialCapacityReview } from "./demo/CapacityReview";
+import { AccommodationReview } from "./demo/AccommodationReview";
 
 /*
  * GTAA-only Navbar height. Coral's Navbar root is 44px (Griffel); passing a
@@ -37,6 +38,7 @@ const useNavbarStyles = makeStyles({
 
 /** Chart wired to the shared operations selection, views and filters. */
 function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void }) {
+  const { acceptedOptionId } = useDemo();
   const { selection, applyChartIntent, matcher, dataset } = useOperations();
   const [threshold, setThreshold] = useState(DEFAULT_BUFFER_PROFILE.threshold_minutes);
   const [showBuffers, setShowBuffers] = useState(false);
@@ -83,6 +85,7 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
         selectionActive={selection.occupancyIds.length > 0 || !!selection.flightId}
         toolbar={<>
           <ViewsFiltersToolbar />
+          <AccommodationReview />
           {evaluation && gateEvaluation && dataset.prepared && <PlanReview
             snapshot={dataset.prepared.snapshot} evaluation={evaluation} variant={dataset.prepared.variant}
             open={bufferReviewOpen} setOpen={setBufferReviewOpen} showOverlay={showBuffers} setShowOverlay={setShowBuffers}
@@ -97,7 +100,10 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
           />}
           <DemoSettingsButton onClick={openDemoSettings} />
         </>}
-        notice={<><DemoStatus /><FilterStatus />{showBuffers && evaluation && dataset.prepared && <p className="ops-filter-status" role="status">
+        notice={<><DemoStatus /><FilterStatus />{acceptedOptionId && <p className="ops-filter-status" role="status">
+          Session-only accommodation accepted. Approved reference retained; use Late request to compare or restore.
+          Reference capacity/atlas and paired reviews are hidden, not reused against changed assignments.
+        </p>}{showBuffers && evaluation && dataset.prepared && <p className="ops-filter-status" role="status">
           Scheduled buffers v{evaluation.metric.version}: {evaluation.variants[dataset.prepared.variant].buffers.availability === "invalid"
             ? "invalid due to overlapping occupancy"
             : `${evaluation.variants[dataset.prepared.variant].buffers.summary.tight_count} handovers below ${threshold} min`}.

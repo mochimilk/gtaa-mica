@@ -163,8 +163,10 @@ throughput or proof that extra demand could operate. Existing unassigned
 demand remains unresolved. It neither attributes a commercial benefit to the
 solver nor changes planner priorities or resilience protections.
 
-Real observed history, changing demand mixes, request-specific accommodation,
-localized repairs and broader replanning remain separate future increments.
+The [late-request workflow](accommodation.md) separately demonstrates
+request-specific direct placement and bounded one-turn repairs.
+Real observed history, changing demand mixes and broader replanning remain
+future increments.
 
 ## Preparation and validation
 

@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:accommodation-profile:1.0.0",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "id", "max_changed_visits", "max_displayed_options", "cases"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "max_changed_visits": { "const": 1 },
+    "max_displayed_options": { "type": "integer", "minimum": 1, "maximum": 5 },
+    "cases": { "type": "array", "minItems": 3, "maxItems": 3, "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["case_id", "probe_id", "start_offset_minutes", "duration_minutes"],
+      "properties": {
+        "case_id": { "enum": ["comfortable", "constrained", "full-day"] },
+        "probe_id": { "type": "string", "pattern": "^\\S+$" },
+        "start_offset_minutes": { "type": "integer", "minimum": 0, "maximum": 1439 },
+        "duration_minutes": { "type": "integer", "minimum": 1, "maximum": 1440 }
+      }
+    } }
+  }
+}

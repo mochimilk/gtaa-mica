@@ -83,6 +83,9 @@ not additive turn slots.
 Its opportunity atlas can show all three colored probes and an explicitly
 synthetic month of planned/end-of-day recurrence and conditional retention,
 with exact-start daily evidence rather than an airport-wide capacity score.
+The [late-request workflow](docs/accommodation.md) previews direct placement
+or a one-turn stand repair, compares operating consequences and applies a
+reversible session-only choice without overwriting the approved reference.
 
 ```sh
 npm run validate:airport
