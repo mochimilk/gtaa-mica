@@ -5,10 +5,12 @@ import { compileAirport, evaluatePlan, readJson } from './airport-model.mjs';
 import { fingerprint, loadCapacityProfile, sourceOccupancies } from './capacity-probe.mjs';
 import { loadFrozenScenarioSources } from './prepare-capacity.mjs';
 import { assessAccommodation, loadAccommodationProfile, prepareAccommodation, requestOccupancy, validateAccommodationProfile } from './accommodation.mjs';
+import { loadScenarioProfile } from './scenario-generator.mjs';
 
 const path = relative => fileURLToPath(new URL(relative, import.meta.url));
 const { airport, sources } = loadFrozenScenarioSources(), profile = loadAccommodationProfile(), probes = loadCapacityProfile().probes;
 const model = compileAirport(airport);
+const routeGeneration = loadScenarioProfile().route_generation;
 
 test('accommodation profile is strict, bounded to one changed visit and complete across cases', () => {
   for (const change of [
@@ -22,16 +24,17 @@ test('all frozen alternatives reproduce, preserve commitments and independently 
   for (const { snapshot, raw } of sources) {
     const frozen = fingerprint({ snapshot, raw, airport, profile });
     const definition = profile.cases.find(item => item.case_id === snapshot.case_id);
-    const evidence = prepareAccommodation(snapshot, raw, airport, profile, probes.find(probe => probe.id === definition.probe_id));
+    const evidence = prepareAccommodation(snapshot, raw, airport, profile, probes.find(probe => probe.id === definition.probe_id), routeGeneration);
     assert.deepEqual(evidence, readJson(path(`../src/demo/prepared/${snapshot.case_id}.accommodation.json`)));
     assert.ok(Date.parse(evidence.approved_at) < Date.parse(evidence.received_at));
     assert.ok(Date.parse(evidence.received_at) < Date.parse(evidence.request.start));
     const fixed = sourceOccupancies(snapshot, raw), incoming = requestOccupancy(evidence.request);
     for (const [variant, result] of Object.entries(evidence.variants)) {
-      assert.equal(result.options.length, 3);
+      assert.equal(result.options.length, result.total_options_found);
       assert.equal(result.status, 'options-found');
       assert.equal(result.search, snapshot.case_id === 'full-day' ? 'single-whole-turn-relocation' : 'direct-placement');
       for (const option of result.options) {
+        assert.equal(option.target_stand_contact, model.stands.get(option.target_stand_id).contact);
         const proposed = fixed[variant].map(item => {
           const move = option.moves.find(move => move.stay_id === item.id);
           return move ? { ...item, standId: move.to_stand_id } : { ...item };
@@ -42,6 +45,7 @@ test('all frozen alternatives reproduce, preserve commitments and independently 
           const original = fixed[variant].find(source => source.id === item.id);
           assert.deepEqual({ ...item, standId: original.standId }, original);
         }
+        for (const move of option.moves) assert.equal(move.to_stand_contact, model.stands.get(move.to_stand_id).contact);
         assert.deepEqual(evaluatePlan(model, [...proposed, { ...incoming, standId: option.target_stand_id }]), []);
         assert.equal(proposed.length, fixed[variant].length);
       }
@@ -64,7 +68,6 @@ test('direct fits do not search or introduce optional disruption; invalid plans 
   assert.equal(result.search, 'direct-placement');
   assert.ok(result.options.every(option => option.kind === 'direct' && !option.moves.length));
   assert.throws(() => assessAccommodation(model, [], { ...incoming, aircraftId: 'unknown' }, new Set()), /Unknown/);
-  assert.throws(() => assessAccommodation(model, [], incoming, new Set(), 0), /limit/);
   assert.throws(() => assessAccommodation(model, [{ ...incoming, standId: 'unknown' }], incoming, new Set()), /Invalid/);
 });
 
@@ -76,7 +79,7 @@ test('a real international-bank request has no acceptable direct or one-turn rep
     cases: profile.cases.map(item => item.case_id === 'full-day'
       ? { ...item, probe_id: probe.id, start_offset_minutes: 900, duration_minutes: 120 } : item),
   };
-  const evidence = prepareAccommodation(snapshot, raw, airport, input, probe);
+  const evidence = prepareAccommodation(snapshot, raw, airport, input, probe, routeGeneration);
   for (const result of Object.values(evidence.variants)) {
     assert.equal(result.status, 'no-acceptable-option-found');
     assert.equal(result.search, 'single-whole-turn-relocation');

@@ -1,0 +1,2059 @@
+{
+  "schema_version": "2.0.0",
+  "source": "synthetic",
+  "movement_kind": "one-way-relocation",
+  "stand_validation_passed": true,
+  "airport": {
+    "id": "contoso",
+    "name": "Contoso International Airport"
+  },
+  "snapshot_fingerprint": "647114cc410da533750a5fb8c1f9f3ca5c945aeb15ce528c7d5f3b332564aa6b",
+  "airport_fingerprint": "e336107b35c9bb391b87b17a51a01efc72b644ace45cfc92da1d8219616b3b5e",
+  "demand_fingerprint": "6b8c2a00e49486edf1e5ceed027a77397be91574120a4a3d2ea972978732ffc9",
+  "default_tow_minutes": 12,
+  "visits": [
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Along%3A1/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Along%3A1/departure",
+      "arrival_handling_minutes": 60,
+      "departure_handling_minutes": 60,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:302",
+              "earliest_start": 1792627380000,
+              "latest_start": 1792632780000
+            },
+            {
+              "stand_id": "t1:stand:303",
+              "earliest_start": 1792627380000,
+              "latest_start": 1792632780000
+            },
+            {
+              "stand_id": "t1:stand:R07",
+              "earliest_start": 1792627380000,
+              "latest_start": 1792632780000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": null,
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A1/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A1/departure",
+      "arrival_handling_minutes": 60,
+      "departure_handling_minutes": 60,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A2/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A2/departure",
+      "arrival_handling_minutes": 60,
+      "departure_handling_minutes": 60,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A3/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A3/departure",
+      "arrival_handling_minutes": 60,
+      "departure_handling_minutes": 60,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A4/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A4/departure",
+      "arrival_handling_minutes": 60,
+      "departure_handling_minutes": 60,
+      "variants": {
+        "baseline": {
+          "source_stay_id": null,
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Afinal-overnight/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Afinal-overnight/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:108",
+              "earliest_start": 1792676880000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:109",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:109",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792673100000,
+              "latest_start": 1792688580000
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "earliest_start": 1792676880000,
+              "latest_start": 1792688580000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Ainitial-overnight/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Ainitial-overnight/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:101",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:101",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:105",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "earliest_start": 1792579500000,
+              "latest_start": 1792594980000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A1/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A1/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:109",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:109",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:110",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "earliest_start": 1792602900000,
+              "latest_start": 1792603200000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A10/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A10/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A11/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A11/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A12/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A12/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A2/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A2/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792619100000,
+              "latest_start": 1792619340000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A3/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A3/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:109",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792622700000,
+              "latest_start": 1792622880000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A4/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A4/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A5/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A5/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A6/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A6/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A7/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A7/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:110",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:222",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:111",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:112",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:113",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:220",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:224",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:226",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:228",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:230",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:232",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:234",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:236",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:238",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:R02",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:R04",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            },
+            {
+              "stand_id": "t1:stand:R06",
+              "earliest_start": 1792632600000,
+              "latest_start": 1792632720000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A8/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A8/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A9/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A9/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A1/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A1/departure",
+      "arrival_handling_minutes": 60,
+      "departure_handling_minutes": 60,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A2/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A2/departure",
+      "arrival_handling_minutes": 60,
+      "departure_handling_minutes": 60,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:306",
+              "earliest_start": 1792626300000,
+              "latest_start": 1792627380000
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "earliest_start": 1792626300000,
+              "latest_start": 1792627380000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:307",
+              "earliest_start": 1792626300000,
+              "latest_start": 1792627380000
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "earliest_start": 1792626300000,
+              "latest_start": 1792627380000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A3/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A3/departure",
+      "arrival_handling_minutes": 60,
+      "departure_handling_minutes": 60,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A4/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A4/departure",
+      "arrival_handling_minutes": 60,
+      "departure_handling_minutes": 60,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:306",
+              "earliest_start": 1792624500000,
+              "latest_start": 1792624560000
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "earliest_start": 1792624500000,
+              "latest_start": 1792624560000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:307",
+              "earliest_start": 1792624500000,
+              "latest_start": 1792624560000
+            },
+            {
+              "stand_id": "t1:stand:R08",
+              "earliest_start": 1792624500000,
+              "latest_start": 1792624560000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A1/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A1/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:101",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "earliest_start": 1792626120000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "earliest_start": 1792624740000,
+              "latest_start": 1792627500000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:103",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "earliest_start": 1792625760000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "earliest_start": 1792614600000,
+              "latest_start": 1792627500000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A2/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A2/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:101",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:102",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:105",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            }
+          ]
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+          "destinations": [
+            {
+              "stand_id": "t1:stand:101",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:103",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:104",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:105",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:106",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:107",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:221",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:223",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:225",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:227",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:229",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:231",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:233",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:235",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:237",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:R01",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:R03",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            },
+            {
+              "stand_id": "t1:stand:R05",
+              "earliest_start": 1792642500000,
+              "latest_start": 1792652280000
+            }
+          ]
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A1/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A1/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A10/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A10/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A11/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A11/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A12/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A12/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A13/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A13/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A14/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A14/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A15/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A15/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A16/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A16/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A2/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A2/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A3/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A3/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A4/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A4/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A5/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A5/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A6/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A6/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A7/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A7/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A8/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A8/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+          "destinations": []
+        }
+      }
+    },
+    {
+      "visit_id": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+      "arrival_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A9/arrival",
+      "departure_flight_id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A9/departure",
+      "arrival_handling_minutes": 45,
+      "departure_handling_minutes": 45,
+      "variants": {
+        "baseline": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+          "destinations": []
+        },
+        "tow-options": {
+          "source_stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+          "destinations": []
+        }
+      }
+    }
+  ]
+}

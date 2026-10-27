@@ -21,7 +21,9 @@ import { BufferOverlay, PlanReview, type ReviewMetric } from "./demo/PlanReview"
 import { DEFAULT_GATE_WAIT_PROFILE, evaluateGateWaitPlans } from "./demo/gate-wait-evaluation";
 import { evaluateCapacityQuery } from "./demo/capacity-evaluation";
 import { CapacityOverlay, CapacityReview, capacityColor, initialCapacityReview } from "./demo/CapacityReview";
-import { AccommodationReview } from "./demo/AccommodationReview";
+import { PlanDecisionReview } from "./demo/PlanDecisionReview";
+import { evaluateTowWindows, towWindowSegments } from "./demo/tow-windows-evaluation";
+import { TowWindowOverlay, TowWindowReview } from "./demo/TowWindowReview";
 
 /*
  * GTAA-only Navbar height. Coral's Navbar root is 44px (Griffel); passing a
@@ -47,6 +49,12 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
   const [reviewMetric, setReviewMetric] = useState<ReviewMetric>("buffers");
   const [showWaiting, setShowWaiting] = useState(false);
   const [assumptionId, setAssumptionId] = useState(DEFAULT_GATE_WAIT_PROFILE.default_assumption_id);
+  const [showTowWindows, setShowTowWindows] = useState(false), [towReviewOpen, setTowReviewOpen] = useState(false);
+  const [selectedTowVisit, setSelectedTowVisit] = useState("");
+  const towEvidence = dataset.prepared?.towWindows;
+  const towAssessments = useMemo(() => dataset.prepared && towEvidence
+    ? evaluateTowWindows(dataset.prepared.snapshot, towEvidence, dataset.prepared.variant) : [], [dataset.prepared, towEvidence]);
+  const towSegments = useMemo(() => towWindowSegments(towAssessments, dataset.domain), [towAssessments, dataset.domain]);
   const capacity = dataset.prepared?.capacity;
   const [capacityState, setCapacityState] = useState(() => initialCapacityReview(dataset.prepared?.snapshot, capacity));
   const capacityQuery = useMemo(() => capacity
@@ -85,7 +93,10 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
         selectionActive={selection.occupancyIds.length > 0 || !!selection.flightId}
         toolbar={<>
           <ViewsFiltersToolbar />
-          <AccommodationReview />
+          <PlanDecisionReview />
+          {towEvidence && <TowWindowReview evidence={towEvidence} assessments={towAssessments}
+            selectedId={selectedTowVisit} setSelectedId={setSelectedTowVisit} open={towReviewOpen} setOpen={setTowReviewOpen}
+            show={showTowWindows} setShow={setShowTowWindows} />}
           {evaluation && gateEvaluation && dataset.prepared && <PlanReview
             snapshot={dataset.prepared.snapshot} evaluation={evaluation} variant={dataset.prepared.variant}
             open={bufferReviewOpen} setOpen={setBufferReviewOpen} showOverlay={showBuffers} setShowOverlay={setShowBuffers}
@@ -101,8 +112,8 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
           <DemoSettingsButton onClick={openDemoSettings} />
         </>}
         notice={<><DemoStatus /><FilterStatus />{acceptedOptionId && <p className="ops-filter-status" role="status">
-          Session-only accommodation accepted. Approved reference retained; use Late request to compare or restore.
-          Reference capacity/atlas and paired reviews are hidden, not reused against changed assignments.
+          Session-only accommodation accepted. Use Compare plans to review the retained reference; Late request to restore it.
+          Reference capacity/atlas and chart-metric reviews are hidden, not reused against changed assignments.
         </p>}{showBuffers && evaluation && dataset.prepared && <p className="ops-filter-status" role="status">
           Scheduled buffers v{evaluation.metric.version}: {evaluation.variants[dataset.prepared.variant].buffers.availability === "invalid"
             ? "invalid due to overlapping occupancy"
@@ -113,6 +124,9 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
             ? gateEvaluation.variants[dataset.prepared.variant].waiting.availability
             : `${Number(gateEvaluation.variants[dataset.prepared.variant].waiting.summary.total_wait_minutes?.toFixed(2))} min`}.
           {" "}Blue dots mark positive arrival estimates, not added occupancy. Whole-plan review; not a solver objective.
+        </p>}{showTowWindows && towEvidence && <p className="ops-filter-status" role="status">
+          Tow windows: gold hatched sections inside lozenges show destination-checked one-way tow starts.
+          {" "}{towSegments.length} visible ranges; other assignments and flight times stay fixed. Routes and crews are not certified.
         </p>}{capacityState.show && capacity && <p className="ops-filter-status" role="status">
           Single-turn capacity v{capacity.metric_version}: {capacityQuery?.error ?? (capacityState.allProbes
             ? `${capacityLayers.reduce((count, layer) => count + layer.opportunities.length, 0)} alternative arrival-start ranges across ${capacityLayers.length} probes`
@@ -136,6 +150,8 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
               duration: capacityState.allProbes ? String(probe.default_duration_minutes) : capacityState.duration,
               selectedId: id, selectedStart: start, open: true })}
           />}
+          {showTowWindows && towEvidence && <TowWindowOverlay segments={towSegments}
+            isMatch={matcher.active ? matcher.occupancy : undefined} onInspect={id => { setSelectedTowVisit(id); setTowReviewOpen(true); }} />}
         </>}
       />
       <SelectionPopover />

@@ -4,7 +4,6 @@ import { compileAirport, evaluatePlan, readJson } from './airport-model.mjs';
 import { fingerprint, sourceOccupancies } from './capacity-probe.mjs';
 import { standCandidates, compareIds } from './stand-pressure.mjs';
 import { createDemandRouteSampler, loadCatalogs } from './airport-catalogs.mjs';
-import { loadScenarioProfile } from './scenario-generator.mjs';
 
 const profilePath = fileURLToPath(new URL('../data/airports/contoso/evaluation/accommodation-profile.json', import.meta.url));
 const shape = new Ajv({ allErrors: true }).compile(readJson(fileURLToPath(new URL('../data/schemas/accommodation-profile.schema.json', import.meta.url))));
@@ -13,7 +12,7 @@ export function validateAccommodationProfile(profile) {
   if (new Set(profile.cases.map(item => item.case_id)).size !== 3) throw new Error('Accommodation profile requires each scenario exactly once.');
   return profile;
 }
-export const loadAccommodationProfile = () => validateAccommodationProfile(readJson(profilePath));
+export const loadAccommodationProfile = (path = profilePath) => validateAccommodationProfile(readJson(path));
 
 const asDemand = item => ({
   id: item.id, aircraft_id: item.aircraftId, operating_airline_ids: item.operatingAirlineIds,
@@ -21,8 +20,7 @@ const asDemand = item => ({
   start: new Date(item.start).toISOString(), end: new Date(item.end).toISOString(),
 });
 
-export function assessAccommodation(model, fixed, incoming, movableStayIds, maxOptions = 3) {
-  if (!Number.isInteger(maxOptions) || maxOptions < 1 || maxOptions > 5) throw new Error('Invalid accommodation option limit.');
+export function assessAccommodation(model, fixed, incoming, movableStayIds) {
   if (fixed.some(item => item.id === incoming.id) || evaluatePlan(model, fixed).length) throw new Error('Invalid approved accommodation plan or request identity.');
   const eligibility = standCandidates(model, asDemand(incoming));
   const targets = eligibility.candidate_stand_ids.map(standId => {
@@ -36,7 +34,12 @@ export function assessAccommodation(model, fixed, incoming, movableStayIds, maxO
     const findings = evaluatePlan(model, proposed);
     if (findings.length) throw new Error(`Accommodation failed independent full-plan validation: ${JSON.stringify(findings)}`);
     const content = { kind: moves.length ? 'localized-repair' : 'direct', target_stand_id: placement.standId, moves };
-    options.push({ id: `accommodation:${fingerprint(content)}`, ...content, stand_validation_passed: true });
+    options.push({
+      id: `accommodation:${fingerprint(content)}`, ...content,
+      target_stand_contact: model.stands.get(placement.standId).contact,
+      moves: moves.map(move => ({ ...move, to_stand_contact: model.stands.get(move.to_stand_id).contact })),
+      stand_validation_passed: true,
+    });
   };
   for (const { placement } of direct) add(placement, [], [...fixed, placement]);
   if (!direct.length) for (const { placement, blockers } of targets) {
@@ -54,7 +57,7 @@ export function assessAccommodation(model, fixed, incoming, movableStayIds, maxO
   return {
     status: options.length ? 'options-found' : 'no-acceptable-option-found',
     search: direct.length ? 'direct-placement' : 'single-whole-turn-relocation',
-    total_options_found: options.length, options: options.slice(0, maxOptions),
+    total_options_found: options.length, options,
     excluded_stands: eligibility.excluded_stands,
     blocked_stands: targets.filter(target => target.blockers.length).map(target => {
       const findings = evaluatePlan(model, [...fixed, target.placement]);
@@ -77,7 +80,7 @@ export function requestOccupancy(request) {
   };
 }
 
-export function prepareAccommodation(snapshot, raw, airport, profile, probe) {
+export function prepareAccommodation(snapshot, raw, airport, profile, probe, routeGeneration) {
   validateAccommodationProfile(profile);
   const definition = profile.cases.find(item => item.case_id === snapshot.case_id);
   if (!definition || probe.id !== definition.probe_id || probe.separation_minutes !== 0) throw new Error('Unknown accommodation case/probe or unsupported extra separation.');
@@ -87,7 +90,8 @@ export function prepareAccommodation(snapshot, raw, airport, profile, probe) {
   const airline = airport.airlines.airlines.find(item => item.id === probe.operating_airline_id);
   if (!airline?.iata) throw new Error('Late request requires a known airline with an IATA flight prefix.');
   const id = `late-request:${snapshot.case_id}`, visitId = `${id}/visit`;
-  const routes = createDemandRouteSampler({ ...loadCatalogs(), airlines: airport.airlines }, airport.airport, loadScenarioProfile().route_generation);
+  if (!routeGeneration) throw new Error('Accommodation preparation requires an explicit route-generation profile.');
+  const routes = createDemandRouteSampler({ ...loadCatalogs(), airlines: airport.airlines }, airport.airport, routeGeneration);
   const originAirport = routes.sample({ seed: profile.id, key: `${id}/arrival`, airline_id: airline.id, sector_id: probe.arrival_sector_id }).airport_code;
   const destination = routes.sample({ seed: profile.id, key: `${id}/departure`, airline_id: airline.id, sector_id: probe.departure_sector_id }).airport_code;
   const carrier = airline.id.replace(/^airline:/, '');
@@ -107,10 +111,10 @@ export function prepareAccommodation(snapshot, raw, airport, profile, probe) {
     const movable = new Set(plan.stays.filter(stay => !stay.towIn && !stay.towOut && stay.arrivalFlightId && stay.departureFlightId &&
       Date.parse(stay.start) >= origin && Date.parse(stay.end) <= horizonEnd &&
       plan.stays.filter(other => other.visitId === stay.visitId).length === 1).map(stay => stay.id));
-    return [variant, assessAccommodation(model, fixed[variant], incoming, movable, profile.max_displayed_options)];
+    return [variant, assessAccommodation(model, fixed[variant], incoming, movable)];
   }));
   return {
-    schema_version: '1.0.0', id, source: 'synthetic', snapshot_fingerprint: fingerprint(snapshot),
+    schema_version: '1.1.0', id, source: 'synthetic', snapshot_fingerprint: fingerprint(snapshot),
     airport_fingerprint: fingerprint(airport), demand_fingerprint: fingerprint(raw), profile,
     approved_at: new Date(origin - 24 * 3600_000).toISOString(), received_at: new Date(origin - 12 * 3600_000).toISOString(),
     request, variants,

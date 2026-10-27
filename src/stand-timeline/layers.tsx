@@ -209,6 +209,8 @@ export function StandRows({
     return rows.map((row, i) => (
       <div
         key={row.id}
+        data-row-id={row.id}
+        tabIndex={-1}
         className={[
           "st-row-label",
           labelAlign === "end" ? "st-row-label--end" : "",

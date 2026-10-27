@@ -1,5 +1,5 @@
 import configuredProfile from "../../data/airports/contoso/evaluation/buffer-profile.json";
-import type { PreparedScenario } from "./dataset";
+import type { PreparedScenario, PreparedStay } from "./dataset";
 import type { PlanVariant } from "./preferences";
 
 export const BUFFER_METRIC = {
@@ -159,6 +159,13 @@ export interface EvaluatedBufferPlan {
   unassigned_visits: number;
   generated_tows: number;
   buffers: BufferResult;
+}
+
+export function calculatePreparedBuffers(stays: readonly PreparedStay[], window: PreparedScenario["plan_window"]) {
+  return calculateStandBuffers(stays.map(stay => ({
+    id: stay.id, visitId: stay.visitId, rowId: stay.rowId, start: Date.parse(stay.start), end: Date.parse(stay.end),
+  })),
+    [Date.parse(window.start), Date.parse(window.end)]);
 }
 
 export interface BufferEvaluation {

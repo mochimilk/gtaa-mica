@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "id": "late-request:full-day",
   "source": "synthetic",
   "snapshot_fingerprint": "1e40dee59ea2ac518ee4d2126fa116d629f8f369bd7745830dab66aeac50e54b",
@@ -93,9 +93,11 @@
             {
               "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Fdeparture",
               "from_stand_id": "t1:stand:109",
-              "to_stand_id": "t1:stand:R06"
+              "to_stand_id": "t1:stand:R06",
+              "to_stand_contact": false
             }
           ],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -106,9 +108,11 @@
             {
               "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Fdeparture",
               "from_stand_id": "t1:stand:109",
-              "to_stand_id": "t1:stand:236"
+              "to_stand_id": "t1:stand:236",
+              "to_stand_contact": true
             }
           ],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -119,9 +123,86 @@
             {
               "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Fdeparture",
               "from_stand_id": "t1:stand:109",
-              "to_stand_id": "t1:stand:234"
+              "to_stand_id": "t1:stand:234",
+              "to_stand_contact": true
             }
           ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:d685b8c68ed85a92f0feaceb2c4ddad250ce37605e1c16db4781d75d15b30a7f",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:109",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Fdeparture",
+              "from_stand_id": "t1:stand:109",
+              "to_stand_id": "t1:stand:R02",
+              "to_stand_contact": false
+            }
+          ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:03311a4b1751de6840a83273cec34e7b3bebe1ca5183d4d209db93ba26e56572",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:224",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Fdeparture",
+              "from_stand_id": "t1:stand:224",
+              "to_stand_id": "t1:stand:R02",
+              "to_stand_contact": false
+            }
+          ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:437607bc54d0bbe48183122124ef8b123cfa0281412ec0f73ae0ed431aa72bb4",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:224",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Fdeparture",
+              "from_stand_id": "t1:stand:224",
+              "to_stand_id": "t1:stand:R06",
+              "to_stand_contact": false
+            }
+          ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:4f0db0ef0714e3a50c84f17b084291d6ae73ca5b43999b1b4a8fe34d9616c098",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:224",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Fdeparture",
+              "from_stand_id": "t1:stand:224",
+              "to_stand_id": "t1:stand:222",
+              "to_stand_contact": true
+            }
+          ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:b16164771ef9b61278eec565b61119595d1211a147ef4bbf77389b1f957af4c1",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:224",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Fdeparture",
+              "from_stand_id": "t1:stand:224",
+              "to_stand_id": "t1:stand:228",
+              "to_stand_contact": true
+            }
+          ],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         }
       ],
@@ -573,9 +654,11 @@
             {
               "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Fdeparture",
               "from_stand_id": "t1:stand:109",
-              "to_stand_id": "t1:stand:R06"
+              "to_stand_id": "t1:stand:R06",
+              "to_stand_contact": false
             }
           ],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -586,9 +669,11 @@
             {
               "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Fdeparture",
               "from_stand_id": "t1:stand:109",
-              "to_stand_id": "t1:stand:236"
+              "to_stand_id": "t1:stand:236",
+              "to_stand_contact": true
             }
           ],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -599,9 +684,86 @@
             {
               "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Fdeparture",
               "from_stand_id": "t1:stand:109",
-              "to_stand_id": "t1:stand:234"
+              "to_stand_id": "t1:stand:234",
+              "to_stand_contact": true
             }
           ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:d685b8c68ed85a92f0feaceb2c4ddad250ce37605e1c16db4781d75d15b30a7f",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:109",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-as%253A7%2Fdeparture",
+              "from_stand_id": "t1:stand:109",
+              "to_stand_id": "t1:stand:R02",
+              "to_stand_contact": false
+            }
+          ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:03311a4b1751de6840a83273cec34e7b3bebe1ca5183d4d209db93ba26e56572",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:224",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Fdeparture",
+              "from_stand_id": "t1:stand:224",
+              "to_stand_id": "t1:stand:R02",
+              "to_stand_contact": false
+            }
+          ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:437607bc54d0bbe48183122124ef8b123cfa0281412ec0f73ae0ed431aa72bb4",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:224",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Fdeparture",
+              "from_stand_id": "t1:stand:224",
+              "to_stand_id": "t1:stand:R06",
+              "to_stand_contact": false
+            }
+          ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:4f0db0ef0714e3a50c84f17b084291d6ae73ca5b43999b1b4a8fe34d9616c098",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:224",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Fdeparture",
+              "from_stand_id": "t1:stand:224",
+              "to_stand_id": "t1:stand:222",
+              "to_stand_contact": true
+            }
+          ],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:b16164771ef9b61278eec565b61119595d1211a147ef4bbf77389b1f957af4c1",
+          "kind": "localized-repair",
+          "target_stand_id": "t1:stand:224",
+          "moves": [
+            {
+              "stay_id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Afull-day%253Av1%2Fmix%253Adomestic-aa%253A36%2Fdeparture",
+              "from_stand_id": "t1:stand:224",
+              "to_stand_id": "t1:stand:228",
+              "to_stand_contact": true
+            }
+          ],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         }
       ],

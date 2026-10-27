@@ -11,6 +11,9 @@ open **Late request**.
 1. Read the incoming airline, aircraft, sectors, route and exact occupancy.
 2. Preview an alternative. The chart and approved reference remain unchanged.
 3. Inspect the affected flight pair, stand changes, buffers and synthetic waiting.
+   **Open executive brief** opens the [plan decision brief](decision-brief.md)
+   with the same option and assumption. **Review accommodation decision**
+   returns here without accepting or changing the chart.
 4. Confirm the coordination checkbox and select **Accept accommodation**.
 5. Inspect the updated chart, flight lists and unassigned alerts.
 6. Reopen **Late request** to compare another choice or **Restore approved reference**.
@@ -77,8 +80,20 @@ Protections are explicit:
 * Move at most one existing whole turn
 * Leave existing unresolved traffic unresolved, rather than trading it away
 
-The UI shows up to three deterministic alternatives and discloses the total
-found. Stand/identity order is not a financial or resilience ranking.
+Evidence v1.1 preserves every rule-valid alternative, not only the first three.
+The UI selects up to the profile's display limit (currently three), covering
+contact/non-contact strategies first, then distinct reported measurements and
+affected turns. It does not fill the list with cosmetic placements.
+An active or explicitly selected choice is retained alongside representatives
+when necessary.
+
+Both **Late request** and **Compare plans** use the same representative set.
+Labels name the incoming stand and any existing flight pair and destination
+stand. Equivalent reported summaries are identified across both synthetic
+waiting assumptions; this does not establish identical passenger, cost or
+coordination consequences. No financial or resilience ranking is implied.
+The full-day case now illustrates contact and non-contact relocations,
+including alternatives with different assessed populations and tight handovers.
 Finding no option means no acceptable option within this narrow search,
 not proof that the service is infeasible. There is no solver-timeout status:
 the finite offline search completes or preparation fails explicitly.
@@ -124,9 +139,9 @@ visit/flight links, lists, filters and alerts together.
 The amended dataset does not carry the original prepared-plan metadata,
 solver status, capacity evidence or atlas as though they described the new
 assignments. Its subtitle explicitly identifies a session accommodation,
-not a new solver run. Reference capacity/atlas and paired review controls
+not a new solver run. Reference capacity/atlas and chart-metric review controls
 are hidden until the original reference is restored. The late-request
-comparison remains available against that reference.
+comparison and **Compare plans** remain available against that reference.
 
 ## Preparation and validation
 
@@ -155,6 +170,10 @@ same-stand overlaps and protected/unknown-stay changes. Authoritative physical
 and adjacency checks run offline; the browser is not a second solver.
 The schema validator is generated offline and works without runtime string
 code generation.
+
+Preparation takes the route-generation profile explicitly rather than
+internally loading Contoso preferences. The airport, demand, probes and
+accommodation profile remain separate inputs for another airport.
 
 Tests reproduce every prepared alternative, replay full hard-rule validation,
 retain original commitments, exercise no-option/invalid-source paths, compare

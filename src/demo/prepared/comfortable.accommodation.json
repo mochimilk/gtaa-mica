@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "id": "late-request:comfortable",
   "source": "synthetic",
   "snapshot_fingerprint": "05bcd30088027e1251b68c84bebe37ffa2e51564a9398a99a1506c75f66103bc",
@@ -90,6 +90,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:108",
           "moves": [],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -97,6 +98,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:109",
           "moves": [],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -104,6 +106,135 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:110",
           "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:afb1b4fa2485ff3f6ff7fe6cb1218d0a26d10506f7d8156fbef9650b7fe5290c",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:111",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:a2bb79b88682dc2310f2c5a7becff755f69a5e46e733ce8aed7fbb12f84753ee",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:112",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:00c7ea762cb3c9083676104f49f88c3e892077348af975f1845c52424d9c1d77",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:113",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:a1c9058769df41f9bddfa01c79844ebed5878277e1c5516e1c77fbf1ef225c1e",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:220",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:f6c2a659236add5bb9825037c88c94cce5f967674ff7a24cddf439ca8c8dbec4",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:222",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:71994497e72eee6cf1b5f374995f1e9ddb39743ab5b6c73ebdb7593fb2fa6c35",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:224",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:2047b9c75122126a3d3d8dbf97395b5035f63dc1a4b66e13f5c30069a4abfaae",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:226",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:b25c664f8fd59aa823c5ccb3475c0463c99acdefa7fd21d19137f8a0e4c53330",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:228",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:9845d7eab28bbd1793a96f57861e181735781275781c26c8cefcb66c9745609a",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:230",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:fb7cbbd9668745e1b2969b93a6be2f913ff621e7ad22ecc3b6e2c24c5c565eed",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:232",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:288b1cf1d3756783a10e959f82ff546b4c59832260a5dbe37bc72e6cff1cc83b",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:234",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:7157412f11e6bc6c8c921f4ca304e32529b136282233975ab5a487d983fe90a1",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:236",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:49d4798bc048368884a98f0f932ff48390a3dbc8afaab8b8ae8fe38a3781f901",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:238",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:7387f87b9731c84d8b9998fa77f5fb3d3c78a3dc4adb3ff10a9d46b9f5842314",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:R02",
+          "moves": [],
+          "target_stand_contact": false,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:597b71c2ed2dac5f08594b85719c840f2702207b56349c2fc2f6c0b7ba439693",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:R04",
+          "moves": [],
+          "target_stand_contact": false,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:e692b86fb7a3a690681b9102e48d8e039e7a40aaa306b1e166cd5ec9747904e4",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:R06",
+          "moves": [],
+          "target_stand_contact": false,
           "stand_validation_passed": true
         }
       ],
@@ -349,6 +480,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:108",
           "moves": [],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -356,6 +488,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:109",
           "moves": [],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -363,6 +496,135 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:110",
           "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:afb1b4fa2485ff3f6ff7fe6cb1218d0a26d10506f7d8156fbef9650b7fe5290c",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:111",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:a2bb79b88682dc2310f2c5a7becff755f69a5e46e733ce8aed7fbb12f84753ee",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:112",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:00c7ea762cb3c9083676104f49f88c3e892077348af975f1845c52424d9c1d77",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:113",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:a1c9058769df41f9bddfa01c79844ebed5878277e1c5516e1c77fbf1ef225c1e",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:220",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:f6c2a659236add5bb9825037c88c94cce5f967674ff7a24cddf439ca8c8dbec4",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:222",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:71994497e72eee6cf1b5f374995f1e9ddb39743ab5b6c73ebdb7593fb2fa6c35",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:224",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:2047b9c75122126a3d3d8dbf97395b5035f63dc1a4b66e13f5c30069a4abfaae",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:226",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:b25c664f8fd59aa823c5ccb3475c0463c99acdefa7fd21d19137f8a0e4c53330",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:228",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:9845d7eab28bbd1793a96f57861e181735781275781c26c8cefcb66c9745609a",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:230",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:fb7cbbd9668745e1b2969b93a6be2f913ff621e7ad22ecc3b6e2c24c5c565eed",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:232",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:288b1cf1d3756783a10e959f82ff546b4c59832260a5dbe37bc72e6cff1cc83b",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:234",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:7157412f11e6bc6c8c921f4ca304e32529b136282233975ab5a487d983fe90a1",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:236",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:49d4798bc048368884a98f0f932ff48390a3dbc8afaab8b8ae8fe38a3781f901",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:238",
+          "moves": [],
+          "target_stand_contact": true,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:7387f87b9731c84d8b9998fa77f5fb3d3c78a3dc4adb3ff10a9d46b9f5842314",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:R02",
+          "moves": [],
+          "target_stand_contact": false,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:597b71c2ed2dac5f08594b85719c840f2702207b56349c2fc2f6c0b7ba439693",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:R04",
+          "moves": [],
+          "target_stand_contact": false,
+          "stand_validation_passed": true
+        },
+        {
+          "id": "accommodation:e692b86fb7a3a690681b9102e48d8e039e7a40aaa306b1e166cd5ec9747904e4",
+          "kind": "direct",
+          "target_stand_id": "t1:stand:R06",
+          "moves": [],
+          "target_stand_contact": false,
           "stand_validation_passed": true
         }
       ],

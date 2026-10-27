@@ -2,22 +2,23 @@ import Ajv from 'ajv';
 import standaloneCode from 'ajv/dist/standalone/index.js';
 import { writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
 import { loadAirport, readJson } from './airport-model.mjs';
 import { generateScenario, loadScenarioProfile } from './scenario-generator.mjs';
 import { loadCapacityProfile, prepareCapacitySnapshot } from './capacity-probe.mjs';
 
 const path = relative => fileURLToPath(new URL(relative, import.meta.url));
 
-export function loadFrozenScenarioSources() {
-  const airport = loadAirport(), compact = loadScenarioProfile();
-  const fullDay = loadScenarioProfile(path('../data/airports/contoso/demand/full-day-profile.json'));
+export function loadFrozenScenarioSources({ airportManifest, scenarioProfile, fullDayProfile, preparedDirectory } = {}) {
+  const airport = loadAirport(airportManifest), compact = loadScenarioProfile(scenarioProfile);
+  const fullDay = loadScenarioProfile(fullDayProfile ?? path('../data/airports/contoso/demand/full-day-profile.json'));
   const sources = ['comfortable', 'constrained', 'full-day'].map(caseId => {
-    const snapshot = readJson(path(`../src/demo/prepared/${caseId}.json`));
+    const snapshot = readJson(resolve(preparedDirectory ?? path('../src/demo/prepared/'), `${caseId}.json`));
     const scenario = generateScenario(caseId === 'full-day' ? fullDay : compact, airport, caseId);
     for (const warning of scenario.routing_warnings ?? []) console.warn(`WARNING ${warning}`);
     return { snapshot, raw: scenario.raw_demand };
   });
-  return { airport, sources };
+  return { airport, sources, routeGeneration: compact.route_generation };
 }
 
 export function writeCapacityArtifacts(snapshots) {

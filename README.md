@@ -86,6 +86,15 @@ with exact-start daily evidence rather than an airport-wide capacity score.
 The [late-request workflow](docs/accommodation.md) previews direct placement
 or a one-turn stand repair, compares operating consequences and applies a
 reversible session-only choice without overwriting the approved reference.
+The [executive decision brief](docs/decision-brief.md), opened with **Compare plans**,
+compares that reference with another prepared plan or accommodation option.
+It separates additional service, lost/retained demand, assignment changes,
+tows, buffers and synthetic waiting from human judgment, with inspection
+links that do not apply the preview.
+The [tow-window overlay](docs/tow-windows.md) marks one-way tow-start ranges
+inside lozenges, checked against handling, travel, compatible destination
+occupancy and adjacency rules. It does not schedule a movement or certify
+routes or crews.
 
 ```sh
 npm run validate:airport

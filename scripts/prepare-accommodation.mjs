@@ -11,12 +11,12 @@ const path = relative => fileURLToPath(new URL(relative, import.meta.url));
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   try {
     if (process.argv.length !== 2) throw new Error('Usage: npm run prepare:accommodation');
-    const { airport, sources } = loadFrozenScenarioSources(), profile = loadAccommodationProfile(), probes = loadCapacityProfile().probes;
+    const { airport, sources, routeGeneration } = loadFrozenScenarioSources(), profile = loadAccommodationProfile(), probes = loadCapacityProfile().probes;
     const artifacts = sources.map(({ snapshot, raw }) => {
       const definition = profile.cases.find(item => item.case_id === snapshot.case_id);
       const probe = probes.find(item => item.id === definition.probe_id);
       if (!probe) throw new Error(`Unknown accommodation probe: ${definition.probe_id}`);
-      return { caseId: snapshot.case_id, evidence: prepareAccommodation(snapshot, raw, airport, profile, probe) };
+      return { caseId: snapshot.case_id, evidence: prepareAccommodation(snapshot, raw, airport, profile, probe, routeGeneration) };
     });
     const ajv = new Ajv({ allErrors: true, code: { source: true, esm: true } });
     ajv.addFormat('date-time', /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/);

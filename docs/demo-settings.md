@@ -53,9 +53,17 @@ The **Late request** control adds a
 [post-approval accommodation rehearsal](accommodation.md): preview a direct fit
 or one-turn stand repair, inspect consequences and explicitly accept a
 session-only choice. Restore the approved reference from the same control.
-Reload and dataset/plan switching clear acceptance. Reference capacity/atlas
-and paired reviews are hidden while amended assignments are active rather
+Reload and dataset/plan switching clear acceptance. Reference capacity/atlas,
+tow-window and chart-metric reviews are hidden while amended assignments are active rather
 than displaying stale evidence.
+The **Compare plans** control opens an [executive decision brief](decision-brief.md)
+against the retained reference, including while a session accommodation is active.
+Compare the other prepared plan or a late-request option, inspect changes and
+return to the explicit accommodation decision without applying a preview.
+The **Tow windows** control adds
+[destination-checked one-way tow-start bands](tow-windows.md) inside lozenges.
+These are read-only relocation opportunities, not scheduled movements,
+parking-and-return cycles or crew/route certification.
 
 ## State and persistence
 
@@ -99,8 +107,10 @@ They omit the solver's large candidate/conflict evidence.
 
 Snapshots and their validator load on demand when Contoso is selected. No
 backend, native bridge, network solver or .NET process is used by the viewer.
-The reusable [timeline renderer](../src/stand-timeline) is unchanged; adapters
-provide its chart-neutral rows, visits and intervals.
+Adapters provide chart-neutral rows, visits and intervals to the reusable
+[timeline renderer](../src/stand-timeline). Its row labels expose stable row
+identities and programmatic focus for stand inspection; no planning logic
+is added to the renderer.
 
 Developers can regenerate all checked-in snapshots after intentionally
 changing the airport or scenario profile:

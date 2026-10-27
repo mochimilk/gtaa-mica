@@ -21,18 +21,18 @@ function indexById<T extends { id: string }>(items: T[], label: string) {
   return result;
 }
 
-export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanVariant): DemoDataset {
+export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanVariant, airportName = "Contoso"): DemoDataset {
   const plan = snapshot.variants[variant];
   return {
     ...adaptScenarioPlan(snapshot, variant, plan,
-      `${plan.covered_flight_count}/${snapshot.flights.length} represented flight legs assigned · ${plan.generated_movement_count} generated tow movements · ${plan.solver_status}. Scheduled context included; not operationally certified.`),
+      `${plan.covered_flight_count}/${snapshot.flights.length} represented flight legs assigned · ${plan.generated_movement_count} generated tow movements · ${plan.solver_status}. Scheduled context included; not operationally certified.`, airportName),
     prepared: { snapshot, variant },
   };
 }
 
 export function adaptScenarioPlan(
   snapshot: Omit<PreparedScenario, "variants">, variant: PlanVariant,
-  plan: Pick<PreparedPlan, "stays" | "covered_flight_count" | "generated_movement_count">, subtitle: string,
+  plan: Pick<PreparedPlan, "stays" | "covered_flight_count" | "generated_movement_count">, subtitle: string, airportName = "Contoso",
 ): DemoDataset {
   const start = instant(snapshot.plan_window.start);
   const end = instant(snapshot.plan_window.end);
@@ -111,7 +111,7 @@ export function adaptScenarioPlan(
   }));
   const byTime = (a: OpsFlight, b: OpsFlight) => a.estimate - b.estimate || a.flight.localeCompare(b.flight);
   return {
-    id: `${snapshot.demand_id}/${variant}`, label: `Contoso · ${SCENARIO_LABELS[snapshot.case_id]} · ${variant === "baseline" ? "Baseline" : "Tow options"}`,
+    id: `${snapshot.demand_id}/${variant}`, label: `${airportName} · ${SCENARIO_LABELS[snapshot.case_id]} · ${variant === "baseline" ? "Baseline" : "Tow options"}`,
     date: snapshot.plan_window.start.slice(0, 10), timeBasis: "scheduled",
     subtitle,
     domain: [start, end], timeline: {

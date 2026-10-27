@@ -3,6 +3,54 @@ title: Repeatable airport demo scenarios
 description: Generate seeded raw flight legs, complete scheduled context and measurable local stand-assignment comparisons without changing the Gantt.
 ---
 
+## Validate another airport
+
+The next airport is an end-to-end portability exercise, not evidence that
+every production planning problem is already modeled.
+Keep airport configuration, raw demand, plans and evaluation profiles separate.
+
+1. Author a manifest and referenced infrastructure with a consistent airport ID,
+   timezone, stand/gate identities, physical permissions, airline/sector groups
+   and adjacency conditions. Validate references before generating demand.
+2. Configure aircraft-size handling, default tow travel, traffic weights, route
+   preferences and a tow profile. Minimum parking is a profile choice, not a
+   universal operating rule.
+3. Generate complete paired visits for the prepared viewer, with short, long
+   and boundary-context stays. Include long stays if tow windows are part of
+   the demonstration. Keep unmatched/ambiguous feed validation separate;
+   the underlying linker preserves unknown boundaries, but the prepared demo
+   projection currently requires complete pairs.
+4. Run baseline/tow assignments and independently validate the complete plans.
+   Do not assume Contoso's coverage, tow counts or available capacity will recur.
+5. Prepare source-matched snapshots, capacity probes, atlas, accommodation and
+   tow-window evidence. Author probes and late requests using airlines,
+   aircraft and sectors the new airport actually permits.
+6. Register the new source and prepared artifact imports in the demo selector,
+   then validate chart rows, flight links, filters, unassigned demand,
+   comparisons, overlays and session restore/reload.
+
+The reusable functions accept an airport object rather than selecting rules
+from an airport name. Frozen-source reconstruction now accepts
+`airportManifest`, `scenarioProfile`, `fullDayProfile` and `preparedDirectory`
+through `loadFrozenScenarioSources`. Accommodation preparation takes its
+route-generation profile explicitly; one-way tow-window preparation takes airport
+handling/travel policy and checks destination availability against each fixed
+plan, without a parking-profile dependency. Display names can be
+supplied to the adapter and the loader uses the prepared airport name.
+
+Existing command defaults and UI source registration still target Contoso.
+Adding a selectable second airport and its artifact destinations is tomorrow's
+integration work; changing a manifest alone does not register it in the UI.
+The Toronto Pearson shell branding is a prototype asset, not the airport
+model's identity.
+
+Portability tests cover a different airport identity, timezone and travel
+duration. The next airport must additionally validate new
+geometry, permissions, catalogs, demand mix and independently prepared evidence.
+Staffing, shared-gate capacity, tow routes/crews, commercial valuation, broader
+repairs and profile-based whole-day strategy optimization remain explicit
+prototype limitations, not completed features.
+
 ## Run the two demo days
 
 The [Contoso scenario profile](../data/airports/contoso/demand/scenario-profile.json)

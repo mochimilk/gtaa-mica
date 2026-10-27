@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:tow-windows:2.0.0",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "source", "movement_kind", "stand_validation_passed", "airport", "snapshot_fingerprint", "airport_fingerprint", "demand_fingerprint", "default_tow_minutes", "visits"],
+  "properties": {
+    "schema_version": { "const": "2.0.0" }, "source": { "const": "synthetic" },
+    "movement_kind": { "const": "one-way-relocation" }, "stand_validation_passed": { "const": true },
+    "airport": {
+      "type": "object", "additionalProperties": false, "required": ["id", "name"],
+      "properties": { "id": { "$ref": "#/definitions/id" }, "name": { "type": "string", "pattern": "\\S" } }
+    },
+    "snapshot_fingerprint": { "$ref": "#/definitions/hash" },
+    "airport_fingerprint": { "$ref": "#/definitions/hash" },
+    "demand_fingerprint": { "$ref": "#/definitions/hash" },
+    "default_tow_minutes": { "type": "number", "exclusiveMinimum": 0 },
+    "visits": { "type": "array", "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["visit_id", "arrival_flight_id", "departure_flight_id", "arrival_handling_minutes", "departure_handling_minutes", "variants"],
+      "properties": {
+        "visit_id": { "$ref": "#/definitions/id" },
+        "arrival_flight_id": { "$ref": "#/definitions/id" },
+        "departure_flight_id": { "$ref": "#/definitions/id" },
+        "arrival_handling_minutes": { "type": "number", "exclusiveMinimum": 0 },
+        "departure_handling_minutes": { "type": "number", "exclusiveMinimum": 0 },
+        "variants": {
+          "type": "object", "additionalProperties": false, "required": ["baseline", "tow-options"],
+          "properties": { "baseline": { "$ref": "#/definitions/assessment" }, "tow-options": { "$ref": "#/definitions/assessment" } }
+        }
+      }
+    } }
+  },
+  "definitions": {
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "assessment": {
+      "type": "object", "additionalProperties": false, "required": ["source_stay_id", "destinations"],
+      "properties": {
+        "source_stay_id": { "anyOf": [{ "$ref": "#/definitions/id" }, { "type": "null" }] },
+        "destinations": { "type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["stand_id", "earliest_start", "latest_start"],
+          "properties": {
+            "stand_id": { "$ref": "#/definitions/id" },
+            "earliest_start": { "type": "integer" }, "latest_start": { "type": "integer" }
+          }
+        } }
+      }
+    }
+  }
+}

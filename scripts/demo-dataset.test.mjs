@@ -40,6 +40,9 @@ const { GATE_WAIT_METRIC, DEFAULT_GATE_WAIT_PROFILE, parseGateWaitProfile, evalu
 const { validateCapacitySnapshot, queryCapacity, evaluateCapacityQuery } = await load('src\\demo\\capacity-evaluation.ts');
 const { validateAtlas, atlasFrequency, atlasSegments } = await load('src\\demo\\atlas-evaluation.ts');
 const { validateAccommodation, accommodationView, accommodationImpact, acceptAccommodation } = await load('src\\demo\\accommodation-evaluation.ts');
+const { buildDecisionBrief } = await load('src\\demo\\decision-brief.ts');
+const { accommodationChoices } = await load('src\\demo\\accommodation-choices.ts');
+const { validateTowWindows, evaluateTowWindows, towWindowSegments } = await load('src\\demo\\tow-windows-evaluation.ts');
 const readSnapshot = caseId => validatePreparedSnapshot(JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.json`), 'utf8')));
 
 const bufferStay = (id, start, end, rowId = 'stand:1', visitId = id) =>
@@ -48,6 +51,190 @@ const bufferHorizon = [0, 200 * 60_000];
 
 const readAccommodation = caseId => JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.accommodation.json`), 'utf8'));
 const readCapacity = caseId => JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.capacity.json`), 'utf8'));
+const readTowWindows = caseId => JSON.parse(readFileSync(resolve(root, `src\\demo\\prepared\\${caseId}.tow-windows.json`), 'utf8'));
+
+test('repair representatives cover available stand strategies, avoid cosmetic filler and retain explicit active choices', () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) for (const variant of ['baseline', 'tow-options']) {
+    const snapshot = readSnapshot(caseId), evidence = readAccommodation(caseId);
+    const frozen = JSON.stringify({ snapshot, evidence });
+    const choices = accommodationChoices(snapshot, evidence, variant);
+    assert.ok(choices.length > 0 && choices.length <= evidence.profile.max_displayed_options);
+    assert.equal(new Set(choices.map(item => item.option.id)).size, choices.length);
+    const reversed = structuredClone(evidence);
+    reversed.variants[variant].options.reverse();
+    assert.deepEqual(accommodationChoices(snapshot, reversed, variant), choices);
+    for (const choice of choices) {
+      assert.ok(evidence.variants[variant].options.some(option => option.id === choice.option.id));
+      assert.match(choice.label, /contact/);
+      assert.ok(Number.isInteger(choice.equivalentCount) && choice.equivalentCount >= 0);
+    }
+    if (caseId === 'full-day') {
+      assert.ok(choices.some(item => item.option.moves[0].to_stand_contact));
+      assert.ok(choices.some(item => !item.option.moves[0].to_stand_contact));
+      assert.ok(choices.every(item => /move .* to/.test(item.label)));
+    }
+    const excluded = evidence.variants[variant].options.find(option => !choices.some(item => item.option.id === option.id));
+    if (excluded) assert.ok(accommodationChoices(snapshot, evidence, variant, [excluded.id]).some(item => item.option.id === excluded.id));
+    assert.throws(() => accommodationChoices(snapshot, evidence, variant, ['unknown']), /Unknown retained/);
+    assert.equal(JSON.stringify({ snapshot, evidence }), frozen);
+  }
+});
+
+test('cosmetic direct placements are not manufactured into three different outcomes', () => {
+  const snapshot = readSnapshot('comfortable'), evidence = readAccommodation('comfortable');
+  const candidates = evidence.variants.baseline.options;
+  const first = candidates[0];
+  evidence.variants.baseline.options = [first, { ...structuredClone(first), id: 'alternate-identity' }];
+  const choices = accommodationChoices(snapshot, evidence, 'baseline');
+  assert.equal(choices.length, 1);
+  assert.equal(choices[0].equivalentCount, 1);
+});
+
+test('tow evidence is CSP-safe, complete and tied to airport, raw demand, source plan and visit endpoints', async () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) {
+    const snapshot = readSnapshot(caseId), capacity = readCapacity(caseId), evidence = readTowWindows(caseId);
+    assert.equal(await validateTowWindows(evidence, snapshot, capacity), evidence);
+    for (const mutate of [
+      value => { value.schema_version = '2'; },
+      value => { value.airport.id = 'other'; },
+      value => { value.snapshot_fingerprint = '0'.repeat(64); },
+      value => { value.airport_fingerprint = '0'.repeat(64); },
+      value => { value.demand_fingerprint = '0'.repeat(64); },
+      value => { value.default_tow_minutes = 0; },
+      value => { value.movement_kind = 'round-trip'; },
+      value => { value.stand_validation_passed = false; },
+      value => { value.visits.pop(); },
+      value => { value.visits[1] = { ...value.visits[0] }; },
+      value => { value.visits[0].visit_id = 'unknown'; },
+      value => { value.visits[0].arrival_flight_id = value.visits[0].departure_flight_id; },
+      value => { value.visits[0].arrival_handling_minutes = 0.0000001; },
+      value => { value.visits[0].variants.baseline.source_stay_id = 'unknown'; },
+      value => { value.visits.find(item => item.variants.baseline.destinations.length).variants.baseline.destinations[0].stand_id = 'unknown'; },
+      value => { const item = value.visits.find(item => item.variants.baseline.destinations.length); item.variants.baseline.destinations[0].stand_id = snapshot.variants.baseline.stays.find(stay => stay.id === item.variants.baseline.source_stay_id).rowId; },
+      value => { const list = value.visits.find(item => item.variants.baseline.destinations.length).variants.baseline.destinations; list.push({ ...list[0] }); },
+      value => { value.visits.find(item => item.variants.baseline.destinations.length).variants.baseline.destinations[0].earliest_start = -1; },
+      value => { value.visits.find(item => item.variants.baseline.destinations.length).variants.baseline.destinations[0].latest_start = Number.MAX_SAFE_INTEGER; },
+      value => { const destination = value.visits.find(item => item.variants.baseline.destinations.length).variants.baseline.destinations[0]; destination.earliest_start = destination.latest_start + 1; },
+    ]) {
+      const broken = structuredClone(evidence);
+      mutate(broken);
+      await assert.rejects(validateTowWindows(broken, snapshot, capacity), /[Tt]ow|millisecond/);
+    }
+  }
+});
+
+test('tow windows preserve occupancy, exclude unassigned/actual movement chains and clip inclusive starts at exact horizon bounds', () => {
+  let visibleRanges = 0;
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) for (const variant of ['baseline', 'tow-options']) {
+    const snapshot = readSnapshot(caseId), evidence = readTowWindows(caseId), frozen = JSON.stringify({ snapshot, evidence });
+    const assessments = evaluateTowWindows(snapshot, evidence, variant);
+    const segments = towWindowSegments(assessments, [Date.parse(snapshot.plan_window.start), Date.parse(snapshot.plan_window.end)]);
+    visibleRanges += segments.length;
+    assert.equal(assessments.length, snapshot.visits.length);
+    assert.ok(segments.every(segment => segment.assessment.available && segment.assessment.rowId && segment.earliest <= segment.latest));
+    if (caseId === 'full-day') assert.equal(assessments.filter(item => item.status.startsWith('Unassigned')).length, 11);
+    if (caseId === 'constrained' && variant === 'tow-options') assert.equal(assessments.filter(item => item.status.startsWith('Existing movement')).length, 1);
+    assert.equal(JSON.stringify({ snapshot, evidence }), frozen);
+    assert.match(adaptPreparedScenario(snapshot, variant, 'Portable Airport Test').label, /^Portable Airport Test/);
+  }
+  assert.ok(visibleRanges > 0);
+  const source = evaluateTowWindows(readSnapshot('comfortable'), readTowWindows('comfortable'), 'baseline').find(item => item.available);
+  const exact = { ...source, ranges: [[0, 0], [10, 10]] };
+  assert.deepEqual(towWindowSegments([exact], [0, 10]).map(item => [item.earliest, item.latest]), [[0, 0]]);
+  const clipped = { ...source, ranges: [[-10, 20]] };
+  assert.deepEqual(towWindowSegments([clipped], [0, 10]).map(item => [item.earliest, item.latest]), [[0, 9]]);
+  assert.throws(() => towWindowSegments([exact], [0, 0]), /Invalid/);
+});
+
+test('decision briefs compare prepared plans in either direction with explicit coverage and changed-visit evidence', () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) for (const variant of ['baseline', 'tow-options']) {
+    const snapshot = readSnapshot(caseId), frozen = JSON.stringify(snapshot);
+    const alternative = variant === 'baseline' ? 'tow-options' : 'baseline';
+    const report = buildDecisionBrief(snapshot, variant, { kind: 'variant', variant: alternative }, 'routine');
+    const before = new Set(snapshot.variants[variant].stays.map(stay => stay.visitId));
+    const after = new Set(snapshot.variants[alternative].stays.map(stay => stay.visitId));
+    assert.deepEqual(report.gainedIds, [...after].filter(id => !before.has(id)));
+    assert.deepEqual(report.lostIds, [...before].filter(id => !after.has(id)));
+    assert.equal(report.retainedIds.length + report.lostIds.length, before.size);
+    assert.equal(report.retainedIds.length + report.gainedIds.length, after.size);
+    assert.equal(report.originalUnresolvedAfter, snapshot.visits.length - after.size);
+    assert.equal(report.addedIds.length, 0);
+    assert.equal(report.retimedFlightIds.length, 0);
+    assert.equal(report.alternativeSource.kind, 'solver');
+    assert.equal(report.referenceSource.requestFingerprint, snapshot.variants[variant].request_fingerprint);
+    assert.equal(report.alternativeSource.requestFingerprint, snapshot.variants[alternative].request_fingerprint);
+    const buffers = evaluateBufferPlans(snapshot);
+    assert.deepEqual(report.beforeBuffers, buffers.variants[variant].buffers);
+    assert.deepEqual(report.afterBuffers, buffers.variants[alternative].buffers);
+    const comparison = buffers.comparison;
+    assert.deepEqual([...report.changedIds].sort(), comparison.changed_retained_visit_ids);
+    for (const change of report.changes) {
+      assert.equal(change.beforeStays.length === 0, !before.has(change.visitId));
+      assert.equal(change.afterStays.length === 0, !after.has(change.visitId));
+      assert.ok(change.flights.length);
+      assert.ok(change.flights.every(flight => snapshot.flights.some(source => source.id === flight.id && source.visitId === change.visitId)));
+      assert.ok([...change.beforeStays, ...change.afterStays].every(stay => snapshot.rows.some(row => row.id === stay.rowId)));
+    }
+    assert.equal(JSON.stringify(snapshot), frozen);
+  }
+});
+
+test('decision briefs share exact accommodation consequences without counting the incoming request as unresolved original demand', () => {
+  for (const caseId of ['comfortable', 'constrained', 'full-day']) for (const variant of ['baseline', 'tow-options']) {
+    const snapshot = readSnapshot(caseId), evidence = readAccommodation(caseId), frozen = JSON.stringify({ snapshot, evidence });
+    for (const assumption of DEFAULT_GATE_WAIT_PROFILE.assumptions) for (const option of evidence.variants[variant].options) {
+      const report = buildDecisionBrief(snapshot, variant, { kind: 'accommodation', optionId: option.id }, assumption.id, evidence);
+      const impact = accommodationImpact(snapshot, evidence, variant, option.id, assumption);
+      assert.deepEqual(report.beforeBuffers, impact.beforeBuffers);
+      assert.deepEqual(report.afterBuffers, impact.afterBuffers);
+      assert.deepEqual(report.beforeWaiting, impact.beforeWaiting);
+      assert.deepEqual(report.afterWaiting, impact.afterWaiting);
+      assert.equal(report.common.arrivalIds.length, impact.commonExistingArrivals);
+      assert.equal(report.common.beforeMinutes, impact.beforeCommonWait);
+      assert.equal(report.common.afterMinutes, impact.afterCommonWait);
+      assert.equal(report.incomingWait, impact.incomingWait);
+      assert.deepEqual(report.addedIds, [evidence.request.visit.turnId]);
+      assert.equal(report.gainedIds.length, 0);
+      assert.equal(report.lostIds.length, 0);
+      assert.equal(report.changedIds.length, option.moves.length);
+      assert.equal(report.retainedIds.length, impact.assignedVisits);
+      assert.equal(report.originalUnresolvedAfter, report.before.unassignedVisits);
+      assert.equal(report.after.scenario.visits.length, snapshot.visits.length + 1);
+      assert.equal(report.after.plan.generated_movement_count, report.before.plan.generated_movement_count);
+      assert.equal(report.alternativeSource.kind, 'bounded-accommodation');
+      assert.equal('solverStatus' in report.alternativeSource, false);
+      assert.equal(report.retimedFlightIds.length, 0);
+      assert.ok(!report.common.arrivalIds.includes(evidence.request.flights[0].id));
+      const incoming = report.changes.find(change => change.kind === 'New service');
+      assert.deepEqual(incoming.flights, evidence.request.flights);
+      assert.equal(incoming.beforeStays.length, 0);
+      assert.equal(incoming.afterStays[0].rowId, option.target_stand_id);
+    }
+    assert.equal(JSON.stringify({ snapshot, evidence }), frozen);
+  }
+});
+
+test('decision comparisons ignore stay identities and ordering, preserve N/A, and reject unsupported inputs', () => {
+  const snapshot = readSnapshot('comfortable');
+  snapshot.variants['tow-options'] = structuredClone(snapshot.variants.baseline);
+  snapshot.variants['tow-options'].stays.reverse().forEach((stay, index) => { stay.id = `renamed:${index}`; });
+  let report = buildDecisionBrief(snapshot, 'baseline', { kind: 'variant', variant: 'tow-options' }, 'routine');
+  assert.equal(report.changes.length, 0);
+  assert.equal(report.common.beforeMinutes, report.common.afterMinutes);
+  snapshot.variants.baseline.stays = [];
+  snapshot.variants.baseline.covered_flight_count = 0;
+  report = buildDecisionBrief(snapshot, 'baseline', { kind: 'variant', variant: 'tow-options' }, 'routine');
+  assert.equal(report.common.arrivalIds.length, 0);
+  assert.equal(report.common.beforeMinutes, null);
+  assert.equal(report.common.afterMinutes, null);
+  assert.equal(report.beforeBuffers.summary.minimum_minutes, null);
+  assert.equal(report.lostIds.length, 0);
+  assert.ok(report.gainedIds.length > 0);
+  assert.throws(() => buildDecisionBrief(snapshot, 'baseline', { kind: 'variant', variant: 'unknown' }, 'routine'), /Unknown/);
+  assert.throws(() => buildDecisionBrief(snapshot, 'baseline', { kind: 'variant', variant: 'tow-options' }, 'unknown'), /Unknown/);
+  assert.throws(() => buildDecisionBrief(snapshot, 'baseline', { kind: 'accommodation', optionId: 'unknown' }, 'routine'), /No validated/);
+  assert.throws(() => buildDecisionBrief(snapshot, 'baseline', { kind: 'accommodation', optionId: 'unknown' }, 'routine', readAccommodation('comfortable')), /Unknown/);
+});
 
 test('accommodation sidecars are CSP-safe, verify exact approved sources and reject broken request or repair links', async () => {
   for (const caseId of ['comfortable', 'constrained', 'full-day']) {
@@ -435,6 +622,10 @@ test('equal assessed counts do not hide different assessed arrival sets', () => 
   assert.equal(result.variants['tow-options'].waiting.summary.assessed_arrivals, 1);
   assert.equal(result.comparison.assessed_sets_differ, true);
   assert.equal(result.comparison.wait_delta_minutes, null);
+  const brief = buildDecisionBrief(snapshot, 'baseline', { kind: 'variant', variant: 'tow-options' }, 'routine');
+  assert.equal(brief.common.arrivalIds.length, 0);
+  assert.equal(brief.common.beforeMinutes, null);
+  assert.equal(brief.common.afterMinutes, null);
 });
 
 test('gate-wait source endpoints fail explicitly on invalid or duplicate arrival references', () => {

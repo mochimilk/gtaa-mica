@@ -1,7 +1,7 @@
 import validate from "./accommodation-validator.mjs";
 import { fingerprintJson, type CapacityProbe, type PreparedCapacity } from "./capacity-evaluation";
-import { calculateStandBuffers, DEFAULT_BUFFER_PROFILE } from "./buffer-evaluation";
-import { calculateWaiting, DEFAULT_GATE_WAIT_PROFILE, type ReleaseDelayAssumption } from "./gate-wait-evaluation";
+import { calculatePreparedBuffers, DEFAULT_BUFFER_PROFILE } from "./buffer-evaluation";
+import { calculateWaiting, commonWaiting, DEFAULT_GATE_WAIT_PROFILE, type ReleaseDelayAssumption } from "./gate-wait-evaluation";
 import { adaptScenarioPlan } from "./prepared-adapter";
 import type { DemoDataset, PreparedFlight, PreparedScenario, PreparedStay } from "./dataset";
 import type { PlanVariant, ScenarioId } from "./preferences";
@@ -10,11 +10,12 @@ export interface AccommodationOption {
   id: string;
   kind: "direct" | "localized-repair";
   target_stand_id: string;
-  moves: { stay_id: string; from_stand_id: string; to_stand_id: string }[];
+  target_stand_contact: boolean;
+  moves: { stay_id: string; from_stand_id: string; to_stand_id: string; to_stand_contact: boolean }[];
   stand_validation_passed: true;
 }
 export interface PreparedAccommodation {
-  schema_version: "1.0.0"; id: string; source: "synthetic";
+  schema_version: "1.1.0"; id: string; source: "synthetic";
   snapshot_fingerprint: string; airport_fingerprint: string; demand_fingerprint: string;
   profile: {
     schema_version: "1.0.0"; id: string; max_changed_visits: 1; max_displayed_options: number;
@@ -66,7 +67,7 @@ export async function validateAccommodation(value: unknown, snapshot: PreparedSc
   for (const variant of ["baseline", "tow-options"] as const) {
     const result = value.variants[variant], plan = snapshot.variants[variant];
     if ((result.status === "options-found") !== (result.total_options_found > 0) ||
-        result.options.length !== Math.min(value.profile.max_displayed_options, result.total_options_found) ||
+        result.options.length !== result.total_options_found ||
         new Set(result.options.map(option => option.id)).size !== result.options.length) throw new Error("Invalid accommodation option counts or status.");
     const excluded = new Set(result.excluded_stands.map(item => item.stand_id));
     const blocked = new Set(result.blocked_stands.map(item => item.stand_id));
@@ -89,7 +90,7 @@ export async function validateAccommodation(value: unknown, snapshot: PreparedSc
             plan.stays.filter(item => item.visitId === stay.visitId).length !== 1) throw new Error("Accommodation changes a protected or unknown stay.");
       }
       const view = accommodationView(snapshot, value, variant, option.id);
-      if (standBuffers(view.plan.stays, snapshot).overlaps.length) throw new Error("Accommodation introduces overlapping stand occupancy.");
+      if (calculatePreparedBuffers(view.plan.stays, snapshot.plan_window).overlaps.length) throw new Error("Accommodation introduces overlapping stand occupancy.");
       adaptScenarioPlan(view.scenario, variant, view.plan, "Validation only");
     }
   }
@@ -119,28 +120,19 @@ export function accommodationView(snapshot: PreparedScenario, evidence: Prepared
   };
 }
 
-function standBuffers(stays: PreparedStay[], snapshot: Pick<PreparedScenario, "plan_window">) {
-  return calculateStandBuffers(stays.map(stay => ({ ...stay, start: Date.parse(stay.start), end: Date.parse(stay.end) })),
-    [Date.parse(snapshot.plan_window.start), Date.parse(snapshot.plan_window.end)]);
-}
-
 export function accommodationImpact(snapshot: PreparedScenario, evidence: PreparedAccommodation, variant: PlanVariant, optionId: string, assumption: ReleaseDelayAssumption) {
   const view = accommodationView(snapshot, evidence, variant, optionId), base = snapshot.variants[variant];
-  const beforeBuffers = standBuffers(base.stays, snapshot), afterBuffers = standBuffers(view.plan.stays, snapshot);
+  const beforeBuffers = calculatePreparedBuffers(base.stays, snapshot.plan_window), afterBuffers = calculatePreparedBuffers(view.plan.stays, snapshot.plan_window);
   const beforeWaiting = calculateWaiting(snapshot, base, beforeBuffers, assumption);
   const afterWaiting = calculateWaiting(view.scenario, view.plan, afterBuffers, assumption);
-  const afterById = new Map(afterWaiting.contributions.map(item => [item.arrival_id, item]));
-  const common = beforeWaiting.contributions.flatMap(item => {
-    const following = afterById.get(item.arrival_id);
-    return following ? [{ before: item.estimated_wait_minutes, after: following.estimated_wait_minutes }] : [];
-  });
+  const common = commonWaiting(beforeWaiting, afterWaiting);
   return {
     view, beforeBuffers, afterBuffers, beforeWaiting, afterWaiting,
     bufferProfile: DEFAULT_BUFFER_PROFILE,
-    commonExistingArrivals: common.length,
-    beforeCommonWait: common.length ? common.reduce((sum, item) => sum + item.before, 0) : null,
-    afterCommonWait: common.length ? common.reduce((sum, item) => sum + item.after, 0) : null,
-    incomingWait: afterById.get(evidence.request.flights[0].id)?.estimated_wait_minutes ?? null,
+    commonExistingArrivals: common.arrivalIds.length,
+    beforeCommonWait: common.beforeMinutes,
+    afterCommonWait: common.afterMinutes,
+    incomingWait: afterWaiting.contributions.find(item => item.arrival_id === evidence.request.flights[0].id)?.estimated_wait_minutes ?? null,
     assignedVisits: new Set(base.stays.map(stay => stay.visitId)).size,
     assumptionProfile: DEFAULT_GATE_WAIT_PROFILE,
   };

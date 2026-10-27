@@ -107,6 +107,19 @@ export interface GateWaitPlan extends Omit<EvaluatedBufferPlan, "buffers"> {
   waiting: GateWaitResult;
 }
 
+export function commonWaiting(before: GateWaitResult, after: GateWaitResult) {
+  const following = new Map(after.contributions.map(item => [item.arrival_id, item]));
+  const pairs = before.contributions.flatMap(item => {
+    const next = following.get(item.arrival_id);
+    return next ? [{ id: item.arrival_id, before: item.estimated_wait_minutes, after: next.estimated_wait_minutes }] : [];
+  });
+  return {
+    arrivalIds: pairs.map(item => item.id),
+    beforeMinutes: pairs.length ? pairs.reduce((sum, item) => sum + item.before, 0) : null,
+    afterMinutes: pairs.length ? pairs.reduce((sum, item) => sum + item.after, 0) : null,
+  };
+}
+
 export interface GateWaitEvaluation {
   metric: typeof GATE_WAIT_METRIC;
   profile: GateWaitProfile;

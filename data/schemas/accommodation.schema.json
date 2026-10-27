@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "urn:gtaa-mica:accommodation:1.0.0",
+  "$id": "urn:gtaa-mica:accommodation:1.1.0",
   "type": "object", "additionalProperties": false,
   "required": ["schema_version", "id", "source", "snapshot_fingerprint", "airport_fingerprint", "demand_fingerprint", "profile", "approved_at", "received_at", "request", "variants"],
   "properties": {
-    "schema_version": { "const": "1.0.0" }, "id": { "$ref": "#/definitions/id" }, "source": { "const": "synthetic" },
+    "schema_version": { "const": "1.1.0" }, "id": { "$ref": "#/definitions/id" }, "source": { "const": "synthetic" },
     "snapshot_fingerprint": { "$ref": "#/definitions/hash" },
     "airport_fingerprint": { "$ref": "#/definitions/hash" },
     "demand_fingerprint": { "$ref": "#/definitions/hash" },
@@ -38,19 +38,21 @@
         "status": { "enum": ["options-found", "no-acceptable-option-found"] },
         "search": { "enum": ["direct-placement", "single-whole-turn-relocation"] },
         "total_options_found": { "type": "integer", "minimum": 0 },
-        "options": { "type": "array", "maxItems": 5, "items": {
+        "options": { "type": "array", "items": {
           "type": "object", "additionalProperties": false,
-          "required": ["id", "kind", "target_stand_id", "moves", "stand_validation_passed"],
+          "required": ["id", "kind", "target_stand_id", "target_stand_contact", "moves", "stand_validation_passed"],
           "properties": {
             "id": { "$ref": "#/definitions/id" },
             "kind": { "enum": ["direct", "localized-repair"] },
             "target_stand_id": { "$ref": "#/definitions/id" },
+            "target_stand_contact": { "type": "boolean" },
             "stand_validation_passed": { "const": true },
             "moves": { "type": "array", "maxItems": 1, "items": {
               "type": "object", "additionalProperties": false,
-              "required": ["stay_id", "from_stand_id", "to_stand_id"],
+              "required": ["stay_id", "from_stand_id", "to_stand_id", "to_stand_contact"],
               "properties": {
-                "stay_id": { "$ref": "#/definitions/id" }, "from_stand_id": { "$ref": "#/definitions/id" }, "to_stand_id": { "$ref": "#/definitions/id" }
+                "stay_id": { "$ref": "#/definitions/id" }, "from_stand_id": { "$ref": "#/definitions/id" }, "to_stand_id": { "$ref": "#/definitions/id" },
+                "to_stand_contact": { "type": "boolean" }
               }
             } }
           }

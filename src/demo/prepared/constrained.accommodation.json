@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.0.0",
+  "schema_version": "1.1.0",
   "id": "late-request:constrained",
   "source": "synthetic",
   "snapshot_fingerprint": "647114cc410da533750a5fb8c1f9f3ca5c945aeb15ce528c7d5f3b332564aa6b",
@@ -90,6 +90,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:306",
           "moves": [],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -97,6 +98,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:307",
           "moves": [],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -104,6 +106,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:R08",
           "moves": [],
+          "target_stand_contact": false,
           "stand_validation_passed": true
         }
       ],
@@ -497,6 +500,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:306",
           "moves": [],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -504,6 +508,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:307",
           "moves": [],
+          "target_stand_contact": true,
           "stand_validation_passed": true
         },
         {
@@ -511,6 +516,7 @@
           "kind": "direct",
           "target_stand_id": "t1:stand:R08",
           "moves": [],
+          "target_stand_contact": false,
           "stand_validation_passed": true
         }
       ],
