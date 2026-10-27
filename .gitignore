@@ -11,3 +11,8 @@ dist-ssr
 
 # Unsigned local Electron bundles
 desktop-out/
+
+# Private environment files; keep the credential-free template tracked.
+.env
+.env.*
+!.env.example

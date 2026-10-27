@@ -1,30 +1,44 @@
-import { useCallback, useMemo, useState, type ReactNode } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Button } from "@fluentui/react-components";
+import { ContentToolbar } from "../components/content-toolbar";
 import {
+  BarBackdrop,
+  BarGhosts,
   BarLabels,
+  BarLink,
   OccupancyBars,
   StandRows,
   StandTimeline,
   TimeAxis,
   TimeGrid,
   type ChartIntent,
+  type DropPreview,
   type Occupancy,
+  type TimelineRow,
+  type TimelineZoom,
 } from "../stand-timeline";
 import { DEMO_DATA as DATA, DEMO_DOMAIN as DOMAIN, formatUtcWithDay as fmt } from "./demoData";
 import { airportLabel } from "./airports";
+import { ghostClashes } from "./delays";
 import { applySelection } from "./selection";
 import { SYNTHETIC_DATE } from "./syntheticFixture";
 import {
+  BAR_BACKDROP_BLUR,
+  BAR_BACKDROP_SATURATE,
   BAR_INSET,
+  BAR_RADIUS,
   DemoPatternDefs,
   GUTTER_WIDTH,
   LABEL_METRICS,
-  MIN_HOUR_WIDTH,
   QUARTER_RULER,
   ROW_HEIGHT,
   fluentChartTheme,
   makeDemoAccessors,
+  rulerFor,
+  stayEnds,
+  type FlightStyle,
 } from "./theme";
+import { useDemoZoom } from "./ZoomMenuRow";
 import "./demo.css";
 
 const KIND_LABEL: Record<string, string> = {
@@ -33,6 +47,9 @@ const KIND_LABEL: Record<string, string> = {
   hold: "Tow / hold",
   dep: "Departure stay",
 };
+
+/** In classic, each bar's ends by what starts and ends its stay: tapered for a flight, zigzagged for a tow. */
+const classicEnds = (o: Occupancy) => stayEnds(DATA.endpoints.get(o.id));
 
 export interface StandTimelineDemoProps {
   /** Controlled selection. Omit both props to use the demo standalone. */
@@ -50,10 +67,65 @@ export interface StandTimelineDemoProps {
   isMatch?: (occupancyId: string) => boolean;
   /** Includes host selections with no chart occupancy, such as unassigned flights. */
   selectionActive?: boolean;
+  /**
+   * With exactly two stays selected, a dashed link flows from the first to the
+   * second. Optional swap verdict for that pair; omit while it is unknown.
+   */
+  swapStatus?: "compatible" | "incompatible";
+  /**
+   * Of `selectedIds`, the stays Skye selected rather than the user: outlined
+   * in Skye's colours. The user and Skye select side by side.
+   */
+  skyeIds?: readonly string[];
+  /**
+   * The dashed links to draw between selected stays, in place of the one
+   * between exactly two: one per pair, so the user's and Skye's are never
+   * joined to each other.
+   */
+  links?: readonly { fromId: string; toId: string; className?: string }[];
+  /**
+   * The stays to draw, when the host changes stands (a new array per change),
+   * including any on `pinnedRows`. Defaults to the fixture's.
+   */
+  occupancies?: readonly Occupancy[];
+  /**
+   * Rows pinned above the stands, under the time ruler: stays waiting for a
+   * stand, say. Their bars read as waiting (see demo.css), and their
+   * accessible names say so instead of naming a stand.
+   */
+  pinnedRows?: readonly TimelineRow[];
+  /** A pinned row's label in the stand column, in place of its name. */
+  pinnedLabel?: (row: TimelineRow) => ReactNode;
+  /** Makes bars draggable to other stands; see StandTimeline's previewDrop. */
+  previewDrop?: (occupancyId: string, rowId: string, shiftMs: number) => DropPreview;
+  /** With previewDrop, bars can be dragged in time too, in steps of this many ms; see StandTimeline. */
+  dragSnapMs?: number;
+  /**
+   * Host chart layers drawn under the bars, e.g. a closed area's band. They
+   * show blurred through the bars' glass, so they render twice (see
+   * BarBackdrop): any ids in them must be their own (useId).
+   */
+  underlay?: ReactNode;
+  /** Host chart layers drawn over the bars, e.g. that band's label. */
+  overlay?: ReactNode;
+  /** Optional controls rendered at the left of the header, before the title. */
+  toolbarStart?: ReactNode;
   /** Optional controls rendered at the right of the header. */
   toolbar?: ReactNode;
-  /** Optional status line rendered under the subtitle. */
-  notice?: ReactNode;
+  /**
+   * Optional content floating over the foot of the chart, e.g. the host's
+   * KPIs. The rows can scroll up clear of it, and it takes the pointer only
+   * where its host gives it back (see demo.css, .demo-chart-summary).
+   */
+  summary?: ReactNode;
+  /**
+   * The board's zoom, from useDemoZoom(), when the host shows its controls
+   * (e.g. ZoomMenuRow in a menu). Without it the board keeps its own, which
+   * pinching it still changes.
+   */
+  zoom?: TimelineZoom;
+  /** How flights are drawn: aero (round ends, with icons; the default) or classic (shaped ends, no icons). */
+  flightStyle?: FlightStyle;
 }
 
 export function StandTimelineDemo({
@@ -62,17 +134,54 @@ export function StandTimelineDemo({
   showSelectionDetail = true,
   isMatch,
   selectionActive,
+  swapStatus,
+  skyeIds,
+  links,
+  occupancies = DATA.occupancies,
+  pinnedRows,
+  pinnedLabel,
+  previewDrop,
+  dragSnapMs,
+  underlay,
+  overlay,
+  toolbarStart,
   toolbar,
-  notice,
+  summary,
+  zoom: hostZoom,
+  flightStyle = "aero",
 }: StandTimelineDemoProps = {}) {
+  const ownZoom = useDemoZoom();
+  const zoom = hostZoom ?? ownZoom;
   const [localIds, setLocalIds] = useState<string[]>([]);
   const controlled = controlledIds !== undefined;
   const selectedIds = controlled ? controlledIds : localIds;
   const hasSelection = selectionActive ?? selectedIds.length > 0;
+  // A new `occupancies` array per stand change, so clashes follow moves and swaps.
+  const clashes = useMemo(() => ghostClashes(occupancies, DATA.delays), [occupancies]);
+  const skyeKey = skyeIds?.join("|") ?? "";
+  const pinnedKey = pinnedRows?.map((row) => row.id).join("|") ?? "";
   const accessors = useMemo(
-    () => makeDemoAccessors(DATA.turnsById, DATA.stayPosition, DATA.endpoints, isMatch, hasSelection),
-    [isMatch, hasSelection],
+    () =>
+      makeDemoAccessors(
+        DATA.turnsById,
+        DATA.stayPosition,
+        DATA.endpoints,
+        DATA.delays,
+        clashes,
+        isMatch,
+        hasSelection,
+        new Set(skyeKey ? skyeKey.split("|") : []),
+        new Set(pinnedKey ? pinnedKey.split("|") : []),
+        flightStyle,
+      ),
+    [clashes, isMatch, hasSelection, skyeKey, pinnedKey, flightStyle],
   );
+  const renderLabel = useMemo(() => {
+    if (!pinnedLabel) return undefined;
+    const pinned = new Set(pinnedKey ? pinnedKey.split("|") : []);
+    return (row: TimelineRow) =>
+      pinned.has(row.id) ? pinnedLabel(row) : <span className="st-row-name">{row.label}</span>;
+  }, [pinnedLabel, pinnedKey]);
 
   const onIntent = useCallback(
     (intent: ChartIntent) => {
@@ -88,51 +197,97 @@ export function StandTimelineDemo({
     [selectedIds],
   );
 
+  // The summary's height, kept on the chart's frame (--demo-summary-height),
+  // so the chart's rows can scroll up clear of it (demo.css).
+  const frameRef = useRef<HTMLDivElement>(null);
+  const summaryRef = useRef<HTMLDivElement>(null);
+  const hasSummary = summary != null;
+  useLayoutEffect(() => {
+    const frame = frameRef.current;
+    const over = summaryRef.current;
+    if (!frame || !over) return undefined;
+    const sync = () => frame.style.setProperty("--demo-summary-height", `${over.offsetHeight}px`);
+    sync();
+    const observer = new ResizeObserver(sync);
+    observer.observe(over, { box: "border-box" });
+    return () => {
+      observer.disconnect();
+      frame.style.removeProperty("--demo-summary-height");
+    };
+  }, [hasSummary]);
+
   return (
     <div className="demo-timeline">
-      <header className="demo-header">
-        <div>
-          <h1 className="demo-title">Stand occupancy · {SYNTHETIC_DATE}</h1>
-          <p className="demo-subtitle">
-            Generic stand-timeline starter. Not an ARIS or GateView replica.
-          </p>
-          {notice && <div className="demo-notice">{notice}</div>}
-        </div>
-        {toolbar && <div className="demo-toolbar">{toolbar}</div>}
-      </header>
+      <ContentToolbar
+        label={`Timeline · ${SYNTHETIC_DATE}`}
+        actionsStart={toolbarStart}
+        actionsEnd={toolbar}
+      />
 
-      <StandTimeline
-        style={fluentChartTheme}
-        className="demo-chart"
-        fillHeight
-        rows={DATA.rows}
-        visits={DATA.visits}
-        occupancies={DATA.occupancies}
-        domain={DOMAIN}
-        timeZone="UTC"
-        rowHeight={ROW_HEIGHT}
-        barInset={BAR_INSET}
-        minHourWidth={MIN_HOUR_WIDTH}
-        labelWidth={GUTTER_WIDTH}
-        axes="both"
-        selectedIds={selectedIds}
-        onIntent={onIntent}
-        ariaLabel="Synthetic stand occupancy timeline, times in UTC"
-      >
-        <DemoPatternDefs />
-        {/* Synthetic piers only drive optional group dividers; no group-name column. */}
-        <StandRows zebra={false} title={null} showGroup={false} labelAlign="end" />
-        <TimeGrid minorMs={QUARTER_RULER.stepMs} />
-        <OccupancyBars barStyle={accessors.barStyle} describe={accessors.describe} />
-        <BarLabels
-          slots={accessors.labelSlots}
-          color={accessors.labelColor}
-          priority={["start", "end", "center"]}
-          {...LABEL_METRICS}
-        />
-        <TimeAxis position="top" zoneLabel="UTC" {...QUARTER_RULER} />
-        <TimeAxis position="bottom" zoneLabel="UTC" {...QUARTER_RULER} />
-      </StandTimeline>
+      {/* The chart, with the summary floating over its foot. */}
+      <div className="demo-chart-frame" ref={frameRef}>
+        <StandTimeline
+          style={fluentChartTheme}
+          className="demo-chart"
+          fillHeight
+          rows={DATA.rows}
+          pinnedRows={pinnedRows}
+          visits={DATA.visits}
+          occupancies={occupancies}
+          previewDrop={previewDrop}
+          dragSnapMs={dragSnapMs}
+          domain={DOMAIN}
+          timeZone="UTC"
+          rowHeight={ROW_HEIGHT}
+          barInset={BAR_INSET}
+          barRadius={BAR_RADIUS}
+          barEnds={flightStyle === "classic" ? classicEnds : undefined}
+          zoom={zoom}
+          labelWidth={GUTTER_WIDTH}
+          selectedIds={selectedIds}
+          onIntent={onIntent}
+          ariaLabel="Synthetic stand occupancy timeline, times in UTC"
+          fade
+        >
+          <DemoPatternDefs />
+          {/* Synthetic piers only drive optional group dividers; no group-name column. */}
+          <StandRows zebra={false} title={null} showGroup={false} labelAlign="end" renderLabel={renderLabel} />
+          {/* The grid and the host's underlay show blurred and saturated through the glass bars. */}
+          <BarBackdrop blur={BAR_BACKDROP_BLUR} saturate={BAR_BACKDROP_SATURATE}>
+            <TimeGrid minorMs={QUARTER_RULER.stepMs} />
+            {underlay}
+          </BarBackdrop>
+          <OccupancyBars
+            barStyle={accessors.barStyle}
+            renderBar={accessors.renderBar}
+            describe={accessors.describe}
+          />
+          <BarLabels
+            slots={accessors.labelSlots}
+            color={accessors.labelColor}
+            className={accessors.labelClassName}
+            priority={["start", "end", "center"]}
+            {...LABEL_METRICS}
+          />
+          {/* Late stays' ghosts, over the bars so a clash shows over the stay it runs into. */}
+          <BarGhosts ghosts={accessors.ghosts} />
+          {/* Selection order is kept, so the link points at the most recent pick. */}
+          {(links ??
+            (selectedIds.length === 2
+              ? [{ fromId: selectedIds[0], toId: selectedIds[1], className: swapStatus ? `demo-link--${swapStatus}` : undefined }]
+              : [])
+          ).map((link) => (
+            <BarLink key={`${link.fromId}>${link.toId}`} fromId={link.fromId} toId={link.toId} className={link.className} />
+          ))}
+          {overlay}
+          <TimeAxis position="top" zoneLabel="UTC" {...rulerFor(zoom.hourWidth)} />
+        </StandTimeline>
+        {hasSummary && (
+          <div className="demo-chart-summary" ref={summaryRef}>
+            {summary}
+          </div>
+        )}
+      </div>
 
       {showSelectionDetail && (
       <section className="demo-detail" aria-live="polite" aria-label="Selection detail">

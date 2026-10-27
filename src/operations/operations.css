@@ -17,6 +17,16 @@
   font-size: var(--fontSizeBase200);
   line-height: var(--lineHeightBase200);
   color: var(--colorNeutralForeground1);
+  /*
+   * The surface the panel sits on: the Content card (colorNeutralBackground4
+   * at half opacity, see App.tsx) over the page (colorNeutralBackground5, see
+   * LumaSkyeBackground). Layered backgrounds composite to the same colour,
+   * opaque, so the sticky table headers and scroll fades match the panel while
+   * hiding rows beneath.
+   */
+  --ops-content-tint: color-mix(in srgb, var(--colorNeutralBackground4) 50%, transparent);
+  --ops-surface: linear-gradient(var(--ops-content-tint), var(--ops-content-tint)),
+    var(--colorNeutralBackground5);
 }
 
 .ops-panel-note {
@@ -139,11 +149,11 @@
 /*
  * OverflowScroll wrapper: joins the flex height chain between NavGroup's
  * item container and .ops-group-scroll, and positions the fade overlays.
- * Fade colour matches the sticky table header surface (colorNeutralBackground4);
- * override --ofs-fade-color if the panel surface changes.
+ * Fades paint the panel's surface (--ops-surface, as the sticky table header
+ * does), masked to a gradient; override --ofs-fade-surface if it changes.
  */
 .ofs {
-  --ofs-fade-color: var(--colorNeutralBackground4);
+  --ofs-fade-surface: var(--ops-surface, var(--colorNeutralBackground5));
   position: relative;
   display: flex;
   flex-direction: column;
@@ -157,6 +167,7 @@
   z-index: 2;
   height: 16px;
   pointer-events: none;
+  background: var(--ofs-fade-surface);
   opacity: 0;
   transition: opacity 120ms ease;
 }
@@ -166,11 +177,11 @@
 }
 
 .ofs-fade--top {
-  background: linear-gradient(to bottom, var(--ofs-fade-color), transparent);
+  mask-image: linear-gradient(to bottom, #000, transparent);
 }
 
 .ofs-fade--bottom {
-  background: linear-gradient(to top, var(--ofs-fade-color), transparent);
+  mask-image: linear-gradient(to top, #000, transparent);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -180,19 +191,16 @@
 }
 
 /*
- * Views / Filters menus (Fluent MenuPopover, portalled). The popover root's
- * height limit comes from Fluent positioning `autoSize: "height"` (inline
- * max-height = space left from the anchor to the viewport edge), so it fits
- * short windows wherever the anchor sits. The root is a flex column so the
- * MenuList inside shrinks to that limit; the list carries the 480px cap and
- * is the only scroll container. Width stays constrained.
+ * Views / Filters menus (components/menu, portalled), drawn as every menu is
+ * (menu.css). The popover root's height limit comes from Fluent positioning
+ * `autoSize: "height"` (inline max-height = space left from the anchor to the
+ * viewport edge), so it fits short windows wherever the anchor sits. The root
+ * is a flex column so the MenuList inside shrinks to that limit; the list
+ * carries the 480px cap and is the only scroll container.
  */
 div.ops-menu-popover {
-  width: min(320px, calc(100vw - 32px));
   display: flex;
   flex-direction: column;
-  max-width: min(320px, calc(100vw - 32px));
-  box-sizing: border-box;
 }
 
 div.ops-menu-popover > .ops-menu-list {
@@ -202,13 +210,6 @@ div.ops-menu-popover > .ops-menu-list {
   min-height: 0;
   max-height: min(480px, calc(100dvh - 100px));
   overflow-y: auto;
-}
-
-/* Fluent dividers bleed into popover padding by default; keep them inside
- * the scrolling list so they do not create horizontal overflow. */
-.ops-menu-list > .fui-MenuDivider {
-  margin-left: 0;
-  margin-right: 0;
 }
 
 /* Status line under the chart title while a view or filter is active. */
@@ -227,6 +228,11 @@ div.ops-menu-popover > .ops-menu-list {
   font-size: var(--fontSizeBase200);
   line-height: var(--lineHeightBase200);
   color: var(--colorNeutralForeground1);
+}
+
+/* Focus lands on the popover itself as it opens; its controls keep their own rings. */
+.ops-popover:focus {
+  outline: none;
 }
 
 .ops-popover-head {
@@ -300,15 +306,23 @@ div.ops-menu-popover > .ops-menu-list {
 }
 
 .ops-list .ops-head-row .ops-cell {
-  /* Header stays visible while the group scrolls; translucent local surface. */
+  /* Header stays visible while the group scrolls, on the panel's own surface. */
   position: sticky;
   top: 0;
   z-index: 1;
-  background: var(--colorNeutralBackground4);
+  background: var(--ops-surface);
   /* backdrop-filter: blur(12px); */
   color: var(--colorNeutralForeground3);
   font-size: var(--fontSizeBase100);
   font-weight: var(--fontWeightSemibold);
+}
+
+/*
+ * Fluent's header button inherits only the cell's background-color, not the
+ * surface's overlay layer, so it would paint darker; let the cell show.
+ */
+.ops-list .ops-head-row .fui-TableHeaderCell__button {
+  background: transparent;
 }
 
 .ops-list abbr {
@@ -322,16 +336,16 @@ div.ops-menu-popover > .ops-menu-list {
 }
 
 .ops-list .ops-row {
-  cursor: pointer;
+  cursor: var(--cursor-pointer);
 }
 
 /*
- * Body rows 28px (header rows keep Fluent's extra-small 24px). Overrides
+ * Body rows 32px (header rows keep Fluent's extra-small 24px). Overrides
  * Fluent's extra-small TableCell `height: 24px`; 16px content (line height,
  * small Badge, icon) is vertically centred by the cells' vertical-align.
  */
 .ops-list .ops-row > .ops-cell {
-  height: 28px;
+  height: 32px;
 }
 
 /*
@@ -416,67 +430,192 @@ div.ops-menu-popover > .ops-menu-list {
   color: var(--colorNeutralForeground3);
 }
 
+/*
+ * At rest a row's text sits at 80%, so the lists stay quiet beside
+ * the chart; hovered, selected (by the user or by Skye) or keyboard-focused,
+ * it is full again. Status marks (the Unassigned badge, the warning icon)
+ * keep their colour throughout. Rows paint no background at rest, so the
+ * cells' opacity only touches their text.
+ */
+.ops-list
+  .ops-row:not(:hover, :focus-visible, [aria-selected="true"], [data-skye-selected])
+  :is(.ops-flight, .ops-muted, .ops-time, .ops-stand, .ops-issue--info) {
+  opacity: 0.8;
+}
+
 /* ------------------------------------------------------------------ alerts */
 
-.ops-alerts {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacingVerticalS);
+/*
+ * Alerts menu (AlertsMenu.tsx): the bell's dot, red while alerts are open; and
+ * the Outputs toggle's (OutputsPanel.tsx), red while changes wait to be approved.
+ */
+.ops-alerts-bell path:last-child,
+.ops-outputs-branch path:last-child {
+  fill: var(--colorPaletteRedBackground3);
 }
 
-.ops-subhead {
-  margin: 0;
-  padding: 0 var(--spacingHorizontalXS);
-  font-size: var(--fontSizeBase200);
-  font-weight: var(--fontWeightSemibold);
-  color: var(--colorNeutralForeground2);
+/*
+ * The alerts, in Ask Skye's floating window (AlertsMenu.tsx): rows inset 20px
+ * like its header's title, which the window scrolls below the header.
+ */
+.ops-alerts-empty {
+  padding: var(--spacingVerticalL) var(--spacingHorizontalXL);
 }
 
-.ops-alert-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacingVerticalXS);
-}
-
+/* One alert: a full-width row that selects its flight. */
 .ops-alert {
+  appearance: none;
   display: flex;
+  align-items: flex-start;
   gap: var(--spacingHorizontalS);
-  padding: var(--spacingVerticalS) var(--spacingHorizontalS);
-  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
-  border-radius: var(--borderRadiusMedium);
+  width: 100%;
+  margin: 0;
+  padding: var(--spacingVerticalM) var(--spacingHorizontalXL);
+  border: none;
+  background: var(--colorSubtleBackground);
+  color: var(--colorNeutralForeground1);
+  font: inherit;
+  text-align: start;
+  cursor: var(--cursor-pointer, pointer);
 }
 
-.ops-alert--selected {
-  border-color: var(--colorNeutralStroke1Selected);
+/* Its flight is selected; hover and press still show over it. */
+.ops-alert[aria-pressed="true"] {
   background: var(--colorSubtleBackgroundSelected);
 }
 
-.ops-alert--done {
-  opacity: 0.75;
+.ops-alert:hover {
+  background: var(--colorSubtleBackgroundHover);
 }
 
+.ops-alert:hover:active {
+  background: var(--colorSubtleBackgroundPressed);
+}
+
+.ops-alert:focus-visible {
+  outline: var(--strokeWidthThick) solid var(--colorStrokeFocus2);
+  outline-offset: -2px;
+}
+
+.ops-alert:disabled {
+  cursor: default;
+  background: var(--colorSubtleBackground);
+}
+
+/* The kind's icon on a 40px disc. */
 .ops-alert-icon {
   flex: none;
-  font-size: 16px;
-  margin-top: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--borderRadiusCircular);
+  background: var(--colorNeutralBackground3);
 }
 
 .ops-alert-body {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--spacingVerticalXXS);
+  align-items: flex-start;
   min-width: 0;
 }
 
 .ops-alert-title {
-  font-weight: var(--fontWeightSemibold);
+  color: var(--colorNeutralForeground1);
 }
 
-.ops-alert-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacingHorizontalXS);
-  margin-left: calc(-1 * var(--spacingHorizontalS));
+.ops-alert-detail {
+  color: var(--colorNeutralForeground3);
+}
+
+/*
+ * Title and detail sit together; the tag stands a little apart, in cranberry
+ * over Fluent's filled Tag colours (hence the doubled class).
+ */
+.ops-alert .ops-alert-tag {
+  margin-top: var(--spacingVerticalSNudge);
+  background: var(--colorPaletteCranberryBackground2);
+  color: var(--colorPaletteCranberryForeground2);
+}
+
+/*
+ * The Alerts menu's rows (Alerts.tsx), each 96px with a full-width divider
+ * between them: the row selects its flight, and its menu button (More, to
+ * archive it) sits over the row's right end, shown only while the row is
+ * hovered (or its menu is open, or it has keyboard focus). Room is kept for
+ * it either way.
+ */
+.ops-alert-item {
+  position: relative;
+  /*
+   * Alpha fills, so the window's glass shows through: about the steps of
+   * Fluent's opaque subtle hover, pressed and selected fills over it.
+   */
+  --ops-alert-hover: color-mix(in srgb, var(--colorNeutralForeground1) 10%, transparent);
+  --ops-alert-pressed: color-mix(in srgb, var(--colorNeutralForeground1) 6%, transparent);
+  --ops-alert-selected: color-mix(in srgb, var(--colorNeutralForeground1) 8%, transparent);
+}
+
+.ops-alert-item + .ops-alert-item {
+  border-top: var(--strokeWidthThin) solid var(--colorNeutralStroke3);
+}
+
+.ops-alert-item > .ops-alert {
+  height: 96px;
+  gap: var(--spacingHorizontalS);
+  padding: var(--spacingVerticalL) calc(32px + 2 * var(--spacingHorizontalS)) var(--spacingVerticalL)
+    var(--spacingHorizontalL);
+}
+
+.ops-alert-item > .ops-alert[aria-pressed="true"]:not([data-mentioned]) {
+  background: var(--ops-alert-selected);
+}
+
+/* Hovering the menu button, or its menu being open, still lights the row. */
+.ops-alert-item:is(:hover, [data-menu-open]) > .ops-alert:not(:disabled, [data-mentioned]) {
+  background: var(--ops-alert-hover);
+}
+
+.ops-alert-item > .ops-alert:hover:active {
+  background: var(--ops-alert-pressed);
+}
+
+/*
+ * Headline and detail as one Caption 1 text, up to 4 lines (2 above a tag);
+ * its own size sets the lines' height, around the space between them. Full
+ * width: shrunk to a line that just fits, a re-layout could clamp it.
+ */
+.ops-alert-text {
+  align-self: stretch;
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+
+.ops-alert-body:has(.ops-alert-tag) > .ops-alert-text {
+  -webkit-line-clamp: 2;
+}
+
+.ops-alert-item .ops-alert-tag {
+  margin-top: var(--spacingVerticalM);
+}
+
+.ops-alert-item .ops-alert-more {
+  position: absolute;
+  top: 50%;
+  right: var(--spacingHorizontalS);
+  translate: 0 -50%;
+  opacity: 0;
+}
+
+.ops-alert-item:is(:hover, [data-menu-open]) .ops-alert-more,
+.ops-alert-item .ops-alert-more:focus-visible {
+  opacity: 1;
 }
 
 /* ----------------------------------------------------------------- actions */
@@ -507,6 +646,260 @@ div.ops-menu-popover > .ops-menu-list {
   gap: var(--spacingHorizontalXS);
 }
 
+/*
+ * One flight or stay (FlightCard), 1:1 with the GTAA-Dash design (Figma node
+ * 144:3130): arrival and departure in an outlined box; stand, aircraft and
+ * registration under their captions; a divider; the actions. The design's
+ * colours are Fluent's dark-theme neutrals, so the tokens here follow the
+ * light theme too. Two classes, to win over Fluent's own (atomic) styles.
+ */
+.ops-popover.ops-popover--card {
+  box-sizing: border-box;
+  width: 314px;
+  max-width: calc(100vw - 32px);
+  padding: 0;
+  overflow: hidden;
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke3);
+  border-radius: var(--borderRadiusLarge);
+  background: var(--colorNeutralBackground1);
+}
+
+.ops-card-head {
+  padding: var(--spacingHorizontalS);
+}
+
+/*
+ * Stroke 1 here and Stroke 3 on the divider (the design has Stroke 2 for both).
+ * In the board's flight style: aero's box is rounded, as in the design;
+ * classic's border is drawn (FlightCard, ShapedEnds) in its bar's shape, a
+ * flight's end tapered and a tow's zigzagged, over padding that keeps the
+ * border's 1px, so both boxes are the same size.
+ */
+.ops-card-ends {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ops-card-ends--aero {
+  padding: var(--spacingHorizontalM);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  border-radius: var(--borderRadiusLarge);
+}
+
+.ops-card-ends--shaped {
+  padding: calc(var(--spacingHorizontalM) + var(--strokeWidthThin));
+}
+
+.ops-card-ends-outline {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ops-card-ends-outline path {
+  fill: none;
+  stroke: var(--colorNeutralStroke1);
+  stroke-width: var(--strokeWidthThin);
+}
+
+.ops-card-end {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacingHorizontalS);
+}
+
+.ops-card-end--end {
+  justify-content: flex-end;
+  text-align: end;
+}
+
+.ops-card-end > svg {
+  flex-shrink: 0;
+}
+
+/* The maker's emblem, in Foreground 3: the two ends share the rest equally, so it sits dead centre. */
+.ops-card-emblem {
+  margin: 0 var(--spacingHorizontalS);
+  color: var(--colorNeutralForeground3);
+}
+
+.ops-card-end-text {
+  min-width: 0;
+}
+
+/* Body 1 Strong, then Caption 1 with the code in semibold. */
+.ops-card-flight {
+  padding-bottom: var(--spacingVerticalXXS);
+  color: var(--colorNeutralForeground1);
+  font-size: var(--fontSizeBase300);
+  line-height: var(--lineHeightBase300);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-card-route {
+  padding-bottom: var(--spacingVerticalXXS);
+  white-space: nowrap;
+}
+
+.ops-card-route,
+.ops-card-caption,
+.ops-card-fact-value {
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+}
+
+.ops-card-route,
+.ops-card-caption,
+.ops-card-type {
+  color: var(--colorNeutralForeground2);
+}
+
+.ops-card-code {
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-card-facts {
+  display: flex;
+  align-items: flex-start;
+  padding: var(--spacingVerticalXS) var(--spacingHorizontalXL);
+}
+
+.ops-card-fact {
+  flex: 1 0 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacingVerticalSNudge);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ops-card-fact--center {
+  align-items: center;
+}
+
+.ops-card-fact--end {
+  align-items: flex-end;
+}
+
+/* A 20px line, its text 2px above centre as in the design. */
+.ops-card-fact-value {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: var(--spacingHorizontalXS);
+  height: 20px;
+  padding-bottom: var(--spacingVerticalXXS);
+  color: var(--colorNeutralForeground1);
+}
+
+/*
+ * The design's size tag: Fluent's extra-small Tag at 16px tall with 4px
+ * corners (the theme's Medium is 8px), its text 4px in. Fluent's 1px
+ * transparent border sits outside the padding, so 3px of it.
+ */
+.ops-card .ops-card-size {
+  height: 16px;
+  border-radius: var(--borderRadiusSmall);
+  margin-top: var(--spacingVerticalXXS);
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+.ops-card-size abbr {
+  text-decoration: none;
+}
+
+/* 16px tall, its line 8px in from each side. */
+.ops-card .ops-card-divider {
+  height: 16px;
+  padding: 0 var(--spacingHorizontalS);
+}
+
+.ops-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacingVerticalXS) 15px var(--spacingVerticalS);
+}
+
+/* Reset stands (not in the design) goes beside the design's end button. */
+.ops-card-actions-end {
+  display: flex;
+  gap: var(--spacingHorizontalS);
+}
+
+/*
+ * Two stays (SwapCard, Figma node 147:3637): the upper stay's details above
+ * its box, the lower's below, and the Swap row between the boxes. 16px at the
+ * card's top and bottom (the design has 12px).
+ */
+.ops-card-facts--above {
+  padding-top: var(--spacingVerticalL);
+}
+
+.ops-card-facts--below {
+  padding-bottom: var(--spacingVerticalL);
+}
+
+.ops-card-head--above {
+  padding-bottom: 0;
+}
+
+.ops-card-head--below {
+  padding-top: 0;
+}
+
+.ops-card-swap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  padding: var(--spacingVerticalM) var(--spacingHorizontalS);
+}
+
+/*
+ * One line from box to box, behind the button: the chart's line between two
+ * selected stays (6px dashes, 4px gaps, flowing one period every 600ms, from
+ * the upper to the lower), in Stroke 1 at the design's 1px.
+ */
+.ops-card-swap::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(50% - 0.5px);
+  width: var(--strokeWidthThin);
+  background: repeating-linear-gradient(to bottom, var(--colorNeutralStroke1) 0 6px, transparent 6px 10px);
+  animation: ops-swap-flow 600ms linear infinite;
+}
+
+@keyframes ops-swap-flow {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ops-card-swap::before {
+    animation: none;
+  }
+}
+
+/* Over the line, and as wide as its icon and label (Fluent's medium minimum is 96px). */
+.ops-card-swap .ops-card-swap-button {
+  position: relative;
+  min-width: 0;
+}
+
 .ops-visually-hidden {
   position: absolute;
   width: 1px;
@@ -514,4 +907,356 @@ div.ops-menu-popover > .ops-menu-list {
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/*
+ * A closed stand area on the chart (ClosureBand): hatched in the chart's
+ * "blocked" red, with a dashed edge, and its label as a pill over the bars.
+ */
+.ops-closure-fill {
+  fill: color-mix(in srgb, var(--st-drop-blocked) 6%, transparent);
+}
+
+.ops-closure-stripe {
+  stroke: color-mix(in srgb, var(--st-drop-blocked) 28%, transparent);
+  stroke-width: 3;
+}
+
+.ops-closure-band {
+  stroke: var(--st-drop-blocked);
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+
+.ops-closure-label rect {
+  fill: var(--st-drop-blocked);
+}
+
+.ops-closure-label text {
+  fill: #ffffff;
+  font-size: var(--st-font-size-small);
+  font-weight: var(--st-font-weight-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ops-closure,
+  .ops-closure-label {
+    animation: ops-closure-in 360ms ease-out both;
+  }
+}
+
+@keyframes ops-closure-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/*
+ * The No stand lane's label (App.tsx, laneLabel), right-aligned in the stand
+ * column like the stands: its name over how many flights wait there, the
+ * count in the warning colour while any do.
+ */
+.ops-lane-label {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: var(--lineHeightBase100);
+}
+
+.ops-lane-count {
+  color: var(--colorNeutralForeground3);
+  font-size: var(--fontSizeBase100);
+}
+
+.ops-lane-count--waiting {
+  color: var(--colorStatusWarningForeground1);
+  font-weight: var(--fontWeightSemibold);
+}
+
+/* ---- Dragging a flight with no stand onto the chart (FlightDrag.tsx) ---- */
+
+.ops-list .ops-row--draggable {
+  cursor: grab;
+}
+
+/* While a flight is carried: no text selection, a closed hand everywhere. */
+html.ops-flight-drag,
+html.ops-flight-drag * {
+  cursor: grabbing !important;
+  user-select: none;
+}
+
+html.ops-flight-drag--blocked,
+html.ops-flight-drag--blocked * {
+  cursor: not-allowed !important;
+}
+
+/* The flight beside the pointer, under Skye's cursor when Skye carries it. */
+.ops-drag-chip {
+  position: fixed;
+  z-index: 2147482000;
+  pointer-events: none;
+  max-width: 280px;
+  padding: var(--spacingVerticalXS) var(--spacingHorizontalS);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  border-radius: var(--borderRadiusMedium);
+  background: var(--colorNeutralBackground1);
+  box-shadow: var(--shadow8);
+  color: var(--colorNeutralForeground1);
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+}
+
+.ops-drag-chip--allowed {
+  border-color: var(--colorStatusSuccessBorder1);
+}
+
+.ops-drag-chip--blocked {
+  border-color: var(--colorStatusDangerBorder1);
+}
+
+.ops-drag-chip-line {
+  display: flex;
+  gap: var(--spacingHorizontalS);
+  white-space: nowrap;
+}
+
+.ops-drag-chip-flight {
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-drag-chip-hours {
+  color: var(--colorNeutralForeground3);
+  font-variant-numeric: tabular-nums;
+}
+
+.ops-drag-chip--allowed .ops-drag-chip-stand {
+  color: var(--colorStatusSuccessForeground1);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.ops-drag-chip--blocked .ops-drag-chip-stand,
+.ops-drag-chip-reason {
+  color: var(--colorStatusDangerForeground1);
+}
+
+.ops-drag-chip-reason {
+  margin-top: var(--spacingVerticalXXS);
+  white-space: normal;
+}
+
+/* The flight's number inside its ghost on the chart. */
+.ops-flight-drop-label {
+  fill: var(--st-drop-allowed);
+  font-size: var(--st-font-size-small);
+  font-weight: var(--st-font-weight-strong);
+}
+
+.st-drop--blocked .ops-flight-drop-label {
+  fill: var(--st-drop-blocked);
+}
+
+
+/* Skye's short alerts list while she talks about them (Alerts, compact):
+   its height is set from the rows; it scrolls to the one she is on. */
+.ops-alert-list[data-compact] {
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+/* The alert Skye is talking about, in her colours. */
+.ops-alert[data-mentioned] {
+  background: color-mix(in srgb, #3b82f6 16%, transparent);
+  box-shadow: inset 3px 0 0 #3b82f6;
+}
+
+/* A flight row in Skye's selection (the user's own keeps its usual look). */
+.ops-list .ops-row[data-skye-selected] > .ops-cell {
+  background: color-mix(in srgb, #3b82f6 14%, transparent);
+}
+
+.ops-list .ops-row[data-skye-selected] > .ops-cell:first-child {
+  box-shadow: inset 3px 0 0 #3b82f6;
+}
+
+/* --------------------------------------------------------------- KPI strip */
+
+/*
+ * The board's KPIs (KpiStrip.tsx), floating over the foot of its chart (the
+ * demo page's summary; see demo.css, .demo-chart-summary): one row of tiles,
+ * 16px in from the chart's sides and bottom, clear of its scrollbar, with 8px
+ * of air above them that the rows come to rest on. The row itself has no
+ * background and takes no pointer, so the chart is live between the tiles.
+ * The tiles with a small chart take a little more of the row; narrower, all
+ * four shrink, never scroll, so their shadows are not clipped.
+ */
+.ops-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 6fr)) minmax(0, 5fr);
+  gap: var(--spacingHorizontalS);
+  padding: 8px 16px 16px;
+  font-family: var(--fontFamilyBase);
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  color: var(--colorNeutralForeground1);
+}
+
+/*
+ * A tile, in the Outputs peek's glass (OutputsPeek.tsx, from Ask Skye's
+ * floating windows, askSkye.css), clearer: the gentle liquid-glass lens
+ * (LiquidGlassFilter.tsx) over an 8px frost (the peek's is 12px), under a
+ * darker background than the peek's as a 60% tint (its Background2 at 75%),
+ * with a hairline edge and a deep shadow, so it lifts off the rows beneath.
+ * The glass and tint lie in layers under the content, each rounded itself,
+ * as the blur is not clipped to its parent's corners.
+ *
+ * On it, its label and, in the top-right corner, its delta; then 24px below,
+ * the figure, a small chart beside it. The top row is the delta's height
+ * whether there is one or not, so every tile's figure sits at the same
+ * height. Explicit 12px corners, since Coral overrides Fluent's radius
+ * tokens. Each tile is a container, so the small chart gives way as it
+ * narrows.
+ */
+.ops-kpi {
+  --ops-kpi-radius: 12px;
+  container: ops-kpi / inline-size;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: 20px auto;
+  grid-template-areas:
+    "label delta"
+    "value chart";
+  align-items: center;
+  column-gap: var(--spacingHorizontalM);
+  row-gap: 24px;
+  min-width: 0;
+  padding: var(--spacingVerticalL) var(--spacingHorizontalL);
+  border: 1px solid var(--colorNeutralStroke2);
+  border-radius: var(--ops-kpi-radius);
+  box-shadow: var(--shadow28);
+  pointer-events: auto;
+}
+
+.ops-kpi::before,
+.ops-kpi::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: calc(var(--ops-kpi-radius) - 1px);
+  pointer-events: none;
+}
+
+.ops-kpi::before {
+  z-index: -2;
+  filter: url(#mica-liquid-glass-open);
+  -webkit-backdrop-filter: blur(8px) saturate(140%);
+  backdrop-filter: blur(8px) saturate(140%);
+}
+
+.ops-kpi::after {
+  z-index: -1;
+  background: color-mix(in srgb, var(--colorNeutralBackground3) 60%, transparent);
+}
+
+.ops-kpi-label {
+  grid-area: label;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--colorNeutralForeground2);
+}
+
+/* Proportional figures: a big standalone number reads tighter without tabular-nums. */
+.ops-kpi-value {
+  grid-area: value;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--fontSizeBase600);
+  line-height: 28px;
+  font-weight: var(--fontWeightSemibold);
+  letter-spacing: -0.01em;
+}
+
+/*
+ * The delta, a small pill tinted in its own colour: green when better than
+ * the plan, red when worse, neutral otherwise.
+ */
+.ops-kpi-delta {
+  grid-area: delta;
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px var(--spacingHorizontalS) 2px 6px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-weight: var(--fontWeightSemibold);
+  color: var(--colorNeutralForeground2);
+  background: color-mix(in srgb, currentColor 14%, transparent);
+}
+
+.ops-kpi-delta svg {
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+
+.ops-kpi-delta--good {
+  color: var(--colorStatusSuccessForeground1);
+}
+
+.ops-kpi-delta--bad {
+  color: var(--colorStatusDangerForeground1);
+}
+
+.ops-kpi-chart {
+  grid-area: chart;
+  display: flex;
+}
+
+.ops-kpi-chart svg {
+  display: block;
+}
+
+/* The tile's content box, inside its padding. */
+@container ops-kpi (max-width: 196px) {
+  .ops-kpi-chart {
+    display: none;
+  }
+}
+
+/*
+ * The small charts: marks in the board's colours on faint neutral tracks,
+ * the same in every chart, so a track reads as the 05:00–17:00 window.
+ */
+.ops-kpi-track,
+.ops-kpi-hour-track {
+  fill: color-mix(in srgb, var(--colorNeutralForeground1) 8%, transparent);
+}
+
+.ops-kpi-spans--conflict .ops-kpi-span {
+  fill: var(--flight-conflict);
+}
+
+.ops-kpi-spans--waiting .ops-kpi-span {
+  fill: var(--flight-waiting);
+}
+
+/* The busiest hour in full colour, the rest quieter. */
+.ops-kpi-hour {
+  fill: color-mix(in srgb, var(--flight-healthy) 45%, transparent);
+}
+
+.ops-kpi-hour--busiest {
+  fill: var(--flight-healthy);
 }

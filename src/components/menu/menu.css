@@ -1,0 +1,201 @@
+/*
+ * Every Fluent menu in the app, drawn as jellyflower's tray menus
+ * (github.com/mochimilk/jellyflower: src/popup.cpp, src/menu_material.hpp,
+ * src/menu_style.hpp), at 96 DPI:
+ *   surface: acrylic, a 72% tint over a blur (jellyflower's 0xB8 alpha), a
+ *     1px border, Windows 11's 8px corners, its rows 6px in from the edge;
+ *   rows: 40px tall, their highlight 3px round; a 16px icon 10px in, the
+ *     label 34px in, a value right-aligned 12px from the end in the
+ *     secondary ink; one line each, in the 12px menu font;
+ *   separators: a 1px line in the border colour, 4px in from the rows, in a
+ *     9px band;
+ *   keyboard focus: the highlight, with a dotted rectangle 3px inside it.
+ * Light and dark follow the system colour scheme, as the app does (see
+ * stand-timeline-demo/demo.css). Fluent styles each part with one generated
+ * class, and a pseudo-class or two on hover, so each rule here is scoped to
+ * the popover to outrank it. The entrance is Menu.tsx's.
+ */
+div.fui-MenuPopover {
+  --mica-menu-text: rgb(26 26 26);
+  --mica-menu-secondary: rgb(100 100 100);
+  --mica-menu-disabled: rgb(109 109 109);
+  --mica-menu-highlight: rgb(234 234 234);
+  --mica-menu-border: rgb(210 210 210);
+  --mica-menu-surface: rgb(249 249 249);
+
+  box-sizing: border-box;
+  min-width: 296px;
+  max-width: calc(100vw - 24px);
+  /* The border's 1px and 5px more: the rows sit 6px in. */
+  padding: 5px;
+  border: 1px solid var(--mica-menu-border);
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--mica-menu-surface) 72%, transparent);
+  backdrop-filter: blur(30px);
+  color: var(--mica-menu-text);
+  font-family: var(--fontFamilyBase);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  div.fui-MenuPopover {
+    --mica-menu-text: rgb(243 243 243);
+    --mica-menu-secondary: rgb(170 170 170);
+    --mica-menu-highlight: rgb(54 54 54);
+    --mica-menu-border: rgb(69 69 69);
+    --mica-menu-surface: rgb(32 32 32);
+  }
+}
+
+/* Without a blur, the surface is solid, as jellyflower's is without acrylic. */
+@supports not (backdrop-filter: blur(1px)) {
+  div.fui-MenuPopover {
+    background-color: var(--mica-menu-surface);
+  }
+}
+
+.fui-MenuPopover .fui-MenuList {
+  gap: 0;
+}
+
+/* Rows: an icon slot, the label, then any value or submenu chevron. */
+.fui-MenuPopover .fui-MenuItem {
+  box-sizing: border-box;
+  max-width: none;
+  min-height: 40px;
+  padding: 0 12px 0 10px;
+  gap: 8px;
+  align-items: center;
+  border-radius: 3px;
+  background-color: transparent;
+  color: var(--mica-menu-text);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.fui-MenuPopover .fui-MenuItem:hover,
+.fui-MenuPopover .fui-MenuItem:hover:active,
+.fui-MenuPopover .fui-MenuItem[data-fui-focus-visible] {
+  background-color: var(--mica-menu-highlight);
+  color: var(--mica-menu-text);
+}
+
+/* Keyboard focus: a dotted rectangle 3px inside the highlight, as Windows draws it. */
+.fui-MenuPopover .fui-MenuItem[data-fui-focus-visible]::after {
+  top: 3px;
+  right: 3px;
+  bottom: 3px;
+  left: 3px;
+  border: 1px dotted var(--mica-menu-text);
+  border-radius: 0;
+}
+
+.fui-MenuPopover .fui-MenuItem[aria-disabled="true"],
+.fui-MenuPopover .fui-MenuItem[aria-disabled="true"]:hover,
+.fui-MenuPopover .fui-MenuItem[aria-disabled="true"]:hover:active {
+  background-color: transparent;
+  color: var(--mica-menu-disabled);
+}
+
+/* The label: one line, cut short with an ellipsis. */
+.fui-MenuPopover .fui-MenuItem .fui-MenuItem__content {
+  min-width: 0;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* With no icon or checkmark, the label still starts 34px in, past the icon slot. */
+.fui-MenuPopover .fui-MenuItem > .fui-MenuItem__content:first-child {
+  margin-left: 24px;
+}
+
+/* The icon slot: a 16px glyph in the text colour, the same on hover. A checkmark takes it too. */
+.fui-MenuPopover .fui-MenuItem .fui-MenuItem__icon,
+.fui-MenuPopover .fui-MenuItem .fui-MenuItem__checkmark {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  font-size: 16px;
+  color: inherit;
+}
+
+.fui-MenuPopover .fui-MenuItem .fui-MenuItem__icon > svg {
+  width: 16px;
+  height: 16px;
+}
+
+.fui-MenuPopover .fui-MenuItem:hover .fui-MenuItem__icon {
+  color: inherit;
+}
+
+.fui-MenuPopover .fui-MenuItem:hover .fui-Icon-filled {
+  display: none;
+}
+
+.fui-MenuPopover .fui-MenuItem:hover .fui-Icon-regular {
+  display: inline;
+}
+
+/* A value at the row's end, 12px clear of the label (the 8px gap and 4px more). */
+.fui-MenuPopover .fui-MenuItem .fui-MenuItem__secondaryContent,
+.fui-MenuPopover .fui-MenuItem .fui-MenuItem__secondaryContent:hover {
+  flex-shrink: 0;
+  padding: 0 0 0 4px;
+  color: var(--mica-menu-secondary);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.fui-MenuPopover .fui-MenuItem[aria-disabled="true"] .fui-MenuItem__secondaryContent {
+  color: var(--mica-menu-disabled);
+}
+
+/* A submenu's chevron, 16px, in the secondary ink. */
+.fui-MenuPopover .fui-MenuItem .fui-MenuItem__submenuIndicator {
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+  font-size: 16px;
+  color: var(--mica-menu-secondary);
+}
+
+/* Separators: a 1px line, 4px in from the rows, in a 9px band. */
+.fui-MenuPopover .fui-MenuDivider {
+  width: auto;
+  margin: 4px;
+  border-bottom: 1px solid var(--mica-menu-border);
+}
+
+/* Group headers (jellyflower has none): a shorter row, its name in the secondary ink, in line with the icons. */
+.fui-MenuPopover .fui-MenuGroupHeader {
+  height: 32px;
+  padding: 0 12px 0 10px;
+  color: var(--mica-menu-secondary);
+  font-size: 12px;
+  font-weight: var(--fontWeightRegular);
+}
+
+/* High contrast: the system's menu colours, as jellyflower takes them. */
+@media (forced-colors: active) {
+  div.fui-MenuPopover {
+    border-color: CanvasText;
+    background-color: Canvas;
+    backdrop-filter: none;
+  }
+
+  .fui-MenuPopover .fui-MenuItem:hover,
+  .fui-MenuPopover .fui-MenuItem[data-fui-focus-visible] {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  .fui-MenuPopover .fui-MenuItem:hover .fui-MenuItem__secondaryContent,
+  .fui-MenuPopover .fui-MenuItem[data-fui-focus-visible] .fui-MenuItem__secondaryContent {
+    color: HighlightText;
+  }
+}

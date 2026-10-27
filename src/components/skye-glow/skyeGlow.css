@@ -1,0 +1,60 @@
+/*
+ * What Skye selects on the chart is outlined in its orb's colours, turning
+ * slowly, with a soft breathing glow, so it reads as Skye's doing rather than
+ * the user's; the user's own selection, beside it, keeps its usual outline.
+ * Skye's bars (.demo-bar--skye) and the line linking Skye's pair
+ * (.demo-link--skye) take the SVG gradients from <SkyeGlowDefs />; a pair
+ * that cannot swap keeps its red line, since that warning matters more. The
+ * colours are the orb's (gtaaOpal), deepened so the ring stands out on the
+ * bars and the page.
+ */
+
+/* Kept in the layout (not display: none), or the browser may not paint its gradient. */
+.skye-glow-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.skye-selection-scope {
+  display: contents;
+}
+
+/*
+ * The same width as the user's own selection outline (--st-stroke-thick), so
+ * only the colour and glow say it was Skye's.
+ */
+.st-bar--selected.demo-bar--skye .st-bar-outline {
+  stroke: url(#skye-glow-gradient);
+  stroke-width: var(--st-stroke-thick);
+  filter: drop-shadow(0 0 2px rgba(15, 111, 255, 0.8)) drop-shadow(0 0 6px rgba(122, 92, 255, 0.55));
+  animation: skye-glow-breathe 2.4s ease-in-out infinite;
+}
+
+.st-link.demo-link--skye:not(.demo-link--incompatible) {
+  filter: drop-shadow(0 0 2px rgba(15, 111, 255, 0.8)) drop-shadow(0 0 6px rgba(122, 92, 255, 0.55));
+  animation: skye-glow-breathe 2.4s ease-in-out infinite;
+}
+
+.st-link.demo-link--skye:not(.demo-link--incompatible) .st-link-path {
+  stroke: url(#skye-glow-flow);
+}
+
+.st-link.demo-link--skye:not(.demo-link--incompatible) .st-link-end {
+  fill: url(#skye-glow-flow);
+}
+
+@keyframes skye-glow-breathe {
+  50% {
+    filter: drop-shadow(0 0 3px rgba(15, 111, 255, 0.95)) drop-shadow(0 0 10px rgba(20, 184, 224, 0.7));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-bar--selected.demo-bar--skye .st-bar-outline,
+  .st-link.demo-link--skye {
+    animation: none;
+  }
+}

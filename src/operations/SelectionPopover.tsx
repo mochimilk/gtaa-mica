@@ -2,8 +2,9 @@
 // actions, anchored to what was selected:
 // - assigned selection (any source): the selected timeline bar (last selected
 //   when several), scrolled into view if the selection came from the panel;
-// - unassigned flight (no bar exists): its list row, or the alert's
-//   "Select" button when chosen from Alerts. No bar is ever invented.
+// - unassigned flight: its bar in the No stand lane, also when chosen from
+//   the panel or the Alerts menu (which closes as it selects); a flight with
+//   no stay times has no bar, so its list row, while the panel shows it.
 // The reusable chart is untouched; bars are found by their data-occupancy-id.
 import {
   useEffect,
@@ -22,13 +23,13 @@ import {
   type PositioningImperativeRef,
 } from "@fluentui/react-components";
 import { DismissRegular } from "@fluentui/react-icons";
+import { agentCursor, isSkyeEvent } from "../components/agent-cursor";
+import { rowsViewport, sectionOf } from "../stand-timeline";
+import { occupancyById } from "./allocation";
+import { ARROW, useBesidePlacement } from "./linkAnchor";
 import { FlightActions, selectionTitle } from "./FlightActions";
-import {
-  selectedFlight,
-  useOperations,
-  type OpsSelection,
-  type SelectionSource,
-} from "./OperationsContext";
+import { FlightCard, SwapCard } from "./FlightCard";
+import { selectedFlight, useOperations, type OpsSelection } from "./OperationsContext";
 import "./operations.css";
 
 type AnchorEl = HTMLElement | SVGElement;
@@ -46,50 +47,47 @@ function query(selector: string): AnchorEl | null {
   return el && isRendered(el) ? el : null;
 }
 
-function findAnchor(selection: OpsSelection, source: SelectionSource): AnchorEl | null {
+const bar = (occupancyId: string) => query(`[data-occupancy-id="${CSS.escape(occupancyId)}"]`);
+
+function findAnchor(selection: OpsSelection): AnchorEl | null {
   const occupancyId = selection.occupancyIds.at(-1);
-  if (occupancyId) return query(`[data-occupancy-id="${CSS.escape(occupancyId)}"]`);
+  if (occupancyId) return bar(occupancyId);
   const flightId = selection.flightId;
-  if (!flightId) return null;
-  const row = `tr[data-flight-id="${CSS.escape(flightId)}"]`;
-  const alert = `[data-ops-alert-flight="${CSS.escape(flightId)}"]`;
-  return source === "alert" ? query(alert) ?? query(row) : query(row) ?? query(alert);
+  const waiting = selectedFlight(selection)?.unplacedStay;
+  return (waiting && bar(waiting.stayId)) || (flightId ? query(`tr[data-flight-id="${CSS.escape(flightId)}"]`) : null);
 }
 
 const SCROLL_REGION = ".st-scroller, .ops-group-scroll";
 
 /**
- * The part of a scroll region where content is actually visible: its client
- * box (excluding scrollbars), minus pinned overlays measured from the DOM —
- * the chart's sticky rulers (.st-header/.st-footer) and stand gutter
- * (.st-labels), or a list's sticky table header (thead).
+ * The part of a scroll region where content is actually visible: for the
+ * chart, where the rows `el` is among show (the body's between its rulers and
+ * below the No stand lane, or the lane's own strip; see rowsViewport); for a
+ * list, its client box (excluding scrollbars) below its sticky table header.
  */
-function visibleContentBox(region: Element) {
+function visibleContentBox(region: Element, el?: Element) {
+  if (region.matches(".st-scroller")) return rowsViewport(region, el ? sectionOf(el) : "body");
   const r = region.getBoundingClientRect();
-  let top = r.top + region.clientTop;
-  let left = r.left + region.clientLeft;
-  let bottom = top + region.clientHeight;
-  const right = left + region.clientWidth;
-  const rect = (sel: string) => region.querySelector(sel)?.getBoundingClientRect();
-  const header = rect(".st-header") ?? rect("thead");
-  const footer = rect(".st-footer");
-  const gutter = rect(".st-labels");
-  if (header) top = Math.max(top, header.bottom);
-  if (footer) bottom = Math.min(bottom, footer.top);
-  if (gutter) left = Math.max(left, gutter.right);
-  return { top, left, bottom, right };
+  const top = r.top + region.clientTop;
+  const left = r.left + region.clientLeft;
+  const head = region.querySelector("thead")?.getBoundingClientRect();
+  return { top: Math.max(top, head?.bottom ?? top), left, bottom: top + region.clientHeight, right: left + region.clientWidth };
 }
 
 /**
  * Scroll the chart just enough that the bar sits fully inside the visible
- * content area (between the UTC rulers, right of the pinned gutter). A bar
- * wider/taller than that area is aligned to its start edge.
+ * content area (between the UTC rulers and below the No stand lane, right of
+ * the pinned gutter; a bar in the lane only along). A bar wider/taller than
+ * that area is aligned to its start edge.
  */
 function revealBar(el: AnchorEl) {
   const region = el.closest<HTMLElement>(".st-scroller");
-  if (!region) return;
-  const box = visibleContentBox(region);
-  const r = el.getBoundingClientRect();
+  if (region) revealRect(region, el.getBoundingClientRect(), el);
+}
+
+/** As revealBar, for any box on the chart (several bars together, say), among the rows `el` is among. */
+export function revealRect(region: HTMLElement, r: DOMRect, el?: Element) {
+  const box = visibleContentBox(region, el);
   const delta = (start: number, end: number, min: number, max: number) =>
     start < min ? start - min : end > max ? Math.min(end - max, start - min) : 0;
   region.scrollTop += delta(r.top, r.bottom, box.top, box.bottom);
@@ -102,7 +100,7 @@ function anchorVisible(el: AnchorEl): boolean {
   const region = el.closest(SCROLL_REGION);
   if (!region) return true;
   const r = el.getBoundingClientRect();
-  const box = visibleContentBox(region);
+  const box = visibleContentBox(region, el);
   return r.bottom > box.top && r.top < box.bottom && r.right > box.left && r.left < box.right;
 }
 
@@ -133,12 +131,22 @@ export function SelectionPopover() {
     if (active && active !== document.body && !surfaceRef.current?.contains(active)) {
       returnFocusRef.current = active;
     }
-    const el = findAnchor(selection, selectionSource);
-    // An assigned flight picked in the panel reveals its bar automatically.
-    // Unassigned flights have no bar, so nothing scrolls for them.
+    const el = findAnchor(selection);
+    // A flight picked in the panel reveals its bar automatically: on its
+    // stand, or along the No stand lane for one waiting for a stand.
     if (el && selectionSource !== "chart" && el.matches("[data-occupancy-id]")) revealBar(el);
     setAnchor(el);
   }, [detailsOpen, selection, selectionSource, selectionRequest]);
+
+  // Selecting another stay with the details open: the click focuses its bar,
+  // outside the popover, and 100ms later the popover's focus trap (tabster's
+  // modalizer) pulls focus back to the first button inside (Swap, once two
+  // are selected) unless focus is inside by then. Put it on the card itself
+  // instead, as when it first opens. Only the user's selections count as
+  // requests, so Skye's never move focus.
+  useEffect(() => {
+    if (detailsOpen) surfaceRef.current?.focus({ preventScroll: true });
+  }, [detailsOpen, selectionRequest]);
 
   // Follow the anchor; once it is hidden in its region or disappears, dismiss
   // like any other close (clears the selection; clearing never scrolls).
@@ -151,8 +159,11 @@ export function SelectionPopover() {
     let frame = 0;
     const check = () => {
       frame = 0;
-      if (!anchorVisible(anchor)) clearSelection();
-      else positioningRef.current?.updatePosition();
+      // Skye's cursor scrolls the chart between the bars it is selecting;
+      // the bar it clicks next becomes the anchor, so the selection stays.
+      if (!anchorVisible(anchor)) {
+        if (!agentCursor.active) clearSelection();
+      } else positioningRef.current?.updatePosition();
     };
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(check);
@@ -172,17 +183,22 @@ export function SelectionPopover() {
     };
   }, [detailsOpen, anchor, clearSelection]);
 
+  // Several stays selected: the details go by the middle of the line between
+  // them, as close as they fit, never over any of them, inside the chart.
+  const isGroup = selection.occupancyIds.length >= 2 && !!anchor?.matches("[data-occupancy-id]");
+  const beside = useBesidePlacement(isGroup ? selection.occupancyIds : null, detailsOpen, surfaceRef);
+
   // Fluent positions against an element or a virtual element; SVG bars use
   // the virtual form (live rect, with the bar as context for scroll parents).
   const target = useMemo(
     () =>
       anchor
-        ? {
+        ? (beside?.target ?? {
             getBoundingClientRect: () => anchor.getBoundingClientRect(),
             contextElement: anchor,
-          }
+          })
         : null,
-    [anchor],
+    [anchor, beside],
   );
 
   const restoreFocus = () => {
@@ -194,6 +210,8 @@ export function SelectionPopover() {
   // selection and closes the popover, except the toolbar case below.
   const onOpenChange = (e: OpenPopoverEvents, data: OnOpenChangeData) => {
     if (data.open) return;
+    // The user's details: Skye's clicks elsewhere on the board leave them open.
+    if (isSkyeEvent()) return;
     // Clicking/focusing another bar, row or alert button re-targets instead:
     // its own handler sets the new selection, which must not be cleared.
     const t = e.target;
@@ -215,36 +233,75 @@ export function SelectionPopover() {
 
   if (!target) return null;
   const isBar = !!anchor?.matches("[data-occupancy-id]");
+  // One flight or one stay: the flight card. Two stays: the swap card. Cards
+  // have no arrow, title bar or close button (Escape or a click outside
+  // closes them); three or more stays get the plain details.
+  const single = !!flight || selection.occupancyIds.length === 1;
+  const [first, second] = selection.occupancyIds.length === 2 ? selection.occupancyIds.map(occupancyById) : [];
+  const pair = !single && first && second ? ([first, second] as const) : null;
+  const card = single || !!pair;
+  const title = selectionTitle(selection.occupancyIds, flight);
 
   return (
     <Popover
       open={detailsOpen}
       onOpenChange={onOpenChange}
       trapFocus
-      withArrow
+      withArrow={!card && (beside?.withArrow ?? true)}
       size="small"
-      positioning={{
-        target,
-        positioningRef,
-        position: isBar ? "below" : "after",
-        align: isBar ? "center" : "top",
-        fallbackPositions: ["above", "after", "before", "below"],
-      }}
+      positioning={
+        beside
+          ? // Several stays: placed by useBesidePlacement, and held there
+            // (a card where its arrow would have put its body).
+            {
+              target,
+              positioningRef,
+              position: beside.position,
+              align: beside.align,
+              offset: card && beside.withArrow ? beside.offset + ARROW : beside.offset,
+              pinned: true,
+            }
+          : {
+              target,
+              positioningRef,
+              // Below a single bar (never over it); beside a row.
+              position: isBar ? "below" : "after",
+              align: isBar ? "center" : "top",
+              fallbackPositions: ["above", "after", "before", "below"],
+              offset: single ? 4 : undefined,
+            }
+      }
     >
-      <PopoverSurface ref={surfaceRef} aria-labelledby={titleId} className="ops-popover">
-        <div className="ops-popover-head">
-          <h2 id={titleId} className="ops-popover-title">
-            {selectionTitle(selection.occupancyIds, flight)}
-          </h2>
-          <Button
-            size="small"
-            appearance="subtle"
-            icon={<DismissRegular />}
-            aria-label="Close details and clear selection"
-            onClick={close}
-          />
-        </div>
-        <FlightActions />
+      {/* Focusable, so Fluent focuses the card itself as it opens, not its
+          first button (Swap, say); Tab reaches the buttons from there. */}
+      <PopoverSurface
+        ref={surfaceRef}
+        tabIndex={-1}
+        aria-labelledby={titleId}
+        className={card ? "ops-popover ops-popover--card" : "ops-popover"}
+      >
+        {single ? (
+          <FlightCard titleId={titleId} title={title} />
+        ) : pair ? (
+          <SwapCard titleId={titleId} title={title} pair={pair} />
+        ) : (
+          <>
+            <div className="ops-popover-head">
+              <h2 id={titleId} className="ops-popover-title">
+                {title}
+              </h2>
+              <Button
+                size="small"
+                appearance="subtle"
+                icon={<DismissRegular />}
+                aria-label="Close details and clear selection"
+                data-ops-popover-dismiss=""
+                onClick={close}
+              />
+            </div>
+            <FlightActions />
+          </>
+        )}
       </PopoverSurface>
     </Popover>
   );

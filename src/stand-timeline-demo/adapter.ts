@@ -2,6 +2,7 @@
 import type { Millis, Occupancy, TimelineRow, Visit } from "../stand-timeline";
 import type { SyntheticStand, SyntheticStay, SyntheticTurn } from "./syntheticFixture";
 
+const MINUTE = 60_000;
 const DAY = 86_400_000;
 
 export function utcAt(date: string, hhmm: string, dayOffset = 0): Millis {
@@ -30,6 +31,19 @@ export interface DemoTimelineData {
   stayPosition: Map<string, StayPosition>;
   /** Actual start/end events (flight, tow or none) at each occupancy. */
   endpoints: Map<string, StayEndpoints>;
+  /** How late each running-late occupancy is; absent when it is on time. */
+  delays: Map<string, StayDelay>;
+}
+
+/**
+ * How far behind schedule an aircraft reaches (`in`) and leaves (`out`) its
+ * stand, ms. The occupancy spans the time it is both scheduled and expected
+ * there: a late arrival's expected on-block, a late departure's scheduled
+ * off-block. See SyntheticStay.delayIn / delayOut.
+ */
+export interface StayDelay {
+  in?: Millis;
+  out?: Millis;
 }
 
 export interface StayPosition {
@@ -91,11 +105,18 @@ export function adaptSyntheticDay(
   }));
   const stayPosition = new Map<string, StayPosition>();
   const endpoints = new Map<string, StayEndpoints>();
+  const delays = new Map<string, StayDelay>();
   const occupancies = turns.flatMap((t) =>
     t.stays.map((s, i): Occupancy => {
       const [start, end] = stayTimes(date, s);
       stayPosition.set(`${t.turnId}-${i + 1}`, { index: i, count: t.stays.length });
       endpoints.set(`${t.turnId}-${i + 1}`, stayEndpoints(t, s, i));
+      if (s.delayIn || s.delayOut) {
+        delays.set(`${t.turnId}-${i + 1}`, {
+          in: s.delayIn ? s.delayIn * MINUTE : undefined,
+          out: s.delayOut ? s.delayOut * MINUTE : undefined,
+        });
+      }
       return {
         id: `${t.turnId}-${i + 1}`,
         visitId: t.turnId,
@@ -113,5 +134,6 @@ export function adaptSyntheticDay(
     turnsById: new Map(turns.map((t) => [t.turnId, t])),
     stayPosition,
     endpoints,
+    delays,
   };
 }

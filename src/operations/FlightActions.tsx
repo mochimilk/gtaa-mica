@@ -1,35 +1,62 @@
-// Selection details shown inside the selection popover. Revealing the bar is
-// automatic and closing the popover clears the selection, so the only action
-// here is the backend-dependent one, disabled with a visible explanation.
+// Selection details shown inside the selection popover when three or more
+// chart stays are selected (one flight or stay gets FlightCard, two get
+// SwapCard; a pair falls back here only if one has no stand). Revealing the
+// bars is automatic and closing the popover clears the selection. The actions
+// are the demo stand changes: Swap for two selected stays, enabled only when
+// they can trade stands under the sample rules (see ./allocation) and made
+// only once approved beside the two stays; and Reset once anything has changed. A
+// stay can also be dragged to another stand, and dragged into or out of the
+// No stand lane, which is how Skye's cursor gives and takes stands
+// (agentGestures.ts).
+import { useId } from "react";
 import { Button } from "@fluentui/react-components";
-import { airportLabel } from "../stand-timeline-demo/airports";
-import { DEMO_DATA, formatUtcFull, formatUtcWithDay } from "../stand-timeline-demo/demoData";
-import { selectedFlight, useOperations } from "./OperationsContext";
+import { DEMO_DATA, formatUtcWithDay } from "../stand-timeline-demo/demoData";
+import { checkSwap, hasStandChanges, occupancyById, stayName } from "./allocation";
+import { useOperations } from "./OperationsContext";
 import { OPS_FLIGHTS, type OpsFlight } from "./operationsData";
 
 export function FlightActions() {
-  const { selection } = useOperations();
-  const flight = selectedFlight(selection);
+  const { selection, requestSwap, resetStands } = useOperations();
+  const noteId = useId();
+  const pair = selection.occupancyIds.length === 2 ? selection.occupancyIds : null;
+  const swap = pair ? checkSwap(pair[0], pair[1]) : null;
+  const note = !pair
+    ? undefined
+    : swap?.ok
+      ? "Checked against the sample rules only: no overlap, and the stand size fits the aircraft."
+      : swap?.reason;
 
   return (
     <div className="ops-actions">
       <div className="ops-details">
-        {flight ? (
-          <FlightDetails flight={flight} />
-        ) : selection.occupancyIds.length > 0 ? (
+        {selection.occupancyIds.length > 0 ? (
           <StaySummary occupancyIds={selection.occupancyIds} />
         ) : (
           <p className="ops-empty">Nothing selected.</p>
         )}
       </div>
       <div className="ops-action-row">
-        <Button size="small" disabled aria-describedby="ops-assign-note">
-          Assign stand
+        <Button
+          size="small"
+          appearance="primary"
+          disabled={!swap?.ok}
+          aria-describedby={note ? noteId : undefined}
+          data-ops-swap=""
+          onClick={() => pair && requestSwap(pair[0], pair[1])}
+        >
+          Swap
         </Button>
+        {hasStandChanges() && (
+          <Button size="small" data-ops-reset-stands="" onClick={resetStands}>
+            Reset stands
+          </Button>
+        )}
       </div>
-      <p id="ops-assign-note" className="ops-footnote">
-        Assign stand is unavailable: this demo has no allocation backend.
-      </p>
+      {note && (
+        <p id={noteId} className="ops-footnote">
+          {note}
+        </p>
+      )}
     </div>
   );
 }
@@ -37,44 +64,10 @@ export function FlightActions() {
 /** Popover heading for the current selection. */
 export function selectionTitle(occupancyIds: readonly string[], flight?: OpsFlight): string {
   if (flight) return `${flight.flight} details`;
+  // One stay: its whole visit's name, e.g. "XD452/453", also on a stay with only one of them.
+  const one = occupancyIds.length === 1 ? occupancyById(occupancyIds[0]) : undefined;
+  if (one) return DEMO_DATA.visits.find((visit) => visit.id === one.visitId)?.label ?? stayName(one);
   return `${occupancyIds.length} chart stay${occupancyIds.length === 1 ? "" : "s"} selected`;
-}
-
-function FlightDetails({ flight: f }: { flight: OpsFlight }) {
-  const turn = f.visitId ? DEMO_DATA.turnsById.get(f.visitId) : undefined;
-  const stays = f.visitId ? DEMO_DATA.occupancies.filter((o) => o.visitId === f.visitId) : [];
-  return (
-    <>
-      <div>
-        {f.direction === "arrival" ? "From" : "To"} {airportLabel(f.routeEnd)}
-      </div>
-      <div>
-        Est. {formatUtcFull(f.estimate)} <span className="ops-muted">(synthetic)</span>
-      </div>
-      <div>
-        {f.standId ? (
-          <>Stand {f.standId}</>
-        ) : (
-          <span className="ops-muted">No stand assigned, so this flight is not on the chart.</span>
-        )}
-      </div>
-      {(f.registration ?? turn?.registration) && (
-        <div className="ops-muted">
-          {[f.registration ?? turn?.registration, f.aircraftType ?? turn?.aircraftType]
-            .filter(Boolean)
-            .join(" · ")}
-        </div>
-      )}
-      {stays.length > 1 && (
-        <div className="ops-muted">
-          Visit stays:{" "}
-          {stays
-            .map((s) => `${s.rowId} ${formatUtcWithDay(s.start)}–${formatUtcWithDay(s.end)}`)
-            .join(" → ")}
-        </div>
-      )}
-    </>
-  );
 }
 
 function StaySummary({ occupancyIds }: { occupancyIds: string[] }) {

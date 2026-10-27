@@ -17,18 +17,21 @@
   --st-space-s: 8px;
   --st-radius: 6px;
   --st-radius-small: 3px;
-  --st-bar-radius: 3px;
   --st-stroke: 1px;
   --st-stroke-thick: 2px;
   --st-stroke-focus: 2.5px;
 
   --st-text: currentColor;
   --st-text-muted: GrayText;
+  --st-tick-text: var(--st-text);
+  --st-row-text: var(--st-text);
   --st-border: rgba(128, 128, 128, 0.45);
   --st-line: rgba(128, 128, 128, 0.22);
   --st-line-strong: rgba(128, 128, 128, 0.45);
   --st-grid-major: rgba(128, 128, 128, 0.28);
   --st-grid-minor: rgba(128, 128, 128, 0.12);
+  --st-tick: var(--st-line-strong);
+  --st-tick-major: var(--st-text-muted);
   --st-row-alt: rgba(128, 128, 128, 0.06);
   --st-pinned-bg: Canvas;
   --st-pinned-backdrop: none;
@@ -39,9 +42,25 @@
   --st-selected: currentColor;
   --st-linked: currentColor;
   --st-focus: Highlight;
+  --st-link: currentColor;
+  --st-link-dash: 6px 4px;
+  /* One dash period (dash + gap), so the flow animation loops seamlessly. */
+  --st-link-dash-period: 10px;
+  --st-link-flow-duration: 600ms;
+  /* Dragging a bar: where it can land, and where it cannot. */
+  --st-drop-allowed: #107c10;
+  --st-drop-blocked: #c50f1f;
+  /* BarGhosts: a ghost's colour, a clashing one's, and its hover pill. */
+  --st-ghost: var(--st-bar-fill);
+  --st-ghost-clash: var(--st-drop-blocked);
+  --st-ghost-pill-bg: #242424;
+  --st-ghost-pill-text: #ffffff;
+  --st-ghost-pill-clash-text: #ffffff;
   --st-scrollbar-thumb: rgba(128, 128, 128, 0.5);
   --st-scrollbar-thumb-hover: rgba(128, 128, 128, 0.7);
   --st-scrollbar-track: transparent;
+  /* `fade`: how far up from the bottom edge the chart fades out. */
+  --st-fade-size: 64px;
 
   min-width: 0;
   font-family: var(--st-font-family);
@@ -78,6 +97,41 @@
 .st-root--fill > .st-scroller {
   flex: 1 1 auto;
   min-height: 0;
+}
+
+/*
+ * fade: the rows fade to transparent towards the chart's lower edge, so it
+ * works over any host surface, and the bottom ruler is dropped. The mask is
+ * on the body's labels and plot themselves, never on an ancestor of the
+ * pinned surfaces (the top ruler, the pinned rows, the row labels): with a
+ * masked ancestor, Chromium draws their backdrop blur without blurring
+ * anything. The component keeps --st-fade-end on both (where the scroller's
+ * visible bottom is, from the body's top, so above any horizontal
+ * scrollbar) and --st-fade-amount (0–1, from the remaining scroll distance),
+ * which eases the fade out at the bottom or when nothing overflows. Both are
+ * registered, so the amount can transition and the bars inside do not
+ * inherit either and restyle on every scroll.
+ */
+@property --st-fade-amount {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --st-fade-end {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+.st-root--fade .st-body > .st-labels,
+.st-root--fade .st-body > .st-plot {
+  transition: --st-fade-amount 150ms ease-out;
+  mask-image: linear-gradient(
+    to bottom,
+    #000 calc(var(--st-fade-end) - var(--st-fade-size)),
+    rgb(0 0 0 / calc(1 - var(--st-fade-amount))) var(--st-fade-end)
+  );
 }
 
 .st-scroller::-webkit-scrollbar {
@@ -121,13 +175,14 @@
   border-bottom: var(--st-stroke) solid var(--st-line-strong);
 }
 
-/* Header pins to the top only when the host limits height (rows scroll under it). */
+/*
+ * Header pins to the top only when the host limits height (rows scroll under
+ * it), above the pinned rows so its divider covers their tucked-in edge.
+ */
 .st-root--vscroll .st-header {
   position: sticky;
   top: 0;
-  z-index: 3;
-  background: var(--st-pinned-bg);
-  backdrop-filter: var(--st-pinned-backdrop);
+  z-index: 4;
 }
 
 .st-footer {
@@ -139,6 +194,45 @@
   position: sticky;
   bottom: 0;
   z-index: 3;
+}
+
+/*
+ * Pinned rows (pinnedRows): their own labels and plot under the top ruler,
+ * with a divider above the body. With the rows scrolling (.st-root--vscroll)
+ * they stick under the ruler (--st-pinned-top, set by the component: its
+ * height, the divider overlapping them), so body bars scroll beneath them.
+ */
+.st-pinned {
+  display: flex;
+  border-bottom: var(--st-stroke) solid var(--st-line-strong);
+}
+
+.st-root--vscroll .st-pinned {
+  position: sticky;
+  top: var(--st-pinned-top, 0px);
+  z-index: 3;
+}
+
+/*
+ * Under the top ruler, the pinned rows tuck their first pixel beneath its
+ * divider (the ruler is drawn above them). At fractional device pixel ratios
+ * a frosted surface's edge snaps on its own and shows the bars beneath in a
+ * hairline; abutting the ruler, that hairline opened right under the divider.
+ */
+.st-root--vscroll .st-header + .st-pinned {
+  margin-top: calc(-1 * var(--st-stroke));
+}
+
+/*
+ * The pinned surface, frosted over what scrolls beneath, is on each piece:
+ * the rulers' axes and the pinned rows' plot here, the corners and row
+ * labels below. Never on their shared parent: in Chromium, a backdrop-filter
+ * inside another one blurs nothing, so a corner or label over a parent's
+ * glass would show what is under it sharp.
+ */
+.st-root--vscroll .st-header > .st-axis,
+.st-root--vscroll .st-footer > .st-axis,
+.st-root--vscroll .st-pinned > .st-plot {
   background: var(--st-pinned-bg);
   backdrop-filter: var(--st-pinned-backdrop);
 }
@@ -182,13 +276,13 @@
 }
 
 .st-tick {
-  stroke: var(--st-line-strong);
+  stroke: var(--st-tick);
   stroke-width: var(--st-stroke);
 }
 
 /* Boundary ticks (e.g. whole hours) run the full axis height, unlabelled or not. */
 .st-tick--major {
-  stroke: var(--st-text-muted);
+  stroke: var(--st-tick-major);
 }
 
 /* SVG text takes the same typography variables as HTML text. */
@@ -200,7 +294,7 @@
 }
 
 .st-tick-label {
-  fill: var(--st-text);
+  fill: var(--st-tick-text);
   font-weight: var(--st-font-weight-strong);
 }
 
@@ -235,6 +329,7 @@
 }
 
 .st-row-name {
+  color: var(--st-row-text);
   font-weight: var(--st-font-weight-strong);
   font-variant-numeric: tabular-nums;
 }
@@ -276,7 +371,7 @@
 
 .st-bar {
   color: var(--st-bar-text);
-  cursor: pointer;
+  cursor: var(--cursor-pointer);
   outline: none;
 }
 
@@ -284,7 +379,6 @@
   fill: var(--st-bar-fill);
   stroke: var(--st-bar-stroke);
   stroke-width: var(--st-stroke);
-  rx: var(--st-bar-radius);
   transition: filter 80ms;
 }
 
@@ -298,9 +392,8 @@
   overflow: visible;
 }
 
-/* Selection/focus outline shares the bar's corner radius. */
+/* Selection/focus outline: 1.5px outside the bar (layers.tsx, barPath's outset), its corners that much rounder to stay concentric. */
 .st-bar-outline {
-  rx: var(--st-bar-radius);
   fill: none;
   stroke: none;
   pointer-events: none;
@@ -310,6 +403,141 @@
   stroke: var(--st-linked);
   stroke-width: var(--st-stroke);
   stroke-dasharray: 3 2;
+}
+
+/*
+ * Dragging bars (previewDrop), to other rows and with dragSnapMs in time. The
+ * bar being dragged fades in place; its ghost where it would land is a
+ * see-through green where it can be dropped and red where it cannot, and a
+ * bar it would swap with shows as a green ghost on its row. Bars in the way
+ * are outlined red. Several bars can be dragged at once, one per pointer.
+ * A drag may cross from the pinned rows to the body or back, so the
+ * dragging state is the whole chart's (.st-root--dragging).
+ */
+.st-bars--draggable .st-bar {
+  touch-action: none;
+}
+
+.st-root--dragging {
+  user-select: none;
+}
+
+.st-root--dragging .st-plot,
+.st-root--dragging .st-bar {
+  cursor: var(--cursor-move, move);
+}
+
+.st-root--dragging:has(.st-drop--blocked) .st-plot,
+.st-root--dragging:has(.st-drop--blocked) .st-bar {
+  cursor: var(--cursor-not-allowed, not-allowed);
+}
+
+.st-bar--dragging {
+  opacity: 0.4;
+}
+
+.st-drop-rect {
+  fill: color-mix(in srgb, var(--st-drop-allowed) 24%, transparent);
+  stroke: var(--st-drop-allowed);
+  stroke-width: var(--st-stroke-thick);
+  stroke-dasharray: 5 3;
+}
+
+.st-drop--blocked .st-drop-rect {
+  fill: color-mix(in srgb, var(--st-drop-blocked) 24%, transparent);
+  stroke: var(--st-drop-blocked);
+}
+
+/* A bar dragged in time: its new times in a pill by its ghost, solid so it reads over bars. */
+.st-drop-time rect {
+  fill: var(--st-drop-allowed);
+}
+
+.st-drop--blocked .st-drop-time rect {
+  fill: var(--st-drop-blocked);
+}
+
+.st-drop-time text {
+  fill: #ffffff;
+}
+
+.st-pill text {
+  font-size: var(--st-font-size-small);
+  font-weight: var(--st-font-weight-strong);
+  font-variant-numeric: tabular-nums;
+}
+
+/*
+ * BarGhosts: see-through dashed extensions of bars, joined to the bar they
+ * come out of, in its colour (the host's `color`), or red where the host
+ * marks a clash. Its mask (the ghost's rounded shape less its bar's shape)
+ * keeps the outline inside the ghost: the stroke is drawn at twice its
+ * width and only its inner half shows, so the ghost's edges are flush with
+ * the bar's. Hovering one shows its pill. They stand aside while a bar is
+ * dragged.
+ */
+.st-ghost-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+.st-ghost {
+  color: var(--st-ghost);
+  cursor: var(--cursor-pointer);
+}
+
+.st-ghost--clash {
+  color: var(--st-ghost-clash);
+}
+
+.st-ghost-rect {
+  pointer-events: none;
+  fill: color-mix(in srgb, currentColor 16%, transparent);
+  stroke: currentColor;
+  /* A 1.5px line: the mask hides the outer half. */
+  stroke-width: 3px;
+  stroke-dasharray: 4 3;
+}
+
+.st-ghost--clash .st-ghost-rect {
+  fill: color-mix(in srgb, currentColor 26%, transparent);
+}
+
+.st-ghost:hover .st-ghost-rect {
+  fill: color-mix(in srgb, currentColor 32%, transparent);
+}
+
+.st-ghost-pill {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.st-ghost:hover .st-ghost-pill {
+  visibility: visible;
+}
+
+.st-ghost-pill rect {
+  fill: var(--st-ghost-pill-bg);
+}
+
+.st-ghost-pill text {
+  fill: var(--st-ghost-pill-text);
+}
+
+.st-ghost--clash .st-ghost-pill rect {
+  fill: var(--st-ghost-clash);
+}
+
+.st-ghost--clash .st-ghost-pill text {
+  fill: var(--st-ghost-pill-clash-text);
+}
+
+.st-root--dragging .st-ghost {
+  pointer-events: none;
+}
+
+.st-bar--blocking .st-bar-outline {
+  stroke: var(--st-drop-blocked);
+  stroke-width: var(--st-stroke-thick);
 }
 
 .st-bar--selected .st-bar-outline {
@@ -323,6 +551,37 @@
   stroke-dasharray: none;
 }
 
+/*
+ * BarLink: dashed connector between two bars. A negative dash offset moves
+ * the dashes along the path direction, i.e. from the first bar to the second.
+ */
+.st-link-path {
+  fill: none;
+  stroke: var(--st-link);
+  stroke-width: var(--st-stroke-thick);
+  stroke-dasharray: var(--st-link-dash);
+  animation: st-link-flow var(--st-link-flow-duration) linear infinite;
+}
+
+.st-link-end {
+  fill: var(--st-link);
+}
+
+@keyframes st-link-flow {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: calc(-1 * var(--st-link-dash-period));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .st-link-path {
+    animation: none;
+  }
+}
+
 .st-bar-label {
   fill: var(--st-bar-text);
   font-weight: var(--st-font-weight);
@@ -334,4 +593,19 @@
 
 .st-bar-label--secondary {
   opacity: 0.85;
+}
+
+/* A slot's host HTML (BarLabelSlot.html), aligned as its text would be. */
+.st-bar-label-html {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.st-bar-label-html--center {
+  justify-content: center;
+}
+
+.st-bar-label-html--end {
+  justify-content: flex-end;
 }

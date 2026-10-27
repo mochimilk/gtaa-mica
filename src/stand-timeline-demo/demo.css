@@ -4,28 +4,24 @@
  */
 /*
  * Bounded page: fills the host <main> (App.tsx) so the chart can take the
- * remaining height; the header keeps its natural size and the selection
+ * remaining height; the toolbar keeps its fixed height and the selection
  * detail shrinks (scrolling inside) only when space runs short.
  */
 .demo-timeline {
   display: flex;
   flex-direction: column;
-  gap: var(--spacingVerticalM);
+  gap: 0;
   flex: 1 1 auto;
   height: 100%;
   min-height: 0;
   width: 100%;
   min-width: 0;
-  padding: var(--spacingVerticalL) var(--spacingHorizontalXL);
+  padding: 0;
   box-sizing: border-box;
   font-family: var(--fontFamilyBase);
   font-size: var(--fontSizeBase200);
   line-height: var(--lineHeightBase200);
   color: var(--colorNeutralForeground1);
-}
-
-.demo-header {
-  flex: none;
 }
 
 /*
@@ -48,41 +44,90 @@
   min-height: 120px;
 }
 
-.demo-header {
+/*
+ * The chart's frame takes its place in the page, and the chart fills it.
+ * The host's summary (its KPIs, say) floats over the chart's foot, and the
+ * rows can scroll up clear of it: the chart's canvas is padded at the bottom
+ * by the summary's height (--demo-summary-height, kept by
+ * StandTimelineDemo), so the last row comes to rest above it. The summary
+ * takes no pointer itself, so the chart stays live between and around its
+ * pieces, scrollbar too; its host gives its own pieces the pointer back.
+ */
+.demo-chart-frame {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  padding-block: var(--spacingVerticalM);
-  justify-content: space-between;
-  gap: var(--spacingVerticalS) var(--spacingHorizontalL);
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 120px;
 }
 
-/* Optional host toolbar at the header's right edge (e.g. Views / Filters). */
-.demo-toolbar {
+.demo-chart-frame .st-canvas {
+  padding-bottom: var(--demo-summary-height, 0px);
+}
+
+/* Over the chart's rulers, pinned rows and fade (z-index 3–4, stand-timeline.css). */
+.demo-chart-summary {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/*
+ * The zoom row in the header's View menu (ZoomMenuRow.tsx), laid out like the
+ * menu's rows (components/menu/menu.css): 40px tall, its 16px icon 10px in,
+ * its label 34px in, in the menu's colours; the level, its value, in the
+ * secondary ink; its controls at the end. It is not an item, so the row
+ * itself never highlights; its buttons do. Greyscale: a subtle button's icon
+ * brightens (to brand) on hover and press, but here it keeps the menu's text
+ * colour, and its hover background alone marks the hover. Disabled buttons
+ * keep Fluent's own greys.
+ */
+.demo-zoom-row {
   display: flex;
   align-items: center;
-  gap: var(--spacingHorizontalXS);
+  gap: 2px;
+  min-height: 40px;
+  padding: 0 6px 0 10px;
+  box-sizing: border-box;
+  color: var(--mica-menu-text);
+  font-size: 12px;
+  line-height: 16px;
 }
 
-.demo-notice {
-  margin-top: var(--spacingVerticalXS);
+/* The menu's icon slot, 8px before the label (with the row's gap). */
+.demo-zoom-row-icon {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  font-size: 16px;
 }
 
-/* A host notice component may render nothing (e.g. no active filter). */
-.demo-notice:empty {
-  display: none;
+.demo-zoom-row-label {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.demo-title {
-  margin: 0;
-  font-size: var(--fontSizeBase400);
-  line-height: var(--lineHeightBase400);
-  font-weight: var(--fontWeightSemibold);
+.demo-zoom-row .fui-Button:not(:disabled):not([aria-disabled="true"]),
+.demo-zoom-row .fui-Button:not(:disabled):not([aria-disabled="true"]):hover,
+.demo-zoom-row .fui-Button:not(:disabled):not([aria-disabled="true"]):hover:active,
+.demo-zoom-row .fui-Button:not(:disabled):not([aria-disabled="true"]) .fui-Button__icon,
+.demo-zoom-row .fui-Button:not(:disabled):not([aria-disabled="true"]):hover .fui-Button__icon,
+.demo-zoom-row .fui-Button:not(:disabled):not([aria-disabled="true"]):hover:active .fui-Button__icon {
+  color: var(--mica-menu-text);
 }
 
-.demo-subtitle {
-  margin: var(--spacingVerticalXXS) 0 0;
-  color: var(--colorNeutralForeground3);
+/* A fixed width that holds the widest level, so the buttons never move. */
+.demo-zoom-row-level {
+  flex: none;
+  width: 5ch;
+  color: var(--mica-menu-secondary);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .demo-detail {
@@ -137,60 +182,78 @@
 }
 
 /*
- * Flight-bar palette from the navy-to-teal base
- *   #000b48 #00367a #0060a1 #008cb8 #00b7be #00e2b9
- * Four carriers keep one hue identity in both modes:
- *   XA deep navy-blue, XB blue, XC turquoise, XD aqua-mint.
- * Text/icon colour is chosen per fill (white on navy/blue, base navy #000b48
- * on bright fills); approximate WCAG contrast is noted per pair. Hatch
- * stripes move away from the label colour so contrast only rises. Only flight
- * bars change; app surfaces and branding keep Fluent tokens. CoralProvider
- * currently follows the system color scheme, so the dark set uses the same
- * prefers-color-scheme switch as before.
+ * Flight-bar palette: one colour per status, not per carrier (see theme.tsx,
+ * STATUS_PALETTE):
+ *   healthy: neutral glass, so Skye's purple stands out on a quiet board: a
+ *     white, fading left to right as the coloured bars' colours do (from
+ *     --flight-glass-from to --flight-glass-to: 30% to 22% on the light
+ *     board, 10% to 7% on the dark one, where white shows far more),
+ *     over the blurred grid, as a frosted HUD panel; at
+ *     rest inside Fluent's Stroke 1 (--flight-glass-edge: ≈ 3.6:1 on the
+ *     dark board, quieter on the light one), with hover and selection
+ *     outlining it strongly;
+ *     its delay ghosts and tow/hold stripes in a neutral that keeps 3:1
+ *     (--flight-glass-mark). --flight-healthy is
+ *     the healthy colour where a status is marked beside the chart (the KPI
+ *     strip's stand use),
+ *   conflict: red, shared with a clashing delay ghost and its pill (see
+ *     fluentChartTheme), so a late stay and its delay read as one,
+ *   waiting: orange, for a stay with no stand, near the Unassigned badge
+ *     and the lane's warning count.
+ * A coloured bar's fill is its base, fading left to right from a low opacity
+ * to a lower one (theme.tsx, BAR_FADE), inside a solid 1px base border. All
+ * bars have neutral Fluent labels; those labels keep ≥ 4.5:1 over the fill
+ * and over the tow/hold hatch, and every coloured border is ≥ 3:1 against
+ * the chart surface, in both modes. The conflict red also carries a clash ghost's pill, so it
+ * has a paired text colour, with its approximate WCAG contrast. Only flight
+ * bars change; app surfaces and branding keep Fluent tokens. Set on the whole
+ * page, so what the host shows beside the chart (its `summary`, say) can mark
+ * a status in its bars' colour. CoralProvider currently follows the system
+ * color scheme, so the dark set uses the same prefers-color-scheme switch.
  */
-.demo-chart {
-  --flight-xa: #00367a;           /* base */
-  --flight-xa-text: #ffffff;      /* ≈ 11.6:1 */
-  --flight-xa-hatch: rgba(0, 11, 72, 0.45);
-  --flight-xb: #0060a1;           /* base */
-  --flight-xb-text: #ffffff;      /* ≈ 6.6:1 */
-  --flight-xb-hatch: rgba(0, 11, 72, 0.35);
-  --flight-xc: #00b7be;           /* base */
-  --flight-xc-text: #000b48;      /* ≈ 7.5:1 */
-  --flight-xc-hatch: rgba(255, 255, 255, 0.35);
-  --flight-xd: #00e2b9;           /* base */
-  --flight-xd-text: #000b48;      /* ≈ 11.0:1 */
-  --flight-xd-hatch: rgba(255, 255, 255, 0.4);
-  --flight-outline: #000b48;      /* selected / linked / focus, on light surfaces */
-  /* Context bars: neutral grey silhouettes; labels/icons are omitted. */
-  --flight-dim-surface: #dedede;
-  --flight-dim-stroke: var(--colorNeutralStroke1);
-  --flight-dim-text: var(--colorNeutralForeground2);
+.demo-timeline {
+  --flight-healthy: #6a89dc;         /* base, deepened from the dark-mode pastel for ≥ 3:1 on white */
+  --flight-glass-from: rgb(255 255 255 / 30%);
+  --flight-glass-to: rgb(255 255 255 / 22%);
+  --flight-glass-edge: var(--colorNeutralStroke1);
+  --flight-glass-mark: rgb(0 0 0 / 45%);  /* ≈ 3.2:1 on the chart surface */
+  --flight-conflict: #d92c2c;         /* base */
+  --flight-conflict-text: #ffffff;    /* ≈ 4.9:1 */
+  --flight-waiting: #d96d0b;          /* base */
+  --flight-outline: #08151b;     /* selected / linked / focus, on light surfaces */
+  --flight-link-blocked: #ff2d2d; /* an incompatible swap's link; ≈ 3.6:1, past 3:1 for graphics */
+  /*
+   * Context bars (dimmed by a selection, view or filter), drawn as disabled
+   * controls: the faintest glass (2% white, fading to 1.5%; it still frosts
+   * the grid behind), a faint Stroke2 outline, their labels and icons in
+   * ForegroundDisabled (≈ 1.6:1 light, ≈ 3:1 dark on the board, faint by
+   * design). Full detail stays in each bar's accessible name and the
+   * selection details.
+   */
+  --flight-dim-glass-from: rgb(255 255 255 / 2%);
+  --flight-dim-glass-to: rgb(255 255 255 / 1.5%);
+  --flight-dim-stroke: var(--colorNeutralStroke2);
+  --flight-dim-text: var(--colorNeutralForegroundDisabled);
 }
 
 @media (prefers-color-scheme: dark) {
-  .demo-chart {
-    /* Derived lighter navy-blue so XA separates from dark surfaces. */
-    --flight-xa: #2a6fc4;
-    --flight-xa-text: #ffffff;    /* ≈ 5.0:1 */
-    --flight-xa-hatch: rgba(0, 11, 72, 0.35);
-    --flight-xb: #008cb8;         /* base; one step lighter than light-mode XB */
-    --flight-xb-text: #000b48;    /* ≈ 4.8:1 */
-    --flight-xb-hatch: rgba(255, 255, 255, 0.3);
-    --flight-xc: #00b7be;         /* base */
-    --flight-xc-text: #000b48;    /* ≈ 7.5:1 */
-    --flight-xc-hatch: rgba(255, 255, 255, 0.35);
-    --flight-xd: #00e2b9;         /* base */
-    --flight-xd-text: #000b48;    /* ≈ 11.0:1 */
-    --flight-xd-hatch: rgba(255, 255, 255, 0.4);
-    --flight-outline: #ffffff;
-    --flight-dim-surface: #3a3a3a;
+  .demo-timeline {
+    /* Brighter, so the colours read off dark surfaces; the red's pill takes dark text. */
+    --flight-healthy: #93adf4;        /* base */
+    --flight-glass-from: rgb(255 255 255 / 10%);
+    --flight-glass-to: rgb(255 255 255 / 7%);
+    --flight-glass-mark: rgb(255 255 255 / 40%);  /* ≈ 3.7:1 on the dark surface */
+    --flight-conflict: #f05252;       /* base */
+    --flight-conflict-text: #08151b;  /* ≈ 5.3:1 */
+    --flight-waiting: #f08a24;        /* base */
+    --flight-outline: #dff6fa;    /* the HUD's ice white */
+    --flight-link-blocked: #ff5252;
   }
 }
 
 /*
  * Hover: the chart's default brightness/saturate filter would lift white-text
- * fills (e.g. dark-mode XA ≈ 5.0:1) toward 4.5:1. Here hover instead shows a
+ * fills (e.g. conflict red ≈ 4.9:1) toward 4.5:1. Here hover instead shows a
  * thin outline on the chart's separate outline rect, so fills and label
  * contrast never change. Selected/linked/focus outlines keep precedence.
  */
@@ -204,9 +267,125 @@
   stroke-width: var(--st-stroke);
 }
 
+/*
+ * A bar's labels (flights, airports, icons, the type tag) sit at 80% at rest,
+ * so the board reads quieter; hovered, keyboard-focused or selected (by the
+ * user or by Skye), they are full again. Dimmed bars keep their own muted
+ * labels.
+ */
+.demo-chart
+  .st-bar-labels:not(
+    .st-bar-labels--hovered,
+    .st-bar-labels--focused,
+    .st-bar-labels--selected,
+    .demo-labels--dimmed
+  ) {
+  opacity: 0.8;
+}
+
 /* Dimmed bars keep a 1px neutral outline so they still read as occupied. */
 .demo-chart .demo-bar--dimmed .st-bar-rect {
   stroke-width: var(--st-stroke);
+}
+
+/*
+ * Pinned rows (pinnedRows): stays waiting for a stand. Their lane has a faint
+ * tint of its own over the pinned surface, so it reads apart from the stands
+ * below, and their bars a dashed border, so a waiting flight never reads as
+ * one on a stand.
+ */
+.demo-chart .st-plot--pinned {
+  --demo-lane-tint: color-mix(in srgb, var(--colorNeutralForeground1) 4%, transparent);
+  background-image: linear-gradient(var(--demo-lane-tint), var(--demo-lane-tint));
+}
+
+.demo-chart .st-plot--pinned .st-bar-rect {
+  stroke-width: 1.5px;
+  stroke-dasharray: 6 3;
+}
+
+/* A dimmed bar's delay ghosts recede with it; a clashing one stays red, just quieter. */
+.demo-chart .demo-ghost--dimmed .st-ghost-rect {
+  opacity: 0.6;
+}
+
+/*
+ * Swap link verdicts (BarLink). A compatible pair keeps the neutral link
+ * (--flight-outline via the theme); only an incompatible one turns red.
+ * Colour is a supplementary cue: the host must also state the verdict in text.
+ */
+.demo-chart .demo-link--incompatible {
+  --st-link: var(--flight-link-blocked);
+}
+
+/*
+ * The aircraft type in a bar's middle (theme.tsx, typeSlot; Figma GTAA-Dash
+ * 151:3938, less its emblem): the type in Caption 1, then the size class tag,
+ * 4px apart, in neutral Fluent colours whatever the bar's status.
+ */
+.demo-type {
+  display: flex;
+  align-items: center;
+  gap: var(--spacingHorizontalXS);
+  height: 20px;
+  color: var(--colorNeutralForeground2);
+  font-family: var(--fontFamilyBase);
+  font-size: var(--fontSizeBase200);
+  font-weight: var(--fontWeightRegular);
+  line-height: var(--lineHeightBase200);
+  white-space: nowrap;
+}
+
+/*
+ * A maker's emblem (emblems.tsx, MakerEmblem), on flight cards: a 20px
+ * square holding it at its file's own size (Boeing 20 × 16.47, Airbus and
+ * Embraer 20 × 20; height set per emblem), as a mask in the text colour.
+ */
+.demo-emblem {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.demo-emblem > span {
+  width: 20px;
+  background-color: currentColor;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+/* Optically centred: 2px of room beneath, as in the design. */
+.demo-type-name {
+  padding-bottom: var(--spacingVerticalXXS);
+}
+
+/*
+ * The size tag: Fluent's small Badge (16px tall, 4px radius) on the darkest
+ * neutral background, in regular Caption 1 with 6px insets and 2px beneath
+ * the text. Two classes, so these win over the Badge's own styles.
+ */
+.demo-chart .demo-type-size {
+  padding: 0 calc(var(--spacingHorizontalXS) + var(--spacingHorizontalXXS)) var(--spacingVerticalXXS);
+  border-color: transparent;
+  background-color: var(--colorNeutralBackground3);
+  color: var(--colorNeutralForeground2);
+  font-size: var(--fontSizeBase200);
+  font-weight: var(--fontWeightRegular);
+  line-height: var(--lineHeightBase200);
+}
+
+/* On a dimmed bar: the muted text colour throughout, and an outline tag. */
+.demo-chart .demo-type--dimmed {
+  color: var(--flight-dim-text);
+}
+
+.demo-chart .demo-type--dimmed .demo-type-size {
+  border-color: var(--flight-dim-stroke);
+  background-color: transparent;
+  color: var(--flight-dim-text);
 }
 
 /* Secondary airport codes are normal-size text too. Full opacity keeps

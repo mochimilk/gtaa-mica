@@ -1,46 +1,43 @@
 // Composes the independent panel modules as vertically stacked, collapsible
-// Coral Panel.NavGroup sections (Arrivals, Departures, Alerts). The panel
-// fills Coral's Panel.Left content area: open groups share the height and
-// each scrolls on its own, so all group headers stay visible.
+// Coral Panel.NavGroup sections (Arrivals, Departures). The panel fills
+// Coral's Panel.Left content area: open groups share the height and each
+// scrolls on its own, so all group headers stay visible. Alerts live in the
+// chart header's Alerts menu (AlertsMenu.tsx).
 import { useState, type ReactNode } from "react";
 import { Panel } from "@coral-ai/react";
-import { Alerts } from "./Alerts";
 import { ArrivalList } from "./ArrivalList";
 import { DepartureList } from "./DepartureList";
 import { useOperations } from "./OperationsContext";
 import { OverflowScroll } from "./OverflowScroll";
-import { ARRIVALS, DEPARTURES, OPS_ALERTS } from "./operationsData";
+import { ARRIVALS, DEPARTURES } from "./operationsData";
 import "./operations.css";
 
-type GroupKey = "arrivals" | "departures" | "alerts";
+type GroupKey = "arrivals" | "departures";
 
 export function OperationsPanel() {
-  // Default: all three expanded (not mutually exclusive); each can collapse independently.
+  // Default: both expanded (not mutually exclusive); each can collapse independently.
   const [open, setOpen] = useState<Record<GroupKey, boolean>>({
     arrivals: true,
     departures: true,
-    alerts: true,
   });
-  const { acknowledged, matcher } = useOperations();
+  const { matcher } = useOperations();
   // Counts follow the current view/filters ("x of y" while one is active).
-  const openAlerts = OPS_ALERTS.filter((a) => !acknowledged.has(a.id));
-  const openShown = openAlerts.filter(matcher.alert).length;
   const describe = (list: typeof ARRIVALS) => {
     const shown = list.filter(matcher.flight);
     const unassigned = shown.filter((f) => !f.standId).length;
     const count = matcher.active ? `${shown.length} of ${list.length}` : `${list.length}`;
     return `${count} flights · ${unassigned} unassigned`;
   };
-  const alertsText =
-    matcher.active && openShown !== openAlerts.length
-      ? `${openShown} of ${openAlerts.length} open`
-      : `${openAlerts.length} open`;
 
   // Each group sits in its own headless Panel.NavSection: with no label the
   // section has no header and is always open, and `border` gives the bottom
   // divider after each group. Collapsing stays on the NavGroup.
   const group = (key: GroupKey, label: string, description: string, content: ReactNode) => (
-    <Panel.NavSection border className={open[key] ? "ops-section ops-section--open" : "ops-section"}>
+    // ops-section--<key> lets Skye's cursor find a group to expand (agentGestures.ts).
+    <Panel.NavSection
+      border
+      className={`ops-section ops-section--${key}${open[key] ? " ops-section--open" : ""}`}
+    >
 
       <Panel.NavGroup
         label={label}
@@ -60,7 +57,6 @@ export function OperationsPanel() {
       <div className="ops-groups">
         {group("arrivals", "Arrivals", describe(ARRIVALS), <ArrivalList />)}
         {group("departures", "Departures", describe(DEPARTURES), <DepartureList />)}
-        {group("alerts", "Alerts", alertsText, <Alerts />)}
       </div>
       {/* Selection details/actions now live in SelectionPopover, anchored to the selection. */}
     </div>

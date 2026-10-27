@@ -1,95 +1,288 @@
 import {
   CoralShellColumn,
   CoralShellRow,
-  Navbar,
   Content,
   Panel,
 } from "@coral-ai/react";
-import { makeStyles } from "@fluentui/react-components";
+import { ToolbarDivider, makeStyles, tokens } from "@fluentui/react-components";
+import { AppNavbar } from "./components/navbar";
+import { AppNavRail } from "./components/nav-rail";
+import { NorvaraLogo } from "./components/navbar/NorvaraLogo";
+import { PanelHeader } from "./components/panel-header";
+import { LeftPanelToggle } from "./components/panel-toggle";
+import { useMemo, useRef } from "react";
+import { MINUTE, type DropPreview } from "./stand-timeline";
+import { DEMO_DATA } from "./stand-timeline-demo/demoData";
 import { StandTimelineDemo } from "./stand-timeline-demo/StandTimelineDemo";
+import { useDemoZoom } from "./stand-timeline-demo/ZoomMenuRow";
+import { checkSwap, currentClosure, describePlan } from "./operations/allocation";
+import {
+  FIRST_LANE_ROW,
+  NO_STAND_LABEL,
+  describeLaneDrop,
+  keepsTimes,
+  noStandLane,
+  planBoardDrop,
+  type NoStandLane,
+} from "./operations/noStandLane";
+import { AlertsMenu } from "./operations/AlertsMenu";
+import { KpiStrip } from "./operations/KpiStrip";
+import { ClosureBand, ClosureLabel } from "./operations/ClosureBand";
+import { FlightDragChip, FlightDropGhost } from "./operations/FlightDrag";
 import { OperationsPanel } from "./operations/OperationsPanel";
-import { OperationsProvider, useOperations } from "./operations/OperationsContext";
+import { OutputsPanel, OutputsToggle } from "./operations/OutputsPanel";
+import { OutputsPeek } from "./operations/OutputsPeek";
+import { OperationsProvider, selectedFlight, useOperations, type OpsSelection } from "./operations/OperationsContext";
 import { SelectionPopover } from "./operations/SelectionPopover";
+import { SwapConfirm } from "./operations/SwapConfirm";
 import { ViewsFiltersToolbar } from "./operations/ViewsFiltersToolbar";
-import { FilterStatus } from "./operations/FilterStatus";
-import { TreeDeciduous } from "@coral-ai/bundleicons";
+import { LiveCallProvider } from "./live";
+import { AgentCursor, AgentHelperCursors } from "./components/agent-cursor";
+import { SkyeGlowDefs } from "./components/skye-glow";
+import { LumaSkyeBackground } from "./components/luma-skye/LumaSkyeBackground";
 
-/*
- * GTAA-only Navbar height. Coral's Navbar root is 44px (Griffel); passing a
- * Griffel class through the supported `styles.root` slot is merged after it,
- * so these declarations win. flexShrink 0 keeps it from compressing in the
- * shell column.
+// Stable ID shared by the left panel and its toggle in the nav rail.
+const OPERATIONS_PANEL_ID = "operations-panel";
+const OPERATIONS_PANEL_LABEL = "operations panel";
+
+/** Bars drag anywhere on the board: to any stand, and along in time in 5-minute steps. */
+const DRAG_SNAP_MS = 5 * MINUTE;
+
+/**
+ * The verdict shown while a bar is dragged over a row (and along in time):
+ * green for a move onto free time, a swap with the one stay it lands on, a
+ * waiting flight dropped on a stand that takes it, or a stay dropped into the
+ * No stand lane; red otherwise. To or from the lane, a stay keeps its times
+ * however it is dragged, so its ghost does too.
  */
-const useNavbarStyles = makeStyles({
-  root: {
-    // height: "64px",
-    flexShrink: 0,
-  },
-});
+function previewDrop(occupancyId: string, rowId: string, shiftMs: number): DropPreview {
+  const drop = planBoardDrop(occupancyId, rowId, shiftMs);
+  const kept = keepsTimes(occupancyId, rowId) ? { shiftMs: 0 } : {};
+  switch (drop.kind) {
+    case "move":
+      return { allowed: true, label: `Drop to ${describePlan(drop)}` };
+    case "swap":
+      return { allowed: true, swapWithId: drop.otherId, label: `Drop to ${describePlan(drop)}` };
+    case "assign":
+    case "unassign":
+      return { allowed: true, label: `Drop to ${describeLaneDrop(drop)}`, ...kept };
+    case "conflict":
+      return { allowed: false, blockingIds: drop.blockingIds, label: drop.reason, ...kept };
+    case "stay":
+      return { allowed: false };
+  }
+}
 
-/** Chart wired to the shared operations selection, views and filters. */
+/** The waiting stay of a selected flight with no stand: its bar in the No stand lane. */
+const waitingStayIds = (selection: OpsSelection) => {
+  const stayId = selectedFlight(selection)?.unplacedStay?.stayId;
+  return stayId ? [stayId] : [];
+};
+
+/**
+ * The No stand lane's label in the stand column, on its first row: how many
+ * flights wait there. Its other rows are unlabelled.
+ */
+function laneLabel(lane: NoStandLane) {
+  const waiting = lane.stays.length;
+  return (row: { id: string }) =>
+    row.id === FIRST_LANE_ROW ? (
+      <span className="ops-lane-label">
+        <span className="st-row-name">{NO_STAND_LABEL}</span>
+        <span className={waiting > 0 ? "ops-lane-count ops-lane-count--waiting" : "ops-lane-count"}>
+          {waiting > 0 ? `${waiting} waiting` : "None waiting"}
+        </span>
+      </span>
+    ) : null;
+}
+
+/** Chart wired to the shared operations selection, views, filters and stands. */
 function ConnectedTimeline() {
-  const { selection, applyChartIntent, matcher } = useOperations();
+  const { selection, skyeSelection, applyChartIntent, matcher, allocationVersion, boardHeld, flightStyle } =
+    useOperations();
+  // Flights waiting for a stand, in the No stand lane above the stands. While
+  // Skye's cursors work several at once, it keeps its rows (see layoutLane).
+  const heldLane = useRef<NoStandLane | undefined>(undefined);
+  const lane = useMemo(() => {
+    const next = noStandLane(boardHeld ? heldLane.current : undefined);
+    heldLane.current = next;
+    return next;
+  }, [allocationVersion, boardHeld]);
+  // A new array per stand change, so the chart lays the bars out again.
+  const occupancies = useMemo(() => [...DEMO_DATA.occupancies, ...lane.stays], [allocationVersion, lane]);
+  const pinnedLabel = useMemo(() => laneLabel(lane), [lane]);
+  // Read on every stand change (allocationVersion re-renders this).
+  const closure = currentClosure();
+  // The user and Skye select side by side: the chart shows both, Skye's in her colours.
+  const userIds = [...selection.occupancyIds, ...waitingStayIds(selection)];
+  const skyeIds = [...skyeSelection.occupancyIds, ...waitingStayIds(skyeSelection)].filter((id) => !userIds.includes(id));
+  const selectedIds = [...userIds, ...skyeIds];
+  // A pair is linked within one player's selection, never across the two.
+  const linkFor = (pair: readonly string[], skye: boolean) => {
+    if (pair.length !== 2) return [];
+    const status = checkSwap(pair[0], pair[1]).ok ? "compatible" : "incompatible";
+    return [{ fromId: pair[0], toId: pair[1], className: `demo-link--${status}${skye ? " demo-link--skye" : ""}` }];
+  };
+  const links = [...linkFor(selection.occupancyIds, false), ...linkFor(skyeSelection.occupancyIds, true)];
+  // The board's zoom, shared with its controls in the header's View menu.
+  const zoom = useDemoZoom();
   return (
     <>
       {/* Details show in SelectionPopover, so the demo's own detail strip is hidden here.
-          Non-matching bars are dimmed (still occupied/selectable), never removed. */}
-      <StandTimelineDemo
-        selectedIds={selection.occupancyIds}
-        onIntent={applyChartIntent}
-        showSelectionDetail={false}
-        isMatch={matcher.active ? matcher.occupancy : undefined}
-        selectionActive={selection.occupancyIds.length > 0 || !!selection.flightId}
-        toolbar={<ViewsFiltersToolbar />}
-        notice={<FilterStatus />}
-      />
+          Non-matching bars are dimmed (still occupied/selectable), never removed.
+          What Skye selected is outlined in its orb's colours (skye-glow). */}
+      <div className="skye-selection-scope">
+        <StandTimelineDemo
+          selectedIds={selectedIds}
+          skyeIds={skyeIds}
+          links={links}
+          onIntent={applyChartIntent}
+          showSelectionDetail={false}
+          isMatch={matcher.active ? matcher.occupancy : undefined}
+          selectionActive={selectedIds.length > 0 || !!selection.flightId || !!skyeSelection.flightId}
+          occupancies={occupancies}
+          pinnedRows={lane.rows}
+          pinnedLabel={pinnedLabel}
+          previewDrop={previewDrop}
+          dragSnapMs={DRAG_SNAP_MS}
+          underlay={<ClosureBand closure={closure} />}
+          overlay={
+            <>
+              <ClosureLabel closure={closure} />
+              {/* A flight with no stand, dragged from the list: where it would land. */}
+              <FlightDropGhost />
+            </>
+          }
+          toolbar={
+            <>
+              <ViewsFiltersToolbar zoom={zoom} />
+              <ToolbarDivider />
+              <OutputsToggle />
+            </>
+          }
+          summary={<KpiStrip />}
+          zoom={zoom}
+          flightStyle={flightStyle}
+        />
+      </div>
       <SelectionPopover />
+      {/* Asks before the user's swaps, beside the two stays. */}
+      <SwapConfirm />
+      {/* The flight being dragged from the list, beside the pointer. */}
+      <FlightDragChip />
     </>
   );
 }
 
+/*
+ * Panel.Left's own margin offsets it against Content in the shell row; inside
+ * Content it sits flush, divided from the timeline by a hairline.
+ */
+const useStyles = makeStyles({
+  panel: {
+    margin: 0,
+    borderRight: `1px solid ${tokens.colorNeutralStroke2}`,
+  },
+  // Beside the full-height nav rail, the content and app bar column takes the
+  // rest of the width (and may shrink below its content's).
+  main: {
+    flex: "1 1 0",
+    minWidth: 0,
+  },
+  // Coral's content window keeps its glass (its own backdrop-filter value),
+  // drawn by a layer behind its content instead of by the window itself. In
+  // Chromium, a backdrop-filter on an ancestor stops any backdrop-filter
+  // inside it from blurring, and the board's time ruler, No stand lane and
+  // stand column blur the rows that scroll under them. Its tint is
+  // colorNeutralBackground4 at half opacity, in place of Coral's
+  // colorNeutralBackgroundAlpha.
+  content: {
+    backgroundColor: `color-mix(in srgb, ${tokens.colorNeutralBackground4} 50%, transparent)`,
+    backdropFilter: "none",
+    isolation: "isolate",
+    "::before": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      zIndex: -1,
+      borderRadius: "inherit",
+      backdropFilter: "saturate(150%) blur(20px)",
+      pointerEvents: "none",
+    },
+  },
+});
+
 export default function App() {
-  const navbarStyles = useNavbarStyles();
+  const styles = useStyles();
   return (
+    // OperationsProvider first: the voice session reaches the app through the
+    // same selection, views, filters and acknowledgements the UI uses.
     <OperationsProvider>
-      <CoralShellColumn>
-        <Navbar
-          logo={<img src="/toronto_pearson.svg" alt="Toronto Pearson" />}
-          styles={{ root: navbarStyles.root }}
-        />
-
+      <LiveCallProvider>
+        <LumaSkyeBackground />
+        {/* The nav rail runs the full height, beside the content and the app bar. */}
         <CoralShellRow>
-          <Panel.Left panelWidth={320}>
+          <AppNavRail
+            actionsEnd={
+              <LeftPanelToggle
+                panelID={OPERATIONS_PANEL_ID}
+                panelLabel={OPERATIONS_PANEL_LABEL}
+                tooltipPositioning="after"
+              />
+            }
+          />
+          <CoralShellColumn className={styles.main}>
+            <CoralShellRow>
+              <Content className={styles.content}>
+                {/* The panel sits inside the content window, beside the timeline. */}
+                <div style={{ display: "flex", flex: "1 1 auto", minHeight: 0, position: "relative" }}>
+                  <Panel.Left panelWidth={320} panelID={OPERATIONS_PANEL_ID} className={styles.panel}>
+                    <PanelHeader logo={<NorvaraLogo />} />
+                    <OperationsPanel />
+                  </Panel.Left>
+                  {/*
+                    Bounded flex host: the timeline fills this height and scrolls its
+                    own rows between pinned rulers. overflowY stays as a fallback for
+                    viewports shorter than the timeline's minimum.
+                  */}
+                  <main
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      minWidth: 0,
+                      boxSizing: "border-box",
+                      flex: "1 1 0",
+                      height: "100%",
+                      minHeight: 0,
+                      overflowY: "auto",
+                    }}
+                  >
+                    <ConnectedTimeline />
+                  </main>
+                  {/* What Skye is changing, at the top right under the board's header, while the Outputs panel is closed. */}
+                  <OutputsPeek />
+                </div>
+              </Content>
+              {/* Beside the content window; its toggle ends the board's header. */}
+              <OutputsPanel />
+            </CoralShellRow>
 
-            <OperationsPanel />
-          </Panel.Left>
-          <Content>
-            {/*
-              Bounded flex host: the timeline fills this height and scrolls its
-              own rows between pinned rulers. overflowY stays as a fallback for
-              viewports shorter than the timeline's minimum.
-            */}
-            <main
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                width: "100%",
-                minWidth: 0,
-                boxSizing: "border-box",
-                flex: "1 1 auto",
-                height: "100%",
-                minHeight: 0,
-                overflowY: "auto",
-              }}
-            >
-              <ConnectedTimeline />
-            </main>
-          </Content>
-                         <Panel.Right icon={<TreeDeciduous/>}></Panel.Right>
-          <Panel.Right></Panel.Right>
-     
+            <AppNavbar
+              askActionsEnd={<AlertsMenu />}
+            />
+
+          </CoralShellColumn>
         </CoralShellRow>
-      </CoralShellColumn>
+        {/* Skye's own cursor, shown while Skye clicks things in the app. */}
+        <AgentCursor name="Skye" />
+        {/* The cursors Skye splits into to work on several things at once. */}
+        <AgentHelperCursors />
+        {/* The gradient that outlines Skye's selections on the chart. */}
+        <SkyeGlowDefs />
+      </LiveCallProvider>
     </OperationsProvider>
   );
 }

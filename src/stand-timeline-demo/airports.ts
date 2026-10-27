@@ -1,8 +1,8 @@
-// App-owned airport reference for the synthetic demo. The demo is set at
-// Toronto Pearson (YYZ); the route airports are familiar codes used only as
-// illustrative synthetic endpoints, not real routes or schedules.
+// App-owned airport reference for the synthetic demo. The demo is set at the
+// fictional Norvara Intl Airport; the route airports are familiar codes used
+// only as illustrative synthetic endpoints, not real routes or schedules.
 
-export const HOME_AIRPORT = { code: "YYZ", name: "Toronto Pearson International" } as const;
+export const HOME_AIRPORT = { code: "YYZ", name: "Norvara Intl" } as const;
 
 /** Route endpoint codes used by the synthetic fixture, in a fixed order. */
 export const ROUTE_AIRPORTS = ["SFO", "LAX", "SEA", "JFK", "BOS", "ORD", "YVR", "YUL", "LHR"] as const;

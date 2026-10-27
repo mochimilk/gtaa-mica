@@ -1,7 +1,10 @@
 // Compact flight table shared by ArrivalList and DepartureList. Fluent v9
 // Table primitives (native <table>) with role="grid" so rows can carry
 // aria-selected and a roving tabindex: Tab enters the grid once, arrow keys,
-// Home and End move between rows, Enter/Space selects.
+// Home and End move between rows, Enter/Space selects. The row of a flight
+// with no stand (and stay times) can be dragged onto a stand on the chart
+// (see ./FlightDrag); the details popover's Assign stand does the same from
+// the keyboard.
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import {
   Badge,
@@ -16,7 +19,9 @@ import { InfoRegular, WarningRegular } from "@fluentui/react-icons";
 import { airportLabel } from "../stand-timeline-demo/airports";
 import { dayOffsetLabel, formatUtc, formatUtcFull } from "../stand-timeline-demo/demoData";
 import { isFlightSelected, useOperations } from "./OperationsContext";
-import { alertsForFlight, type OpsFlight } from "./operationsData";
+import { alertsForFlight } from "./boardAlerts";
+import { beginFlightDrag } from "./FlightDrag";
+import type { OpsFlight } from "./operationsData";
 
 export interface FlightListProps {
   flights: readonly OpsFlight[];
@@ -54,7 +59,7 @@ export function FlightList({
   timeHeaderLabel,
   emptyMessage,
 }: FlightListProps) {
-  const { selection, selectFlight, acknowledged } = useOperations();
+  const { selection, skyeSelection, selectFlight, acknowledged, assignStands } = useOperations();
   const bodyRef = useRef<HTMLTableSectionElement>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -123,7 +128,7 @@ export function FlightList({
             <TableHeaderCell className="ops-cell">Flight</TableHeaderCell>
             <TableHeaderCell className="ops-cell">{routeHeader}</TableHeaderCell>
             <TableHeaderCell className="ops-cell" aria-label={`${timeHeaderLabel}, UTC, synthetic`}>
-              <abbr title={`${timeHeaderLabel} (UTC, synthetic)`}>{timeHeader}</abbr>*
+              <abbr title={`${timeHeaderLabel} (UTC, synthetic)`}>{timeHeader}</abbr>
             </TableHeaderCell>
             <TableHeaderCell className="ops-cell">Stand</TableHeaderCell>
             <TableHeaderCell className="ops-cell" aria-label="Alerts" />
@@ -135,15 +140,23 @@ export function FlightList({
             const alerts = alertsForFlight(f.id, acknowledged);
             const warning = alerts.some((a) => a.severity === "warning");
             const day = dayOffsetLabel(f.estimate);
+            const draggable = !f.standId && !!f.unplacedStay;
             return (
               <TableRow
                 key={f.id}
-                className="ops-row"
+                className={draggable ? "ops-row ops-row--draggable" : "ops-row"}
                 data-flight-id={f.id}
+                data-ops-draggable={draggable || undefined}
                 aria-selected={selected}
+                data-skye-selected={(!selected && isFlightSelected(f, skyeSelection)) || undefined}
                 tabIndex={f.id === tabStopId ? 0 : -1}
                 onFocus={() => setActiveId(f.id)}
                 onClick={() => selectFlight(f)}
+                onPointerDown={
+                  draggable
+                    ? (e) => beginFlightDrag(e, f, (stayId, standId) => assignStands([{ stayId, standId }]))
+                    : undefined
+                }
               >
                 <TableCell className="ops-cell ops-flight">{f.flight}</TableCell>
                 <TableCell className="ops-cell ops-muted" title={airportLabel(f.routeEnd)}>
@@ -184,10 +197,6 @@ export function FlightList({
           })}
         </TableBody>
       </Table>
-      <p className="ops-footnote">
-        *{timeHeader} = {timeHeaderLabel.toLowerCase()}: synthetic estimate, UTC. "−1d"/"+1d"
-        marks a day before/after the demo date. Demo data only.
-      </p>
     </div>
   );
 }

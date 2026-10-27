@@ -1,0 +1,965 @@
+/*
+ * Ask Skye: VelmAI's chat surface and buttons, ported to Mica.
+ *
+ * The layout, sizes and motion are VelmAI's (src/ui/components/chat/chat.css
+ * and button/button.css). VelmAI's own dark palette is replaced by Fluent's
+ * CSS variables, which Coral's FluentProvider sets on the tree, so fonts and
+ * colours follow the app's theme. Everything is scoped under .mica-ask.
+ */
+
+.mica-ask {
+  /* VelmAI tokens, mapped onto Fluent. */
+  --ask-font: var(--fontFamilyBase);
+  --ask-type-body: var(--fontWeightRegular) var(--fontSizeBase300) / var(--lineHeightBase300) var(--ask-font);
+  --ask-type-caption: var(--fontWeightRegular) var(--fontSizeBase200) / var(--lineHeightBase200) var(--ask-font);
+  --ask-text: var(--colorNeutralForeground1);
+  --ask-muted: var(--colorNeutralForeground3);
+  --ask-accent: var(--colorBrandForeground1);
+  --ask-accent-strong: var(--colorBrandBackground);
+  --ask-accent-strong-hover: var(--colorBrandBackgroundHover);
+  --ask-on-accent: var(--colorNeutralForegroundOnBrand);
+  --ask-border: var(--colorNeutralStroke2);
+  /*
+   * The bar's glass (see the glass, below): clear, at liquid-glass-react's
+   * defaults, displacementScale 70 and blurAmount 0.0625 (6px).
+   */
+  --ask-glass-lens: url(#mica-liquid-glass);
+  --ask-glass-backdrop: blur(6px) saturate(140%);
+  --ask-glass-tint: transparent;
+  --ask-glass-control: var(--colorSubtleBackgroundHover);
+  --ask-glass-control-hover: var(--colorSubtleBackgroundPressed);
+  --ask-selected-bg: var(--colorBrandBackground2);
+  --ask-selected-border: var(--colorBrandStroke2);
+  --ask-danger-text: var(--colorPaletteRedForeground1);
+  --ask-shadow: var(--shadow28);
+  --ask-focus-ring: 2px solid var(--colorStrokeFocus2);
+  --ask-motion-fast: var(--durationFast);
+  --ask-motion-normal: var(--durationNormal);
+  /* Opening a window: it widens from the pill, then its content fades in. */
+  --ask-motion-grow: var(--durationFast);
+  --ask-motion-reveal: var(--durationFaster);
+  --ask-ease: var(--curveEasyEase);
+
+  --ask-space-1: 4px;
+  --ask-space-2: 8px;
+  --ask-space-3: 12px;
+  --ask-space-4: 16px;
+  --ask-space-5: 20px;
+  --ask-control-size: 40px;
+  --ask-control-size-sm: 28px;
+  --ask-radius-control: 6px;
+  --ask-radius-m: 16px;
+  --ask-radius-lg: 20px;
+  --ask-radius-pill: 9999px;
+
+  /*
+   * VelmAI's bar is 64px. Here the dock fills the 56px app bar: the same 40px
+   * controls with 8px around them. The input, closed or open, is the pill's
+   * row: 7px round the 32px orb, so 46px inside the surface's border.
+   */
+  --ask-bar-height: 56px;
+  --ask-pill-inset: 7px;
+  --ask-pill-height: calc(32px + 2 * var(--ask-pill-inset));
+  --ask-radius-bar: 28px;
+  --ask-width-pill: 285px;
+  --ask-width-voice: 385px;
+  --ask-width-open: 640px;
+  --ask-max-height-open: 560px;
+
+  /*
+   * The dock reserves the pill's footprint in the navbar, so the navbar never
+   * reflows. The chat itself is anchored to the dock's bottom and grows up
+   * over the board, since the navbar sits at the bottom of the shell.
+   */
+  position: relative;
+  width: var(--ask-width-pill);
+  height: var(--ask-bar-height);
+  flex-shrink: 0;
+  color: var(--ask-text);
+  font: var(--ask-type-body);
+}
+
+/* Coral's canvas root: let it fill the dock without adding layout of its own. */
+.mica-ask > div {
+  height: 100%;
+}
+
+/* A floating notice stacked above the chat, then the chat. */
+.mica-ask__stack {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--ask-space-3);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/*
+ * With a window open (the chat, the alerts, any floating window), the stack
+ * stands over Skye's cursors and their tethers (agent-cursor.css), as the
+ * Outputs peek does: WINDOW_Z in window-layer. What opens from it (a tooltip,
+ * a menu) mounts over it there (AskSkye's PortalMountNodeProvider). Closed,
+ * it stays under her cursor, which takes off from the pill's orb.
+ */
+.mica-ask__stack:has(.mica-ask__surface[data-open='true'], .mica-ask__float) {
+  z-index: 2147483001;
+}
+
+.mica-ask__stack > * {
+  pointer-events: auto;
+}
+
+/*
+ * The surface, the chat toggle on its left and any end actions on its right.
+ * They are out of the row's flow, just past the surface's ends, so the
+ * surface stays centred in the dock. They line up with the bar's controls,
+ * at the bottom where the panel grows up. (Mute is the app bar's, at its
+ * end: see MuteButton.)
+ */
+.mica-ask__row {
+  position: relative;
+}
+
+.mica-ask__side {
+  position: absolute;
+  bottom: calc((var(--ask-bar-height) - var(--ask-control-size)) / 2);
+  display: flex;
+  align-items: center;
+  gap: var(--ask-space-1);
+  height: var(--ask-control-size);
+}
+
+.mica-ask__side[data-side='start'] {
+  right: calc(100% + var(--ask-space-2));
+}
+
+.mica-ask__side[data-side='end'] {
+  left: calc(100% + var(--ask-space-2));
+}
+
+/*
+ * Glass: the bar, the chat, notices and floating windows are liquid glass. A
+ * layer under their content blurs what is behind them and bends it like a
+ * lens, through liquid-glass-react's filter (LiquidGlassFilter.tsx). The layer
+ * sees only as far back as an ancestor that fades or filters, so none may: a
+ * window that fades in fades its glass instead of itself.
+ */
+.mica-ask__surface,
+.mica-ask__notice,
+.mica-ask__float {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+:is(.mica-ask__surface, .mica-ask__notice, .mica-ask__float)::before,
+:is(.mica-ask__surface, .mica-ask__notice, .mica-ask__float)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+:is(.mica-ask__surface, .mica-ask__notice, .mica-ask__float)::before {
+  filter: var(--ask-glass-lens);
+  -webkit-backdrop-filter: var(--ask-glass-backdrop);
+  backdrop-filter: var(--ask-glass-backdrop);
+}
+
+/* The tint lies over the glass, not under it, so the lens cannot bend it away at the edges. */
+:is(.mica-ask__surface, .mica-ask__notice, .mica-ask__float)::after {
+  background: var(--ask-glass-tint);
+  transition: background-color var(--ask-motion-fast) var(--ask-ease);
+}
+
+/*
+ * Open, the chat and the floating windows (and notices) are frosted, under a
+ * gentler lens, and tinted with the theme's background, light or dark with
+ * the app. The bar under a floating window stays clear.
+ */
+.mica-ask__surface[data-open='true'],
+.mica-ask__notice,
+.mica-ask__float {
+  --ask-glass-lens: url(#mica-liquid-glass-open);
+  --ask-glass-backdrop: blur(15px) saturate(140%);
+  --ask-glass-tint: color-mix(in srgb, var(--colorNeutralBackground2) 90%, transparent);
+}
+
+/* Surface: the pill, the voice bar, and the open panel are one element that changes size. */
+
+.mica-ask__surface {
+  display: flex;
+  flex-direction: column;
+  /* The pill hugs the orb and Connect; allow-keywords lets that width still animate. */
+  width: fit-content;
+  max-width: calc(100vw - 32px);
+  interpolate-size: allow-keywords;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--ask-border);
+  border-radius: var(--ask-radius-pill);
+  box-shadow: var(--ask-shadow);
+  transition:
+    width var(--ask-motion-grow) var(--ask-ease),
+    border-color var(--ask-motion-fast) var(--ask-ease);
+}
+
+.mica-ask__surface *,
+.mica-ask__surface *::before,
+.mica-ask__surface *::after {
+  box-sizing: border-box;
+}
+
+.mica-ask__surface[data-listening='true'] {
+  width: var(--ask-width-voice);
+}
+
+/*
+ * Closed, the surface is the pill, in the app bar's middle, as the controls
+ * beside it are: it rises off the dock's foot by half the room the pill and
+ * its 1px border leave. Open, its foot stays there and it grows up from it,
+ * so the input sits where the pill was.
+ */
+.mica-ask__surface {
+  margin-bottom: calc((var(--ask-bar-height) - var(--ask-pill-height)) / 2 - 1px);
+}
+
+/* The open chat hugs its conversation and only grows to the cap; past that the messages scroll. */
+.mica-ask__surface[data-open='true'] {
+  width: var(--ask-width-open);
+  max-height: min(var(--ask-max-height-open), calc(100dvh - 120px));
+  border-radius: var(--ask-radius-m);
+}
+
+/*
+ * Opening, the chat's content waits for the surface to finish widening, then
+ * fades in quickly, so it is never seen squeezed into the pill's width.
+ */
+.mica-ask__surface[data-open='true'] > :is(.mica-ask__header, .mica-ask__messages, .mica-ask__input) {
+  animation: mica-ask-reveal var(--ask-motion-reveal) var(--ask-ease) var(--ask-motion-grow) both;
+}
+
+@keyframes mica-ask-reveal {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Before the first message the chat still opens as a window, with room for the conversation. */
+.mica-ask__surface[data-open='true'][data-empty='true'] .mica-ask__messages {
+  min-height: 200px;
+}
+
+/* Header */
+
+.mica-ask__header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ask-space-2);
+  padding: var(--ask-space-2) var(--ask-space-2) var(--ask-space-2) var(--ask-space-5);
+  border-bottom: 1px solid var(--ask-border);
+}
+
+/* A window that cannot be dismissed has no close button; its header keeps the height it would give. */
+.mica-ask__header[data-dismissible='false'] {
+  min-height: calc(var(--ask-control-size) + 2 * var(--ask-space-2));
+}
+
+.mica-ask__title {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mica-ask__title-name {
+  margin: 0;
+  overflow: hidden;
+  font: var(--ask-type-body);
+  font-weight: var(--fontWeightSemibold);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Messages: Coral's Chat.Messages, in VelmAI's scrolling panel. */
+
+.mica-ask__messages {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Coral pads its list for a full page; the panel is compact. */
+.mica-ask__messages > div {
+  padding-top: var(--ask-space-4);
+  padding-bottom: var(--ask-space-4);
+}
+
+/*
+ * Coral draws its thinking indicator (a spinner and cycling words) under the
+ * last message and offers no prop to turn it off. The input shows those words
+ * instead, so the copy here is hidden: the indicator is the list's only row
+ * that leads with a spinner.
+ */
+.mica-ask__messages > div > div > div:has(> .fui-Spinner:first-child) {
+  display: none;
+}
+
+/* A spoken turn from a call: Coral's markdown, labelled as spoken. */
+.mica-ask__spoken {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ask-space-1);
+  padding: var(--ask-space-2) 0;
+}
+
+.mica-ask__spoken-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ask-space-1);
+  color: var(--ask-muted);
+  font: var(--ask-type-caption);
+}
+
+.mica-ask__spoken-label svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* Notices float above the bar, so the composer keeps its own glass and round ends. */
+
+.mica-ask__notice {
+  display: flex;
+  align-items: center;
+  gap: var(--ask-space-2);
+  max-width: min(var(--ask-width-open), calc(100vw - 32px));
+  padding: var(--ask-space-2) var(--ask-space-2) var(--ask-space-2) var(--ask-space-4);
+  border: 1px solid var(--ask-border);
+  border-radius: var(--ask-radius-bar);
+  box-shadow: var(--ask-shadow);
+}
+
+.mica-ask__notice-text {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.mica-ask__notice[data-tone='error'] .mica-ask__notice-text {
+  color: var(--ask-danger-text);
+}
+
+/*
+ * A floating window (AskFloatingWindow, e.g. Alerts): the open chat's glass,
+ * width, corners and header, standing above the bar instead of growing out
+ * of it. Its slot has no box, so the window is one of the stack's items,
+ * centred over the bar, and an empty slot adds no gap.
+ */
+.mica-ask__float-slot {
+  display: contents;
+}
+
+.mica-ask__float {
+  display: flex;
+  flex-direction: column;
+  width: var(--ask-width-open);
+  max-width: calc(100vw - 32px);
+  max-height: min(
+    var(--ask-max-height-open),
+    calc(100dvh - 120px - var(--ask-bar-height) - var(--ask-space-3))
+  );
+  overflow: hidden;
+  border: 1px solid var(--ask-border);
+  border-radius: var(--ask-radius-m);
+  box-shadow: var(--ask-shadow);
+  transition:
+    width var(--ask-motion-grow) var(--ask-ease),
+    translate var(--ask-motion-grow) var(--ask-ease),
+    border-color var(--ask-motion-grow) var(--ask-ease),
+    box-shadow var(--ask-motion-grow) var(--ask-ease);
+}
+
+/*
+ * It opens as the chat does, widening from the pill's width as it fades up
+ * into place. Its fill, edge and glass fade, not the window (see the glass)…
+ */
+@starting-style {
+  .mica-ask__float {
+    width: var(--ask-width-pill);
+    translate: 0 8px;
+    border-color: transparent;
+    box-shadow: none;
+  }
+}
+
+.mica-ask__float::before,
+.mica-ask__float::after {
+  animation: mica-ask-reveal var(--ask-motion-grow) var(--ask-ease) both;
+}
+
+/* …and its content follows once it is wide (mica-ask-reveal, as the chat's). */
+.mica-ask__float:not([data-closing]) > * {
+  animation: mica-ask-reveal var(--ask-motion-reveal) var(--ask-ease) var(--ask-motion-grow) both;
+}
+
+/* Closing runs it back: the content fades first, then the window narrows away. */
+.mica-ask__float[data-closing] {
+  width: var(--ask-width-pill);
+  translate: 0 8px;
+  border-color: transparent;
+  box-shadow: none;
+  pointer-events: none;
+  transition-delay: var(--ask-motion-reveal);
+}
+
+.mica-ask__float[data-closing]::before,
+.mica-ask__float[data-closing]::after {
+  animation: mica-ask-conceal var(--ask-motion-grow) var(--ask-ease) var(--ask-motion-reveal) both;
+}
+
+.mica-ask__float[data-closing] > * {
+  animation: mica-ask-conceal var(--ask-motion-reveal) var(--ask-ease) both;
+}
+
+@keyframes mica-ask-conceal {
+  to {
+    opacity: 0;
+  }
+}
+
+.mica-ask__float *,
+.mica-ask__float *::before,
+.mica-ask__float *::after {
+  box-sizing: border-box;
+}
+
+/* Focus lands on the window itself as it opens; its controls keep their own rings. */
+.mica-ask__float:focus {
+  outline: none;
+}
+
+/* Below the header, the window's content scrolls. */
+.mica-ask__float-body {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: var(--ask-space-4);
+}
+/* Input */
+
+.mica-ask__input {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--ask-space-3);
+  /* The pill's row in every state: the orb leads it, 7px in from the surface's edge. */
+  min-height: var(--ask-pill-height);
+  padding: var(--ask-pill-inset);
+}
+
+/* Nothing ends the voice bar now (Disconnect is at the app bar's end): 12px past the waveform. */
+.mica-ask__input[data-variant='voice'] {
+  gap: var(--ask-space-2);
+  padding-right: var(--ask-space-3);
+}
+
+.mica-ask__surface[data-open='true'] .mica-ask__input {
+  border-top: 1px solid var(--ask-border);
+}
+
+/*
+ * A draft that wraps grows upward: Send stays at the bottom right, and the
+ * orb stays beside the first line. Its controls are the orb's 32px, so the
+ * composer is the pill's height, and Send sits 7px in, as the orb does.
+ */
+.mica-ask__input[data-variant='composer'] {
+  --ask-control-size: 32px;
+  align-items: flex-end;
+}
+
+.mica-ask__input[data-variant='composer'] .mica-ask__orb {
+  align-self: flex-start;
+  margin-top: calc((var(--ask-control-size) - 32px) / 2);
+  margin-right: calc(var(--ask-space-2) - var(--ask-space-3));
+}
+
+/* Idle, the pill is one button that calls Skye: 7px round the orb and 22px after Connect. */
+.mica-ask__input[data-variant='idle'] {
+  min-height: 0;
+  padding: 0;
+}
+
+/*
+ * Idle, the pill's stroke is on the surface around Connect, so it follows
+ * Connect's state. At rest it is halfway between the surface's subtle stroke
+ * and a Fluent button's; hovered and pressed, it firms up as a Fluent
+ * button's does. Its fill stays the bar's clear glass.
+ */
+.mica-ask__surface:has(> .mica-ask__input[data-variant='idle']) {
+  border-color: color-mix(in srgb, var(--colorNeutralStroke1) 50%, var(--colorNeutralStroke2));
+}
+
+.mica-ask__surface:has(> .mica-ask__input[data-variant='idle'] .mica-ask__connect:hover) {
+  border-color: var(--colorNeutralStroke1Hover);
+}
+
+.mica-ask__surface:has(> .mica-ask__input[data-variant='idle'] .mica-ask__connect:active) {
+  border-color: var(--colorNeutralStroke1Pressed);
+}
+
+.mica-ask__connect {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--ask-space-2);
+  margin: 0;
+  padding: var(--ask-pill-inset) 22px var(--ask-pill-inset) var(--ask-pill-inset);
+  border: 0;
+  border-radius: var(--ask-radius-pill);
+  background: transparent;
+  color: var(--colorNeutralForeground3);
+  font: var(--ask-type-body);
+  cursor: var(--cursor-pointer, pointer);
+  transition: color var(--ask-motion-fast) var(--ask-ease);
+}
+
+.mica-ask__connect:hover {
+  color: var(--colorNeutralForeground3Hover);
+}
+
+.mica-ask__connect:active {
+  color: var(--colorNeutralForeground3Pressed);
+}
+
+/*
+ * While Skye's cursor is out, the orb's place (now its recall button) sits
+ * just before Connect rather than inside it, in the same spot: 7px round
+ * it, as round the orb, so the pill keeps its size.
+ */
+.mica-ask__input[data-variant='idle'] > .mica-ask__orb {
+  margin: var(--ask-pill-inset) 0 var(--ask-pill-inset) var(--ask-pill-inset);
+}
+
+.mica-ask__input[data-variant='idle'] > .mica-ask__orb + .mica-ask__connect {
+  padding-left: var(--ask-space-2);
+}
+
+/*
+ * The buttons at the end of the input: 8px apart, each with a faint outline
+ * that firms up on hover. Fluent's buttons and VelmAI's alike, so the row
+ * reads as one set.
+ */
+.mica-ask__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: var(--ask-space-2);
+}
+
+.mica-ask__input .mica-ask__actions :is(.ask-button, .fui-Button) {
+  border: 1px solid color-mix(in srgb, var(--ask-text) 10%, transparent);
+}
+
+.mica-ask__input .mica-ask__actions :is(.ask-button, .fui-Button):hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--ask-text) 24%, transparent);
+}
+
+.mica-ask__connect:focus-visible {
+  outline: var(--ask-focus-ring);
+  outline-offset: -2px;
+}
+
+/* Body 1 Strong, in Connect's colour. */
+.mica-ask__connect-label {
+  font: var(--fontWeightSemibold) var(--fontSizeBase300) / var(--lineHeightBase300) var(--ask-font);
+  white-space: nowrap;
+}
+
+.mica-ask__orb {
+  display: inline-flex;
+  flex-shrink: 0;
+  transition:
+    opacity var(--ask-motion-normal) var(--ask-ease),
+    filter var(--ask-motion-normal) var(--ask-ease);
+}
+
+/*
+ * Thinking dots: Luma's step spinner (StepStatusIcon) at its own 20px,
+ * centred in the orb's 32px box, closing into a check when Skye finishes. The
+ * box is fixed and lays the icon out as a flex item, so the spinner (a block)
+ * and the check (an inline icon) sit in the same place. The icon draws in
+ * this colour, and its spread overflows its 20px into the box. It holds still
+ * under reduced motion by itself.
+ */
+.mica-ask__thinking-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--colorNeutralForeground1);
+}
+
+/* Coral's cycling thinking words, in the pill's text or the empty draft's place. */
+.mica-ask__thinking-text {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ask-muted);
+  font: var(--ask-type-body);
+  white-space: nowrap;
+}
+
+/* The orb's thinking dots replace Coral's spinner. */
+.mica-ask__thinking-text .fui-Spinner {
+  display: none;
+}
+
+/*
+ * In the pill, a fixed width that fits the longest word, so the pill, which
+ * hugs its contents, doesn't grow and shrink as each letter types out. In the
+ * monospace face Coral uses, so 1ch is one letter.
+ */
+.mica-ask__connect .mica-ask__thinking-text {
+  flex: none;
+  width: 14ch;
+  font-family: var(--fontFamilyMonospace);
+}
+
+/* Over the empty draft, on its first line, like a placeholder. */
+.mica-ask__field > .mica-ask__thinking-text {
+  position: absolute;
+  inset: 0;
+  align-items: flex-start;
+  padding: calc((var(--ask-control-size) - var(--lineHeightBase300)) / 2) 0;
+  pointer-events: none;
+}
+
+/*
+ * While Skye's cursor is out in the app, the orb shrinks away beneath the dot
+ * it became (see agent-cursor), and grows back as the dot returns into it.
+ */
+.mica-ask__orb > * {
+  transition:
+    transform 320ms var(--ask-ease),
+    opacity 240ms var(--ask-ease);
+}
+
+.mica-ask__orb[data-agent-away] > * {
+  transform: scale(0.4);
+  opacity: 0;
+}
+
+/*
+ * The recall button fills the orb's place once the cursor has left it,
+ * appearing as the launch finishes (697ms, see cursorMotion's LAUNCH_MS).
+ */
+.mica-ask__orb[data-agent-away] > .mica-ask__recall {
+  transform: none;
+  opacity: 1;
+  animation: mica-ask-recall-in 200ms var(--ask-ease) 697ms both;
+}
+
+@keyframes mica-ask-recall-in {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mica-ask__orb[data-agent-away] > .mica-ask__recall {
+    animation: none;
+  }
+}
+
+/* The thinking dots hand over to the cursor's copy of them at once, so they never show twice. */
+.mica-ask__orb[data-agent-away] > [data-agent-spinner] {
+  transition: none;
+}
+
+/* No service: the orb goes grey and faint rather than turning red. */
+.mica-ask__orb[data-status='disconnected'] {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+.mica-ask__field {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mica-ask__draft {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--ask-control-size);
+  max-height: 120px;
+  margin: 0;
+  padding: calc((var(--ask-control-size) - var(--lineHeightBase300)) / 2) 0;
+  resize: none;
+  border: 0;
+  border-radius: var(--ask-radius-control);
+  background: transparent;
+  color: var(--ask-text);
+  font: var(--ask-type-body);
+  cursor: var(--cursor-text, text);
+}
+
+/* The draft is the only text field in the composer, and its caret marks focus; a ring would box the whole row. */
+.mica-ask__draft:focus-visible {
+  outline: none;
+}
+
+.mica-ask__draft::placeholder {
+  color: var(--ask-muted);
+  opacity: 1;
+}
+
+.mica-ask__input .ask-button.mica-ask__send {
+  background: var(--ask-text);
+  color: var(--colorNeutralBackground1);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.mica-ask__input .ask-button.mica-ask__send:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--ask-text) 85%, var(--ask-accent-strong));
+}
+
+/* Recall Skye's cursor: inverse, like Send, and the orb's size, in its place. */
+.mica-ask__input .ask-button.mica-ask__recall {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+  background: var(--ask-text);
+  color: var(--colorNeutralBackground1);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.mica-ask__input .ask-button.mica-ask__recall:hover {
+  background: color-mix(in srgb, var(--ask-text) 85%, var(--ask-accent-strong));
+}
+
+/* Its bundled icon: regular at rest, filled on hover, as on Fluent's buttons. */
+.mica-ask__recall .fui-Icon-filled,
+.mica-ask__recall:hover .fui-Icon-regular {
+  display: none;
+}
+
+.mica-ask__recall:hover .fui-Icon-filled {
+  display: block;
+}
+
+/* Voice visualizer: mirrored bars around the center line, faded toward both ends. */
+
+.ask-waveform {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ask-bar-gap, 3px);
+  min-width: 0;
+  height: 32px;
+  overflow: hidden;
+  color: var(--ask-text);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+}
+
+.ask-waveform__bar {
+  flex: 0 0 var(--ask-bar-width, 2.5px);
+  height: calc(4px + var(--ask-bar-level, 0) * 28px);
+  border-radius: var(--ask-radius-pill);
+  background: currentColor;
+  transition: height 90ms linear;
+}
+
+/* Without levels the bars breathe in a travelling wave, so a live call never looks frozen. */
+.ask-waveform[data-live='false'] .ask-waveform__bar {
+  height: 4px;
+  animation: ask-breathe 1.4s ease-in-out infinite;
+  animation-delay: calc(var(--ask-bar-index, 0) * -70ms);
+}
+
+@keyframes ask-breathe {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(2.5);
+  }
+}
+
+.mica-ask__visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Button: VelmAI's custom control. */
+
+.ask-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ask-space-2);
+  flex-shrink: 0;
+  min-width: var(--ask-control-size);
+  height: var(--ask-control-size);
+  margin: 0;
+  padding: 0 var(--ask-space-3);
+  border: 1px solid transparent;
+  border-radius: var(--ask-radius-control);
+  background: var(--ask-glass-control);
+  color: var(--ask-text);
+  font: var(--ask-type-body);
+  letter-spacing: 0;
+  white-space: nowrap;
+  cursor: var(--cursor-pointer, pointer);
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color var(--ask-motion-fast) var(--ask-ease),
+    border-color var(--ask-motion-fast) var(--ask-ease),
+    color var(--ask-motion-fast) var(--ask-ease);
+}
+
+.ask-button svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.ask-button[data-size='small'] {
+  gap: var(--ask-space-1);
+  min-width: var(--ask-control-size-sm);
+  height: var(--ask-control-size-sm);
+  padding: 0 var(--ask-space-2);
+  font: var(--ask-type-caption);
+}
+
+.ask-button[data-size='small'] svg {
+  width: 16px;
+  height: 16px;
+}
+
+.ask-button[data-shape='circular'] {
+  border-radius: var(--ask-radius-pill);
+}
+
+.ask-button[data-icon-only='true'] {
+  width: var(--ask-control-size);
+  aspect-ratio: 1;
+  padding: 0;
+}
+
+.ask-button[data-size='small'][data-icon-only='true'] {
+  width: var(--ask-control-size-sm);
+}
+
+.ask-button__text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ask-button:hover:not(:disabled) {
+  background: var(--ask-glass-control-hover);
+}
+
+.ask-button[data-appearance='primary'] {
+  border-color: transparent;
+  background: var(--ask-accent-strong);
+  color: var(--ask-on-accent);
+}
+
+.ask-button[data-appearance='primary']:hover:not(:disabled) {
+  background: var(--ask-accent-strong-hover);
+}
+
+.ask-button[data-appearance='transparent'] {
+  border-color: transparent;
+  background: transparent;
+  color: var(--ask-muted);
+}
+
+.ask-button[data-appearance='transparent']:hover:not(:disabled) {
+  background: transparent;
+  color: var(--ask-text);
+}
+
+.ask-button[aria-pressed='true'],
+.ask-button[aria-expanded='true'] {
+  border-color: var(--ask-selected-border);
+  background: var(--ask-selected-bg);
+  color: var(--ask-accent);
+}
+
+.ask-button:focus-visible {
+  outline: var(--ask-focus-ring);
+  outline-offset: 2px;
+}
+
+.ask-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mica-ask__surface,
+  .mica-ask__connect,
+  .ask-waveform__bar,
+  .ask-button {
+    transition: none;
+  }
+
+  .mica-ask__surface > *,
+  .mica-ask__float,
+  .mica-ask__float::before,
+  .mica-ask__float::after,
+  .mica-ask__float > * {
+    transition: none;
+    animation: none;
+  }
+
+  .ask-waveform[data-live='false'] .ask-waveform__bar {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .mica-ask__surface,
+  .mica-ask__float,
+  .ask-button {
+    border: 1px solid CanvasText;
+  }
+
+  .ask-waveform__bar {
+    background: CanvasText;
+  }
+}
+
+/* Compact (Skye's, while she talks about what it shows): its content sets its
+   height and scrolls itself, so the body does not scroll as well. */
+.mica-ask__float[data-compact] .mica-ask__float-body {
+  overflow: hidden;
+}

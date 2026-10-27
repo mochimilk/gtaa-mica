@@ -72,7 +72,7 @@ Windows testing. The browser production output remains `dist/`.
 
 `electron/main.mjs` owns only the window, lifecycle and restricted local asset
 protocol (`mica://app`). The packaged app loads `dist/` without a web server;
-root-relative public assets, including the Pearson logo, resolve on that origin.
+root-relative public assets, including the Norvara Intl Airport logo, resolve on that origin.
 The renderer has Node integration disabled, context isolation and sandboxing
 enabled, denied native permission requests, and restricted navigation/popups.
 No preload or IPC is needed for this UI. Packaged content has a CSP; inline

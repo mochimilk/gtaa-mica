@@ -1,20 +1,17 @@
 // App-owned Views + Filters model and matching predicates over the synthetic
 // demo data. Only supported fixture fields are used (carrier, stand area,
-// aircraft type, explicit flight/tow endpoints, open synthetic alerts);
-// nothing here invents status, conflicts or a live clock.
+// aircraft type, explicit flight/tow endpoints, open synthetic alerts, which
+// include the delay conflicts drawn on the chart; see ./boardAlerts); nothing here
+// invents status or a live clock.
 //
 // Semantics:
 // - One view at a time (radio). "all" applies no view restriction.
 // - Filters: OR within a dimension, AND across dimensions.
 // - An empty dimension means "no restriction" (all values pass).
 import { DEMO_DATA } from "../stand-timeline-demo/demoData";
-import {
-  OPS_ALERTS,
-  OPS_FLIGHTS,
-  OPS_FLIGHTS_BY_ID,
-  type OpsAlert,
-  type OpsFlight,
-} from "./operationsData";
+import { offBoardStay } from "./allocation";
+import { currentAlerts, type OpsAlert } from "./boardAlerts";
+import { OPS_FLIGHTS, OPS_FLIGHTS_BY_ID, type OpsFlight } from "./operationsData";
 
 export type ViewKey = "all" | "attention" | "arrivals" | "departures" | "tows";
 
@@ -80,7 +77,7 @@ const passes = (set: string[], value: string) => set.length === 0 || set.include
 function openAlertScope(acknowledged: ReadonlySet<string>) {
   const flights = new Set<string>();
   const visits = new Set<string>();
-  for (const a of OPS_ALERTS) {
+  for (const a of currentAlerts()) {
     if (acknowledged.has(a.id)) continue;
     flights.add(a.flightId);
     const visit = OPS_FLIGHTS_BY_ID.get(a.flightId)?.visitId;
@@ -107,12 +104,15 @@ export function makeMatcher(
   const scope = openAlertScope(acknowledged);
   const occById = new Map(DEMO_DATA.occupancies.map((o) => [o.id, o]));
 
+  // A stay on a stand, or one waiting in the No stand lane (its area "Unassigned").
   const occupancy = (id: string) => {
     if (!active) return true;
-    const o = occById.get(id);
+    const waiting = offBoardStay(id);
+    const o = occById.get(id) ?? waiting;
     const turn = o?.visitId ? DEMO_DATA.turnsById.get(o.visitId) : undefined;
     const ep = DEMO_DATA.endpoints.get(id);
     if (!o || !turn || !ep) return false;
+    const area = waiting ? UNASSIGNED_AREA : (areaByStand.get(o.rowId) ?? "");
     const inView =
       view === "all" ||
       (view === "attention" && scope.visits.has(turn.turnId)) ||
@@ -122,7 +122,7 @@ export function makeMatcher(
     return (
       inView &&
       passes(filters.carrier, turn.carrier) &&
-      passes(filters.area, areaByStand.get(o.rowId) ?? "") &&
+      passes(filters.area, area) &&
       passes(filters.type, turn.aircraftType)
     );
   };

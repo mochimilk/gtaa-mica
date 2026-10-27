@@ -10,6 +10,12 @@ import {
 
 export const DEMO_DATA = adaptSyntheticDay(SYNTHETIC_DATE, SYNTHETIC_STANDS, SYNTHETIC_TURNS);
 
+// DEMO_DATA is the board's shared, mutable state (stand changes rewrite it in
+// place). A hot update would hand some importers a fresh copy while others
+// keep the old one, and Skye's cursors and the chart would then work on
+// different boards, so a change here reloads the page instead.
+if (import.meta.hot) import.meta.hot.accept(() => location.reload());
+
 export const DEMO_DOMAIN = [
   utcAt(SYNTHETIC_DATE, SYNTHETIC_WINDOW.from),
   utcAt(SYNTHETIC_DATE, SYNTHETIC_WINDOW.to),
