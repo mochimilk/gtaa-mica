@@ -64,6 +64,38 @@ test('current Contoso configuration validates without warnings', () => {
   assert.deepEqual(validateAirport(loadAirport()), { errors: [], warnings: [] });
 });
 
+test('optional leg aircraft groups inherit base permissions, intersect them and reject unknown references', () => {
+  const data = fixture();
+  const target = occupancy('target', 'A');
+  assert.deepEqual(run(data, [target]), []);
+  data.stands.stands[0]['arrival-aircraft-groups'] = [];
+  assert.deepEqual(run(data, [target]).map(f => f.code), ['arrival-aircraft-not-allowed']);
+  assert.deepEqual(run(data, [{ ...target, arrival: undefined }]), []);
+  data.stands.stands[0]['arrival-aircraft-groups'] = ['small'];
+  data.stands.stands[0]['departure-aircraft-groups'] = ['large'];
+  assert.deepEqual(run(data, [target]).map(f => f.code), ['departure-aircraft-not-allowed']);
+  data.stands.stands[0]['aircraft-groups'] = ['large'];
+  assert.ok(run(data, [target]).some(f => f.code === 'aircraft-not-allowed'));
+  data.stands.stands[0]['arrival-aircraft-groups'] = ['unknown'];
+  assert.ok(validateAirport(data).errors.some(error => error.includes('unknown')));
+});
+
+test('maximum code restrictions cover smaller letters and fail closed for absent or invalid metadata', () => {
+  const data = fixture();
+  data.stands.stands[0]['restriction-conditions'] = [restriction({ 'maximum-aircraft-size-code': 'C' })];
+  const items = [occupancy('target', 'A'), occupancy('neighbor', 'B')];
+  for (const code of ['A', 'B', 'C']) {
+    data.aircraft.aircraft[0]['ICAO-code'] = code;
+    assert.deepEqual(run(data, items), []);
+  }
+  for (const code of ['D', 'E', 'F', undefined, 'unknown']) {
+    data.aircraft.aircraft[0]['ICAO-code'] = code;
+    assert.deepEqual(targetFindings(run(data, items))[0].denied, [code && /^[D-F]$/.test(code) ? 'aircraft-size' : 'aircraft-size-unverified']);
+  }
+  data.stands.stands[0]['restriction-conditions'][0].allow['maximum-aircraft-size-code'] = 'G';
+  assert.ok(validateAirport(data).errors.length);
+});
+
 test('multiple allowed airline groups form a union without exclusion lists', () => {
   const data = fixture();
   for (const airline of ['airline:ACA', 'airline:UAL', 'airline:AAL']) {

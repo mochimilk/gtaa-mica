@@ -35,6 +35,12 @@
       "name": "Domestic-International",
       "description": "Description for Domestic-International sector",
       "sectors": ["domestic", "international"]
+    },
+    {
+      "id": "all-general",
+      "name": "All-General",
+      "description": "Description for All-General sector",
+      "sectors": ["domestic", "international", "transborder"]
     }
   ]
 }

@@ -1,0 +1,66 @@
+{
+  "schema_version": "1.0.0",
+  "id": "gtaa",
+  "name": "Toronto Pearson International Airport",
+  "fictional": false,
+  "iata_code": "YYZ",
+  "icao_code": "CYYZ",
+  "country": "Canada",
+  "time_zone": "America/Toronto",
+  "description": "Source-backed GTAA draft for Terminal 1, Terminal 3 and the Infield Concourse. Not operationally approved.",
+  "spatial_reference": {
+    "exchange_crs": "OGC:CRS84",
+    "coordinate_order": [
+      "longitude",
+      "latitude"
+    ],
+    "coordinate_status": "approximate-label-anchors-with-unlocated-stands",
+    "reference_coordinates": [
+      -79.622388,
+      43.682157
+    ],
+    "reference_source": "User-confirmed red airport pin in alignment overview before cropping, not the cropped PDF page or embedded screenshot centre.",
+    "source_diagram_coordinates": "PDF points, native page origin bottom-left and y increasing upward; label positions only, not stand centres.",
+    "georeferencing_status": "approximate-user-aligned-bing-overlay",
+    "vertical_accuracy": "unknown",
+    "georeferencing_file": "georeferencing.json",
+    "horizontal_accuracy_metres": null,
+    "unlocated_placeholder_coordinates": [
+      -79.628365,
+      43.67984
+    ]
+  },
+  "datasets": {
+    "operating_policy": "operating-policy.json",
+    "traffic_profile": "demand/traffic-profile.json",
+    "buildings": "infrastructure/buildings.json",
+    "stands": "infrastructure/stands.json",
+    "gates": "infrastructure/gates.json",
+    "airfield": "infrastructure/airfield.json",
+    "spaces": "infrastructure/spaces.geojson",
+    "zones": "infrastructure/zones.geojson",
+    "pedestrian_nodes": "routing/pedestrian-nodes.geojson",
+    "pedestrian_edges": "routing/pedestrian-edges.geojson",
+    "taxi_nodes": "routing/taxi-nodes.geojson",
+    "source_evidence": "source-evidence.json",
+    "data_gaps": "data-gaps.json",
+    "georeferencing": "georeferencing.json",
+    "aircraft": "aircraft.json",
+    "aircraft_groups": "aircraft-groups.json",
+    "asm_rules": "asm-rules.json"
+  },
+  "planning_ready": false,
+  "routing_ready": false,
+  "assumptions": [
+    "166 stands and 147 gates have approximate georeferenced map-label coordinates for visualization only, not aircraft parking points or gate doors. T1 193 and IFC 528A retain explicit airport-reference placeholders. Absolute horizontal accuracy is unverified; do not use any of these positions for routing, distance, capacity or clearance calculations.",
+    "All stands are geometry-only stubs. Even translated closure headings do not make a stand assignable.",
+    "Exterior stand identifiers and interior passenger gates are different resources. Map label proximity suggests associations for review; shared gates do not establish gate capacities.",
+    "Contact values, arrival/departure sector groups, airline authorizations and explicit stand availability are user-configured. Passenger gate associations and unverified passenger levels still require review.",
+    "ASM aircraft permissions use a GTAA-specific exact-variant catalog with user-added IATA codes. IATA codes do not merge distinct ASM variants.",
+    "The user approved copying Contoso's synthetic demo handling windows, 12-minute default tow duration and hourly traffic weights. These are test assumptions, not verified GTAA operating figures; traffic weights use America/Toronto local time and do not specify total flight volume.",
+    "ASM exact aircraft variants and per-leg permissions are translated separately from manual stopline, VDGS, bridge, GPU, ramp and spotter requirements. An assignment does not establish that those procedures are satisfied.",
+    "Stand-level and aircraft-conditioned closures and supported neighbor restrictions are encoded with source references. Ambiguous source aircraft tokens and B737-500-or-smaller ordering remain explicit review requirements in asm-rules.json.",
+    "Maps and ASM documents have different dates. Map-only and ASM-only stands remain explicit reconciliation items; absence does not prove a stand is open or closed.",
+    "Empty infrastructure and routing collections mean not yet modelled, not that those facilities do not exist. Revisions and general notes are not current stand permissions."
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "schema_version": "1.0.0",
+  "airport_id": "gtaa",
+  "description": "Unmodelled airfield stub. The supplied terminal diagrams do not establish complete runway or taxiway geometry.",
+  "runways": [],
+  "taxiways": []
+}

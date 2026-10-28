@@ -36,6 +36,14 @@ npm run preview
 
 ## Airport configuration
 
+The [GTAA airport draft](docs/gtaa-airport.md) covers Terminal 1, Terminal 3 and
+the Infield Concourse using the supplied maps and ASM documents. It includes
+source evidence and explicit data gaps, not an assignable airport model.
+GTAA-local exact aircraft catalogs, service-leg permissions and supported ASM
+neighbor rules are included; procedural requirements remain manual review items.
+User-approved synthetic handling, tow and traffic defaults are configured
+separately from verified airport operating figures.
+
 See [Stand configuration and occupancy-dependent rules](docs/stand-rules.md)
 for the airport data contract, closure/restriction examples, Contoso remote-stand
 use cases, and the distinction between configuration validation and solver support.

@@ -50,6 +50,11 @@
       "minProperties": 1,
       "properties": {
         "aircraft-groups": { "$ref": "#/definitions/ids" },
+        "maximum-aircraft-size-code": {
+          "type": "string",
+          "enum": ["A", "B", "C", "D", "E", "F"],
+          "description": "Maximum ICAO aircraft code letter on the affected stand. Missing or invalid aircraft code metadata fails this restriction rather than granting compatibility."
+        },
         "arrival-sector-groups": { "$ref": "#/definitions/ids" },
         "departure-sector-groups": { "$ref": "#/definitions/ids" }
       }
@@ -92,7 +97,10 @@
         "description": { "type": "string" },
         "associated_building_id": { "$ref": "#/definitions/id" },
         "pier": { "$ref": "#/definitions/id" },
-        "contact": { "type": "boolean" },
+        "contact": {
+          "type": ["boolean", "null"],
+          "description": "Contact versus non-contact. Null records an unverified classification on geometry-only stubs; ready stands require a boolean."
+        },
         "coordinates": { "$ref": "#/definitions/coordinates" },
         "gate_ids": { "$ref": "#/definitions/ids" },
         "arrival-sector-group": { "$ref": "#/definitions/id" },
@@ -103,6 +111,14 @@
           "description": "Allowed airline groups, combined as a union. Omitted or empty means no authorized airlines and closes this stand to assignment."
         },
         "aircraft-groups": { "$ref": "#/definitions/ids" },
+        "arrival-aircraft-groups": {
+          "$ref": "#/definitions/ids",
+          "description": "Optional aircraft subset for an arrival leg. Omitted inherits base compatibility; empty permits no arrivals. Does not authorize a sector."
+        },
+        "departure-aircraft-groups": {
+          "$ref": "#/definitions/ids",
+          "description": "Optional aircraft subset for a departure leg. Omitted inherits base compatibility; empty permits no departures. Does not authorize a sector."
+        },
         "close-conditions": {
           "type": "array",
           "items": { "$ref": "#/definitions/closure" }
@@ -121,6 +137,9 @@
             "required": ["configuration_status"]
           },
           "then": {
+            "properties": {
+              "contact": { "type": "boolean" }
+            },
             "required": [
               "gate_ids", "arrival-sector-group", "departure-sector-group",
               "closed", "aircraft-groups", "close-conditions", "restriction-conditions"

@@ -29,7 +29,7 @@ const shapes = {
       time_zone: { type: 'string' },
       datasets: {
         type: 'object', required: ['stands', 'gates', 'buildings'],
-        properties: { stands: id, gates: id, buildings: id, traffic_profile: id, operating_policy: id },
+        properties: { stands: id, gates: id, buildings: id, traffic_profile: id, operating_policy: id, aircraft: id, aircraft_groups: id },
       },
     },
   }),
@@ -65,7 +65,8 @@ export function loadAirport(manifestPath = resolve(root, 'data', 'airports', 'co
   const shared = name => readJson(resolve(root, 'data', `${name}.json`));
   return {
     airport, stands: local('stands'), gates: local('gates'), buildings: local('buildings'),
-    aircraft: shared('aircraft'), aircraftGroups: shared('aircraft-groups'),
+    aircraft: airport.datasets.aircraft === undefined ? shared('aircraft') : local('aircraft'),
+    aircraftGroups: airport.datasets.aircraft_groups === undefined ? shared('aircraft-groups') : local('aircraft_groups'),
     sectors: shared('sectors'), sectorGroups: shared('sector-groups'),
     airlines: shared('airlines'), airlineGroups: shared('airline-groups'),
     trafficProfile: airport.datasets.traffic_profile === undefined ? undefined : local('traffic_profile'),
@@ -197,6 +198,9 @@ export function validateAirport(data) {
       if (gatesToStands.has(gate)) gatesToStands.get(gate).push(stand.id);
     }
     checkDimensions(stand, path);
+    for (const leg of ['arrival', 'departure']) {
+      for (const group of stand[`${leg}-aircraft-groups`] ?? []) reference(group, aircraftGroups, `${path}/${leg}-aircraft-groups`);
+    }
     for (const group of stand['airline-groups'] ?? []) reference(group, airlineGroups, `${path}/airline-groups`);
     for (const kind of ['close-conditions', 'restriction-conditions']) {
       for (const [position, condition] of (stand[kind] ?? []).entries()) {
@@ -311,6 +315,8 @@ export function evaluatePlan(model, occupancies) {
     if (!belongs(occupancy.aircraftId, stand['aircraft-groups'], model.aircraftGroups)) report('aircraft-not-allowed');
     if (occupancy.operatingAirlineIds?.some(id => !model.allowedAirlines.get(stand.id).has(id))) report('occupancy-airline-not-allowed');
     for (const leg of ['arrival', 'departure']) {
+      if (occupancy[leg] && stand[`${leg}-aircraft-groups`] !== undefined &&
+          !belongs(occupancy.aircraftId, stand[`${leg}-aircraft-groups`], model.aircraftGroups)) report(`${leg}-aircraft-not-allowed`);
       if (occupancy[leg] && !model.sectorGroups.get(stand[`${leg}-sector-group`]).has(occupancy[leg].sectorId)) report(`${leg}-sector-not-allowed`);
       if (occupancy[leg] && !model.allowedAirlines.get(stand.id).has(occupancy[leg].operatingAirlineId)) report(`${leg}-airline-not-allowed`);
     }
@@ -331,6 +337,11 @@ export function evaluatePlan(model, occupancies) {
       const allow = rule.condition.allow;
       const denied = [];
       if (allow['aircraft-groups'] !== undefined && !belongs(occupancy.aircraftId, allow['aircraft-groups'], model.aircraftGroups)) denied.push('aircraft');
+      if (allow['maximum-aircraft-size-code'] !== undefined) {
+        const code = model.aircraftSizeCodes.get(occupancy.aircraftId);
+        if (typeof code !== 'string' || !/^[A-F]$/.test(code)) denied.push('aircraft-size-unverified');
+        else if (code > allow['maximum-aircraft-size-code']) denied.push('aircraft-size');
+      }
       for (const leg of ['arrival', 'departure']) {
         const groups = allow[`${leg}-sector-groups`];
         if (occupancy[leg] && groups !== undefined && !belongs(occupancy[leg].sectorId, groups, model.sectorGroups)) denied.push(leg);

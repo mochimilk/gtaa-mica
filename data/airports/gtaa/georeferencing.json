@@ -1,0 +1,367 @@
+{
+  "schema_version": "1.0.0",
+  "airport_id": "gtaa",
+  "status": "approximate-visualization-only",
+  "coordinate_order": [
+    "longitude",
+    "latitude"
+  ],
+  "image": {
+    "source_id": "alignment-ifc-t3",
+    "embedded_image_index": 0,
+    "width_pixels": 3472,
+    "height_pixels": 1798,
+    "north_up": true,
+    "pixel_origin": "top-left",
+    "overlay_pdf_to_image": [
+      1,
+      0,
+      0,
+      -1,
+      1610.5158691,
+      1311.3446045
+    ]
+  },
+  "overview": {
+    "source_id": "alignment-overview",
+    "width_pixels": 1213,
+    "height_pixels": 768,
+    "background_bounds_pixels": [
+      38,
+      83,
+      1114,
+      640
+    ],
+    "overview_to_image": [
+      3.2267657992565058,
+      0,
+      0,
+      3.228007181328546,
+      -122.61710037174721,
+      -267.9245960502693
+    ]
+  },
+  "anchor": {
+    "coordinates": [
+      -79.622388,
+      43.682157
+    ],
+    "overview_pixel": [
+      400,
+      458
+    ],
+    "image_pixel": [
+      1168.089219330855,
+      1210.5026929982046
+    ],
+    "selection": "Tip of red airport pin in user overview, not the icon centre, embedded image centre or PDF page centre.",
+    "authority": "User-confirmed original map centre before cropping; absolute geographic accuracy not independently surveyed."
+  },
+  "scale": {
+    "method": "Visible Bing scale-bar stroke widths in embedded screenshot physical pixels.",
+    "metric": {
+      "metres": 100,
+      "pixel_width": 114,
+      "pixel_edges": [
+        3331.5,
+        3445.5
+      ],
+      "image_y": 1770
+    },
+    "imperial_check": {
+      "feet": 300,
+      "metres": 91.44,
+      "pixel_width": 103,
+      "pixel_edges": [
+        3200.5,
+        3303.5
+      ],
+      "image_y": 1770,
+      "ground_metres_per_pixel": 0.8877669902912622
+    },
+    "ground_metres_per_pixel": 0.8771929824561403,
+    "user_zoom": 16.4,
+    "zoom_usage": "Cross-check only: physical image pixels are not necessarily CSS pixels. No assumed device pixel ratio is applied.",
+    "cross_check_relative_difference": 0.012054368932038928
+  },
+  "projection": {
+    "method": "Spherical Web Mercator offsets about anchor",
+    "radius_metres": 6378137,
+    "formula": "[a,b,c,d,e,f] maps PDF [x,y] to image [a*x+c*y+e,b*x+d*y+f]. Mercator metres per image pixel = ground_metres_per_pixel / cos(anchor latitude). Image y increases southward. Invert spherical Mercator and round longitude/latitude to six decimals."
+  },
+  "accuracy": {
+    "absolute_horizontal_metres": null,
+    "vertical": "unknown",
+    "interpretation": "Frame checks measure drawing registration only, not real-world accuracy. Label displacement, user overlay alignment, pin selection, scale-bar quantization and map accuracy remain unmeasured. No 20-50 m guarantee.",
+    "overview_selection_resolution_ground_metres_per_pixel": 2.8304963151372857
+  },
+  "representative_position": "Arithmetic mean of all native PDF label anchors for an entity; not a parking stop point, aircraft centroid or gate door.",
+  "unlocated_stand_ids": [
+    "ifc:stand:528A",
+    "t1:stand:193"
+  ],
+  "unlocated_placeholder_coordinates": [
+    -79.628365,
+    43.67984
+  ],
+  "transforms": {
+    "t1": {
+      "source_id": "map-t1",
+      "alignment_source_id": "alignment-t1",
+      "alignment_space": "overlay PDF points, bottom-left origin",
+      "pdf_to_image": [
+        1.1387711893250183,
+        0,
+        -3.0963378712972603e-7,
+        -1.138772094369719,
+        1772.7308440218762,
+        1941.5163971722816
+      ],
+      "fit_controls": [
+        {
+          "name": "Left border bottom",
+          "pdf_point": [
+            19.5,
+            25.3999755859375
+          ],
+          "alignment_point": [
+            184.42100524902344,
+            -601.2470092773438
+          ]
+        },
+        {
+          "name": "Top border lower-left",
+          "pdf_point": [
+            178.7,
+            1207.1
+          ],
+          "alignment_point": [
+            365.7130126953125,
+            744.4400024414062
+          ]
+        },
+        {
+          "name": "Top border lower-right",
+          "pdf_point": [
+            1703.000048828125,
+            1207.1
+          ],
+          "alignment_point": [
+            2101.5419921875,
+            744.4400024414062
+          ]
+        }
+      ],
+      "registration_checks": [
+        {
+          "name": "Left border top",
+          "pdf_point": [
+            19.5,
+            1170.3
+          ],
+          "alignment_point": [
+            184.42100524902344,
+            702.5330200195312
+          ],
+          "image_pixel": [
+            1794.9368743490234,
+            608.8115844804688
+          ],
+          "residual_image_pixels": 0.0003928729643242131,
+          "residual_ground_metres": 0.0003446254073019413
+        },
+        {
+          "name": "Top border upper-left",
+          "pdf_point": [
+            178.7,
+            1215.6
+          ],
+          "alignment_point": [
+            365.7130126953125,
+            754.1199951171875
+          ],
+          "image_pixel": [
+            1976.2288817953124,
+            557.2246093828126
+          ],
+          "residual_image_pixels": 0.0004298816954681336,
+          "residual_ground_metres": 0.00037708920655099446
+        }
+      ],
+      "max_registration_residual_ground_metres": 0.00037708920655099446,
+      "method": "Native vector frame vertices matched between original and aligned PDF, including paths outside the artboard."
+    },
+    "t3": {
+      "source_id": "map-t3",
+      "alignment_source_id": "alignment-ifc-t3",
+      "alignment_space": "overlay PDF points, bottom-left origin",
+      "pdf_to_image": [
+        0.5702977321943851,
+        0.6022250243545014,
+        0.6022250853152514,
+        -0.5702975907106341,
+        940.7393336876897,
+        329.79224275198885
+      ],
+      "fit_controls": [
+        {
+          "name": "Bottom border upper-left",
+          "pdf_point": [
+            22.7153,
+            34.1521
+          ],
+          "alignment_point": [
+            -636.2548,
+            987.3495
+          ]
+        },
+        {
+          "name": "Bottom border upper-right",
+          "pdf_point": [
+            1706.1973556640626,
+            34.1521
+          ],
+          "alignment_point": [
+            323.8311985351562,
+            -26.48552197265625
+          ]
+        },
+        {
+          "name": "Top border lower-left",
+          "pdf_point": [
+            218.3204,
+            1207.3813
+          ],
+          "alignment_point": [
+            181.8464,
+            1538.641
+          ]
+        }
+      ],
+      "registration_checks": [
+        {
+          "name": "Right border bottom",
+          "pdf_point": [
+            1697.6946,
+            25.6496
+          ],
+          "alignment_point": [
+            313.8615,
+            -26.214
+          ],
+          "image_pixel": [
+            1924.3773691,
+            1337.5586045
+          ],
+          "residual_image_pixels": 0.00020130101160608038,
+          "residual_ground_metres": 0.00017657983474217578
+        },
+        {
+          "name": "Right border top",
+          "pdf_point": [
+            1697.6946,
+            1215.8836087890625
+          ],
+          "alignment_point": [
+            1030.6505014648437,
+            652.5740249023438
+          ],
+          "image_pixel": [
+            2641.1663705648434,
+            658.7705795976563
+          ],
+          "residual_image_pixels": 0.0003454530604545635,
+          "residual_ground_metres": 0.0003030290003987399
+        },
+        {
+          "name": "Left border top",
+          "pdf_point": [
+            22.7153,
+            1170.594
+          ],
+          "alignment_point": [
+            48.139,
+            1635.4596
+          ],
+          "image_pixel": [
+            1658.6548690999998,
+            -324.11499549999985
+          ],
+          "residual_image_pixels": 0.000030186946540429822,
+          "residual_ground_metres": 0.000026479777667043705
+        }
+      ],
+      "max_registration_residual_ground_metres": 0.0003030290003987399,
+      "method": "Native vector frame vertices matched between original and aligned PDF, including paths outside the artboard."
+    },
+    "ifc": {
+      "source_id": "map-ifc",
+      "alignment_source_id": "alignment-overview",
+      "alignment_space": "overview image pixels, top-left origin",
+      "pdf_to_image": [
+        0.3018803762298186,
+        -0.304872671120427,
+        -0.3022636197740909,
+        -0.3010239411303609,
+        395.8190874318664,
+        1599.0855489369073
+      ],
+      "fit_controls": [
+        {
+          "name": "Frame bottom-left",
+          "pdf_point": [
+            19.8,
+            26.9
+          ],
+          "alignment_point": [
+            160,
+            574
+          ]
+        },
+        {
+          "name": "Frame bottom-right",
+          "pdf_point": [
+            1703.3,
+            26.9
+          ],
+          "alignment_point": [
+            317.5,
+            415
+          ]
+        },
+        {
+          "name": "Frame top-right",
+          "pdf_point": [
+            1703.3,
+            1217.2
+          ],
+          "alignment_point": [
+            206,
+            304
+          ]
+        }
+      ],
+      "registration_checks": [
+        {
+          "name": "Frame top-left, extrapolated across logo gap",
+          "pdf_point": [
+            19.8,
+            1217.2
+          ],
+          "alignment_point": [
+            49,
+            462
+          ],
+          "image_pixel": [
+            35.494423791821575,
+            1223.414721723519
+          ],
+          "residual_image_pixels": 3.608744205886819,
+          "residual_ground_metres": 3.165565092883175
+        }
+      ],
+      "max_registration_residual_ground_metres": 3.165565092883175,
+      "method": "Manual frame corners from overview; IFC optional-content group is empty in cropped PDF exports."
+    }
+  }
+}

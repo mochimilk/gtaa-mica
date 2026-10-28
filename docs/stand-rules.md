@@ -23,9 +23,15 @@ catalogs, pass its manifest:
 npm run validate:airport -- data\airports\another-airport\airport.json
 ```
 
+An airport can override the shared aircraft and aircraft-group catalogs using
+manifest-relative `datasets.aircraft` and `datasets.aircraft_groups` paths.
+Omitted paths keep the shared defaults. GTAA uses this to retain exact ASM
+variants without changing Contoso.
+
 > [!IMPORTANT]
-> These commands validate authoring and exercise a reference rule evaluator.
-> The application and imported .NET solver do not yet consume these rules.
+> These commands validate authoring and exercise the JavaScript rule evaluator.
+> Local assignment uses that evaluator to filter candidates and build conflicts;
+> the imported .NET solver does not parse the stand rules directly.
 > Passing validation is not a clearance calculation, capacity guarantee, solver
 > acceptance, or operational certification.
 
@@ -35,6 +41,8 @@ npm run validate:airport -- data\airports\another-airport\airport.json
 * A gate is a passenger-processing location inside or beside a terminal.
 * `contact: true` identifies a contact stand; `false` identifies a non-contact
   stand. A remote stand can still have passenger gate references for bus service.
+  A `geometry-only` stub may use `contact: null` when that classification is
+  unverified. A `ready` stand must use a boolean.
 * Aircraft groups are authored sets of aircraft model IDs, not automatically
   interpreted ICAO classes.
 * Sector groups are authored sets of sector IDs. Arrival and departure
@@ -83,9 +91,11 @@ name of a group. Edit the group's members explicitly.
 | `coordinates`            | Stand reference point as `[longitude, latitude]`, not clearance |
 | `associated_building_id` | Optional nearby building; not containment inside a floor        |
 | `pier`                   | Optional display grouping                                      |
-| `contact`                | Contact versus remote aircraft position                        |
+| `contact`                | Contact versus remote; null only for unverified geometry stubs  |
 | `gate_ids`               | Authoritative passenger gate associations; can be empty         |
 | `aircraft-groups`        | Base allowed aircraft groups                                   |
+| `arrival-aircraft-groups` | Optional aircraft subset for an arrival leg                    |
+| `departure-aircraft-groups` | Optional aircraft subset for a departure leg                |
 | `airline-groups`         | Union of authorized airline groups; missing/empty closes stand  |
 | `arrival-sector-group`   | Base arrival permission                                        |
 | `departure-sector-group` | Base departure permission                                      |
@@ -101,6 +111,11 @@ also supply all seven operational fields from `gate_ids` through
 `restriction-conditions`. Use empty arrays deliberately rather than leaving
 ready configuration incomplete.
 
+The [GTAA source-backed draft](gtaa-airport.md) uses user-configured contact values
+and approximate map-label coordinates, with flagged airport-reference
+placeholders for two unlocated stands. Their coordinates, ASM evidence and
+partial closures do not make them eligible for assignment.
+
 `airline-groups` may be omitted, but omission is not common-use permission.
 Omitted/empty lists, or groups containing no airlines, make the stand unavailable
 for every assignment, including parking without flight legs. `closed: false`
@@ -110,6 +125,11 @@ A `geometry-only` record may contain partially authored permissions, but the
 reference evaluator refuses to allocate occupancy to it. `ready` means the
 configuration is complete enough to evaluate, not that it has been certified.
 The airport's separate `planning_ready` flag is not set automatically.
+
+Leg-specific aircraft groups intersect the base aircraft permission. Omission
+inherits base compatibility; an empty array denies that service leg. Only legs
+present on the occupancy are checked. Parking without either leg still requires
+base aircraft compatibility and airline authorization.
 
 An empty base aircraft list permits no aircraft. Base sector permissions are
 explicit group IDs, not null or wildcard defaults.
@@ -350,6 +370,7 @@ Restrictions use the same top-level trigger fields as closures. Their required
 | Allow field               | Result on the affected stand                                  |
 |---------------------------|---------------------------------------------------------------|
 | `aircraft-groups`          | Allow aircraft in the union of these groups                    |
+| `maximum-aircraft-size-code` | Limit the target's verified ICAO code letter to A-F          |
 | `arrival-sector-groups`    | Allow arrivals in the union of these groups                    |
 | `departure-sector-groups`  | Allow departures in the union of these groups                  |
 
@@ -365,6 +386,11 @@ plural arrays. This supports multiple groups and an explicit empty allowed set.
 * Compare actual aircraft/sector membership, not equality of group names.
 * Arrival/departure allow dimensions affect only legs present on the target.
 * An active closure wins over restrictions. There is no last-wins ordering.
+
+`maximum-aircraft-size-code` compares the catalog's `ICAO-code` against the stated
+maximum. Missing or invalid size metadata produces a restriction finding with
+`aircraft-size-unverified`; it never grants permission. This code-letter limit
+does not interpret relative aircraft expressions such as "B737-500 or smaller."
 
 ### Narrow aircraft compatibility
 

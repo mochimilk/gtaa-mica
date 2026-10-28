@@ -1,0 +1,171 @@
+{
+  "schema_version": "1.0.0",
+  "airport_id": "gtaa",
+  "status": "draft-not-planning-ready",
+  "blockers": [
+    {
+      "id": "sectors",
+      "scope": "all-stands",
+      "status": "user-configured",
+      "source_id": "sector-workbook",
+      "question": "Separate arrival/departure sector groups are user-configured on all stands. Review any directional or aircraft-specific exceptions before operational promotion; the original encrypted workbook was not decrypted."
+    },
+    {
+      "id": "coordinates",
+      "scope": "all-stands-and-gates",
+      "status": "approximate-visualization-complete-operational-review-pending",
+      "question": "Approximate positions come from user-aligned Bing overlays and label anchors. Locate T1 193 and IFC 528A; confirm actual parking/gate reference points and required geographic accuracy before operational use.",
+      "located_stands": 166,
+      "located_gates": 147,
+      "unlocated_stand_ids": [
+        "ifc:stand:528A",
+        "t1:stand:193"
+      ]
+    },
+    {
+      "id": "aircraft-variants",
+      "scope": "all-asm-stands",
+      "status": "source-derived-exact-variants-with-explicit-review-items",
+      "question": "Review unresolved source aircraft expressions listed in asm-rules.json. Exact W, SSW, NEO, MAX and regional types remain distinct; no ambiguous token grants compatibility.",
+      "unresolved_expression_count": 7
+    },
+    {
+      "id": "conditional-rules",
+      "scope": "all-asm-stands",
+      "status": "supported-rules-encoded-manual-procedures-and-relative-size-pending",
+      "question": "Supported aircraft-conditioned neighbor restrictions and Code C limits are encoded. Define the allowed set for B737-500 or smaller on stand 176 while 175A is occupied; confirm manual bridge, stopline, GPU, ramp and spotter requirements before operational use."
+    },
+    {
+      "id": "airlines",
+      "scope": "all-stands",
+      "status": "user-configured",
+      "question": "Stand airline authorizations are user-configured. Their presence does not automatically make a stand ready."
+    },
+    {
+      "id": "availability",
+      "scope": "all-stands",
+      "status": "user-configured-pending-operational-review",
+      "question": "Explicit open/closed values are user-configured. Confirm operational availability, alternative-position coexistence and source effective dates before promotion."
+    },
+    {
+      "id": "contact-and-gates",
+      "scope": "all-stands-and-gates",
+      "status": "contact-user-configured-gate-review-pending",
+      "question": "Contact/non-contact values are user-configured. Confirm provisional map gate associations, bus-gate arrangements and actual passenger levels. No gate capacity is inferred."
+    },
+    {
+      "id": "operating-policy",
+      "scope": "airport",
+      "status": "synthetic-demo-configured-pending-operational-confirmation",
+      "question": "User-approved Contoso demo defaults are configured: arrival/departure windows of 45 minutes each for codes A-C and 60 minutes each for D-F, plus a 12-minute default tow. Replace these assumptions with verified GTAA policies before operational use."
+    },
+    {
+      "id": "traffic-profile",
+      "scope": "airport",
+      "status": "synthetic-demo-configured-pending-observed-traffic",
+      "question": "User-approved Contoso hourly weights are configured for domestic, international and transborder traffic in Toronto local time. Supply scenario flight volumes separately; replace synthetic weights with observed GTAA traffic when available."
+    },
+    {
+      "id": "geometry-and-routing",
+      "scope": "airport",
+      "status": "pending",
+      "question": "Provide building footprints and levels, airfield geometry, passenger zones and pedestrian/taxi connectivity before enabling maps or routing."
+    },
+    {
+      "id": "aircraft-generation-metadata",
+      "scope": "gtaa-exact-aircraft-catalog",
+      "status": "pending",
+      "question": "All 112 ASM variants now have sourced ICAO size letters, with preliminary/folded and cancelled-model planning qualifications preserved. Supply scenario seat counts for synthetic generation; no generic seat/MTOW values were copied. The cancelled A350-800 is not a certified production aircraft and requires traffic-pool review.",
+      "aircraft_without_verified_size_code": [],
+      "aircraft_without_seat_counts": 112
+    }
+  ],
+  "source_reconciliation": [
+    {
+      "stand_id": "ifc:stand:528A",
+      "status": "asm-only-not-located-on-map",
+      "question": "Provide its current map location and passenger gate association, or confirm parking-only operation."
+    },
+    {
+      "stand_id": "t1:stand:101",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    },
+    {
+      "stand_id": "t1:stand:101A",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    },
+    {
+      "stand_id": "t1:stand:103A",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    },
+    {
+      "stand_id": "t1:stand:105A",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    },
+    {
+      "stand_id": "t1:stand:107A",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    },
+    {
+      "stand_id": "t1:stand:160A",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    },
+    {
+      "stand_id": "t1:stand:162A",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    },
+    {
+      "stand_id": "t1:stand:162B",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    },
+    {
+      "stand_id": "t1:stand:164",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    },
+    {
+      "stand_id": "t1:stand:193",
+      "status": "asm-only-not-located-on-map",
+      "question": "Provide its current map location and passenger gate association, or confirm parking-only operation."
+    },
+    {
+      "stand_id": "t1:stand:245B",
+      "status": "map-only-not-confirmed-by-current-asm",
+      "question": "Confirm whether this older map-only position is still in service and provide current aircraft/stand restrictions."
+    }
+  ],
+  "review_examples": [
+    {
+      "stand_id": "t1:stand:124",
+      "source_id": "asm-t1",
+      "pdf_page": 3,
+      "issue": "Some aircraft on 124 prohibit B777-300ER, B777-200LR and B747 on 120A. This is not an unconditional closure of 120A."
+    },
+    {
+      "stand_id": "t1:stand:175A",
+      "source_id": "asm-t1",
+      "pdf_page": 39,
+      "issue": "Occupancy restricts 176 to B737-500 or smaller. A size ordering must be explicitly defined, not inferred from broad group C."
+    },
+    {
+      "stand_id": "t1:stand:254",
+      "source_id": "asm-t1",
+      "pdf_page": 49,
+      "issue": "Arrivals-only rows apply to specific aircraft; do not make the entire stand arrivals-only or fabricate departure-sector compatibility."
+    },
+    {
+      "stand_id": "t3:stand:C34A",
+      "source_id": "asm-t3",
+      "pdf_page": 26,
+      "issue": "C35 is restricted to code C or smaller; A380 bridge sequencing also applies. Do not treat these as broad F-group permission."
+    }
+  ]
+}
