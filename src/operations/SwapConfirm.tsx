@@ -9,7 +9,7 @@ import { ConfirmPopover, type ConfirmPopoverTarget } from "../components/confirm
 import { formatUtcWithDay } from "../stand-timeline-demo/demoData";
 import { occupancyById, stayName } from "./allocation";
 import { useBesidePlacement } from "./linkAnchor";
-import { useOperations } from "./OperationsContext";
+import { useOpsActions, useOpsDetails } from "./OperationsContext";
 import { revealRect } from "./SelectionPopover";
 
 const useStyles = makeStyles({
@@ -30,7 +30,8 @@ const barOf = (occupancyId: string) =>
   document.querySelector(`[data-occupancy-id="${CSS.escape(occupancyId)}"]`);
 
 export function SwapConfirm() {
-  const { swapRequest, answerSwap } = useOperations();
+  const { swapRequest } = useOpsDetails();
+  const { answerSwap } = useOpsActions();
   const styles = useStyles();
   const [ready, setReady] = useState(false);
   const surfaceRef = useRef<HTMLDivElement>(null);

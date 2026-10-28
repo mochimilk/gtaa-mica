@@ -29,11 +29,6 @@
     var(--colorNeutralBackground5);
 }
 
-.ops-panel-note {
-  flex: none;
-  padding: var(--spacingVerticalXS) var(--spacingHorizontalM);
-}
-
 .ops-groups {
   display: flex;
   flex-direction: column;
@@ -210,14 +205,6 @@ div.ops-menu-popover > .ops-menu-list {
   min-height: 0;
   max-height: min(480px, calc(100dvh - 100px));
   overflow-y: auto;
-}
-
-/* Status line under the chart title while a view or filter is active. */
-.ops-filter-status {
-  margin: 0;
-  color: var(--colorNeutralForeground2);
-  font-size: var(--fontSizeBase200);
-  line-height: var(--lineHeightBase200);
 }
 
 /* Selection details popover (Fluent PopoverSurface, portalled to the body). */
@@ -455,6 +442,15 @@ div.ops-menu-popover > .ops-menu-list {
 }
 
 /*
+ * The Outputs panel (OutputsPanel.tsx, Coral's Panel.Right): its inner
+ * surface is opaque (colorNeutralBackground3), so Coral's backdrop blur under
+ * it never shows. Off, it isn't redrawn whenever what's behind it changes.
+ */
+[data-coral-surface="panel-right"] > div:first-child {
+  backdrop-filter: none;
+}
+
+/*
  * The alerts, in Ask Skye's floating window (AlertsMenu.tsx): rows inset 20px
  * like its header's title, which the window scrolls below the header.
  */
@@ -634,10 +630,6 @@ div.ops-menu-popover > .ops-menu-list {
   overflow-y: auto;
   padding: 0 var(--spacingHorizontalXS);
   font-variant-numeric: tabular-nums;
-}
-
-.ops-details-title {
-  font-weight: var(--fontWeightSemibold);
 }
 
 .ops-action-row {

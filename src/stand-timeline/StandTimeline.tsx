@@ -126,25 +126,19 @@ const WHEEL_PAGE_PX = 400;
 
 /**
  * The visible bars of each section, each laid out in its own section's
- * coordinates. A stay on a pinned row goes there; one on no row is left out.
+ * coordinates, none selected (see markSelection). A stay on a pinned row goes
+ * there; one on no row is left out.
  */
 function layoutBars(
   occupancies: readonly Occupancy[],
   visits: readonly Visit[] | undefined,
   sections: Record<TimelineSection, readonly TimelineRow[]>,
-  selectedIds: readonly string[] | undefined,
   scale: TimeScale,
   rowHeight: number,
   barInset: number,
   barEnds: StandTimelineProps["barEnds"],
 ): Record<TimelineSection, BarDatum[]> {
-  const selected = new Set(selectedIds);
   const visitsById = new Map((visits ?? []).map((v) => [v.id, v]));
-  // Across both sections, so a stay's siblings are outlined wherever they are.
-  const linkedVisits = new Set<string>();
-  for (const o of occupancies) {
-    if (o.visitId && selected.has(o.id)) linkedVisits.add(o.visitId);
-  }
   const place = new Map<string, { section: TimelineSection; index: number }>();
   sections.body.forEach((row, index) => place.set(row.id, { section: "body", index }));
   sections.pinned.forEach((row, index) => place.set(row.id, { section: "pinned", index }));
@@ -156,7 +150,6 @@ function layoutBars(
     const c = clipInterval(o.start, o.end, scale.domain);
     if (!c) continue;
     const x0 = scale.x(c.start);
-    const isSelected = selected.has(o.id);
     const ends = barEnds?.(o);
     out[at.section].push({
       occupancy: o,
@@ -173,8 +166,8 @@ function layoutBars(
         start: (!c.clippedStart && ends?.start) || "round",
         end: (!c.clippedEnd && ends?.end) || "round",
       },
-      selected: isSelected,
-      linked: !isSelected && !!o.visitId && linkedVisits.has(o.visitId),
+      selected: false,
+      linked: false,
     });
   }
   // Row-major order gives a predictable Tab order through the bars.
@@ -182,6 +175,40 @@ function layoutBars(
     bars.sort((a, b) => a.rowIndex - b.rowIndex || a.occupancy.start - b.occupancy.start);
   }
   return out;
+}
+
+/** Each laid-out bar's selected and linked copies, made once, so a bar keeps its object while its state does. */
+const selectedBars = new WeakMap<BarDatum, BarDatum>();
+const linkedBars = new WeakMap<BarDatum, BarDatum>();
+
+function flagged(bar: BarDatum, flags: WeakMap<BarDatum, BarDatum>, selected: boolean): BarDatum {
+  let copy = flags.get(bar);
+  if (!copy) flags.set(bar, (copy = { ...bar, selected, linked: !selected }));
+  return copy;
+}
+
+/**
+ * The laid-out bars with `selectedIds` marked, and their siblings (stays of
+ * the same visit, in either section) linked. A selection change only gives
+ * new objects to the bars whose state changed, so layers that draw a bar at a
+ * time (memoized on it) redraw just those.
+ */
+function markSelection(
+  laidOut: Record<TimelineSection, BarDatum[]>,
+  selectedIds: readonly string[] | undefined,
+): Record<TimelineSection, BarDatum[]> {
+  if (!selectedIds?.length) return laidOut;
+  const selected = new Set(selectedIds);
+  const linkedVisits = new Set<string>();
+  for (const bars of Object.values(laidOut)) {
+    for (const bar of bars) if (bar.occupancy.visitId && selected.has(bar.occupancy.id)) linkedVisits.add(bar.occupancy.visitId);
+  }
+  const mark = (bar: BarDatum) => {
+    if (selected.has(bar.occupancy.id)) return flagged(bar, selectedBars, true);
+    const visitId = bar.occupancy.visitId;
+    return visitId && linkedVisits.has(visitId) ? flagged(bar, linkedBars, false) : bar;
+  };
+  return { pinned: laidOut.pinned.map(mark), body: laidOut.body.map(mark) };
 }
 
 export function StandTimeline({
@@ -369,11 +396,11 @@ export function StandTimeline({
     return (t: Millis) => f.format(t);
   }, [timeZone]);
 
-  const bars = useMemo(
-    () =>
-      layoutBars(occupancies, visits, { pinned: pinnedRows, body: rows }, selectedIds, scale, rowHeight, barInset, barEnds),
-    [occupancies, visits, pinnedRows, rows, selectedIds, scale, rowHeight, barInset, barEnds],
+  const laidOut = useMemo(
+    () => layoutBars(occupancies, visits, { pinned: pinnedRows, body: rows }, scale, rowHeight, barInset, barEnds),
+    [occupancies, visits, pinnedRows, rows, scale, rowHeight, barInset, barEnds],
   );
+  const bars = useMemo(() => markSelection(laidOut, selectedIds), [laidOut, selectedIds]);
   const allBars = useMemo(() => [...bars.pinned, ...bars.body], [bars]);
 
   const emit = useCallback(

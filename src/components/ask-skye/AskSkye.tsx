@@ -18,7 +18,6 @@ import { AskButton } from "./AskButton";
 import { AskFloatSlot } from "./AskFloatingWindow";
 import { closeAskPanels, useAnyAskPanelOpen, useAskPanel } from "./askPanels";
 import { AskInput, type AskServiceStatus } from "./AskInput";
-import { LiquidGlassFilter } from "./LiquidGlassFilter";
 import { mergeSkyeNotes, skyeNotes, subscribeSkyeNotes } from "./skyeNotes";
 import { useAudioLevels } from "./useAudioLevels";
 import { mergeVoiceTurns, VOICE_MESSAGE_TYPE } from "./voiceMessages";
@@ -374,7 +373,6 @@ export function AskSkye({ agentName, actionsEnd, notices }: AskSkyeProps) {
     // Talking to Skye must not drop the selection being talked about; see
     // ViewsFiltersToolbar for the marker.
     <div className="mica-ask" {...KEEP_SELECTION_ATTR}>
-      <LiquidGlassFilter />
       <Chat.Canvas onSendMessage={onSendMessage} onStop={cancelTypedRequest}>
         <AskSurface agentName={agentName} actionsEnd={actionsEnd} notices={notices} speakNext={speakNext} />
       </Chat.Canvas>

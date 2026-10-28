@@ -44,14 +44,6 @@
   /* One of the orb's thinking dots: r 3 in StepStatusIcon's 20px box (the script scales it to the spinner's size). */
   --agent-cursor-swarm-size: 6px;
   --agent-cursor-morph: 360ms cubic-bezier(0.2, 0, 0, 1);
-  /*
-   * The colour of everything that glows while Skye's helpers work (her orb's
-   * glow and the ring round it, the helpers, the tethers and the light along
-   * them), as channels; change it here. By default it is ink, the dot's own
-   * black, white over a dark page; the View menu's Skye glow (skyeGlow.ts)
-   * picks another (below).
-   */
-  --agent-cursor-light: 27, 27, 31;
 
   position: fixed;
   inset: 0;
@@ -66,25 +58,48 @@
     --agent-cursor-ring: #1b1b1f;
     --agent-cursor-ink: #1b1b1f;
     --agent-cursor-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/*
+ * The colour of everything that glows while Skye's helpers work (her orb's
+ * glow and the ring round it, the helpers, the tethers and the light along
+ * them), as channels; change it here. By default it is ink, the dot's own
+ * black, white over a dark page; Glow in Settings (skyeGlow.ts) picks
+ * another (below). Each choice's swatch there (components/settings) shows
+ * its own, whichever is chosen.
+ */
+.agent-cursor-layer,
+.skye-glow-swatch {
+  --agent-cursor-light: 27, 27, 31;
+}
+
+@media (prefers-color-scheme: dark) {
+  .agent-cursor-layer,
+  .skye-glow-swatch {
     --agent-cursor-light: 255, 255, 255;
   }
 }
 
 /* The other Skye glows (skyeGlow.ts): Aurora, the northern lights' blue-violet; Glacier, an electric ice-blue. */
-:root[data-skye-glow="aurora"] .agent-cursor-layer {
+:root[data-skye-glow="aurora"] .agent-cursor-layer,
+.skye-glow-swatch[data-glow="aurora"] {
   --agent-cursor-light: 92, 64, 224;
 }
 
-:root[data-skye-glow="glacier"] .agent-cursor-layer {
+:root[data-skye-glow="glacier"] .agent-cursor-layer,
+.skye-glow-swatch[data-glow="glacier"] {
   --agent-cursor-light: 0, 140, 190;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root[data-skye-glow="aurora"] .agent-cursor-layer {
+  :root[data-skye-glow="aurora"] .agent-cursor-layer,
+  .skye-glow-swatch[data-glow="aurora"] {
     --agent-cursor-light: 156, 136, 255;
   }
 
-  :root[data-skye-glow="glacier"] .agent-cursor-layer {
+  :root[data-skye-glow="glacier"] .agent-cursor-layer,
+  .skye-glow-swatch[data-glow="glacier"] {
     --agent-cursor-light: 0, 229, 255;
   }
 }
@@ -404,8 +419,9 @@
   box-shadow: 0 0 12px 3px rgba(var(--agent-cursor-light), 0.3);
 }
 
+/* Only while the helper shows: the hidden ones would otherwise keep drawing frames. */
 @media (prefers-reduced-motion: no-preference) {
-  .agent-cursor-echo::before {
+  .agent-cursor[data-visible] .agent-cursor-echo::before {
     animation: agent-cursor-echo-breathe 1.2s ease-in-out infinite alternate;
   }
 }
@@ -516,9 +532,8 @@
   gap: 6px;
   padding: 3px 8px;
   border-radius: 4px 8px 8px 8px;
-  /* Frosted: a little see-through, over the page behind blurred and saturated. */
-  background: color-mix(in srgb, var(--agent-cursor-fill) 72%, transparent);
-  backdrop-filter: blur(8px) saturate(1.8);
+  /* Solid: a blur would redraw the page behind it as the cursor moves. */
+  background: var(--agent-cursor-fill);
   color: var(--agent-cursor-ink);
   /* Roboto Mono, bundled (@fontsource, imported by AgentCursor) so it also loads in the packaged app. */
   font: 600 11px/16px "Roboto Mono", ui-monospace, Consolas, monospace;

@@ -6,6 +6,7 @@ import App from "./App";
 import coralConfig from "../coral.config.json";
 import "./components/cursor/cursor.css";
 import "./components/grain/grain.css";
+import "./components/effects/effects.css";
 import "./index.css";
 
 /**

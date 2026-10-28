@@ -27,9 +27,6 @@ export const TEAM: readonly Person[] = [
   { name: "Travis Hughes", expertise: "baggage" },
 ];
 
-/** The user's own area: they approve Skye's stand changes last. */
-export const USER_EXPERTISE: Expertise = "stands";
-
 /** The teammates' names, in TEAM's order. */
 export const PEOPLE: readonly string[] = TEAM.map((person) => person.name);
 

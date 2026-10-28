@@ -7,7 +7,7 @@ import { useState, type ReactNode } from "react";
 import { Panel } from "@coral-ai/react";
 import { ArrivalList } from "./ArrivalList";
 import { DepartureList } from "./DepartureList";
-import { useOperations } from "./OperationsContext";
+import { useOpsBoard } from "./OperationsContext";
 import { OverflowScroll } from "./OverflowScroll";
 import { ARRIVALS, DEPARTURES } from "./operationsData";
 import "./operations.css";
@@ -20,7 +20,7 @@ export function OperationsPanel() {
     arrivals: true,
     departures: true,
   });
-  const { matcher } = useOperations();
+  const { matcher } = useOpsBoard();
   // Counts follow the current view/filters ("x of y" while one is active).
   const describe = (list: typeof ARRIVALS) => {
     const shown = list.filter(matcher.flight);

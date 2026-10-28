@@ -1,9 +1,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
-import { Button } from "@fluentui/react-components";
 import { ContentToolbar } from "../components/content-toolbar";
 import { DateStepper } from "../components/date-stepper";
 import {
-  BarBackdrop,
   BarGhosts,
   BarLabels,
   BarLink,
@@ -19,14 +17,11 @@ import {
   type TimelineRow,
   type TimelineZoom,
 } from "../stand-timeline";
-import { DEMO_DATA as DATA, DEMO_DOMAIN as DOMAIN, formatUtcWithDay as fmt } from "./demoData";
-import { airportLabel } from "./airports";
+import { DEMO_DATA as DATA, DEMO_DOMAIN as DOMAIN } from "./demoData";
 import { ghostClashes } from "./delays";
 import { applySelection } from "./selection";
 import { SYNTHETIC_DATE } from "./syntheticFixture";
 import {
-  BAR_BACKDROP_BLUR,
-  BAR_BACKDROP_SATURATE,
   BAR_INSET,
   BAR_RADIUS,
   DemoPatternDefs,
@@ -45,13 +40,6 @@ import { useDemoZoom } from "./ZoomMenuRow";
 import type { Pixels } from "../studio/drawings";
 import "./demo.css";
 
-const KIND_LABEL: Record<string, string> = {
-  turn: "Turn",
-  arr: "Arrival stay",
-  hold: "Tow / hold",
-  dep: "Departure stay",
-};
-
 /**
  * Each bar's ends in each style, by what starts and ends its stay: zigzagged
  * for a tow, round (aero) or tapered (classic) for a flight. One function per
@@ -62,15 +50,13 @@ const BAR_ENDS: Record<FlightStyle, (o: Occupancy) => BarEnds> = {
   classic: (o) => stayEnds(DATA.endpoints.get(o.id), "classic"),
 };
 
+/** The labels' disclosure order; one array, so each bar's labels (memoized) keep their props. */
+const LABEL_PRIORITY = ["start", "end", "center"] as const;
+
 export interface StandTimelineDemoProps {
   /** Controlled selection. Omit both props to use the demo standalone. */
   selectedIds?: readonly string[];
   onIntent?: (intent: ChartIntent) => void;
-  /**
-   * Show the built-in selection detail strip under the chart (default true).
-   * Hosts with their own selection details (e.g. GTAA's popover) can hide it.
-   */
-  showSelectionDetail?: boolean;
   /**
    * Optional host match predicate (e.g. views/filters). Non-matching bars are
    * dimmed but stay on the chart, occupied and selectable. Omit for no dimming.
@@ -111,11 +97,7 @@ export interface StandTimelineDemoProps {
   previewDrop?: (occupancyId: string, rowId: string, shiftMs: number) => DropPreview;
   /** With previewDrop, bars can be dragged in time too, in steps of this many ms; see StandTimeline. */
   dragSnapMs?: number;
-  /**
-   * Host chart layers drawn under the bars, e.g. a closed area's band. They
-   * show blurred through the bars' glass, so they render twice (see
-   * BarBackdrop): any ids in them must be their own (useId).
-   */
+  /** Host chart layers drawn under the bars, e.g. a closed area's band. */
   underlay?: ReactNode;
   /** Host chart layers drawn over the bars, e.g. that band's label. */
   overlay?: ReactNode;
@@ -140,7 +122,6 @@ export interface StandTimelineDemoProps {
 export function StandTimelineDemo({
   selectedIds: controlledIds,
   onIntent: controlledOnIntent,
-  showSelectionDetail = true,
   isMatch,
   selectionActive,
   swapStatus,
@@ -200,12 +181,6 @@ export function StandTimelineDemo({
     },
     [controlledOnIntent],
   );
-  const clearSelection = () => onIntent({ type: "select", occupancyIds: [], mode: "replace" });
-
-  const selected = useMemo(
-    () => DATA.occupancies.filter((o) => selectedIds.includes(o.id)),
-    [selectedIds],
-  );
 
   return (
     <div className="demo-timeline">
@@ -242,11 +217,10 @@ export function StandTimelineDemo({
         <DemoPatternDefs />
         {/* Synthetic piers only drive optional group dividers; no group-name column. */}
         <StandRows zebra={false} title={null} showGroup={false} labelAlign="end" renderLabel={renderLabel} />
-        {/* The grid and the host's underlay show blurred and saturated through the glass bars. */}
-        <BarBackdrop blur={BAR_BACKDROP_BLUR} saturate={BAR_BACKDROP_SATURATE}>
-          <TimeGrid minorMs={QUARTER_RULER.stepMs} />
-          {underlay}
-        </BarBackdrop>
+        {/* The grid and the host's underlay show through the glass bars, unblurred: a
+            BarBackdrop would draw them twice and blur the whole plot on every repaint. */}
+        <TimeGrid minorMs={QUARTER_RULER.stepMs} />
+        {underlay}
         <OccupancyBars
           barStyle={accessors.barStyle}
           renderBar={accessors.renderBar}
@@ -256,7 +230,7 @@ export function StandTimelineDemo({
           slots={accessors.labelSlots}
           color={accessors.labelColor}
           className={accessors.labelClassName}
-          priority={["start", "end", "center"]}
+          priority={LABEL_PRIORITY}
           padding={LABEL_PADDING[flightStyle]}
           {...LABEL_METRICS}
         />
@@ -274,61 +248,6 @@ export function StandTimelineDemo({
         <TimeAxis position="top" zoneLabel="UTC" {...rulerFor(zoom.hourWidth)} />
       </StandTimeline>
       {summary}
-
-      {showSelectionDetail && (
-      <section className="demo-detail" aria-live="polite" aria-label="Selection detail">
-        {selected.length === 0 ? (
-          <p className="demo-hint">
-            Click a bar, or Tab to it and press Enter/Space, to select it. Shift-click toggles
-            a bar in or out of the selection. Esc or clicking empty space clears it.
-            Stays from the same visit are outlined with a dashed line.
-          </p>
-        ) : (
-          <>
-            <div className="demo-detail-head">
-              <strong>
-                {selected.length} selected
-              </strong>
-              <Button size="small" appearance="secondary" onClick={clearSelection}>
-                Clear
-              </Button>
-            </div>
-            {selected.map((o) => (
-              <SelectedOccupancy key={o.id} occupancy={o} />
-            ))}
-          </>
-        )}
-      </section>
-      )}
-    </div>
-  );
-}
-
-function SelectedOccupancy({ occupancy }: { occupancy: Occupancy }) {
-  const turn = occupancy.visitId ? DATA.turnsById.get(occupancy.visitId) : undefined;
-  const siblings = DATA.occupancies.filter((o) => o.visitId === occupancy.visitId);
-  return (
-    <div className="demo-detail-card">
-      <div className="demo-detail-line">
-        <span className="demo-chip">{occupancy.rowId}</span>
-        <strong>
-          {fmt(occupancy.start)}–{fmt(occupancy.end)} UTC
-        </strong>
-        <span>{KIND_LABEL[occupancy.kind ?? ""] ?? occupancy.kind}</span>
-        {turn && (
-          <span className="demo-muted">
-            {turn.arrFlight} from {airportLabel(turn.origin)} / {turn.depFlight} to{" "}
-            {airportLabel(turn.destination)} ·{" "}
-            {turn.aircraftType} · {turn.registration}
-          </span>
-        )}
-      </div>
-      {siblings.length > 1 && (
-        <div className="demo-detail-line demo-muted">
-          Visit {occupancy.visitId}: {siblings.length} stays —{" "}
-          {siblings.map((s) => `${s.rowId} ${fmt(s.start)}–${fmt(s.end)}`).join(" → ")}
-        </div>
-      )}
     </div>
   );
 }

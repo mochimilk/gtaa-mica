@@ -11,7 +11,7 @@ import { AskFloatingWindow, useAskPanel } from "../components/ask-skye";
 import { useAnyAskPanelOpen } from "../components/ask-skye/askPanels";
 import { skyeAlerts, hideSkyeAlerts, subscribeSkyeAlerts } from "./skyeAlerts";
 import { Alerts } from "./Alerts";
-import { useOperations } from "./OperationsContext";
+import { useOpsBoard } from "./OperationsContext";
 import { currentAlerts } from "./boardAlerts";
 import { KEEP_SELECTION_ATTR } from "./ViewsFiltersToolbar";
 import "./operations.css";
@@ -35,7 +35,7 @@ const AlertDotIcon = bundleIcon(AlertDotFilled, AlertDotRegular);
 const AlertIcon = bundleIcon(AlertFilled, AlertRegular);
 
 export function AlertsMenu() {
-  const { acknowledged, matcher } = useOperations();
+  const { acknowledged, matcher } = useOpsBoard();
   const [open, setOpen] = useAskPanel("alerts");
   // Skye's compact alerts, while she talks about them: only when the user has
   // none of Ask Skye's windows open, and the user opening theirs takes over.

@@ -28,12 +28,7 @@
   box-shadow: var(--skye-notice-lit);
 }
 
-/*
- * It rises into place while its glass and content fade in: never the notice
- * itself, as a fading ancestor would stop its glass from blurring (see
- * askSkye.css, Glass).
- */
-.mica-ask__notice.skye-notice::before,
+/* It rises into place while its fill and content fade in (see askSkye.css, Fill). */
 .mica-ask__notice.skye-notice::after,
 .mica-ask__notice.skye-notice > * {
   animation: skye-notice-fade var(--ask-motion-normal) var(--ask-ease) both;
@@ -53,7 +48,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mica-ask__notice.skye-notice,
-  .mica-ask__notice.skye-notice::before,
   .mica-ask__notice.skye-notice::after,
   .mica-ask__notice.skye-notice > * {
     animation: none;

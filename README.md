@@ -1,13 +1,16 @@
-# Coral — base starter
+# GTAA Mica
 
-A minimal Vite + React app with all six Coral libraries installed:
+Stand planning for Norvara Intl Airport, with Skye, a chat and voice
+assistant. A Vite + React app on the Coral libraries, also shipped as an
+Electron desktop app.
+
+Coral libraries used:
 
 - `@coral-ai/react` — provider, layout, and UI components
-- `@coral-ai/markdown` — markdown and code rendering
-- `@coral-ai/charts` — bar and line charts
-- `@coral-ai/bundleicons` — Fluent icons
+- `@coral-ai/markdown` — markdown and code rendering (chat messages)
 - `@coral-ai/chat` — chat surfaces and agent helpers
-- `@coral-ai/docs` — documentation layout and table of contents
+- `@coral-ai/charts` — not used directly; `@coral-ai/chat` requires it
+- `@coral-ai/bundleicons` — Fluent icons
 
 ## Start
 
@@ -16,7 +19,9 @@ npm install
 npm run dev
 ```
 
-The scaffold includes a navbar and welcome page. Edit `src/App.tsx` to build your app. Chat and charts are available to import when needed; this starter requires no backend or API credentials.
+Voice needs the local broker (`npm run dev:voice`, `server/micaLiveServer.mjs`)
+and its settings (see `.env.example` and `docs/gpt-live-voice.md`). Without it
+the app runs and shows voice as disconnected.
 
 ## Project configuration
 
@@ -39,7 +44,7 @@ The existing `@coral-ai/cli` is included as a dev dependency:
 npx coral add chat
 ```
 
-You can also import any of the six libraries directly without adding a recipe.
+You can also import any of the Coral libraries directly without adding a recipe.
 
 ## Desktop development (Electron)
 
@@ -72,7 +77,7 @@ Windows testing. The browser production output remains `dist/`.
 
 `electron/main.mjs` owns only the window, lifecycle and restricted local asset
 protocol (`mica://app`). The packaged app loads `dist/` without a web server;
-root-relative public assets, including the Norvara Intl Airport logo, resolve on that origin.
+root-relative public assets resolve on that origin.
 The renderer has Node integration disabled, context isolation and sandboxing
 enabled, denied native permission requests, and restricted navigation/popups.
 On Windows and Linux the page draws the title bar (`src/components/title-bar`):

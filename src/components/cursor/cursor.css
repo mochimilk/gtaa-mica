@@ -1,11 +1,15 @@
 /*
- * App-wide cursor theme: the "dark" set from ./assets/dark.
+ * App-wide cursor theme: the "dark" set of a Windows cursor pack (its .cur
+ * and .ani sources and installer are in git history, before they were
+ * removed as unused by the app).
  *
  * Browsers can't use the Windows .cur files as-is. Chromium picks the largest
  * frame in a .cur (128px here), and it can't play .ani files at all. So the
  * 32px and 64px frames were extracted to PNGs in ./web/dark and are served with
  * image-set() for 1x and 2x displays. Each hotspot is the 32px frame's hotspot,
- * given in CSS pixels. Every value falls back to the native keyword.
+ * given in CSS pixels. Every value falls back to the native keyword. Only the
+ * cursors the app uses are kept; the pack's help and resize cursors are in
+ * git history too.
  *
  * The busy cursors (wait.ani, appstarting.ani) and grab/grabbing have no
  * static equivalent, so they stay native.
@@ -17,14 +21,9 @@
   --cursor-default: image-set(url("./web/dark/arrow.png") 1x, url("./web/dark/arrow@2x.png") 2x) 2 2, default;
   --cursor-pointer: image-set(url("./web/dark/hand.png") 1x, url("./web/dark/hand@2x.png") 2x) 6 1, pointer;
   --cursor-text: image-set(url("./web/dark/ibeam.png") 1x, url("./web/dark/ibeam@2x.png") 2x) 4 9, text;
-  --cursor-help: image-set(url("./web/dark/help.png") 1x, url("./web/dark/help@2x.png") 2x) 2 2, help;
   --cursor-not-allowed: image-set(url("./web/dark/no.png") 1x, url("./web/dark/no@2x.png") 2x) 2 2, not-allowed;
   --cursor-crosshair: image-set(url("./web/dark/crosshair.png") 1x, url("./web/dark/crosshair@2x.png") 2x) 15 15, crosshair;
   --cursor-move: image-set(url("./web/dark/sizeall.png") 1x, url("./web/dark/sizeall@2x.png") 2x) 14 13, move;
-  --cursor-ns-resize: image-set(url("./web/dark/sizens.png") 1x, url("./web/dark/sizens@2x.png") 2x) 6 10, ns-resize;
-  --cursor-ew-resize: image-set(url("./web/dark/sizewe.png") 1x, url("./web/dark/sizewe@2x.png") 2x) 10 6, ew-resize;
-  --cursor-nwse-resize: image-set(url("./web/dark/sizenwse.png") 1x, url("./web/dark/sizenwse@2x.png") 2x) 8 8, nwse-resize;
-  --cursor-nesw-resize: image-set(url("./web/dark/sizenesw.png") 1x, url("./web/dark/sizenesw@2x.png") 2x) 8 8, nesw-resize;
 }
 
 /* The arrow is the base cursor and is inherited everywhere else. */

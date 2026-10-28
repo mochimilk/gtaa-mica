@@ -1,6 +1,6 @@
 // The colour Skye's light is drawn in while her helpers work (her orb's glow,
 // the ring round it, the helpers, the tethers and the light along them), a
-// choice in the board's View menu. Each choice sets --agent-cursor-light
+// choice in Settings' Appearance page. Each choice sets --agent-cursor-light
 // (agent-cursor.css), through data-skye-glow on the root element, since the
 // cursors' layers are portalled to <body>.
 import { useSyncExternalStore } from "react";
@@ -8,9 +8,9 @@ import { useSyncExternalStore } from "react";
 export type SkyeGlow = "default" | "aurora" | "glacier";
 
 /**
- * The choices, in the order the View menu cycles through them, with their
- * names there: ink (black over a light page, white over a dark one); the
- * blue-violet of the northern lights; and an electric ice-blue.
+ * The choices, in the order Settings shows them, with their names there:
+ * ink (black over a light page, white over a dark one); the blue-violet of
+ * the northern lights; and an electric ice-blue.
  */
 export const SKYE_GLOWS: readonly { value: SkyeGlow; label: string }[] = [
   { value: "default", label: "Default" },

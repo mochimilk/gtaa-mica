@@ -84,7 +84,7 @@ export const fluentChartTheme = {
  * mode live there). Only a stay that needs attention takes a colour:
  *   healthy: neutral glass, so the board stays quiet and Skye's purple (her
  *     cursors' aura, her selections) stands out on it: faint white, fading
- *     left to right as the coloured bars do, over the blurred grid (BarBackdrop), inside
+ *     left to right as the coloured bars do, over the grid, inside
  *     Fluent's Stroke 1 at rest,
  *   conflict: red, a late stay whose delay runs into another stay on its
  *     stand (the clashes the Alerts list as conflicts; see ./delays),
@@ -131,14 +131,6 @@ const GLASS: StatusPalette = {
 const DIM_FILL: FillStops = [["var(--flight-dim-glass-from)", 1], ["var(--flight-dim-glass-to)", 1]];
 const DIM_GRADIENT_ID = "demo-gradient-dimmed";
 
-/**
- * Background blur under the bars, px (BarBackdrop): frosted glass, the grid
- * behind softened but still there. Much more spreads a 1px line so thin it
- * vanishes inside the bar while it stays sharp beside it.
- */
-export const BAR_BACKDROP_BLUR = 2;
-/** How saturated what shows through the bars is (BarBackdrop): 180%, as acrylic glass lifts what is behind it. */
-export const BAR_BACKDROP_SATURATE = 1.8;
 /**
  * Tow/hold stripes, in the bar's mark colour over the fill. Neutral labels
  * keep ≥ 4.5:1 over them in both modes.
@@ -211,13 +203,13 @@ const TOW_OUT = "Tow-out";
 
 /**
  * How flights are drawn, on the board and in the flight card, as chosen in
- * the View menu's Timeline row. Each shapes the ends of a bar by what happens
+ * Settings' Timeline. Each shapes the ends of a bar by what happens
  * there (END_SHAPE): Aero, the default, rounds a flight's; Classic tapers
  * them. Both zigzag a tow's, and neither draws icons.
  */
 export type FlightStyle = "classic" | "aero";
 
-/** Each style's name, as the View menu shows it. */
+/** Each style's name, as Settings shows it. */
 export const FLIGHT_STYLE_LABEL: Record<FlightStyle, string> = { classic: "Classic", aero: "Aero" };
 
 /**

@@ -12,11 +12,12 @@ import { useId } from "react";
 import { Button } from "@fluentui/react-components";
 import { DEMO_DATA, formatUtcWithDay } from "../stand-timeline-demo/demoData";
 import { checkSwap, hasStandChanges, occupancyById, stayName } from "./allocation";
-import { useOperations } from "./OperationsContext";
+import { useOpsActions, useOpsSelections } from "./OperationsContext";
 import { OPS_FLIGHTS, type OpsFlight } from "./operationsData";
 
 export function FlightActions() {
-  const { selection, requestSwap, resetStands } = useOperations();
+  const { selection } = useOpsSelections();
+  const { requestSwap, resetStands } = useOpsActions();
   const noteId = useId();
   const pair = selection.occupancyIds.length === 2 ? selection.occupancyIds : null;
   const swap = pair ? checkSwap(pair[0], pair[1]) : null;

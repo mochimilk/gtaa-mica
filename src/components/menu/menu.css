@@ -2,9 +2,11 @@
  * Every Fluent menu in the app, drawn as jellyflower's tray menus
  * (github.com/mochimilk/jellyflower: src/popup.cpp, src/menu_material.hpp,
  * src/menu_style.hpp), at 96 DPI:
- *   surface: acrylic, a 72% tint over a blur (jellyflower's 0xB8 alpha), a
- *     1px border, Windows 11's 8px corners, its rows 6px in from the edge;
- *   rows: 40px tall, their highlight 3px round; a 16px icon 10px in, the
+ *   surface: solid, as jellyflower's is without acrylic (a blur here would
+ *     redraw what is behind every open menu each frame), a 1px border, Fluent's XL corners (8px, as Windows 11's), its rows 6px in
+ *     from the edge;
+ *   rows: 40px tall, their highlight round to match the surface's corners from
+ *     6px in (8px less 6px); a 16px icon 10px in, the
  *     label 34px in, a value right-aligned 12px from the end in the
  *     secondary ink; one line each, in the 12px menu font;
  *   separators: a 1px line in the border colour, 4px in from the rows, in a
@@ -22,16 +24,15 @@ div.fui-MenuPopover {
   --mica-menu-highlight: rgb(234 234 234);
   --mica-menu-border: rgb(210 210 210);
   --mica-menu-surface: rgb(249 249 249);
+  --mica-menu-radius: var(--borderRadiusXLarge);
 
   box-sizing: border-box;
-  min-width: 296px;
-  max-width: calc(100vw - 24px);
+  /* Its width is Fluent's: as wide as its rows, from 138px to 300px. */
   /* The border's 1px and 5px more: the rows sit 6px in. */
   padding: 5px;
   border: 1px solid var(--mica-menu-border);
-  border-radius: 8px;
-  background-color: color-mix(in srgb, var(--mica-menu-surface) 72%, transparent);
-  backdrop-filter: blur(30px);
+  border-radius: var(--mica-menu-radius);
+  background-color: var(--mica-menu-surface);
   color: var(--mica-menu-text);
   font-family: var(--fontFamilyBase);
   font-size: 12px;
@@ -48,11 +49,12 @@ div.fui-MenuPopover {
   }
 }
 
-/* Without a blur, the surface is solid, as jellyflower's is without acrylic. */
-@supports not (backdrop-filter: blur(1px)) {
-  div.fui-MenuPopover {
-    background-color: var(--mica-menu-surface);
-  }
+/*
+ * A menu of more than one item is no narrower than 256px. Counted by sibling
+ * items, not :only-child, since Tabster puts focus guards in the list.
+ */
+div.fui-MenuPopover:has(.fui-MenuItem ~ .fui-MenuItem) {
+  min-width: 256px;
 }
 
 .fui-MenuPopover .fui-MenuList {
@@ -62,12 +64,12 @@ div.fui-MenuPopover {
 /* Rows: an icon slot, the label, then any value or submenu chevron. */
 .fui-MenuPopover .fui-MenuItem {
   box-sizing: border-box;
-  max-width: none;
   min-height: 40px;
   padding: 0 12px 0 10px;
   gap: 8px;
   align-items: center;
-  border-radius: 3px;
+  /* Concentric with the surface: its radius, less the 6px the rows sit in. */
+  border-radius: calc(var(--mica-menu-radius) - 6px);
   background-color: transparent;
   color: var(--mica-menu-text);
   font-size: 12px;

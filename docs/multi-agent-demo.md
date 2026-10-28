@@ -45,8 +45,8 @@ many more moves and a longer run. For the demo, give a window.
    resized), glowing, so it reads as Skye directing them rather than one more
    hand. Everything that glows here is one colour, `--agent-cursor-light` in
    `agent-cursor.css`: by default black on a light page and white on a dark
-   one. The View menu's **Skye glow** row cycles it through Default, Aurora
-   (blue-violet) and Glacier (electric ice-blue). A ring round the
+   one. **Glow** in Settings (the avatar's menu, Appearance) picks Default,
+   Aurora (blue-violet) or Glacier (electric ice-blue). A ring round the
    orb fills as the stays move, a loading bar for the whole job. Solid, glowing
    lines run from the ring to each helper, and more join everyone in
    triangles, a web over the work. Every 2.6 seconds a glowing orb of light

@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type Context,
   type ReactNode,
   type SetStateAction,
 } from "react";
@@ -192,12 +193,52 @@ export interface OperationsValue {
   resetFilters: () => void;
   /** Matching predicates for the current view/filters (chart, lists, alerts). */
   matcher: OpsMatcher;
-  /** How flights are drawn on the board and in their cards (the View menu's Timeline row); aero by default. */
+  /** How flights are drawn on the board and in their cards (Timeline in Settings); aero by default. */
   flightStyle: FlightStyle;
   setFlightStyle: (style: FlightStyle) => void;
 }
 
-const OperationsContext = createContext<OperationsValue | null>(null);
+/**
+ * The value in four parts, by how often each changes, so a component reading
+ * one part re-renders only when that part changes: the callbacks (never), the
+ * selections (every pick), the details popover and swap question (every
+ * request), and the board's state (stand changes, views, filters).
+ */
+type ActionKey =
+  | "actAsSkye"
+  | "applyChartIntent"
+  | "selectFlight"
+  | "selectFlights"
+  | "clearSelection"
+  | "undoSkyeChanges"
+  | "approveSkyeChanges"
+  | "applyStandPlan"
+  | "requestSwap"
+  | "answerSwap"
+  | "resetStands"
+  | "runSkyeBatch"
+  | "closeArea"
+  | "assignStands"
+  | "applyFixes"
+  | "unassignStands"
+  | "setDetailsOpen"
+  | "setAcknowledged"
+  | "setView"
+  | "setFilter"
+  | "resetFilters"
+  | "setFlightStyle";
+export type OperationsActions = Pick<OperationsValue, ActionKey>;
+export type OperationsSelections = Pick<OperationsValue, "selection" | "skyeSelection">;
+export type OperationsDetails = Pick<OperationsValue, "detailsOpen" | "selectionSource" | "selectionRequest" | "swapRequest">;
+export type OperationsBoard = Pick<
+  OperationsValue,
+  "allocationVersion" | "boardHeld" | "acknowledged" | "view" | "filters" | "matcher" | "flightStyle"
+>;
+
+const ActionsContext = createContext<OperationsActions | null>(null);
+const SelectionsContext = createContext<OperationsSelections | null>(null);
+const DetailsContext = createContext<OperationsDetails | null>(null);
+const BoardContext = createContext<OperationsBoard | null>(null);
 
 const EMPTY: OpsSelection = { occupancyIds: [], flightId: null };
 
@@ -475,10 +516,9 @@ export function OperationsProvider({ children }: { children: ReactNode }) {
     [view, filters, acknowledged, allocationVersion],
   );
 
-  const value = useMemo(
+  // Every callback above is stable, so this is made once.
+  const actions = useMemo<OperationsActions>(
     () => ({
-      selection,
-      skyeSelection,
       actAsSkye,
       applyChartIntent,
       selectFlight,
@@ -486,36 +526,23 @@ export function OperationsProvider({ children }: { children: ReactNode }) {
       clearSelection,
       undoSkyeChanges: undoSkye,
       approveSkyeChanges: approveSkye,
-      allocationVersion,
       applyStandPlan,
       resetStands,
       runSkyeBatch,
-      boardHeld,
       closeArea,
       assignStands,
       applyFixes,
       unassignStands,
       requestSwap,
-      swapRequest,
       answerSwap,
-      detailsOpen,
       setDetailsOpen,
-      selectionSource,
-      selectionRequest,
-      acknowledged,
       setAcknowledged,
-      view,
       setView,
-      filters,
       setFilter,
       resetFilters,
-      matcher,
-      flightStyle,
       setFlightStyle,
     }),
     [
-      selection,
-      skyeSelection,
       actAsSkye,
       applyChartIntent,
       selectFlight,
@@ -523,38 +550,66 @@ export function OperationsProvider({ children }: { children: ReactNode }) {
       clearSelection,
       undoSkye,
       approveSkye,
-      allocationVersion,
       applyStandPlan,
       resetStands,
       runSkyeBatch,
-      boardHeld,
       closeArea,
       assignStands,
       applyFixes,
       unassignStands,
       requestSwap,
-      swapRequest,
       answerSwap,
-      detailsOpen,
-      selectionSource,
-      selectionRequest,
-      acknowledged,
+      setDetailsOpen,
       setAcknowledged,
-      view,
-      filters,
       setFilter,
       resetFilters,
-      matcher,
-      flightStyle,
     ],
   );
-  return <OperationsContext.Provider value={value}>{children}</OperationsContext.Provider>;
+  const selections = useMemo<OperationsSelections>(() => ({ selection, skyeSelection }), [selection, skyeSelection]);
+  const details = useMemo<OperationsDetails>(
+    () => ({ detailsOpen, selectionSource, selectionRequest, swapRequest }),
+    [detailsOpen, selectionSource, selectionRequest, swapRequest],
+  );
+  const board = useMemo<OperationsBoard>(
+    () => ({ allocationVersion, boardHeld, acknowledged, view, filters, matcher, flightStyle }),
+    [allocationVersion, boardHeld, acknowledged, view, filters, matcher, flightStyle],
+  );
+  return (
+    <ActionsContext.Provider value={actions}>
+      <SelectionsContext.Provider value={selections}>
+        <DetailsContext.Provider value={details}>
+          <BoardContext.Provider value={board}>{children}</BoardContext.Provider>
+        </DetailsContext.Provider>
+      </SelectionsContext.Provider>
+    </ActionsContext.Provider>
+  );
 }
 
+function useRequired<T>(context: Context<T | null>): T {
+  const value = useContext(context);
+  if (!value) throw new Error("useOperations must be used inside <OperationsProvider>");
+  return value;
+}
+
+/** The callbacks alone; they never change, so reading them never re-renders. */
+export const useOpsActions = () => useRequired(ActionsContext);
+/** The user's and Skye's selections; re-renders on every pick. */
+export const useOpsSelections = () => useRequired(SelectionsContext);
+/** The details popover and the swap question; re-renders on every selection request. */
+export const useOpsDetails = () => useRequired(DetailsContext);
+/** Stands, views, filters, acknowledgements and the flight style; re-renders when they change. */
+export const useOpsBoard = () => useRequired(BoardContext);
+
+/**
+ * All of it, re-rendering on any change. Prefer the narrower hooks above where
+ * a component reads only a part, above all in what the board draws many of.
+ */
 export function useOperations(): OperationsValue {
-  const ctx = useContext(OperationsContext);
-  if (!ctx) throw new Error("useOperations must be used inside <OperationsProvider>");
-  return ctx;
+  const actions = useOpsActions();
+  const selections = useOpsSelections();
+  const details = useOpsDetails();
+  const board = useOpsBoard();
+  return useMemo(() => ({ ...actions, ...selections, ...details, ...board }), [actions, selections, details, board]);
 }
 
 /**

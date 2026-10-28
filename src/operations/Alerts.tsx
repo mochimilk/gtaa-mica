@@ -13,7 +13,7 @@ import {
 } from "@fluentui/react-icons";
 import { AirplaneOff20Regular } from "../components/custom-icons";
 import { Menu, MenuItem, MenuList, MenuPopover, MenuTrigger } from "../components/menu";
-import { isFlightSelected, useOperations } from "./OperationsContext";
+import { isFlightSelected, useOpsActions, useOpsBoard, useOpsSelections } from "./OperationsContext";
 import { currentAlerts, type AlertKind, type OpsAlert } from "./boardAlerts";
 import { OPS_FLIGHTS_BY_ID } from "./operationsData";
 import { KEEP_SELECTION_ATTR } from "./ViewsFiltersToolbar";
@@ -42,7 +42,7 @@ export function Alerts({
   mentioned?: string | null;
 }) {
   const listRef = useRef<HTMLUListElement>(null);
-  const { acknowledged, matcher } = useOperations();
+  const { acknowledged, matcher } = useOpsBoard();
   // Alerts follow the filters (not the view; see opsFilters.ts).
   const all = currentAlerts();
   const open = all.filter((a) => !acknowledged.has(a.id));
@@ -89,7 +89,8 @@ export function Alerts({
 }
 
 function AlertItem({ alert, onSelect, mentioned }: { alert: OpsAlert; onSelect?: () => void; mentioned: boolean }) {
-  const { selection, selectFlight, setAcknowledged } = useOperations();
+  const { selection } = useOpsSelections();
+  const { selectFlight, setAcknowledged } = useOpsActions();
   const flight = OPS_FLIGHTS_BY_ID.get(alert.flightId);
   const selected = !!flight && isFlightSelected(flight, selection);
   const Icon = ICONS[alert.kind];

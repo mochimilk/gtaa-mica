@@ -12,6 +12,7 @@ import {
 import type { OrbParams, StyleName } from "./engine/presets";
 import type { OrbPalette } from "./palettes";
 import { useVoiceLevel } from "./useVoiceLevel";
+import { useAtRest, useReduceEffects } from "../effects";
 
 export type OrbPreset = StyleName;
 export type OrbState = OrbStateName;
@@ -153,6 +154,10 @@ const useStyles = makeStyles({
       animationName: "none",
     },
   },
+  // Effects reduced, the halo holds still too.
+  glowStill: {
+    animationName: "none",
+  },
 });
 
 function usePrefersReducedMotion(): boolean {
@@ -191,7 +196,9 @@ function glowShadow(params: OrbParams, size: number): string {
 
 /**
  * Animated WebGPU orb. Shows a static gradient until the first frame lands,
- * and keeps it when WebGPU is unavailable or the user prefers reduced motion.
+ * and keeps it when WebGPU is unavailable, the user prefers reduced motion or
+ * effects are reduced (components/effects). While the app is at rest the
+ * renderer stops and the static orb stands in, until any input wakes it.
  * Decorative: pair it with visible text that carries any meaning.
  */
 export function LiveOrb({
@@ -208,8 +215,17 @@ export function LiveOrb({
 }: LiveOrbProps) {
   const styles = useStyles();
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const reducedMotion = usePrefersReducedMotion();
+  const prefersReducedMotion = usePrefersReducedMotion();
+  // Effects reduced, the orb holds still, as under reduced motion.
+  const reduceEffects = useReduceEffects();
+  const reducedMotion = prefersReducedMotion || reduceEffects;
+  const atRest = useAtRest();
   const [status, setStatus] = React.useState<"loading" | "ready" | "failed">("loading");
+  // Once it has rested, the static orb stands in while it starts again, not the skeleton.
+  const [rested, setRested] = React.useState(false);
+  React.useEffect(() => {
+    if (atRest) setRested(true);
+  }, [atRest]);
 
   const configuration = React.useMemo(() => createPresetOrbStateConfiguration(preset), [preset]);
 
@@ -230,11 +246,11 @@ export function LiveOrb({
 
   // Can run live at all (WebGPU works, motion allowed); `live` = running now.
   const canRunLive = !reducedMotion && status !== "failed";
-  const live = canRunLive && !paused;
+  const live = canRunLive && !paused && !atRest;
 
-  // Voice drives motion, so it stays still under reduced motion and while paused.
+  // Voice drives motion, so it stays still under reduced motion and while paused or at rest.
   const glowVoiceRef = React.useRef<HTMLSpanElement>(null);
-  const voiceLevel = useVoiceLevel(reducedMotion || paused ? null : voice, (level) => {
+  const voiceLevel = useVoiceLevel(reducedMotion || paused || atRest ? null : voice, (level) => {
     const element = glowVoiceRef.current;
     if (!element) return;
     element.style.opacity = level ? String(GLOW_OPACITY + GLOW_VOICE_OPACITY * level) : "";
@@ -260,7 +276,10 @@ export function LiveOrb({
         if (speedup === 1) return target;
         return { ...target, params: { ...target.params, speed: target.params.speed * speedup } };
       },
-      onReady: () => setStatus("ready"),
+      onReady: () => {
+        setStatus("ready");
+        setRested(false);
+      },
       onError: (error) => {
         console.warn("LiveOrb: falling back to a static orb.", error);
         setStatus("failed");
@@ -271,10 +290,11 @@ export function LiveOrb({
   const showCanvas = live && status === "ready";
   // Starting up or paused: the skeleton only, no glow. The static gradient
   // (with glow) is for when the orb cannot run live at all, or for a caller
-  // that asked for it as the placeholder.
+  // that asked for it as the placeholder; and at rest, and waking from it.
   const waiting = canRunLive && !showCanvas;
-  const skeleton = waiting && placeholder === "skeleton";
-  const gradient = !canRunLive || (waiting && placeholder === "gradient");
+  const resting = atRest || rested;
+  const skeleton = waiting && !resting && placeholder === "skeleton";
+  const gradient = !canRunLive || (waiting && (resting || placeholder === "gradient"));
   const canvasSize = Math.round(size * CANVAS_OVERSCAN);
   // The shader draws the ball at `radius` of the canvas, a bit inside `size`.
   // Tuck the glow circle 1px under that rim so no dark seam shows between them.
@@ -285,7 +305,10 @@ export function LiveOrb({
       {glow && (
         <span className={mergeClasses(styles.glowLayer, skeleton && styles.glowHidden)}>
           <span ref={glowVoiceRef} className={styles.glowVoice}>
-            <span className={styles.glow} style={{ inset: glowInset, boxShadow: glowShadow(params, size) }} />
+            <span
+              className={mergeClasses(styles.glow, reduceEffects && styles.glowStill)}
+              style={{ inset: glowInset, boxShadow: glowShadow(params, size) }}
+            />
           </span>
         </span>
       )}

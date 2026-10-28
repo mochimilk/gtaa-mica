@@ -19,12 +19,7 @@
   --ask-accent-strong-hover: var(--colorBrandBackgroundHover);
   --ask-on-accent: var(--colorNeutralForegroundOnBrand);
   --ask-border: var(--colorNeutralStroke2);
-  /*
-   * The bar's glass (see the glass, below): clear, at liquid-glass-react's
-   * defaults, displacementScale 70 and blurAmount 0.0625 (6px).
-   */
-  --ask-glass-lens: url(#mica-liquid-glass);
-  --ask-glass-backdrop: blur(6px) saturate(140%);
+  /* The bar's fill (see the fill, below): clear. */
   --ask-glass-tint: transparent;
   --ask-glass-control: var(--colorSubtleBackgroundHover);
   --ask-glass-control-hover: var(--colorSubtleBackgroundPressed);
@@ -49,7 +44,6 @@
   --ask-control-size-sm: 28px;
   --ask-radius-control: 6px;
   --ask-radius-m: 16px;
-  --ask-radius-lg: 20px;
   --ask-radius-pill: 9999px;
 
   /*
@@ -142,11 +136,10 @@
 }
 
 /*
- * Glass: the bar, the chat, notices and floating windows are liquid glass. A
- * layer under their content blurs what is behind them and bends it like a
- * lens, through liquid-glass-react's filter (LiquidGlassFilter.tsx). The layer
- * sees only as far back as an ancestor that fades or filters, so none may: a
- * window that fades in fades its glass instead of itself.
+ * Fill: the bar, the chat, notices and floating windows are filled by a layer
+ * under their content (no blur or lens: they cost a redraw of what is behind
+ * them on every frame). The layer fades on its own, so a window that fades
+ * in fades its fill and content rather than itself.
  */
 .mica-ask__surface,
 .mica-ask__notice,
@@ -156,38 +149,25 @@
   overflow: hidden;
 }
 
-:is(.mica-ask__surface, .mica-ask__notice, .mica-ask__float)::before,
 :is(.mica-ask__surface, .mica-ask__notice, .mica-ask__float)::after {
   content: '';
   position: absolute;
   inset: 0;
   z-index: -1;
   pointer-events: none;
-}
-
-:is(.mica-ask__surface, .mica-ask__notice, .mica-ask__float)::before {
-  filter: var(--ask-glass-lens);
-  -webkit-backdrop-filter: var(--ask-glass-backdrop);
-  backdrop-filter: var(--ask-glass-backdrop);
-}
-
-/* The tint lies over the glass, not under it, so the lens cannot bend it away at the edges. */
-:is(.mica-ask__surface, .mica-ask__notice, .mica-ask__float)::after {
   background: var(--ask-glass-tint);
   transition: background-color var(--ask-motion-fast) var(--ask-ease);
 }
 
 /*
- * Open, the chat and the floating windows (and notices) are frosted, under a
- * gentler lens, and tinted with the theme's background, light or dark with
- * the app. The bar under a floating window stays clear.
+ * Open, the chat and the floating windows (and notices) are solid, in the
+ * theme's background, light or dark with the app. The bar under a floating
+ * window stays clear.
  */
 .mica-ask__surface[data-open='true'],
 .mica-ask__notice,
 .mica-ask__float {
-  --ask-glass-lens: url(#mica-liquid-glass-open);
-  --ask-glass-backdrop: blur(15px) saturate(140%);
-  --ask-glass-tint: color-mix(in srgb, var(--colorNeutralBackground2) 90%, transparent);
+  --ask-glass-tint: var(--colorNeutralBackground2);
 }
 
 /* Surface: the pill, the voice bar, and the open panel are one element that changes size. */
@@ -388,7 +368,7 @@
 
 /*
  * It opens as the chat does, widening from the pill's width as it fades up
- * into place. Its fill, edge and glass fade, not the window (see the glass)…
+ * into place. Its fill, edge and content fade, not the window (see the fill)…
  */
 @starting-style {
   .mica-ask__float {
@@ -399,7 +379,6 @@
   }
 }
 
-.mica-ask__float::before,
 .mica-ask__float::after {
   animation: mica-ask-reveal var(--ask-motion-grow) var(--ask-ease) both;
 }
@@ -419,7 +398,6 @@
   transition-delay: var(--ask-motion-reveal);
 }
 
-.mica-ask__float[data-closing]::before,
 .mica-ask__float[data-closing]::after {
   animation: mica-ask-conceal var(--ask-motion-grow) var(--ask-ease) var(--ask-motion-reveal) both;
 }
@@ -934,7 +912,6 @@
 
   .mica-ask__surface > *,
   .mica-ask__float,
-  .mica-ask__float::before,
   .mica-ask__float::after,
   .mica-ask__float > * {
     transition: none;

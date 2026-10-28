@@ -34,7 +34,14 @@ import { FlightDragChip, FlightDropGhost } from "./operations/FlightDrag";
 import { OperationsPanel } from "./operations/OperationsPanel";
 import { OutputsPanel, OutputsToggle } from "./operations/OutputsPanel";
 import { OutputsPeek } from "./operations/OutputsPeek";
-import { OperationsProvider, selectedFlight, useOperations, type OpsSelection } from "./operations/OperationsContext";
+import {
+  OperationsProvider,
+  selectedFlight,
+  useOpsActions,
+  useOpsBoard,
+  useOpsSelections,
+  type OpsSelection,
+} from "./operations/OperationsContext";
 import { SelectionPopover } from "./operations/SelectionPopover";
 import { SwapConfirm } from "./operations/SwapConfirm";
 import { ViewsFiltersToolbar } from "./operations/ViewsFiltersToolbar";
@@ -105,8 +112,10 @@ function laneLabel(lane: NoStandLane) {
 
 /** Chart wired to the shared operations selection, views, filters and stands. */
 function ConnectedTimeline() {
-  const { selection, skyeSelection, applyChartIntent, matcher, allocationVersion, boardHeld, flightStyle } =
-    useOperations();
+  // Not the details popover or swap question (useOpsDetails): the chart does not draw them.
+  const { selection, skyeSelection } = useOpsSelections();
+  const { applyChartIntent } = useOpsActions();
+  const { matcher, allocationVersion, boardHeld, flightStyle } = useOpsBoard();
   // Flights waiting for a stand, in the No stand lane above the stands. While
   // Skye's cursors work several at once, it keeps its rows (see layoutLane).
   const heldLane = useRef<NoStandLane | undefined>(undefined);
@@ -120,24 +129,55 @@ function ConnectedTimeline() {
   const pinnedLabel = useMemo(() => laneLabel(lane), [lane]);
   // Read on every stand change (allocationVersion re-renders this).
   const closure = currentClosure();
-  // The user and Skye select side by side: the chart shows both, Skye's in her colours.
-  const userIds = [...selection.occupancyIds, ...waitingStayIds(selection)];
-  const skyeIds = [...skyeSelection.occupancyIds, ...waitingStayIds(skyeSelection)].filter((id) => !userIds.includes(id));
-  const selectedIds = [...userIds, ...skyeIds];
-  // A pair is linked within one player's selection, never across the two.
-  const linkFor = (pair: readonly string[], skye: boolean) => {
-    if (pair.length !== 2) return [];
-    const status = checkSwap(pair[0], pair[1]).ok ? "compatible" : "incompatible";
-    return [{ fromId: pair[0], toId: pair[1], className: `demo-link--${status}${skye ? " demo-link--skye" : ""}` }];
-  };
-  const links = [...linkFor(selection.occupancyIds, false), ...linkFor(skyeSelection.occupancyIds, true)];
+  // The user and Skye select side by side: the chart shows both, Skye's in her
+  // colours. Made once per selection (and stand change, for a pair's verdict),
+  // so the chart redraws only the bars whose selection changed.
+  const { skyeIds, selectedIds, links } = useMemo(() => {
+    const userIds = [...selection.occupancyIds, ...waitingStayIds(selection)];
+    const skyeIds = [...skyeSelection.occupancyIds, ...waitingStayIds(skyeSelection)].filter((id) => !userIds.includes(id));
+    // A pair is linked within one player's selection, never across the two.
+    const linkFor = (pair: readonly string[], skye: boolean) => {
+      if (pair.length !== 2) return [];
+      const status = checkSwap(pair[0], pair[1]).ok ? "compatible" : "incompatible";
+      return [{ fromId: pair[0], toId: pair[1], className: `demo-link--${status}${skye ? " demo-link--skye" : ""}` }];
+    };
+    return {
+      skyeIds,
+      selectedIds: [...userIds, ...skyeIds],
+      links: [...linkFor(selection.occupancyIds, false), ...linkFor(skyeSelection.occupancyIds, true)],
+    };
+  }, [selection, skyeSelection, allocationVersion]);
   // The board's zoom, shared with its controls in the header's View menu.
   const zoom = useDemoZoom();
   // Each aircraft type's drawing from the Studio, in the middle of its aircraft's bars.
   const drawings = useDrawings();
+  // What the board draws of the host's, made once each, so a render here does
+  // not render them again: they follow what they read themselves.
+  const underlay = useMemo(() => <ClosureBand closure={closure} />, [closure]);
+  const overlay = useMemo(
+    () => (
+      <>
+        <ClosureLabel closure={closure} />
+        {/* A flight with no stand, dragged from the list: where it would land. */}
+        <FlightDropGhost />
+      </>
+    ),
+    [closure],
+  );
+  const toolbar = useMemo(
+    () => (
+      <>
+        <ViewsFiltersToolbar zoom={zoom} />
+        <ToolbarDivider />
+        <OutputsToggle />
+      </>
+    ),
+    [zoom],
+  );
+  const summary = useMemo(() => <KpiStrip />, []);
   return (
     <>
-      {/* Details show in SelectionPopover, so the demo's own detail strip is hidden here.
+      {/* Details show in SelectionPopover.
           Non-matching bars are dimmed (still occupied/selectable), never removed.
           What Skye selected is outlined in its orb's colours (skye-glow). */}
       <div className="skye-selection-scope">
@@ -146,7 +186,6 @@ function ConnectedTimeline() {
           skyeIds={skyeIds}
           links={links}
           onIntent={applyChartIntent}
-          showSelectionDetail={false}
           isMatch={matcher.active ? matcher.occupancy : undefined}
           selectionActive={selectedIds.length > 0 || !!selection.flightId || !!skyeSelection.flightId}
           occupancies={occupancies}
@@ -154,22 +193,10 @@ function ConnectedTimeline() {
           pinnedLabel={pinnedLabel}
           previewDrop={previewDrop}
           dragSnapMs={DRAG_SNAP_MS}
-          underlay={<ClosureBand closure={closure} />}
-          overlay={
-            <>
-              <ClosureLabel closure={closure} />
-              {/* A flight with no stand, dragged from the list: where it would land. */}
-              <FlightDropGhost />
-            </>
-          }
-          toolbar={
-            <>
-              <ViewsFiltersToolbar zoom={zoom} />
-              <ToolbarDivider />
-              <OutputsToggle />
-            </>
-          }
-          summary={<KpiStrip />}
+          underlay={underlay}
+          overlay={overlay}
+          toolbar={toolbar}
+          summary={summary}
           zoom={zoom}
           flightStyle={flightStyle}
           drawings={drawings}

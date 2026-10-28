@@ -25,15 +25,6 @@
 }
 
 /*
- * The selection detail may shrink on short viewports (it already scrolls
- * inside its max-height) but keeps at least one line visible.
- */
-.demo-detail {
-  flex: 0 1 auto;
-  min-height: calc(var(--lineHeightBase200) + 2 * var(--spacingVerticalS) + 2px);
-}
-
-/*
  * The chart takes all remaining height (its own rows scroll inside).
  * Minimum: both 30px rulers + borders + one 40px row + the horizontal
  * scrollbar, so the rulers stay visible on short viewports without forcing
@@ -99,57 +90,6 @@
   white-space: nowrap;
 }
 
-.demo-detail {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacingVerticalXS);
-  padding: var(--spacingVerticalS) var(--spacingHorizontalM);
-  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
-  border-radius: var(--borderRadiusMedium);
-  /* Many selected stays scroll here instead of squeezing the chart. */
-  max-height: 30%;
-  overflow-y: auto;
-}
-
-.demo-hint {
-  margin: 0;
-  color: var(--colorNeutralForeground3);
-}
-
-.demo-detail-head {
-  display: flex;
-  align-items: center;
-  gap: var(--spacingHorizontalS);
-  font-weight: var(--fontWeightSemibold);
-}
-
-.demo-detail-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacingVerticalXXS);
-  padding-top: var(--spacingVerticalXS);
-  border-top: var(--strokeWidthThin) solid var(--colorNeutralStroke3);
-}
-
-.demo-detail-line {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: var(--spacingVerticalXXS) var(--spacingHorizontalS);
-  font-variant-numeric: tabular-nums;
-}
-
-.demo-chip {
-  padding: 0 var(--spacingHorizontalXS);
-  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
-  border-radius: var(--borderRadiusSmall);
-  font-weight: var(--fontWeightSemibold);
-}
-
-.demo-muted {
-  color: var(--colorNeutralForeground3);
-}
-
 /*
  * Flight-bar palette: one colour per status, not per carrier (see theme.tsx,
  * STATUS_PALETTE):
@@ -157,7 +97,7 @@
  *     white, fading left to right as the coloured bars' colours do (from
  *     --flight-glass-from to --flight-glass-to: 30% to 22% on the light
  *     board, 10% to 7% on the dark one, where white shows far more),
- *     over the blurred grid, as a frosted HUD panel; at
+ *     over the grid, as a HUD panel; at
  *     rest inside Fluent's Stroke 1 (--flight-glass-edge: ≈ 3.6:1 on the
  *     dark board, quieter on the light one), with hover and selection
  *     outlining it strongly;

@@ -17,7 +17,7 @@ import type { Millis } from "../stand-timeline";
 import { DEMO_DOMAIN, formatUtc } from "../stand-timeline-demo/demoData";
 import { standState } from "./allocation";
 import { boardKpis, MIN_WINDOW_MINUTES, planKpis, type KpiSpan } from "./boardKpis";
-import { useOperations } from "./OperationsContext";
+import { useOpsBoard } from "./OperationsContext";
 import { formatDuration } from "./operationsData";
 import { KEEP_SELECTION_ATTR } from "./ViewsFiltersToolbar";
 import "./operations.css";
@@ -164,7 +164,7 @@ function HourlyUse({ hours, busiest }: { hours: readonly { from: Millis; use: nu
 }
 
 export function KpiStrip() {
-  const { allocationVersion } = useOperations();
+  const { allocationVersion } = useOpsBoard();
   const [expanded, setExpanded] = useState(false);
   const id = useId();
   const toggleLabel = expanded ? "Hide KPI details" : "Show KPI details";

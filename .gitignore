@@ -2,6 +2,8 @@ node_modules
 dist
 dist-ssr
 *.local
+# tsc -b's incremental build state
+*.tsbuildinfo
 
 .vscode/*
 !.vscode/extensions.json

@@ -1,0 +1,32 @@
+/*
+ * The app's effects reduced (effects.ts; Settings' Reduce effects), through
+ * data-effects="reduced": no blur anywhere, not even where the app keeps it
+ * (the board's rulers, No stand lane and stand column, the content window,
+ * Settings); no film grain. The background glow, the orbs and Skye's
+ * selection glow are stilled in their own styles and components. (Resting,
+ * rest.ts, pauses animations without a stylesheet.)
+ */
+:root[data-effects="reduced"] *,
+:root[data-effects="reduced"] *::before,
+:root[data-effects="reduced"] *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* The film grain (grain.css). */
+:root[data-effects="reduced"] body::after {
+  display: none;
+}
+
+/*
+ * Settings (SettingsOverlay): without their blur, Coral's see-through card and
+ * page would show the app through them, so they are solid: the card in
+ * Background 1, the page beside its menu (the div after the nav) in 2.
+ */
+:root[data-effects="reduced"] .mica-settings {
+  background-color: var(--colorNeutralBackground1);
+}
+
+:root[data-effects="reduced"] .mica-settings nav + div {
+  background-color: var(--colorNeutralBackground2);
+}

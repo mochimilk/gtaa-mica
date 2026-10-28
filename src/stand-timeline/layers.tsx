@@ -1,4 +1,6 @@
 import {
+  memo,
+  useCallback,
   useEffect,
   useId,
   useRef,
@@ -9,7 +11,15 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
-import { useTimeline, useTimelineRegion, type BarDrag, type RowAt, type RowRef } from "./context";
+import {
+  useTimeline,
+  useTimelineRegion,
+  type BarDrag,
+  type HoverStore,
+  type RowAt,
+  type RowRef,
+  type TimelineSection,
+} from "./context";
 import {
   HOUR,
   MINUTE,
@@ -22,7 +32,7 @@ import {
   roundedPath,
   timeTicks,
 } from "./geometry";
-import type { BarDatum, BarEnds, Millis, TimelineRow } from "./model";
+import type { BarDatum, BarEnds, ChartIntent, Millis, TimelineRow } from "./model";
 import { rowsViewport } from "./viewport";
 
 /* ------------------------------------------------------------------ axis */
@@ -434,7 +444,8 @@ function useBarDrag() {
   const stops = useRef(new Map<number, () => void>());
   useEffect(() => () => [...stops.current.values()].forEach((stop) => stop()), []);
 
-  const begin = (event: ReactPointerEvent<SVGGElement>, id: string, from: RowRef) => {
+  // Stable, so the bars it is handed to (OccupancyBar) can skip re-rendering.
+  const begin = useCallback((event: ReactPointerEvent<SVGGElement>, id: string, from: RowRef) => {
     if (!latest.current.previewDrop || event.button !== 0) return;
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     const svg = event.currentTarget.ownerSVGElement;
@@ -561,7 +572,7 @@ function useBarDrag() {
     window.addEventListener("pointercancel", cancel);
     window.addEventListener("keydown", escape);
     stops.current.set(pointerId, stop);
-  };
+  }, [store]);
 
   return { drags, begin, enabled: !!previewDrop };
 }
@@ -572,8 +583,6 @@ export function OccupancyBars({ barStyle, renderBar, describe = defaultDescribe 
   const { drags, begin, enabled } = useBarDrag();
   if (region !== "plot") return null;
 
-  const select = (id: string, toggle: boolean) =>
-    emit({ type: "select", occupancyIds: [id], mode: toggle ? "toggle" : "replace" });
   const active = [...drags.values()];
   const dragging = new Set(active.filter((drag) => drag.preview).map((drag) => drag.id));
   const blocking = new Set(
@@ -582,58 +591,107 @@ export function OccupancyBars({ barStyle, renderBar, describe = defaultDescribe 
 
   return (
     <g className={enabled ? "st-bars st-bars--draggable" : "st-bars"}>
-      {bars.map((bar) => {
-        const style = barStyle?.(bar) ?? {};
-        const label = describe(bar, formatTime);
-        const id = bar.occupancy.id;
-        return (
-          <g
-            key={id}
-            className={[
-              "st-bar",
-              bar.selected ? "st-bar--selected" : "",
-              bar.linked ? "st-bar--linked" : "",
-              dragging.has(id) ? "st-bar--dragging" : "",
-              blocking.has(id) ? "st-bar--blocking" : "",
-              style.className ?? "",
-            ].join(" ")}
-            style={style.color ? { color: style.color } : undefined}
-            role="button"
-            tabIndex={0}
-            aria-pressed={bar.selected}
-            aria-label={label}
-            data-occupancy-id={id}
-            onPointerDown={(e: ReactPointerEvent<SVGGElement>) => begin(e, id, { section, index: bar.rowIndex })}
-            // Shared with layers drawn apart from the bars (BarLabels marks their labels).
-            onPointerEnter={() => hover.set({ hoveredId: id })}
-            onPointerLeave={() => hover.get().hoveredId === id && hover.set({ hoveredId: null })}
-            onFocus={(e) => e.currentTarget.matches(":focus-visible") && hover.set({ focusedId: id })}
-            onBlur={() => hover.get().focusedId === id && hover.set({ focusedId: null })}
-            onClick={(e: MouseEvent) => {
-              e.stopPropagation();
-              select(id, e.shiftKey || e.metaKey || e.ctrlKey);
-            }}
-            onKeyDown={(e: KeyboardEvent) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                select(id, e.shiftKey);
-              } else if (e.key === "Escape") {
-                emit({ type: "select", occupancyIds: [], mode: "replace" });
-              }
-            }}
-          >
-            {renderBar ? renderBar(bar, style) : <DefaultBar bar={bar} style={style} />}
-            {/* 1.5px outside the bar, its edges parallel to the bar's. */}
-            <path className="st-bar-outline" d={barPath(bar, bar.ends, barRadius, 1.5)} />
-          </g>
-        );
-      })}
+      {bars.map((bar) => (
+        <OccupancyBar
+          key={bar.occupancy.id}
+          bar={bar}
+          barStyle={barStyle}
+          renderBar={renderBar}
+          describe={describe}
+          barRadius={barRadius}
+          formatTime={formatTime}
+          section={section}
+          hover={hover}
+          emit={emit}
+          begin={begin}
+          dragging={dragging.has(bar.occupancy.id)}
+          blocking={blocking.has(bar.occupancy.id)}
+        />
+      ))}
       {[...drags].map(([pointerId, drag]) => (
         <DropGhosts key={pointerId} drag={drag} />
       ))}
     </g>
   );
 }
+
+interface OccupancyBarProps extends OccupancyBarsProps {
+  bar: BarDatum;
+  describe: NonNullable<OccupancyBarsProps["describe"]>;
+  barRadius: number;
+  formatTime: (t: Millis) => string;
+  section: TimelineSection;
+  hover: HoverStore;
+  emit: (intent: ChartIntent) => void;
+  begin: (event: ReactPointerEvent<SVGGElement>, id: string, from: RowRef) => void;
+  dragging: boolean;
+  blocking: boolean;
+}
+
+/**
+ * One bar. Memoized: the chart gives a bar a new object only when it is laid
+ * out again or its selection changes, so a click or a drag step redraws the
+ * bars it touches, not every bar.
+ */
+const OccupancyBar = memo(function OccupancyBar({
+  bar,
+  barStyle,
+  renderBar,
+  describe,
+  barRadius,
+  formatTime,
+  section,
+  hover,
+  emit,
+  begin,
+  dragging,
+  blocking,
+}: OccupancyBarProps) {
+  const style = barStyle?.(bar) ?? {};
+  const label = describe(bar, formatTime);
+  const id = bar.occupancy.id;
+  const select = (toggle: boolean) => emit({ type: "select", occupancyIds: [id], mode: toggle ? "toggle" : "replace" });
+  return (
+    <g
+      className={[
+        "st-bar",
+        bar.selected ? "st-bar--selected" : "",
+        bar.linked ? "st-bar--linked" : "",
+        dragging ? "st-bar--dragging" : "",
+        blocking ? "st-bar--blocking" : "",
+        style.className ?? "",
+      ].join(" ")}
+      style={style.color ? { color: style.color } : undefined}
+      role="button"
+      tabIndex={0}
+      aria-pressed={bar.selected}
+      aria-label={label}
+      data-occupancy-id={id}
+      onPointerDown={(e: ReactPointerEvent<SVGGElement>) => begin(e, id, { section, index: bar.rowIndex })}
+      // Shared with layers drawn apart from the bars (BarLabels marks their labels).
+      onPointerEnter={() => hover.set({ hoveredId: id })}
+      onPointerLeave={() => hover.get().hoveredId === id && hover.set({ hoveredId: null })}
+      onFocus={(e) => e.currentTarget.matches(":focus-visible") && hover.set({ focusedId: id })}
+      onBlur={() => hover.get().focusedId === id && hover.set({ focusedId: null })}
+      onClick={(e: MouseEvent) => {
+        e.stopPropagation();
+        select(e.shiftKey || e.metaKey || e.ctrlKey);
+      }}
+      onKeyDown={(e: KeyboardEvent) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          select(e.shiftKey);
+        } else if (e.key === "Escape") {
+          emit({ type: "select", occupancyIds: [], mode: "replace" });
+        }
+      }}
+    >
+      {renderBar ? renderBar(bar, style) : <DefaultBar bar={bar} style={style} />}
+      {/* 1.5px outside the bar, its edges parallel to the bar's. */}
+      <path className="st-bar-outline" d={barPath(bar, bar.ends, barRadius, 1.5)} />
+    </g>
+  );
+});
 
 /** "+1h 30m", "−15m": how far a drag moves a bar in time. */
 function formatShift(ms: number): string {
@@ -1054,7 +1112,29 @@ export function layoutLabelSlots(
   return [{ ...t, name: first, x: 0, width: w, primary, secondary }];
 }
 
-export function BarLabels({
+export function BarLabels(props: BarLabelsProps) {
+  const region = useTimelineRegion();
+  const { bars, hover } = useTimeline();
+  if (region !== "plot") return null;
+  return (
+    <g pointerEvents="none" aria-hidden="true">
+      {bars.map((bar) => (
+        <BarLabel key={bar.occupancy.id} bar={bar} hover={hover} {...props} />
+      ))}
+    </g>
+  );
+}
+
+/**
+ * One bar's labels. The labels are their own layer, above every bar, so CSS
+ * can't reach them from their bar's :hover or :focus-visible; each follows
+ * the shared store for its own bar alone, so the pointer crossing the board
+ * redraws the labels it leaves and enters, not all of them. Memoized as the
+ * bars are (OccupancyBar).
+ */
+const BarLabel = memo(function BarLabel({
+  bar,
+  hover,
   slots,
   text,
   color,
@@ -1067,122 +1147,104 @@ export function BarLabels({
   iconGap = 3,
   iconMargin = 0,
   padding = 5,
-}: BarLabelsProps) {
-  const region = useTimelineRegion();
-  const { bars, hover: hoverStore } = useTimeline();
-  // The labels are their own layer, above every bar, so CSS can't reach them
-  // from their bar's :hover or :focus-visible; they follow the shared store.
-  const hover = useSyncExternalStore(hoverStore.subscribe, hoverStore.get);
-  if (region !== "plot") return null;
+}: BarLabelsProps & { bar: BarDatum; hover: HoverStore }) {
+  const id = bar.occupancy.id;
+  const hovered = useSyncExternalStore(hover.subscribe, () => hover.get().hoveredId === id);
+  const focused = useSyncExternalStore(hover.subscribe, () => hover.get().focusedId === id);
+
+  let barSlots = slots?.(bar);
+  if (!barSlots) {
+    const raw = text ? text(bar) : (bar.occupancy.label ?? bar.visit?.label);
+    if (!raw) return null;
+    barSlots = { start: { primary: raw } };
+  }
+  // `padding` in from the bar's end, or from where a shaped end begins, as from a round one.
+  const padLeft = padding + barEndDepth(bar.ends.start, bar.height);
+  const padRight = padding + barEndDepth(bar.ends.end, bar.height);
+  const w = bar.width - padLeft - padRight;
+  if (w <= 0) return null;
+  const twoLines = bar.height >= 2 * linePitch;
+  const placed = layoutLabelSlots(barSlots, priority, w, twoLines, charWidth, slotGap, {
+    size: iconSize,
+    gap: iconGap,
+    margin: iconMargin,
+  });
+  if (placed.length === 0) return null;
+  const fill = color?.(bar);
+  const mid = bar.height / 2;
+  const iconY = (bar.height - iconSize) / 2;
 
   return (
-    <g pointerEvents="none" aria-hidden="true">
-      {bars.map((bar) => {
-        let barSlots = slots?.(bar);
-        if (!barSlots) {
-          const raw = text ? text(bar) : (bar.occupancy.label ?? bar.visit?.label);
-          if (!raw) return null;
-          barSlots = { start: { primary: raw } };
-        }
-        // `padding` in from the bar's end, or from where a shaped end begins, as from a round one.
-        const padLeft = padding + barEndDepth(bar.ends.start, bar.height);
-        const padRight = padding + barEndDepth(bar.ends.end, bar.height);
-        const w = bar.width - padLeft - padRight;
-        if (w <= 0) return null;
-        const twoLines = bar.height >= 2 * linePitch;
-        const placed = layoutLabelSlots(barSlots, priority, w, twoLines, charWidth, slotGap, {
-          size: iconSize,
-          gap: iconGap,
-          margin: iconMargin,
-        });
-        if (placed.length === 0) return null;
-        const fill = color?.(bar);
-        const mid = bar.height / 2;
-        const iconY = (bar.height - iconSize) / 2;
-
-        const id = bar.occupancy.id;
-        return (
-          <g
-            key={id}
-            className={[
-              "st-bar-labels",
-              bar.selected ? "st-bar-labels--selected" : "",
-              bar.linked ? "st-bar-labels--linked" : "",
-              hover.hoveredId === id ? "st-bar-labels--hovered" : "",
-              hover.focusedId === id ? "st-bar-labels--focused" : "",
-              className?.(bar) ?? "",
-            ].join(" ")}
+    <g
+      className={[
+        "st-bar-labels",
+        bar.selected ? "st-bar-labels--selected" : "",
+        bar.linked ? "st-bar-labels--linked" : "",
+        hovered ? "st-bar-labels--hovered" : "",
+        focused ? "st-bar-labels--focused" : "",
+        className?.(bar) ?? "",
+      ].join(" ")}
+    >
+      {placed.map((p) => {
+        const anchor = p.name === "end" ? "end" : p.name === "center" ? "middle" : "start";
+        const textX0 = p.leadW;
+        const textW = p.width - p.leadW - p.trailW;
+        const tx = anchor === "end" ? textX0 + textW : anchor === "middle" ? textX0 + textW / 2 : textX0;
+        const hasSecond = !!p.secondary;
+        const iconBox = (x: number, node: ReactNode) => (
+          <svg
+            className="st-bar-label-icon"
+            x={x}
+            y={iconY}
+            width={iconSize}
+            height={iconSize}
+            style={{ fontSize: iconSize, color: fill }}
+            aria-hidden="true"
           >
-            {placed.map((p) => {
-              const anchor = p.name === "end" ? "end" : p.name === "center" ? "middle" : "start";
-              const textX0 = p.leadW;
-              const textW = p.width - p.leadW - p.trailW;
-              const tx =
-                anchor === "end" ? textX0 + textW : anchor === "middle" ? textX0 + textW / 2 : textX0;
-              const hasSecond = !!p.secondary;
-              const iconBox = (x: number, node: ReactNode) => (
-                <svg
-                  className="st-bar-label-icon"
-                  x={x}
-                  y={iconY}
-                  width={iconSize}
-                  height={iconSize}
-                  style={{ fontSize: iconSize, color: fill }}
-                  aria-hidden="true"
-                >
-                  {node}
-                </svg>
-              );
-              const slotW = Math.max(0, Math.min(p.width, w - p.x));
-              // Each slot gets its own nested <svg>, which clips it to its allotted width.
-              if (p.html) {
-                return (
-                  <svg key={p.name} x={bar.x + padLeft + p.x} y={bar.y} width={slotW} height={bar.height}>
-                    <foreignObject x={0} y={(bar.height - p.html.height) / 2} width={slotW} height={p.html.height}>
-                      <div className={`st-bar-label-html st-bar-label-html--${p.name}`}>{p.html.node}</div>
-                    </foreignObject>
-                  </svg>
-                );
-              }
-              return (
-                <svg
-                  key={p.name}
-                  x={bar.x + padLeft + p.x}
-                  y={bar.y}
-                  width={slotW}
-                  height={bar.height}
-                >
-                  {/* Icons sit inset by iconMargin within their reserved block. */}
-                  {p.leading && iconBox(iconMargin, p.leading)}
-                  {p.trailing && iconBox(p.width - iconMargin - iconSize, p.trailing)}
-                  <text
-                    className="st-bar-label st-bar-label--primary"
-                    x={tx}
-                    y={hasSecond ? mid - linePitch / 2 : mid}
-                    textAnchor={anchor}
-                    dominantBaseline="central"
-                    style={{ fill }}
-                  >
-                    {p.primary}
-                  </text>
-                  {hasSecond && (
-                    <text
-                      className="st-bar-label st-bar-label--secondary"
-                      x={tx}
-                      y={mid + linePitch / 2}
-                      textAnchor={anchor}
-                      dominantBaseline="central"
-                      style={{ fill }}
-                    >
-                      {p.secondary}
-                    </text>
-                  )}
-                </svg>
-              );
-            })}
-          </g>
+            {node}
+          </svg>
+        );
+        const slotW = Math.max(0, Math.min(p.width, w - p.x));
+        // Each slot gets its own nested <svg>, which clips it to its allotted width.
+        if (p.html) {
+          return (
+            <svg key={p.name} x={bar.x + padLeft + p.x} y={bar.y} width={slotW} height={bar.height}>
+              <foreignObject x={0} y={(bar.height - p.html.height) / 2} width={slotW} height={p.html.height}>
+                <div className={`st-bar-label-html st-bar-label-html--${p.name}`}>{p.html.node}</div>
+              </foreignObject>
+            </svg>
+          );
+        }
+        return (
+          <svg key={p.name} x={bar.x + padLeft + p.x} y={bar.y} width={slotW} height={bar.height}>
+            {/* Icons sit inset by iconMargin within their reserved block. */}
+            {p.leading && iconBox(iconMargin, p.leading)}
+            {p.trailing && iconBox(p.width - iconMargin - iconSize, p.trailing)}
+            <text
+              className="st-bar-label st-bar-label--primary"
+              x={tx}
+              y={hasSecond ? mid - linePitch / 2 : mid}
+              textAnchor={anchor}
+              dominantBaseline="central"
+              style={{ fill }}
+            >
+              {p.primary}
+            </text>
+            {hasSecond && (
+              <text
+                className="st-bar-label st-bar-label--secondary"
+                x={tx}
+                y={mid + linePitch / 2}
+                textAnchor={anchor}
+                dominantBaseline="central"
+                style={{ fill }}
+              >
+                {p.secondary}
+              </text>
+            )}
+          </svg>
         );
       })}
     </g>
   );
-}
+});

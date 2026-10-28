@@ -16,7 +16,7 @@ import { Branch20Filled, Branch20Regular, bundleIcon, createFluentIcon } from "@
 import { skyeOrbStill } from "../components/orb";
 import { RightPanelToggle } from "../components/panel-toggle";
 import { flightsAtStay } from "./allocation";
-import { selectedFlight, useOperations } from "./OperationsContext";
+import { selectedFlight, useOpsActions, useOpsSelections } from "./OperationsContext";
 import { describeApprovers, formatLogTime, type OutputActor, type OutputDecision, type OutputRequest, type OutputStep } from "./outputs";
 import { OutputsApproval } from "./OutputsApproval";
 import { OUTPUT_ICON_GAP, OutputSteps, RequestMeta, useOutputs } from "./OutputSteps";
@@ -280,7 +280,7 @@ export function OutputsToggle() {
  * into view with its details beside it; or, for an area's closure, its band.
  */
 function useOpenStep() {
-  const { selectFlight } = useOperations();
+  const { selectFlight } = useOpsActions();
   return (step: OutputStep) => {
     const flight = step.stayId ? flightsAtStay(step.stayId)[0] : undefined;
     if (flight) {
@@ -296,7 +296,7 @@ function useOpenStep() {
 export function OutputsPanel() {
   const styles = useStyles();
   const requests = useOutputs();
-  const { selection } = useOperations();
+  const { selection } = useOpsSelections();
   const openStep = useOpenStep();
   // The stays the user has selected: a flight waiting for a stand is selected by its flight.
   const waiting = selectedFlight(selection)?.unplacedStay?.stayId;

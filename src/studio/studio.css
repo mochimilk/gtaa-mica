@@ -153,8 +153,7 @@
   padding: var(--spacingVerticalS) var(--spacingHorizontalXS);
   box-sizing: border-box;
   border-radius: var(--borderRadiusXLarge);
-  background-color: color-mix(in srgb, var(--colorNeutralBackground1) 85%, transparent);
-  backdrop-filter: saturate(150%) blur(20px);
+  background-color: var(--colorNeutralBackground1);
   box-shadow: var(--shadow16);
   overflow-y: auto;
 }

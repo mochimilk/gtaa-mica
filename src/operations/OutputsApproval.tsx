@@ -8,7 +8,7 @@
 import { useSyncExternalStore } from "react";
 import { Button, makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
 import { callGuests, subscribeCallGuests } from "../live/callGuests";
-import { useOperations } from "./OperationsContext";
+import { useOpsActions } from "./OperationsContext";
 import { useOutputs } from "./OutputSteps";
 import { callForSignoffs, skyeReview, subscribeSkyeReview, type Signoff } from "./skyeReview";
 import "./operations.css";
@@ -42,7 +42,7 @@ export function OutputsApproval({ className }: { className?: string }) {
   const review = useSyncExternalStore(subscribeSkyeReview, skyeReview);
   const ringing = useSyncExternalStore(subscribeCallGuests, callGuests)?.calling ?? [];
   const working = useOutputs().some((request) => request.actor === "skye" && request.working);
-  const { undoSkyeChanges, approveSkyeChanges } = useOperations();
+  const { undoSkyeChanges, approveSkyeChanges } = useOpsActions();
   if (!review || working) return null;
 
   const waiting = review.signoffs.find((entry) => entry.state !== "approved");

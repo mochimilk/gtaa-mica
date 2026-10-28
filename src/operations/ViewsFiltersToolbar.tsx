@@ -1,25 +1,15 @@
 // Views (eye) and Filters (funnel) icon buttons for the chart header. Each
 // opens a menu (components/menu) with MenuGroups and controlled checkedValues: Views
 // is a single-choice radio group, with the board's zoom under it (given
-// `zoom`), then Skye glow (the colour of Skye's light while her helpers work,
-// see skyeGlow.ts), Timeline, the flight style, and Noise, the app's film
-// grain (components/grain), toggles showing their values at the row's end;
-// Filters are labelled checkbox groups that stay open while toggling
-// (persistOnClick). State lives in the operations context; matching is in
-// opsFilters.ts. The data-ops-* attributes are how Skye's cursor finds these
-// controls (agentGestures.ts).
+// `zoom`); the board's look (Skye glow, Timeline, Noise) is in Settings
+// (components/settings). Filters are labelled checkbox groups that stay open
+// while toggling (persistOnClick). State lives in the operations context;
+// matching is in opsFilters.ts. The data-ops-* attributes are how Skye's
+// cursor finds these controls (agentGestures.ts).
 import { Fragment, useState } from "react";
 import { Button, Tooltip } from "@fluentui/react-components";
-import {
-  ArrowResetRegular,
-  ColorRegular,
-  DustRegular,
-  EyeRegular,
-  FilterRegular,
-  TimelineRegular,
-} from "@fluentui/react-icons";
-import { isSkyeEvent, setSkyeGlow, SKYE_GLOWS, useSkyeGlow } from "../components/agent-cursor";
-import { setGrain, useGrain } from "../components/grain";
+import { ArrowResetRegular, EyeRegular, FilterRegular } from "@fluentui/react-icons";
+import { isSkyeEvent } from "../components/agent-cursor";
 import {
   Menu,
   MenuDivider,
@@ -30,14 +20,12 @@ import {
   MenuItemRadio,
   MenuList,
   MenuPopover,
-  MenuToggleItem,
   MenuTrigger,
   type MenuProps,
 } from "../components/menu";
 import type { TimelineZoom } from "../stand-timeline";
-import { FLIGHT_STYLE_LABEL } from "../stand-timeline-demo/theme";
 import { ZoomMenuRow } from "../stand-timeline-demo/ZoomMenuRow";
-import { useOperations } from "./OperationsContext";
+import { useOpsActions, useOpsBoard } from "./OperationsContext";
 import {
   FILTER_LABELS,
   FILTER_OPTIONS,
@@ -68,10 +56,8 @@ const optionLabel = (dim: FilterDim, value: string) =>
   dim === "area" && value === UNASSIGNED_AREA ? "Unassigned (no stand)" : value;
 
 export function ViewsFiltersToolbar({ zoom }: { zoom?: TimelineZoom }) {
-  const { view, setView, filters, setFilter, resetFilters, flightStyle, setFlightStyle } = useOperations();
-  const skyeGlow = useSkyeGlow();
-  const glow = SKYE_GLOWS.findIndex((choice) => choice.value === skyeGlow);
-  const grain = useGrain();
+  const { view, filters } = useOpsBoard();
+  const { setView, setFilter, resetFilters } = useOpsActions();
   const viewLabel = VIEWS.find((v) => v.value === view)?.label ?? "All activity";
   const viewActive = view !== "all";
   const filterCount = DIMS.reduce((n, d) => n + filters[d].length, 0);
@@ -118,26 +104,12 @@ export function ViewsFiltersToolbar({ zoom }: { zoom?: TimelineZoom }) {
                 </MenuItemRadio>
               ))}
             </MenuGroup>
-            <MenuDivider />
-            {zoom && <ZoomMenuRow zoom={zoom} />}
-            <MenuToggleItem
-              icon={<ColorRegular />}
-              label="Skye glow"
-              value={SKYE_GLOWS[glow].label}
-              onToggle={() => setSkyeGlow(SKYE_GLOWS[(glow + 1) % SKYE_GLOWS.length].value)}
-            />
-            <MenuToggleItem
-              icon={<TimelineRegular />}
-              label="Timeline"
-              value={FLIGHT_STYLE_LABEL[flightStyle]}
-              onToggle={() => setFlightStyle(flightStyle === "classic" ? "aero" : "classic")}
-            />
-            <MenuToggleItem
-              icon={<DustRegular />}
-              label="Noise"
-              value={grain ? "On" : "Off"}
-              onToggle={() => setGrain(!grain)}
-            />
+            {zoom && (
+              <>
+                <MenuDivider />
+                <ZoomMenuRow zoom={zoom} />
+              </>
+            )}
           </MenuList>
         </MenuPopover>
       </Menu>

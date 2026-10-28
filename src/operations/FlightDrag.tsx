@@ -14,7 +14,7 @@ import { barPath, rowsViewport, useTimeline, useTimelineRegion, type Millis } fr
 import { DEMO_DATA, formatUtc } from "../stand-timeline-demo/demoData";
 import { BAR_INSET, stayEnds } from "../stand-timeline-demo/theme";
 import { planAssign } from "./allocation";
-import { useOperations } from "./OperationsContext";
+import { useOpsBoard } from "./OperationsContext";
 import type { OpsFlight } from "./operationsData";
 
 /** How far a press on a row must travel before it becomes a drag, px. */
@@ -258,7 +258,7 @@ export function FlightDragChip() {
 export function FlightDropGhost() {
   const region = useTimelineRegion();
   const { rows, rowHeight, barRadius, scale } = useTimeline();
-  const { flightStyle } = useOperations();
+  const { flightStyle } = useOpsBoard();
   const carried = useFlightDrags();
   if (region !== "plot") return null;
   return (

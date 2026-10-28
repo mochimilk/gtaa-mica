@@ -42,21 +42,16 @@ import "./operations.css";
 const HEADER_HEIGHT = 56;
 
 /**
- * Ask Skye's floating windows' glass, open (askSkye.css), lighter: their
- * gentle lens (LiquidGlassFilter.tsx), frosted a little less (12px to their 15px), and the theme's
- * background as a 75% tint (theirs is 90%). The board shows through it, so
- * its list fades its rows out at the edges (OverflowScroll's mask) rather
- * than painting over them.
+ * Ask Skye's floating windows' fill (askSkye.css): the theme's background,
+ * solid. Its list fades its rows out at the edges (OverflowScroll's mask).
  */
-const GLASS_LENS = "url(#mica-liquid-glass-open)";
-const GLASS_BACKDROP = "blur(12px) saturate(140%)";
-const GLASS_TINT = `color-mix(in srgb, ${tokens.colorNeutralBackground2} 75%, transparent)`;
+const FILL = tokens.colorNeutralBackground2;
 /**
- * Done, in dark mode, the tint is the reference card's deep navy instead, as
- * strong, so the violet light over it stays saturated rather than greying on
- * the neutral tint. Light mode keeps its own, under dark text.
+ * Done, in dark mode, the fill is the reference card's deep navy instead, so
+ * the violet light over it stays saturated rather than greying on the
+ * neutral fill. Light mode keeps its own, under dark text.
  */
-const DONE_TINT = "color-mix(in srgb, #05051d 75%, transparent)";
+const DONE_FILL = "#05051d";
 
 const subscribeColorMode = (notify: () => void) => {
   eventBus.on("colorModeChanged", notify);
@@ -108,21 +103,19 @@ const LIT = [
   `inset 0 -45px 56px ${8 + LIT_BLEED}px rgba(80, 84, 230, 0.45)`,
 ].join(", ");
 
-/** Inside the 1px border: the glass layers are rounded themselves, as the blur is not clipped to its parent's corners. */
+/** Inside the 1px border: the fill layer is rounded itself, to match its parent's corners. */
 const INNER_RADIUS = `calc(${tokens.borderRadiusXLarge} - 1px)`;
 
-// The glass lies under the content, in layers that fade in and out: the
-// blur sees only as far back as an ancestor that fades, so neither the
-// surface nor the peek ever does (as Ask Skye's windows fade their glass,
-// not themselves).
-const glassLayer: GriffelStyle = {
+// The fill lies under the content, in a layer that fades in and out (as Ask
+// Skye's windows fade their fill, not themselves).
+const fillLayer: GriffelStyle = {
   content: '""',
   position: "absolute",
   top: 0,
   right: 0,
   bottom: 0,
   left: 0,
-  // Under the lit layer (-1), which lies over the tint.
+  // Under the lit layer (-1), which lies over the fill.
   zIndex: -2,
   borderRadius: INNER_RADIUS,
   pointerEvents: "none",
@@ -168,7 +161,7 @@ const useStyles = makeStyles({
     transitionTimingFunction: tokens.curveDecelerateMid,
     transitionDelay: "0s",
   },
-  // The glass and what is on it.
+  // The fill and what is on it.
   surface: {
     position: "relative",
     flex: "1 1 auto",
@@ -184,10 +177,9 @@ const useStyles = makeStyles({
     transitionProperty: "border-color, box-shadow",
     transitionDuration: tokens.durationFast,
     transitionTimingFunction: tokens.curveAccelerateMid,
-    "::before": { ...glassLayer, filter: GLASS_LENS, backdropFilter: GLASS_BACKDROP },
     "::after": {
-      ...glassLayer,
-      backgroundColor: GLASS_TINT,
+      ...fillLayer,
+      backgroundColor: FILL,
       transitionProperty: "opacity, background-color",
     },
     "& > *": {
@@ -202,14 +194,13 @@ const useStyles = makeStyles({
     boxShadow: tokens.shadow28,
     transitionDuration: tokens.durationNormal,
     transitionTimingFunction: tokens.curveDecelerateMid,
-    "::before": fadeIn,
     "::after": { ...fadeIn, transitionProperty: "opacity, background-color" },
     "& > *": fadeIn,
   },
   surfaceDoneDark: {
-    "::after": { backgroundColor: DONE_TINT },
+    "::after": { backgroundColor: DONE_FILL },
   },
-  // Over the glass and its tint, under the content; it fades in as Skye finishes.
+  // Over the fill, under the content; it fades in as Skye finishes.
   lit: {
     position: "absolute",
     top: `${-LIT_BLEED}px`,

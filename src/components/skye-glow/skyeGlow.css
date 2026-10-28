@@ -58,3 +58,9 @@
     animation: none;
   }
 }
+
+/* Effects reduced (components/effects): the glow holds still too. */
+:root[data-effects="reduced"] .st-bar--selected.demo-bar--skye .st-bar-outline,
+:root[data-effects="reduced"] .st-link.demo-link--skye {
+  animation: none;
+}

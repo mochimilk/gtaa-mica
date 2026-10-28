@@ -35,7 +35,7 @@ import {
   planAssign,
   standArea,
 } from "./allocation";
-import { selectedFlight, useOperations, type OpsSelection } from "./OperationsContext";
+import { selectedFlight, useOpsActions, useOpsBoard, useOpsSelections, type OpsSelection } from "./OperationsContext";
 import { useDrawings } from "../studio/drawings";
 import { PixelArt, crispSize } from "../studio/PixelArt";
 import type { OpsFlight } from "./operationsData";
@@ -96,7 +96,8 @@ function cardEnd(side: Side, stay: Occupancy | undefined, flight: OpsFlight | un
 }
 
 export function FlightCard({ titleId, title }: { titleId: string; title: string }) {
-  const { selection, assignStands, unassignStands, resetStands } = useOperations();
+  const { selection } = useOpsSelections();
+  const { assignStands, unassignStands, resetStands } = useOpsActions();
   const flight = selectedFlight(selection);
   const { stay, onStand } = cardStay(selection, flight);
 
@@ -178,7 +179,7 @@ export function SwapCard({
   title: string;
   pair: readonly [Occupancy, Occupancy];
 }) {
-  const { requestSwap } = useOperations();
+  const { requestSwap } = useOpsActions();
   const [upper, lower] = [...pair].sort(
     (a, b) => (rowIndex.get(a.rowId) ?? 0) - (rowIndex.get(b.rowId) ?? 0) || a.start - b.start,
   );
@@ -234,7 +235,7 @@ const AERO_BOX_RADIUS = 12;
  * plain rounded box; any other is drawn in its shape (ShapedEnds).
  */
 function StayEnds({ stay, flight }: { stay?: Occupancy; flight?: OpsFlight }) {
-  const { flightStyle } = useOperations();
+  const { flightStyle } = useOpsBoard();
   const drawings = useDrawings();
   const type = aircraftTypeOf(stay, flight);
   const symbol = type ? drawings.get(type) : undefined;

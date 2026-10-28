@@ -5,7 +5,7 @@
 // with no stand (and stay times) can be dragged onto a stand on the chart
 // (see ./FlightDrag); the details popover's Assign stand does the same from
 // the keyboard.
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { memo, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import {
   Badge,
   Table,
@@ -18,7 +18,7 @@ import {
 import { InfoRegular, WarningRegular } from "@fluentui/react-icons";
 import { airportLabel } from "../stand-timeline-demo/airports";
 import { dayOffsetLabel, formatUtc, formatUtcFull } from "../stand-timeline-demo/demoData";
-import { isFlightSelected, useOperations } from "./OperationsContext";
+import { isFlightSelected, useOpsActions, useOpsBoard, useOpsSelections } from "./OperationsContext";
 import { alertsForFlight } from "./boardAlerts";
 import { beginFlightDrag } from "./FlightDrag";
 import type { OpsFlight } from "./operationsData";
@@ -59,7 +59,9 @@ export function FlightList({
   timeHeaderLabel,
   emptyMessage,
 }: FlightListProps) {
-  const { selection, skyeSelection, selectFlight, acknowledged, assignStands } = useOperations();
+  const { selection, skyeSelection } = useOpsSelections();
+  const { selectFlight, assignStands } = useOpsActions();
+  const { acknowledged, allocationVersion } = useOpsBoard();
   const bodyRef = useRef<HTMLTableSectionElement>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -135,68 +137,105 @@ export function FlightList({
           </TableRow>
         </TableHeader>
         <TableBody ref={bodyRef} onKeyDown={onKeyDown}>
-          {flights.map((f) => {
-            const selected = isFlightSelected(f, selection);
-            const alerts = alertsForFlight(f.id, acknowledged);
-            const warning = alerts.some((a) => a.severity === "warning");
-            const day = dayOffsetLabel(f.estimate);
-            const draggable = !f.standId && !!f.unplacedStay;
-            return (
-              <TableRow
-                key={f.id}
-                className={draggable ? "ops-row ops-row--draggable" : "ops-row"}
-                data-flight-id={f.id}
-                data-ops-draggable={draggable || undefined}
-                aria-selected={selected}
-                data-skye-selected={(!selected && isFlightSelected(f, skyeSelection)) || undefined}
-                tabIndex={f.id === tabStopId ? 0 : -1}
-                onFocus={() => setActiveId(f.id)}
-                onClick={() => selectFlight(f)}
-                onPointerDown={
-                  draggable
-                    ? (e) => beginFlightDrag(e, f, (stayId, standId) => assignStands([{ stayId, standId }]))
-                    : undefined
-                }
-              >
-                <TableCell className="ops-cell ops-flight">{f.flight}</TableCell>
-                <TableCell className="ops-cell ops-muted" title={airportLabel(f.routeEnd)}>
-                  {f.routeEnd}
-                </TableCell>
-                <TableCell className="ops-cell ops-time" title={formatUtcFull(f.estimate)}>
-                  <span aria-hidden="true">
-                    {formatUtc(f.estimate)}
-                    {day && <span className="ops-day">{day}</span>}
-                  </span>
-                  <span className="ops-visually-hidden">{formatUtcFull(f.estimate)}</span>
-                </TableCell>
-                <TableCell className="ops-cell">
-                  {f.standId ? (
-                    <span className="ops-stand">{f.standId}</span>
-                  ) : (
-                    <Badge appearance="tint" color="warning" size="small" shape="rounded">
-                      Unassigned
-                    </Badge>
-                  )}
-                </TableCell>
-                <TableCell className="ops-cell ops-issue">
-                  {alerts.length > 0 && (
-                    <>
-                      {warning ? (
-                        <WarningRegular className="ops-issue--warning" aria-hidden />
-                      ) : (
-                        <InfoRegular className="ops-issue--info" aria-hidden />
-                      )}
-                      <span className="ops-visually-hidden">
-                        {alerts.length} open alert{alerts.length > 1 ? "s" : ""}
-                      </span>
-                    </>
-                  )}
-                </TableCell>
-              </TableRow>
-            );
-          })}
+          {flights.map((f) => (
+            <FlightRow
+              key={f.id}
+              flight={f}
+              version={allocationVersion}
+              selected={isFlightSelected(f, selection)}
+              skyeSelected={isFlightSelected(f, skyeSelection)}
+              tabStop={f.id === tabStopId}
+              acknowledged={acknowledged}
+              onActive={setActiveId}
+              selectFlight={selectFlight}
+              assignStands={assignStands}
+            />
+          ))}
         </TableBody>
       </Table>
     </div>
   );
 }
+
+interface FlightRowProps {
+  flight: OpsFlight;
+  /** The stands' version: flights change in place when a stand does, so this redraws the row. */
+  version: number;
+  selected: boolean;
+  skyeSelected: boolean;
+  tabStop: boolean;
+  acknowledged: ReadonlySet<string>;
+  onActive: (flightId: string) => void;
+  selectFlight: (flight: OpsFlight) => void;
+  assignStands: ReturnType<typeof useOpsActions>["assignStands"];
+}
+
+/**
+ * One flight's row. Memoized on what it shows, so a pick on the board or in
+ * a list redraws the rows whose selection changed, not the hundred others.
+ */
+const FlightRow = memo(function FlightRow({
+  flight: f,
+  selected,
+  skyeSelected,
+  tabStop,
+  acknowledged,
+  onActive,
+  selectFlight,
+  assignStands,
+}: FlightRowProps) {
+  const alerts = alertsForFlight(f.id, acknowledged);
+  const warning = alerts.some((a) => a.severity === "warning");
+  const day = dayOffsetLabel(f.estimate);
+  const draggable = !f.standId && !!f.unplacedStay;
+  return (
+    <TableRow
+      className={draggable ? "ops-row ops-row--draggable" : "ops-row"}
+      data-flight-id={f.id}
+      data-ops-draggable={draggable || undefined}
+      aria-selected={selected}
+      data-skye-selected={(!selected && skyeSelected) || undefined}
+      tabIndex={tabStop ? 0 : -1}
+      onFocus={() => onActive(f.id)}
+      onClick={() => selectFlight(f)}
+      onPointerDown={
+        draggable ? (e) => beginFlightDrag(e, f, (stayId, standId) => assignStands([{ stayId, standId }])) : undefined
+      }
+    >
+      <TableCell className="ops-cell ops-flight">{f.flight}</TableCell>
+      <TableCell className="ops-cell ops-muted" title={airportLabel(f.routeEnd)}>
+        {f.routeEnd}
+      </TableCell>
+      <TableCell className="ops-cell ops-time" title={formatUtcFull(f.estimate)}>
+        <span aria-hidden="true">
+          {formatUtc(f.estimate)}
+          {day && <span className="ops-day">{day}</span>}
+        </span>
+        <span className="ops-visually-hidden">{formatUtcFull(f.estimate)}</span>
+      </TableCell>
+      <TableCell className="ops-cell">
+        {f.standId ? (
+          <span className="ops-stand">{f.standId}</span>
+        ) : (
+          <Badge appearance="tint" color="warning" size="small" shape="rounded">
+            Unassigned
+          </Badge>
+        )}
+      </TableCell>
+      <TableCell className="ops-cell ops-issue">
+        {alerts.length > 0 && (
+          <>
+            {warning ? (
+              <WarningRegular className="ops-issue--warning" aria-hidden />
+            ) : (
+              <InfoRegular className="ops-issue--info" aria-hidden />
+            )}
+            <span className="ops-visually-hidden">
+              {alerts.length} open alert{alerts.length > 1 ? "s" : ""}
+            </span>
+          </>
+        )}
+      </TableCell>
+    </TableRow>
+  );
+});

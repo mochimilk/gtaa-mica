@@ -23,10 +23,9 @@ function closureBox(closure: Closure, { rows, rowHeight, scale }: TimelineContex
 const describe = (closure: Closure) => `${closure.area} closed ${formatUtc(closure.from)}–${formatUtc(closure.to)}`;
 
 /**
- * The hatched band, under the bars. Skye's cursor goes to it
- * (`data-closure-band`) before it clears the area. It shows through the bars'
- * glass, so the board draws it twice (BarBackdrop): each copy's pattern has
- * an id of its own, and both copies sit in the same place.
+ * The hatched band, under the bars, showing through their glass. Skye's
+ * cursor goes to it (`data-closure-band`) before it clears the area. Its
+ * pattern has an id of its own (useId).
  */
 export function ClosureBand({ closure }: { closure: Closure | null }) {
   const region = useTimelineRegion();

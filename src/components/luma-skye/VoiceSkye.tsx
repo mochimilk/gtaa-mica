@@ -90,6 +90,9 @@ const useStyles = makeStyles({
     transform: `scale(calc(0.85 + 0.2 * ${energyVar}), calc(0.4 + 0.8 * ${energyVar}))`,
     opacity: `calc(0.35 + 0.65 * ${energyVar})`,
   },
+  // Holding still (`still`): no sway, and no layers kept on the GPU for one.
+  still: { animationName: 'none' },
+  layerStill: { willChange: 'auto' },
 })
 
 export interface VoiceSkyeProps {
@@ -99,6 +102,8 @@ export interface VoiceSkyeProps {
   level?: () => number
   /** Colours. Defaults to `luma`. */
   palette?: SkyePalette
+  /** Holds still at each state's level, as under reduced motion (e.g. with effects reduced). */
+  still?: boolean
   className?: string
 }
 
@@ -115,12 +120,12 @@ function paint(root: HTMLElement, presence: number, energy: number) {
  * `theme/skye.ts`). It sways gently at rest, stands up and follows the
  * traveller's voice while listening, breathes while the assistant works, and
  * follows the assistant's voice while it speaks. Decorative: hidden from
- * screen readers and from the pointer. Under reduced motion it holds still at
+ * screen readers and from the pointer. Under reduced motion, or `still`, it holds still at
  * each state's level.
  */
-export function VoiceSkye({ state, level, palette = skyePalettes.luma, className }: VoiceSkyeProps) {
+export function VoiceSkye({ state, level, palette = skyePalettes.luma, still = false, className }: VoiceSkyeProps) {
   const styles = useStyles()
-  const reducedMotion = useReducedMotion()
+  const reducedMotion = useReducedMotion() || still
   const rootRef = useRef<HTMLDivElement>(null)
   const levelRef = useRef(level)
   // Where the skye is now. It outlives each state, so a change blends from wherever it was.
@@ -173,20 +178,20 @@ export function VoiceSkye({ state, level, palette = skyePalettes.luma, className
 
   return (
     <div ref={rootRef} className={mergeClasses(styles.root, state === 'idle' && styles.resting, className)} aria-hidden="true" data-luma-skye={state}>
-      <div className={mergeClasses(styles.body, styles.waveSway)}>
-        <div className={mergeClasses(styles.layer, styles.wave)} style={{ backgroundImage: layers.wave }} />
+      <div className={mergeClasses(styles.body, styles.waveSway, still && styles.still)}>
+        <div className={mergeClasses(styles.layer, styles.wave, still && styles.layerStill)} style={{ backgroundImage: layers.wave }} />
       </div>
-      <div className={mergeClasses(styles.body, styles.crestSway)}>
-        <div className={mergeClasses(styles.layer, styles.crest)} style={{ backgroundImage: layers.crest }} />
+      <div className={mergeClasses(styles.body, styles.crestSway, still && styles.still)}>
+        <div className={mergeClasses(styles.layer, styles.crest, still && styles.layerStill)} style={{ backgroundImage: layers.crest }} />
       </div>
-      <div className={mergeClasses(styles.edge, styles.rimSway)}>
-        <div className={mergeClasses(styles.layer, styles.rim)} style={{ boxShadow: layers.rim }} />
+      <div className={mergeClasses(styles.edge, styles.rimSway, still && styles.still)}>
+        <div className={mergeClasses(styles.layer, styles.rim, still && styles.layerStill)} style={{ boxShadow: layers.rim }} />
       </div>
-      <div className={mergeClasses(styles.body, styles.lighter, styles.glowSway)}>
-        <div className={mergeClasses(styles.layer, styles.glow)} style={{ backgroundImage: layers.glow }} />
+      <div className={mergeClasses(styles.body, styles.lighter, styles.glowSway, still && styles.still)}>
+        <div className={mergeClasses(styles.layer, styles.glow, still && styles.layerStill)} style={{ backgroundImage: layers.glow }} />
       </div>
-      <div className={mergeClasses(styles.body, styles.lighter, styles.coreSway)}>
-        <div className={mergeClasses(styles.layer, styles.core)} style={{ backgroundImage: layers.core }} />
+      <div className={mergeClasses(styles.body, styles.lighter, styles.coreSway, still && styles.still)}>
+        <div className={mergeClasses(styles.layer, styles.core, still && styles.layerStill)} style={{ backgroundImage: layers.core }} />
       </div>
     </div>
   )

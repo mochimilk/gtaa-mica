@@ -1,7 +1,8 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { eventBus } from "@coral-ai/react";
 import { makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
 import { useLiveCall } from "../../live";
+import { holdAwake, useReduceEffects } from "../effects";
 import { VoiceSkye } from "./VoiceSkye";
 import { skyeState } from "./state";
 
@@ -26,7 +27,12 @@ const subscribeColorMode = (notify: () => void) => {
   return () => eventBus.off("colorModeChanged", notify);
 };
 
-/** Luma's five-layer glow behind the whole shell, with Mica's actual call. */
+/**
+ * Luma's five-layer glow behind the whole shell, with Mica's actual call.
+ * While the call is on or Skye is working, the app stays awake
+ * (components/effects), so nothing of hers pauses mid-way; with effects
+ * reduced, the glow holds still.
+ */
 export function LumaSkyeBackground() {
   const styles = useStyles();
   const colorMode = useSyncExternalStore(subscribeColorMode, () => eventBus.getColorMode());
@@ -36,10 +42,13 @@ export function LumaSkyeBackground() {
     () => live.voiceLevel(state === "speaking" ? "agent" : "user"),
     [live.voiceLevel, state],
   );
+  const busy = state !== "idle" && state !== "unavailable";
+  useEffect(() => (busy ? holdAwake() : undefined), [busy]);
+  const reduceEffects = useReduceEffects();
   return (
     <div className={styles.root} data-luma-background aria-hidden="true">
       <div className={mergeClasses(styles.skye, colorMode === "light" && styles.light)}>
-        <VoiceSkye state={state} level={level} />
+        <VoiceSkye state={state} level={level} still={reduceEffects} />
       </div>
     </div>
   );

@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { FlightList } from "./FlightList";
-import { useOperations } from "./OperationsContext";
+import { useOpsBoard } from "./OperationsContext";
 import { DEPARTURES } from "./operationsData";
 
 export function DepartureList() {
   // Lists show only matching flights (the chart dims instead of hiding).
-  const { matcher } = useOperations();
+  const { matcher } = useOpsBoard();
   const flights = useMemo(() => DEPARTURES.filter(matcher.flight), [matcher]);
   return (
     <FlightList

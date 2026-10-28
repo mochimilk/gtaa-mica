@@ -34,7 +34,7 @@ import {
   DISRUPTION,
 } from "./disruption";
 import { useDisruptionTrigger } from "./disruptionTrigger";
-import { useOperations } from "./OperationsContext";
+import { useOpsBoard } from "./OperationsContext";
 import { OPS_FLIGHTS_BY_ID } from "./operationsData";
 import { describeApprovers, formatLogTime } from "./outputs";
 import { OUTPUTS_PANEL_ID } from "./OutputsPanel";
@@ -106,7 +106,7 @@ export function DisruptionNotice() {
   const run = useAskRun();
   const state = useSyncExternalStore(subscribeDisruption, disruptionState);
   // Read on every stand change, so the words follow the board.
-  const { allocationVersion } = useOperations();
+  const { allocationVersion } = useOpsBoard();
   const words = useMemo(() => disruptionNotice(), [allocationVersion, state]);
   const land = useSkyeSpeaksUp(live);
   useDisruptionTrigger(live.state.phase, live.state.working, land);

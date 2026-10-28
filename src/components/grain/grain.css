@@ -3,8 +3,8 @@
  * above every surface, portal and popover (only the boot splash is higher),
  * which never takes a pointer. Its specks average mid grey, so it also greys
  * the page a little: --app-grain is how much shows, less on the dark page,
- * where the specks show far more against black. The View menu's Noise row
- * turns it off (grain.ts), through data-grain on the root element.
+ * where the specks show far more against black. Off by default: Noise in
+ * Settings turns it on (grain.ts), through data-grain on the root element.
  */
 :root {
   --app-grain: 6%;
@@ -16,7 +16,7 @@
   }
 }
 
-body::after {
+:root[data-grain] body::after {
   content: "";
   position: fixed;
   inset: 0;
@@ -25,8 +25,4 @@ body::after {
   background: url("./grain.svg") repeat;
   background-size: 200px 200px;
   opacity: var(--app-grain);
-}
-
-:root[data-grain="off"] body::after {
-  display: none;
 }

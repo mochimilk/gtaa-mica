@@ -1,3 +1,6 @@
+import { useEffect, useRef } from "react";
+import { useAtRest, useReduceEffects } from "../effects";
+import { useOpsSelections } from "../../operations/OperationsContext";
 import "./skyeGlow.css";
 
 /** The gradients Skye's selections are drawn with on SVG; skyeGlow.css names them too. */
@@ -11,12 +14,26 @@ const reducedMotion = () =>
  * The orb's colours as SVG gradients, for drawing what Skye has selected on
  * the chart (see skyeGlow.css): one that slowly turns, for a bar's outline,
  * and one that flows across the chart, for the line linking two bars. Mount
- * it once; any SVG in the page can use them.
+ * it once; any SVG in the page can use them. They move only while Skye has
+ * something selected and the app is awake (components/effects), since a
+ * running SVG animation draws a frame every frame, used or not; with effects
+ * reduced, they hold still.
  */
 export function SkyeGlowDefs() {
-  const animate = !reducedMotion();
+  const reduceEffects = useReduceEffects();
+  const animate = !reducedMotion() && !reduceEffects;
+  const { skyeSelection } = useOpsSelections();
+  const atRest = useAtRest();
+  const running = animate && !atRest && (skyeSelection.occupancyIds.length > 0 || skyeSelection.flightId !== null);
+  const svgRef = useRef<SVGSVGElement>(null);
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg || !animate) return;
+    if (running) svg.unpauseAnimations();
+    else svg.pauseAnimations();
+  }, [animate, running]);
   return (
-    <svg className="skye-glow-defs" width="0" height="0" aria-hidden focusable="false">
+    <svg ref={svgRef} className="skye-glow-defs" width="0" height="0" aria-hidden focusable="false">
       <defs>
         <linearGradient id={SKYE_GLOW_GRADIENT_ID} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#0F6FFF" />
