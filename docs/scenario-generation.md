@@ -5,6 +5,12 @@ description: Generate seeded raw flight legs, complete scheduled context and mea
 
 ## Validate another airport
 
+Use the [airport onboarding guide](airport-onboarding.md) for source requirements,
+file formats, map alignment, aircraft reuse and the `/add-airport` AI prompt.
+The [GTAA configuration](gtaa-airport.md#synthetic-full-day-configuration) now
+provides a second executable 160-visit baseline with domestic, US transborder
+and international traffic.
+
 The next airport is an end-to-end portability exercise, not evidence that
 every production planning problem is already modeled.
 Keep airport configuration, raw demand, plans and evaluation profiles separate.
@@ -39,7 +45,7 @@ plan, without a parking-profile dependency. Display names can be
 supplied to the adapter and the loader uses the prepared airport name.
 
 Existing command defaults and UI source registration still target Contoso.
-Adding a selectable second airport and its artifact destinations is tomorrow's
+Adding a selectable second airport and its artifact destinations remains separate
 integration work; changing a manifest alone does not register it in the UI.
 The Toronto Pearson shell branding is a prototype asset, not the airport
 model's identity.
@@ -202,7 +208,13 @@ Legacy `external_airport_ids` array order remains meaningful. Catalog-backed
 market/airport arrays and traffic targets are canonicalized by ID. Catalog
 routes require an explicit host `country` in the airport manifest; country and
 sector decisions are not inferred from airline nationality or the airport's
-time zone. Unsupported sector policies fail explicitly.
+time zone. The manifest's `iata_code` identifies the host endpoint to exclude
+when its internal `id` differs from the airport catalog code. Transborder targets
+support Canada-US routes in either direction, filtering to the partner country
+and the configured market/carrier pool. Unsupported host/sector policies and
+empty intersections fail explicitly. International routing retains its generic
+foreign-market semantics; GTAA authors non-US international markets separately
+from its US transborder market.
 
 Readable numbers use catalog IATA prefixes plus deterministic values from
 100 through 9999, with collision probing per operating airline across the

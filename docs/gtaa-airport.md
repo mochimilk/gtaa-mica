@@ -1,15 +1,16 @@
 ---
-title: GTAA source-backed airport draft
-description: Toronto Pearson stand and gate stubs, source evidence, readiness limits and outstanding operational inputs.
-ms.date: 2026-10-27
+title: GTAA source-backed airport configuration
+description: Toronto Pearson stand rules, source evidence, synthetic demand profile, readiness limits and outstanding operational inputs.
+ms.date: 2026-10-28
 ---
 
 ## Coverage
 
 The [GTAA manifest](../data/airports/gtaa/airport.json) follows Contoso's
 infrastructure and routing layout. It identifies Toronto Pearson as YYZ/CYYZ
-with the `America/Toronto` time zone. Contoso remains the default airport;
-this draft does not change application demo selection.
+with the `America/Toronto` time zone. The original fixture remains the
+fresh-install viewer default. Choose **GTAA · Toronto Pearson** in
+[Demo settings](demo-settings.md) to inspect its prepared full-day schedule.
 
 | Area | Stand stubs | Interior gates | Stands in current ASM tables | Stand-level directional closures |
 |------|-------------|----------------|------------------------------|---------------------------------|
@@ -29,7 +30,9 @@ aircraft-conditioned closures and 14 neighboring restrictions. Seven malformed
 or ambiguous aircraft expressions remain explicit review items. Size metadata
 is sourced for all 112 variants. Folded and extended 777-9 configurations remain
 distinct; the cancelled A350-800 retains a planning-only qualification.
-No variant seat counts or MTOW values are invented.
+All 112 variants now have user-configured simulation seat counts. These are
+not verified operator layouts or universal aircraft capacities. MTOW values
+have not been invented.
 
 ## Files and provenance
 
@@ -51,6 +54,9 @@ No variant seat counts or MTOW values are invented.
 * [Operating policy](../data/airports/gtaa/operating-policy.json) and
   [traffic profile](../data/airports/gtaa/demand/traffic-profile.json) hold
   user-approved synthetic assumptions, not verified GTAA operating figures.
+* [Scenario profile](../data/airports/gtaa/demand/scenario-profile.json) and
+  [tow profile](../data/airports/gtaa/demand/tow-profile.json) define the initial
+  160-visit stand-only simulation, independently of hourly traffic weights.
 * [Georeferencing](../data/airports/gtaa/georeferencing.json) records the map
   anchor, scale, terminal transforms, control vertices and registration checks.
 * [Data gaps](../data/airports/gtaa/data-gaps.json) record blockers, source
@@ -121,11 +127,12 @@ earlier `[-79.628365, 43.67984]` airport-reference placeholder, explicitly flagg
 > two flagged placeholders as real stand positions. None of these coordinates
 > is approved for operational distance, routing, capacity or clearance calculations.
 
-Every stand remains `configuration_status: "geometry-only"`. Contact values,
-arrival/departure sector groups, airline authorizations and explicit availability
-have been user-configured. The stand schema still allows null contact only for
-geometry-only records; ready records require a boolean. Both airport readiness
-flags remain false. The reference evaluator rejects occupancy on these stubs.
+All 168 stands are user-configured as `configuration_status: "ready"`, with
+boolean contact values, arrival/departure sector groups, airline authorizations
+and explicit availability. They can participate in stand-rule evaluation.
+This does not certify geographic accuracy, simultaneous capacity or manual
+procedures. Both airport readiness flags remain false. Geometry-only records
+still cannot be assigned by the evaluator.
 
 The 113 stand-level closures translate explicit headings. Aircraft-conditioned
 closures and neighboring restrictions are encoded separately, including the
@@ -181,14 +188,14 @@ current ASM tables but have no located label on the supplied maps. Their gate
 associations are left empty. Absence from either source does not establish
 whether a stand is currently open or closed.
 
-Before promoting any stand to ready:
+Before operational use, independently of the user-approved simulation readiness:
 
 1. Reconcile current stand inventory and source effective dates.
 2. Locate the two remaining stands and confirm actual parking/gate reference
    points and required geographic accuracy.
 3. Confirm passenger gate associations and levels.
-4. Review unresolved source aircraft expressions and planning-only types.
-   Supply seat counts for synthetic scenario generation.
+4. Review unresolved source aircraft expressions, external aircraft-code audit
+   findings, planning-only types and operator-specific seat configurations.
 5. Review the translated neighbor rules and confirm manual operating procedures.
 6. Review user-configured sector/airline permissions and availability for the
    stands selected for testing.
@@ -198,6 +205,57 @@ The shared C/D/E/F groups are not used to infer ASM compatibility. A Code C
 neighbor restriction uses verified catalog size metadata and fails closed if
 that metadata is missing. "B737-500 or smaller" still needs an explicit allowed
 model set for stand 176 while 175A is occupied; it is not a general Code C rule.
+
+## Synthetic full-day configuration
+
+The initial [scenario profile](../data/airports/gtaa/demand/scenario-profile.json)
+follows Contoso's full-day process for October 28, 2026, from Toronto local
+midnight to midnight: `2026-10-28T04:00:00Z` through `2026-10-29T04:00:00Z`.
+
+| Target | Visits | Source legs |
+|--------|--------|-------------|
+| Canadian domestic | 64 | 128 |
+| US transborder | 64 | 128 |
+| Europe international | 16 | 32 |
+| Asia international | 16 | 32 |
+| Total | 160 | 320 |
+
+The user approved the date and 64/64/32 sector split. The equal Europe/Asia split,
+fleet/operator rows, PAX ranges, stay ranges and market weights are illustrative
+choices following Contoso, not measured Pearson demand or verified airline
+fleets/service. Five exact catalog identities are selected: A220-300, A320,
+EMB175, B737-800-W and B787-9. Cancelled and preliminary types are excluded.
+Air Canada supplies the configured domestic pool; this is not a claim that
+other Canadian operators do not serve Pearson.
+
+Planning-group shares derive from eligible stands, splitting shared credits,
+then applying the configured carrier/fleet weights. The initial result has
+125 Star, 18 Oneworld and 17 SkyTeam visits using the authored planning groups,
+not a verified alliance directory. These static credits are not independent
+simultaneous capacity.
+
+There are no fabricated boundary visits or pressure banks. The separate
+[tow profile](../data/airports/gtaa/demand/tow-profile.json) disables elective
+generated movements. With the checked-in seed and current configuration, both
+native solver variants were optimal: 160 assigned visits, 320 assigned legs,
+zero unassigned visits and zero generated tows. Both plans passed independent
+stand-rule validation and all scenario expectation checks.
+
+```powershell
+npm run generate:scenario -- --airport data\airports\gtaa\airport.json --profile data\airports\gtaa\demand\scenario-profile.json --case full-day --output .\gtaa-full-day-scenario.json
+npm run run:scenario -- --airport data\airports\gtaa\airport.json --profile data\airports\gtaa\demand\scenario-profile.json --case full-day --tow-profile data\airports\gtaa\demand\tow-profile.json --time-limit-seconds 30 --output .\gtaa-full-day-review.json
+```
+
+Use fresh output filenames; existing files are not overwritten. Generation
+returns exit `0`; a solved review matching expectations returns `3`, while
+failed expectations return `2`. These commands create synthetic CLI artifacts;
+they do not automatically replace the viewer snapshot. Run
+`npm run prepare:demo:gtaa` to regenerate the checked-in full-day schedule.
+Both viewer plans cover all visits without elective tows. GTAA-specific buffer,
+waiting, capacity/atlas, accommodation, decision and tow-window reviews remain
+unavailable; Contoso analysis assumptions are not reused.
+See the [onboarding guide](airport-onboarding.md) for reusable input requirements,
+formats, diagram alignment and AI assistance.
 
 ## Regeneration
 
@@ -223,7 +281,9 @@ npm run validate:airport -- data\airports\gtaa\airport.json
 npm run test:airport
 ```
 
-GTAA validation should report no errors and 168 geometry-only warnings.
+GTAA validation should report no errors and no geometry-only warnings for the
+168 user-ready stands. Run `npm run test:scenarios` for both Contoso and GTAA
+generation/native assignment regressions.
 The regression tests verify inventory counts, source hashes and page coverage,
 pin/scale calibration, transform residuals, coordinate reproduction, remaining
 placeholders, closure direction, gate inverses, exact variants, physical cell

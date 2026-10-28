@@ -126,12 +126,22 @@ This is an authoring foundation, not a live route service. No dependencies,
 hosted resources or new styles are needed.
 
 The [scenario generator](scenario-generation.md) now supports a `route_generation`
-policy with weighted international market pools. Its `createDemandRouteSampler`
-path uses an explicit manifest host country and the traffic row's sector.
+policy with weighted international and transborder market pools. Its
+`createDemandRouteSampler` path uses an explicit manifest host country and the
+traffic row's sector. Manifest `iata_code` takes precedence over internal `id`
+when excluding the host airport.
 Domestic legs select domestic catalog endpoints. International legs select
 foreign endpoints from the configured markets. Home-country operators may use
 those explicit foreign market choices; foreign operators are restricted to
 their hub/home-country choices intersected with the markets.
+
+Transborder legs support the Canada-US country pair in either direction.
+They select only partner-country endpoints within the configured markets and
+carrier choices; other host countries and empty intersections are explicit
+errors. International retains its existing foreign-market semantics. GTAA's
+[scenario profile](../data/airports/gtaa/demand/scenario-profile.json) therefore
+authors a US transborder market and separate non-US Europe/Asia international
+markets rather than relabelling US flights as international.
 
 This scenario override is intentionally narrower than a worldwide airline
 network model. It does not change the standalone YYZ roster sampler described

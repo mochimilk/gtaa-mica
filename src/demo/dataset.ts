@@ -6,6 +6,13 @@ import type { PreparedCapacity } from "./capacity-evaluation";
 import type { PreparedAtlas } from "./atlas-evaluation";
 import type { PreparedAccommodation } from "./accommodation-evaluation";
 import type { PreparedTowWindows } from "./tow-windows-evaluation";
+import type { BufferProfile } from "./buffer-evaluation";
+import type { GateWaitProfile } from "./gate-wait-evaluation";
+
+export interface PreparedReviewProfiles {
+  buffers: BufferProfile;
+  waiting: GateWaitProfile;
+}
 
 export interface DemoDataset {
   id: string;
@@ -20,7 +27,15 @@ export interface DemoDataset {
   arrivals: OpsFlight[];
   departures: OpsFlight[];
   alerts: OpsAlert[];
-  prepared?: { snapshot: PreparedScenario; variant: PlanVariant; capacity?: PreparedCapacity; atlas?: PreparedAtlas; accommodation?: PreparedAccommodation; towWindows?: PreparedTowWindows };
+  prepared?: {
+    snapshot: PreparedScenario;
+    variant: PlanVariant;
+    reviewProfiles?: PreparedReviewProfiles;
+    capacity?: PreparedCapacity;
+    atlas?: PreparedAtlas;
+    accommodation?: PreparedAccommodation;
+    towWindows?: PreparedTowWindows;
+  };
 }
 
 export interface PreparedFlight {
@@ -55,6 +70,7 @@ export interface PreparedPlan {
 
 export interface PreparedScenario {
   schema_version: "1.0.0";
+  airport?: { id: string; name: string; time_zone: string };
   case_id: ScenarioId;
   demand_id: string;
   plan_window: { start: string; end: string };

@@ -113,6 +113,7 @@ export function accommodationView(snapshot: PreparedScenario, evidence: Prepared
     option,
     scenario: {
       schema_version: snapshot.schema_version, case_id: snapshot.case_id, demand_id: snapshot.demand_id,
+      ...(snapshot.airport ? { airport: snapshot.airport } : {}),
       plan_window: snapshot.plan_window, rows: snapshot.rows,
       visits: [...snapshot.visits, request.visit], flights: [...snapshot.flights, ...request.flights],
     },

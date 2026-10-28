@@ -8,6 +8,14 @@
   "properties": {
     "schema_version": { "const": "1.0.0" },
     "case_id": { "enum": ["comfortable", "constrained", "full-day"] },
+    "airport": {
+      "type": "object", "additionalProperties": false, "required": ["id", "name", "time_zone"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "name": { "type": "string", "pattern": "\\S" },
+        "time_zone": { "type": "string", "pattern": "\\S" }
+      }
+    },
     "demand_id": { "$ref": "#/definitions/id" },
     "plan_window": {
       "type": "object", "additionalProperties": false, "required": ["start", "end"],

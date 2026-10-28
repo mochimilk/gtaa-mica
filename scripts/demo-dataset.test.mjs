@@ -15,13 +15,14 @@ function moduleUrl(path) {
   let code = path.endsWith('.json') ? `export default ${source};` : ts.transpileModule(source, {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ESNext },
   }).outputText;
-  code = code.replace(/\bfrom\s+(["'])([^"']+)\1/g, (_, quote, specifier) => {
-    const target = specifier.startsWith('.')
+  const resolveSpecifier = specifier => specifier.startsWith('.')
       ? specifier.endsWith('.mjs') ? pathToFileURL(resolve(dirname(path), specifier)).href
         : moduleUrl(resolve(dirname(path), specifier.endsWith('.json') ? specifier : `${specifier}.ts`))
       : pathToFileURL(require.resolve(specifier)).href;
-    return `from ${quote}${target}${quote}`;
-  });
+  code = code.replace(/\bfrom\s+(["'])([^"']+)\1/g, (_, quote, specifier) =>
+    `from ${quote}${resolveSpecifier(specifier)}${quote}`);
+  code = code.replace(/\bimport\((["'])([^"']+)\1\)/g, (_, quote, specifier) =>
+    `import(${quote}${resolveSpecifier(specifier)}${quote})`);
   const url = `data:text/javascript;base64,${Buffer.from(code).toString('base64')}`;
   modules.set(path, url);
   return url;
@@ -31,7 +32,7 @@ const { adaptPreparedScenario } = await load('src\\demo\\prepared-adapter.ts');
 const { validatePreparedSnapshot } = await load('src\\demo\\validate-prepared.ts');
 const { makeMatcher, makeFilterOptions, EMPTY_FILTERS } = await load('src\\operations\\opsFilters.ts');
 const { ORIGINAL_DATASET, loadDemoDataset } = await load('src\\demo\\load-dataset.ts');
-const { DEFAULT_DEMO_PREFERENCES, parseDemoPreferences } = await load('src\\demo\\preferences.ts');
+const { DEFAULT_DEMO_PREFERENCES, parseDemoPreferences, scenariosForSource } = await load('src\\demo\\preferences.ts');
 const { DEMO_DATA, DEMO_DOMAIN, dayOffsetLabel, formatUtcWithDay } = await load('src\\stand-timeline-demo\\demoData.ts');
 const { OPS_FLIGHTS, OPS_ALERTS } = await load('src\\operations\\operationsData.ts');
 const { standLabel } = await load('src\\stand-timeline-demo\\adapter.ts');
@@ -881,8 +882,8 @@ test('fresh-install defaults retain the exact existing chart, panel and alert ob
 });
 
 test('versioned preferences round-trip and reject malformed, unsupported or stale selections', () => {
-  for (const source of ['original', 'contoso']) {
-    for (const scenario of ['comfortable', 'constrained', 'full-day']) {
+  for (const source of ['original', 'contoso', 'gtaa']) {
+    for (const scenario of scenariosForSource(source)) {
       for (const variant of ['baseline', 'tow-options']) {
         const preferences = { version: 1, source, scenario, variant };
         assert.deepEqual(parseDemoPreferences(JSON.parse(JSON.stringify(preferences))), preferences);
@@ -891,9 +892,112 @@ test('versioned preferences round-trip and reject malformed, unsupported or stal
   }
   for (const value of [null, [], 'contoso', {}, { ...DEFAULT_DEMO_PREFERENCES, version: 2 },
     { ...DEFAULT_DEMO_PREFERENCES, scenario: 'deleted' }, { ...DEFAULT_DEMO_PREFERENCES, variant: 'unvalidated' },
-    { ...DEFAULT_DEMO_PREFERENCES, source: 'live' }, { ...DEFAULT_DEMO_PREFERENCES, data: {} }]) {
+    { ...DEFAULT_DEMO_PREFERENCES, source: 'live' }, { ...DEFAULT_DEMO_PREFERENCES, data: {} },
+    { ...DEFAULT_DEMO_PREFERENCES, source: 'gtaa', scenario: 'comfortable' },
+    { ...DEFAULT_DEMO_PREFERENCES, source: 'gtaa', scenario: 'constrained' }]) {
     assert.throws(() => parseDemoPreferences(value), /invalid|unsupported/);
   }
+});
+
+test('GTAA loads both complete stand-only plans without Contoso analysis evidence or profiles', async () => {
+  const ids = new Set([ORIGINAL_DATASET.id]);
+  const stands = JSON.parse(readFileSync(resolve(root, 'data\\airports\\gtaa\\infrastructure\\stands.json'), 'utf8')).stands;
+  const standIds = new Set(stands.map(stand => stand.id));
+  for (const variant of ['baseline', 'tow-options']) {
+    const dataset = await loadDemoDataset({ version: 1, source: 'gtaa', scenario: 'full-day', variant });
+    assert.ok(!ids.has(dataset.id));
+    ids.add(dataset.id);
+    assert.match(dataset.label, /^Toronto Pearson International Airport/);
+    assert.match(dataset.label, /Full day/);
+    assert.equal(dataset.date, '2026-10-28');
+    assert.deepEqual(dataset.domain, [Date.parse('2026-10-28T04:00:00Z'), Date.parse('2026-10-29T04:00:00Z')]);
+    assert.equal(dataset.timeBasis, 'scheduled');
+    assert.match(dataset.subtitle, /not operationally certified/);
+    assert.equal(dataset.timeline.rows.length, 168);
+    assert.deepEqual(new Set(dataset.timeline.rows.map(row => row.id)), standIds);
+    assert.deepEqual(Object.fromEntries(['t1', 't3', 'ifc'].map(group =>
+      [group, dataset.timeline.rows.filter(row => row.group === group).length])), { t1: 97, t3: 57, ifc: 14 });
+    assert.equal(dataset.timeline.occupancies.length, 160);
+    assert.equal(dataset.timeline.turnsById.size, 160);
+    assert.equal(dataset.flights.length, 320);
+    assert.equal(dataset.arrivals.length, 160);
+    assert.equal(dataset.departures.length, 160);
+    assert.equal(dataset.alerts.length, 0);
+    assert.ok([...dataset.timeline.endpoints.values()].every(item => item.start.kind === 'flight' && item.end.kind === 'flight'));
+    assert.equal(dataset.prepared.snapshot.airport.id, 'gtaa');
+    assert.equal(dataset.prepared.snapshot.airport.time_zone, 'America/Toronto');
+    assert.equal(dataset.prepared.snapshot.variants[variant].solver_status, 'optimal');
+    assert.equal(dataset.prepared.snapshot.variants[variant].covered_flight_count, 320);
+    assert.equal(dataset.prepared.snapshot.variants[variant].generated_movement_count, 0);
+    for (const field of ['reviewProfiles', 'capacity', 'atlas', 'accommodation', 'towWindows']) {
+      assert.equal(dataset.prepared[field], undefined, `GTAA must not borrow ${field}`);
+    }
+    for (const flight of dataset.flights) {
+      assert.equal(dataset.flightsById.get(flight.id), flight);
+      assert.ok(standIds.has(flight.standId));
+      const stay = dataset.timeline.occupancies.find(stay => stay.id === flight.occupancyId);
+      assert.equal(stay.visitId, flight.visitId);
+      assert.equal(stay.rowId, flight.standId);
+    }
+    const options = makeFilterOptions(dataset);
+    assert.deepEqual(options.carrier, ['AAL', 'ACA', 'AFR', 'BAW', 'CES', 'CPA', 'DAL', 'DLH', 'EVA', 'UAL']);
+    assert.equal(options.type.length, 5);
+    assert.ok(options.type.every(type => type.startsWith('gtaa:aircraft:')));
+    const aca = makeMatcher(dataset, 'all', { ...EMPTY_FILTERS, carrier: ['ACA'] }, new Set());
+    assert.equal(dataset.flights.filter(aca.flight).length, 220);
+    for (const group of ['t1', 't3', 'ifc']) {
+      const matcher = makeMatcher(dataset, 'all', { ...EMPTY_FILTERS, area: [group] }, new Set());
+      const rows = new Set(dataset.timeline.rows.filter(row => row.group === group).map(row => row.id));
+      assert.ok(dataset.flights.filter(matcher.flight).every(flight => rows.has(flight.standId)));
+      assert.ok(dataset.timeline.occupancies.filter(stay => matcher.occupancy(stay.id)).every(stay => rows.has(stay.rowId)));
+    }
+    const tows = makeMatcher(dataset, 'tows', EMPTY_FILTERS, new Set());
+    assert.equal(dataset.flights.filter(tows.flight).length, 0);
+    assert.equal(dataset.timeline.occupancies.filter(stay => tows.occupancy(stay.id)).length, 0);
+  }
+});
+
+test('actual Contoso loaders retain all cases, both variants and their own review profiles', async () => {
+  for (const scenario of scenariosForSource('contoso')) for (const variant of ['baseline', 'tow-options']) {
+    const dataset = await loadDemoDataset({ version: 1, source: 'contoso', scenario, variant });
+    assert.match(dataset.label, /^Contoso/);
+    assert.equal(dataset.prepared.snapshot.case_id, scenario);
+    assert.equal(dataset.prepared.variant, variant);
+    assert.ok(dataset.prepared.capacity && dataset.prepared.atlas && dataset.prepared.accommodation && dataset.prepared.towWindows);
+    assert.equal(dataset.prepared.reviewProfiles.buffers, DEFAULT_BUFFER_PROFILE);
+    assert.equal(dataset.prepared.reviewProfiles.waiting, DEFAULT_GATE_WAIT_PROFILE);
+  }
+  await assert.rejects(loadDemoDataset({ version: 1, source: 'gtaa', scenario: 'comfortable', variant: 'baseline' }), /invalid|unsupported/);
+});
+
+test('snapshot selection checks airport identity as well as a shared full-day case ID', () => {
+  const gtaa = JSON.parse(readFileSync(resolve(root, 'src\\demo\\prepared\\gtaa\\full-day.json'), 'utf8'));
+  const contoso = readSnapshot('full-day');
+  const expected = { airportId: 'gtaa', caseId: 'full-day' };
+  assert.equal(validatePreparedSnapshot(gtaa, expected), gtaa);
+  assert.throws(() => validatePreparedSnapshot(contoso, expected), /airport or case/);
+  assert.throws(() => validatePreparedSnapshot(gtaa, { airportId: 'contoso', caseId: 'full-day' }), /airport or case/);
+  assert.throws(() => validatePreparedSnapshot(gtaa, { airportId: 'gtaa', caseId: 'comfortable' }), /airport or case/);
+  const missingIdentity = structuredClone(gtaa);
+  delete missingIdentity.airport;
+  assert.throws(() => validatePreparedSnapshot(missingIdentity, expected), /airport or case/);
+  assert.equal(validatePreparedSnapshot(contoso, { airportId: 'contoso', caseId: 'full-day' }), contoso);
+});
+
+test('decision review uses explicitly supplied airport profiles rather than Contoso assumptions', () => {
+  const snapshot = readSnapshot('comfortable');
+  const profiles = {
+    buffers: { ...DEFAULT_BUFFER_PROFILE, threshold_minutes: 2 },
+    waiting: {
+      ...DEFAULT_GATE_WAIT_PROFILE,
+      assumptions: DEFAULT_GATE_WAIT_PROFILE.assumptions.map(item => ({ ...item, id: `other-airport:${item.id}` })),
+    },
+  };
+  const brief = buildDecisionBrief(snapshot, 'baseline', { kind: 'variant', variant: 'tow-options' },
+    profiles.waiting.assumptions[0].id, undefined, profiles);
+  assert.equal(brief.bufferProfile, profiles.buffers);
+  assert.equal(brief.waitingProfile, profiles.waiting);
+  assert.equal(brief.assumption, profiles.waiting.assumptions[0]);
 });
 
 test('both comfortable variants render all 36 visits with no fabricated tows or alerts', () => {

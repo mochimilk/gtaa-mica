@@ -21,7 +21,7 @@ function indexById<T extends { id: string }>(items: T[], label: string) {
   return result;
 }
 
-export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanVariant, airportName = "Contoso"): DemoDataset {
+export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanVariant, airportName = snapshot.airport?.name ?? "Contoso"): DemoDataset {
   const plan = snapshot.variants[variant];
   return {
     ...adaptScenarioPlan(snapshot, variant, plan,
@@ -32,7 +32,7 @@ export function adaptPreparedScenario(snapshot: PreparedScenario, variant: PlanV
 
 export function adaptScenarioPlan(
   snapshot: Omit<PreparedScenario, "variants">, variant: PlanVariant,
-  plan: Pick<PreparedPlan, "stays" | "covered_flight_count" | "generated_movement_count">, subtitle: string, airportName = "Contoso",
+  plan: Pick<PreparedPlan, "stays" | "covered_flight_count" | "generated_movement_count">, subtitle: string, airportName = snapshot.airport?.name ?? "Contoso",
 ): DemoDataset {
   const start = instant(snapshot.plan_window.start);
   const end = instant(snapshot.plan_window.end);

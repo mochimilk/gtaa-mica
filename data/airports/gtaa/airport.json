@@ -7,7 +7,7 @@
   "icao_code": "CYYZ",
   "country": "Canada",
   "time_zone": "America/Toronto",
-  "description": "Source-backed GTAA draft for Terminal 1, Terminal 3 and the Infield Concourse. Not operationally approved.",
+  "description": "Source-backed GTAA configuration for Terminal 1, Terminal 3 and the Infield Concourse, with user-ready stands and a synthetic demand baseline. Not operationally approved.",
   "spatial_reference": {
     "exchange_crs": "OGC:CRS84",
     "coordinate_order": [
@@ -53,7 +53,7 @@
   "routing_ready": false,
   "assumptions": [
     "166 stands and 147 gates have approximate georeferenced map-label coordinates for visualization only, not aircraft parking points or gate doors. T1 193 and IFC 528A retain explicit airport-reference placeholders. Absolute horizontal accuracy is unverified; do not use any of these positions for routing, distance, capacity or clearance calculations.",
-    "All stands are geometry-only stubs. Even translated closure headings do not make a stand assignable.",
+    "All 168 stands are user-configured as ready for stand-rule evaluation. This does not certify geographic accuracy, simultaneous capacity, source reconciliation or manual procedures; planning_ready and routing_ready remain false.",
     "Exterior stand identifiers and interior passenger gates are different resources. Map label proximity suggests associations for review; shared gates do not establish gate capacities.",
     "Contact values, arrival/departure sector groups, airline authorizations and explicit stand availability are user-configured. Passenger gate associations and unverified passenger levels still require review.",
     "ASM aircraft permissions use a GTAA-specific exact-variant catalog with user-added IATA codes. IATA codes do not merge distinct ASM variants.",

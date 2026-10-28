@@ -24,7 +24,7 @@
         "properties": {
           "id": { "$ref": "#/definitions/id" },
           "count": { "type": "integer", "minimum": 1, "maximum": 200 },
-          "sector_id": { "enum": ["domestic", "international"] },
+          "sector_id": { "enum": ["domestic", "international", "transborder"] },
           "market_id": { "$ref": "#/definitions/id" }
         }
       }

@@ -111,10 +111,11 @@ also supply all seven operational fields from `gate_ids` through
 `restriction-conditions`. Use empty arrays deliberately rather than leaving
 ready configuration incomplete.
 
-The [GTAA source-backed draft](gtaa-airport.md) uses user-configured contact values
+The [GTAA source-backed configuration](gtaa-airport.md) uses user-configured contact values
 and approximate map-label coordinates, with flagged airport-reference
-placeholders for two unlocated stands. Their coordinates, ASM evidence and
-partial closures do not make them eligible for assignment.
+placeholders for two unlocated stands. The user has marked its 168 stands ready
+for synthetic evaluation. Coordinates and ASM evidence alone do not establish
+readiness, geographic accuracy or operational approval.
 
 `airline-groups` may be omitted, but omission is not common-use permission.
 Omitted/empty lists, or groups containing no airlines, make the stand unavailable

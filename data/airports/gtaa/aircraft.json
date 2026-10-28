@@ -5,7 +5,9 @@
     {
       "id": "gtaa:aircraft:A220-100",
       "name": "Airbus A220-100",
-      "iata-code": "221",
+      "IATA-type": "221",
+      "IATA-subtype": "221",
+      "ICAO-type": "A221",
       "source": {
         "canonical_asm_type": "A220-100",
         "catalog_status": "asm-variant-identity-only",
@@ -16,12 +18,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 109
     },
     {
       "id": "gtaa:aircraft:A220-300",
       "name": "Airbus A220-300",
-      "iata-code": "223",
+      "IATA-type": "223",
+      "ICAO-type": "A223",
+      "IATA-subtype": "223",
       "source": {
         "canonical_asm_type": "A220-300",
         "catalog_status": "asm-variant-identity-only",
@@ -32,12 +37,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 130
     },
     {
       "id": "gtaa:aircraft:A300-600",
       "name": "Airbus A300-600",
-      "iata-code": "AB6",
+      "IATA-type": "AB6",
+      "IATA-subtype": "AB6",
+      "ICAO-type": "A306",
       "source": {
         "canonical_asm_type": "A300-600",
         "catalog_status": "asm-variant-identity-only",
@@ -48,12 +56,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 266
     },
     {
       "id": "gtaa:aircraft:A310-300",
       "name": "Airbus A310-300",
-      "iata-code": "310",
+      "IATA-type": "310",
+      "IATA-subtype": "310",
+      "ICAO-type": "A310",
       "source": {
         "canonical_asm_type": "A310-300",
         "catalog_status": "asm-variant-identity-only",
@@ -64,12 +75,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 280
     },
     {
       "id": "gtaa:aircraft:A318",
       "name": "Airbus A318",
-      "iata-code": "318",
+      "IATA-type": "318",
+      "IATA-subtype": "318",
+      "ICAO-type": "A318",
       "source": {
         "canonical_asm_type": "A318",
         "catalog_status": "asm-variant-identity-only",
@@ -80,12 +94,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 132
     },
     {
       "id": "gtaa:aircraft:A319",
       "name": "Airbus A319",
-      "iata-code": "319",
+      "IATA-type": "319",
+      "IATA-subtype": "319",
+      "ICAO-type": "A319",
       "source": {
         "canonical_asm_type": "A319",
         "catalog_status": "asm-variant-identity-only",
@@ -96,12 +113,15 @@
           "aircraft_id": "A319"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 156
     },
     {
       "id": "gtaa:aircraft:A319-NEO",
       "name": "Airbus A319NEO",
-      "iata-code": "31N",
+      "IATA-type": "31N",
+      "IATA-subtype": "31N",
+      "ICAO-type": "A31N",
       "source": {
         "canonical_asm_type": "A319NEO",
         "catalog_status": "asm-variant-identity-only",
@@ -112,12 +132,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 160
     },
     {
       "id": "gtaa:aircraft:A319-W",
       "name": "Airbus A319W",
-      "iata-code": "319",
+      "IATA-type": "319",
+      "IATA-subtype": "319",
+      "ICAO-type": "A319",
       "source": {
         "canonical_asm_type": "A319W",
         "catalog_status": "asm-variant-identity-only",
@@ -131,12 +154,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 156
     },
     {
       "id": "gtaa:aircraft:A320",
       "name": "Airbus A320",
-      "iata-code": "320",
+      "IATA-type": "320",
+      "IATA-subtype": "320",
+      "ICAO-type": "A320",
       "source": {
         "canonical_asm_type": "A320",
         "catalog_status": "asm-variant-identity-only",
@@ -147,12 +173,15 @@
           "aircraft_id": "A320"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 180
     },
     {
       "id": "gtaa:aircraft:A320-NEO",
       "name": "Airbus A320NEO",
-      "iata-code": "32N",
+      "IATA-type": "32N",
+      "IATA-subtype": "32N",
+      "ICAO-type": "A32N",
       "source": {
         "canonical_asm_type": "A320NEO",
         "catalog_status": "asm-variant-identity-only",
@@ -163,12 +192,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 180
     },
     {
       "id": "gtaa:aircraft:A320-W",
       "name": "Airbus A320W",
-      "iata-code": "320",
+      "IATA-type": "320",
+      "IATA-subtype": "320",
+      "ICAO-type": "A320",
       "source": {
         "canonical_asm_type": "A320W",
         "catalog_status": "asm-variant-identity-only",
@@ -182,12 +214,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 180
     },
     {
       "id": "gtaa:aircraft:A321",
       "name": "Airbus A321",
-      "iata-code": "321",
+      "IATA-type": "321",
+      "IATA-subtype": "321",
+      "ICAO-type": "A321",
       "source": {
         "canonical_asm_type": "A321",
         "catalog_status": "asm-variant-identity-only",
@@ -198,12 +233,15 @@
           "aircraft_id": "A321"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 220
     },
     {
       "id": "gtaa:aircraft:A321-NEO",
       "name": "Airbus A321NEO",
-      "iata-code": "32Q",
+      "IATA-type": "32Q",
+      "IATA-subtype": "32Q",
+      "ICAO-type": "A32Q",
       "source": {
         "canonical_asm_type": "A321NEO",
         "catalog_status": "asm-variant-identity-only",
@@ -214,12 +252,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 220
     },
     {
       "id": "gtaa:aircraft:A321-W",
       "name": "Airbus A321W",
-      "iata-code": "321",
+      "IATA-type": "321",
+      "IATA-subtype": "321",
+      "ICAO-type": "A321",
       "source": {
         "canonical_asm_type": "A321W",
         "catalog_status": "asm-variant-identity-only",
@@ -233,12 +274,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 220
     },
     {
       "id": "gtaa:aircraft:A330-200",
       "name": "Airbus A330-200",
-      "iata-code": "332",
+      "IATA-type": "332",
+      "IATA-subtype": "332",
+      "ICAO-type": "A332",
       "source": {
         "canonical_asm_type": "A330-200",
         "catalog_status": "asm-variant-identity-only",
@@ -249,12 +293,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 406
     },
     {
       "id": "gtaa:aircraft:A330-300",
       "name": "Airbus A330-300",
-      "iata-code": "333",
+      "IATA-type": "333",
+      "IATA-subtype": "333",
+      "ICAO-type": "A333",
       "source": {
         "canonical_asm_type": "A330-300",
         "catalog_status": "asm-variant-identity-only",
@@ -265,12 +312,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A330-800",
       "name": "Airbus A330-800",
-      "iata-code": "338",
+      "IATA-type": "338",
+      "IATA-subtype": "338",
+      "ICAO-type": "A338",
       "source": {
         "canonical_asm_type": "A330-800",
         "catalog_status": "asm-variant-identity-only",
@@ -281,12 +331,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 406
     },
     {
       "id": "gtaa:aircraft:A330-900",
       "name": "Airbus A330-900",
-      "iata-code": "339",
+      "IATA-type": "339",
+      "IATA-subtype": "339",
+      "ICAO-type": "A339",
       "source": {
         "canonical_asm_type": "A330-900",
         "catalog_status": "asm-variant-identity-only",
@@ -297,12 +350,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A340",
       "name": "Airbus A340",
-      "iata-code": "340",
+      "IATA-type": "340",
+      "IATA-subtype": "340",
+      "ICAO-type": "A340",
       "source": {
         "canonical_asm_type": "A340",
         "catalog_status": "asm-variant-identity-only",
@@ -313,12 +369,15 @@
           "aircraft_id": "A340"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A340-200",
       "name": "Airbus A340-200",
-      "iata-code": "342",
+      "IATA-type": "342",
+      "IATA-subtype": "342",
+      "ICAO-type": "A342",
       "source": {
         "canonical_asm_type": "A340-200",
         "catalog_status": "asm-variant-identity-only",
@@ -329,12 +388,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A340-300",
       "name": "Airbus A340-300",
-      "iata-code": "343",
+      "IATA-type": "343",
+      "IATA-subtype": "343",
+      "ICAO-type": "A343",
       "source": {
         "canonical_asm_type": "A340-300",
         "catalog_status": "asm-variant-identity-only",
@@ -345,12 +407,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A340-500",
       "name": "Airbus A340-500",
-      "iata-code": "345",
+      "IATA-type": "345",
+      "IATA-subtype": "345",
+      "ICAO-type": "A345",
       "source": {
         "canonical_asm_type": "A340-500",
         "catalog_status": "asm-variant-identity-only",
@@ -361,12 +426,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A340-600",
       "name": "Airbus A340-600",
-      "iata-code": "346",
+      "IATA-type": "346",
+      "IATA-subtype": "346",
+      "ICAO-type": "A346",
       "source": {
         "canonical_asm_type": "A340-600",
         "catalog_status": "asm-variant-identity-only",
@@ -377,12 +445,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A350-1000",
       "name": "Airbus A350-1000",
-      "iata-code": "351",
+      "IATA-type": "351",
+      "IATA-subtype": "351",
+      "ICAO-type": "A351",
       "source": {
         "canonical_asm_type": "A350-1000",
         "catalog_status": "asm-variant-identity-only",
@@ -393,12 +464,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A350-800",
       "name": "Airbus A350-800",
-      "iata-code": "358",
+      "IATA-type": "358",
+      "IATA-subtype": "358",
+      "ICAO-type": "A358",
       "source": {
         "canonical_asm_type": "A350-800",
         "catalog_status": "asm-variant-identity-only",
@@ -414,12 +488,15 @@
           "planning_only": true
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A350-900",
       "name": "Airbus A350-900",
-      "iata-code": "359",
+      "IATA-type": "359",
+      "IATA-subtype": "359",
+      "ICAO-type": "A359",
       "source": {
         "canonical_asm_type": "A350-900",
         "catalog_status": "asm-variant-identity-only",
@@ -430,12 +507,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 440
     },
     {
       "id": "gtaa:aircraft:A380",
       "name": "Airbus A380",
-      "iata-code": "380",
+      "IATA-type": "380",
+      "IATA-subtype": "380",
+      "ICAO-type": "A380",
       "source": {
         "canonical_asm_type": "A380",
         "catalog_status": "asm-variant-identity-only",
@@ -446,12 +526,15 @@
           "aircraft_id": "A380"
         }
       },
-      "ICAO-code": "F"
+      "ICAO-code": "F",
+      "seats": 555
     },
     {
       "id": "gtaa:aircraft:A380-800",
       "name": "Airbus A380-800",
-      "iata-code": "388",
+      "IATA-type": "388",
+      "IATA-subtype": "388",
+      "ICAO-type": "A388",
       "source": {
         "canonical_asm_type": "A380-800",
         "catalog_status": "asm-variant-identity-only",
@@ -462,12 +545,15 @@
           "locator": "ME1911189 Issue 4.0, 6 July 2020, page 2; ICAO/EASA column, not FAA ADG or approach category"
         }
       },
-      "ICAO-code": "F"
+      "ICAO-code": "F",
+      "seats": 555
     },
     {
       "id": "gtaa:aircraft:B717",
       "name": "Boeing B717",
-      "iata-code": "717",
+      "IATA-type": "717",
+      "IATA-subtype": "717",
+      "ICAO-type": "B717",
       "source": {
         "canonical_asm_type": "B717",
         "catalog_status": "asm-variant-identity-only",
@@ -478,12 +564,15 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row 717-200, not the FAA group column"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 134
     },
     {
       "id": "gtaa:aircraft:B717-200",
       "name": "Boeing B717-200",
-      "iata-code": "717",
+      "IATA-type": "717",
+      "IATA-subtype": "717",
+      "ICAO-type": "B712",
       "source": {
         "canonical_asm_type": "B717-200",
         "catalog_status": "asm-variant-identity-only",
@@ -494,12 +583,15 @@
           "aircraft_id": "B712"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 134
     },
     {
       "id": "gtaa:aircraft:B727-200",
       "name": "Boeing B727-200",
-      "iata-code": "727",
+      "IATA-type": "727",
+      "IATA-subtype": "727",
+      "ICAO-type": "B722",
       "source": {
         "canonical_asm_type": "B727-200",
         "catalog_status": "asm-variant-identity-only",
@@ -513,12 +605,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 189
     },
     {
       "id": "gtaa:aircraft:B727-200-W",
       "name": "Boeing B727-200W",
-      "iata-code": "72W",
+      "IATA-type": "72W",
+      "IATA-subtype": "72W",
+      "ICAO-type": "B722",
       "source": {
         "canonical_asm_type": "B727-200W",
         "catalog_status": "asm-variant-identity-only",
@@ -532,12 +627,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 189
     },
     {
       "id": "gtaa:aircraft:B737-100",
       "name": "Boeing B737-100",
-      "iata-code": "731",
+      "IATA-type": "731",
+      "IATA-subtype": "731",
+      "ICAO-type": "B731",
       "source": {
         "canonical_asm_type": "B737-100",
         "catalog_status": "asm-variant-identity-only",
@@ -551,12 +649,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 124
     },
     {
       "id": "gtaa:aircraft:B737-200",
       "name": "Boeing B737-200",
-      "iata-code": "732",
+      "IATA-type": "732",
+      "IATA-subtype": "732",
+      "ICAO-type": "B732",
       "source": {
         "canonical_asm_type": "B737-200",
         "catalog_status": "asm-variant-identity-only",
@@ -570,12 +671,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 136
     },
     {
       "id": "gtaa:aircraft:B737-300",
       "name": "Boeing B737-300",
-      "iata-code": "733",
+      "IATA-type": "733",
+      "IATA-subtype": "733",
+      "ICAO-type": "B733",
       "source": {
         "canonical_asm_type": "B737-300",
         "catalog_status": "asm-variant-identity-only",
@@ -589,12 +693,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 149
     },
     {
       "id": "gtaa:aircraft:B737-300-W",
       "name": "Boeing B737-300W",
-      "iata-code": "73W",
+      "IATA-type": "73W",
+      "IATA-subtype": "73W",
+      "ICAO-type": "B733",
       "source": {
         "canonical_asm_type": "B737-300W",
         "catalog_status": "asm-variant-identity-only",
@@ -608,12 +715,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 149
     },
     {
       "id": "gtaa:aircraft:B737-400",
       "name": "Boeing B737-400",
-      "iata-code": "734",
+      "IATA-type": "734",
+      "IATA-subtype": "734",
+      "ICAO-type": "B734",
       "source": {
         "canonical_asm_type": "B737-400",
         "catalog_status": "asm-variant-identity-only",
@@ -624,12 +734,15 @@
           "aircraft_id": "B734"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 168
     },
     {
       "id": "gtaa:aircraft:B737-500",
       "name": "Boeing B737-500",
-      "iata-code": "735",
+      "IATA-type": "735",
+      "IATA-subtype": "735",
+      "ICAO-type": "B735",
       "source": {
         "canonical_asm_type": "B737-500",
         "catalog_status": "asm-variant-identity-only",
@@ -643,12 +756,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 132
     },
     {
       "id": "gtaa:aircraft:B737-500-W",
       "name": "Boeing B737-500W",
-      "iata-code": "75W",
+      "IATA-type": "75W",
+      "IATA-subtype": "75W",
+      "ICAO-type": "B735",
       "source": {
         "canonical_asm_type": "B737-500W",
         "catalog_status": "asm-variant-identity-only",
@@ -662,12 +778,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 132
     },
     {
       "id": "gtaa:aircraft:B737-600",
       "name": "Boeing B737-600",
-      "iata-code": "736",
+      "IATA-type": "736",
+      "IATA-subtype": "736",
+      "ICAO-type": "B736",
       "source": {
         "canonical_asm_type": "B737-600",
         "catalog_status": "asm-variant-identity-only",
@@ -681,12 +800,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 110
     },
     {
       "id": "gtaa:aircraft:B737-700",
       "name": "Boeing B737-700",
-      "iata-code": "737",
+      "IATA-type": "737",
+      "IATA-subtype": "737",
+      "ICAO-type": "B737",
       "source": {
         "canonical_asm_type": "B737-700",
         "catalog_status": "asm-variant-identity-only",
@@ -700,12 +822,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 140
     },
     {
       "id": "gtaa:aircraft:B737-700-W",
       "name": "Boeing B737-700W",
-      "iata-code": "7W",
+      "IATA-type": "737",
+      "IATA-subtype": "7W",
+      "ICAO-type": "B737",
       "source": {
         "canonical_asm_type": "B737-700W",
         "catalog_status": "asm-variant-identity-only",
@@ -719,12 +844,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 140
     },
     {
       "id": "gtaa:aircraft:B737-800",
       "name": "Boeing B737-800",
-      "iata-code": "738",
+      "IATA-type": "738",
+      "IATA-subtype": "738",
+      "ICAO-type": "B738",
       "source": {
         "canonical_asm_type": "B737-800",
         "catalog_status": "asm-variant-identity-only",
@@ -735,12 +863,15 @@
           "aircraft_id": "B738"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 189
     },
     {
       "id": "gtaa:aircraft:B737-800-SSW",
       "name": "Boeing B737-800SSW",
-      "iata-code": "738",
+      "IATA-type": "738",
+      "IATA-subtype": "738",
+      "ICAO-type": "B738",
       "source": {
         "canonical_asm_type": "B737-800SSW",
         "catalog_status": "asm-variant-identity-only",
@@ -754,12 +885,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 189
     },
     {
       "id": "gtaa:aircraft:B737-800-W",
       "name": "Boeing B737-800W",
-      "iata-code": "738",
+      "IATA-type": "738",
+      "IATA-subtype": "7W",
+      "ICAO-type": "B738",
       "source": {
         "canonical_asm_type": "B737-800W",
         "catalog_status": "asm-variant-identity-only",
@@ -773,12 +907,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 189
     },
     {
       "id": "gtaa:aircraft:B737-900",
       "name": "Boeing B737-900",
-      "iata-code": "739",
+      "IATA-type": "739",
+      "IATA-subtype": "739",
+      "ICAO-type": "B739",
       "source": {
         "canonical_asm_type": "B737-900",
         "catalog_status": "asm-variant-identity-only",
@@ -789,12 +926,15 @@
           "aircraft_id": "B739"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 215
     },
     {
       "id": "gtaa:aircraft:B737-900-SSW",
       "name": "Boeing B737-900SSW",
-      "iata-code": "739",
+      "IATA-type": "739",
+      "IATA-subtype": "739",
+      "ICAO-type": "B739",
       "source": {
         "canonical_asm_type": "B737-900SSW",
         "catalog_status": "asm-variant-identity-only",
@@ -808,12 +948,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 215
     },
     {
       "id": "gtaa:aircraft:B737-900-W",
       "name": "Boeing B737-900W",
-      "iata-code": "739",
+      "IATA-type": "739",
+      "IATA-subtype": "7W",
+      "ICAO-type": "B739",
       "source": {
         "canonical_asm_type": "B737-900W",
         "catalog_status": "asm-variant-identity-only",
@@ -827,12 +970,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 215
     },
     {
       "id": "gtaa:aircraft:B737-MAX10",
       "name": "Boeing B737-MAX10",
-      "iata-code": "7M10",
+      "IATA-type": "7M",
+      "IATA-subtype": "7M10",
+      "ICAO-type": "B3XM",
       "source": {
         "canonical_asm_type": "B737-MAX10",
         "catalog_status": "asm-variant-identity-only",
@@ -846,12 +992,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 230
     },
     {
       "id": "gtaa:aircraft:B737-MAX7",
       "name": "Boeing B737-MAX7",
-      "iata-code": "7M7",
+      "IATA-type": "7M",
+      "IATA-subtype": "7M7",
+      "ICAO-type": "B3XM",
       "source": {
         "canonical_asm_type": "B737-MAX7",
         "catalog_status": "asm-variant-identity-only",
@@ -865,12 +1014,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 172
     },
     {
       "id": "gtaa:aircraft:B737-MAX8",
       "name": "Boeing B737-MAX8",
-      "iata-code": "7M8",
+      "IATA-type": "7M8",
+      "IATA-subtype": "7M8",
+      "ICAO-type": "B3XM",
       "source": {
         "canonical_asm_type": "B737-MAX8",
         "catalog_status": "asm-variant-identity-only",
@@ -884,12 +1036,15 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 178
     },
     {
       "id": "gtaa:aircraft:B737-MAX9",
       "name": "Boeing B737-MAX9",
-      "iata-code": "7M9",
+      "IATA-type": "7M",
+      "IATA-subtype": "7M9",
+      "ICAO-type": "B3XM",
       "source": {
         "canonical_asm_type": "B737-MAX9",
         "catalog_status": "asm-variant-identity-only",
@@ -903,10 +1058,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 193
     },
     {
-      "iata-code": "741",
+      "IATA-type": "741",
+      "IATA-subtype": "741",
+      "ICAO-type": "B741",
       "id": "gtaa:aircraft:B747-100",
       "name": "Boeing B747-100",
       "source": {
@@ -919,10 +1077,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row 747-100,200,300, not the FAA group column"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 366
     },
     {
-      "iata-code": "742",
+      "IATA-type": "74",
+      "IATA-subtype": "742",
+      "ICAO-type": "B742",
       "id": "gtaa:aircraft:B747-200",
       "name": "Boeing B747-200",
       "source": {
@@ -935,10 +1096,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row 747-100,200,300, not the FAA group column"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 366
     },
     {
-      "iata-code": "743",
+      "IATA-type": "74",
+      "IATA-subtype": "743",
+      "ICAO-type": "B743",
       "id": "gtaa:aircraft:B747-300",
       "name": "Boeing B747-300",
       "source": {
@@ -951,10 +1115,13 @@
           "aircraft_id": "B743"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 400
     },
     {
-      "iata-code": "744",
+      "IATA-type": "74",
+      "IATA-subtype": "744",
+      "ICAO-type": "B744",
       "id": "gtaa:aircraft:B747-400",
       "name": "Boeing B747-400",
       "source": {
@@ -967,10 +1134,13 @@
           "aircraft_id": "B744"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 416
     },
     {
-      "iata-code": "74C",
+      "IATA-type": "74",
+      "IATA-subtype": "74C",
+      "ICAO-type": "B74C",
       "id": "gtaa:aircraft:B747-400C",
       "name": "Boeing B747-400C",
       "source": {
@@ -984,10 +1154,13 @@
           "configuration_reference": "https://www.boeing.com/content/dam/boeing/v2/airports/acaps/747-400_Rev_F.pdf"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 416
     },
     {
-      "iata-code": "748",
+      "IATA-type": "74",
+      "IATA-subtype": "748",
+      "ICAO-type": "B748",
       "id": "gtaa:aircraft:B747-8",
       "name": "Boeing B747-8",
       "source": {
@@ -1003,10 +1176,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "F"
+      "ICAO-code": "F",
+      "seats": 467
     },
     {
-      "iata-code": "752",
+      "IATA-type": "75",
+      "IATA-subtype": "752",
+      "ICAO-type": "B752",
       "id": "gtaa:aircraft:B757-200",
       "name": "Boeing B757-200",
       "source": {
@@ -1022,10 +1198,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 239
     },
     {
-      "iata-code": "75W",
+      "IATA-type": "75",
+      "IATA-subtype": "75W",
+      "ICAO-type": "B752",
       "id": "gtaa:aircraft:B757-200-W",
       "name": "Boeing B757-200W",
       "source": {
@@ -1041,10 +1220,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 239
     },
     {
-      "iata-code": "753",
+      "IATA-type": "75",
+      "IATA-subtype": "753",
+      "ICAO-type": "B753",
       "id": "gtaa:aircraft:B757-300",
       "name": "Boeing B757-300",
       "source": {
@@ -1057,10 +1239,13 @@
           "aircraft_id": "B753"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 280
     },
     {
-      "iata-code": "75Y",
+      "IATA-type": "75",
+      "IATA-subtype": "75Y",
+      "ICAO-type": "B753",
       "id": "gtaa:aircraft:B757-300-W",
       "name": "Boeing B757-300W",
       "source": {
@@ -1076,10 +1261,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 280
     },
     {
-      "iata-code": "762",
+      "IATA-type": "76",
+      "IATA-subtype": "762",
+      "ICAO-type": "B762",
       "id": "gtaa:aircraft:B767-200",
       "name": "Boeing B767-200",
       "source": {
@@ -1092,10 +1280,13 @@
           "aircraft_id": "B762"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 181
     },
     {
-      "iata-code": "763",
+      "IATA-type": "76",
+      "IATA-subtype": "763",
+      "ICAO-type": "B763",
       "id": "gtaa:aircraft:B767-300",
       "name": "Boeing B767-300",
       "source": {
@@ -1108,10 +1299,13 @@
           "aircraft_id": "B763"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 218
     },
     {
-      "iata-code": "76W",
+      "IATA-type": "76",
+      "IATA-subtype": "76W",
+      "ICAO-type": "B763",
       "id": "gtaa:aircraft:B767-300-W",
       "name": "Boeing B767-300W",
       "source": {
@@ -1124,10 +1318,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row 767-300/-300W, not the FAA group column"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 218
     },
     {
-      "iata-code": "764",
+      "IATA-type": "76",
+      "IATA-subtype": "764",
+      "ICAO-type": "B764",
       "id": "gtaa:aircraft:B767-400",
       "name": "Boeing B767-400",
       "source": {
@@ -1140,10 +1337,13 @@
           "aircraft_id": "B764"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 245
     },
     {
-      "iata-code": "772",
+      "IATA-type": "77",
+      "IATA-subtype": "772",
+      "ICAO-type": "B772",
       "id": "gtaa:aircraft:B777-200",
       "name": "Boeing B777-200",
       "source": {
@@ -1156,10 +1356,13 @@
           "aircraft_id": "B772"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 305
     },
     {
-      "iata-code": "77E",
+      "IATA-type": "77",
+      "IATA-subtype": "77E",
+      "ICAO-type": "B772",
       "id": "gtaa:aircraft:B777-200-ER",
       "name": "Boeing B777-200ER",
       "source": {
@@ -1172,10 +1375,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row 777-200, 200ER, 200LR, 777F, not the FAA group column"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 313
     },
     {
-      "iata-code": "77L",
+      "IATA-type": "77",
+      "IATA-subtype": "77L",
+      "ICAO-type": "B772",
       "id": "gtaa:aircraft:B777-200-LR",
       "name": "Boeing B777-200LR",
       "source": {
@@ -1188,10 +1394,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row 777-200, 200ER, 200LR, 777F, not the FAA group column"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 317
     },
     {
-      "iata-code": "773",
+      "IATA-type": "77",
+      "IATA-subtype": "773",
+      "ICAO-type": "B773",
       "id": "gtaa:aircraft:B777-300",
       "name": "Boeing B777-300",
       "source": {
@@ -1204,10 +1413,13 @@
           "aircraft_id": "B773"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 368
     },
     {
-      "iata-code": "77W",
+      "IATA-type": "77",
+      "IATA-subtype": "77W",
+      "ICAO-type": "B77W",
       "id": "gtaa:aircraft:B777-300-ER",
       "name": "Boeing B777-300ER",
       "source": {
@@ -1220,10 +1432,13 @@
           "aircraft_id": "B77W"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 396
     },
     {
-      "iata-code": "779",
+      "IATA-type": "77",
+      "IATA-subtype": "779",
+      "ICAO-type": "B779",
       "id": "gtaa:aircraft:B777-9",
       "name": "Boeing B777-9",
       "source": {
@@ -1238,10 +1453,13 @@
           "preliminary": true
         }
       },
-      "ICAO-code": "F"
+      "ICAO-code": "F",
+      "seats": 426
     },
     {
-      "iata-code": "77X",
+      "IATA-type": "77",
+      "IATA-subtype": "77X",
+      "ICAO-type": "B779",
       "id": "gtaa:aircraft:B777-9-FOLDED",
       "name": "Boeing B777-9 (Folded)",
       "source": {
@@ -1256,10 +1474,13 @@
           "preliminary": true
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 426
     },
     {
-      "iata-code": "78X",
+      "IATA-type": "78",
+      "IATA-subtype": "78X",
+      "ICAO-type": "B78X",
       "id": "gtaa:aircraft:B787-10",
       "name": "Boeing B787-10",
       "source": {
@@ -1272,10 +1493,13 @@
           "aircraft_id": "B78X"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 336
     },
     {
-      "iata-code": "788",
+      "IATA-type": "78",
+      "IATA-subtype": "788",
+      "ICAO-type": "B788",
       "id": "gtaa:aircraft:B787-8",
       "name": "Boeing B787-8",
       "source": {
@@ -1288,10 +1512,13 @@
           "aircraft_id": "B788"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 242
     },
     {
-      "iata-code": "789",
+      "IATA-type": "78",
+      "IATA-subtype": "789",
+      "ICAO-type": "B789",
       "id": "gtaa:aircraft:B787-9",
       "name": "Boeing B787-9",
       "source": {
@@ -1304,10 +1531,13 @@
           "aircraft_id": "B789"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 296
     },
     {
-      "iata-code": "CR1",
+      "IATA-type": "CR",
+      "IATA-subtype": "CR1",
+      "ICAO-type": "CRJ1",
       "id": "gtaa:aircraft:CRJ100",
       "name": "CRJ CRJ100",
       "source": {
@@ -1323,10 +1553,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "B"
+      "ICAO-code": "B",
+      "seats": 50
     },
     {
-      "iata-code": "CR2",
+      "IATA-type": "CR",
+      "IATA-subtype": "CR2",
+      "ICAO-type": "CRJ2",
       "id": "gtaa:aircraft:CRJ200",
       "name": "CRJ CRJ200",
       "source": {
@@ -1342,10 +1575,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "B"
+      "ICAO-code": "B",
+      "seats": 50
     },
     {
-      "iata-code": "CR7",
+      "IATA-type": "CR",
+      "IATA-subtype": "CR7",
+      "ICAO-type": "CRJ7",
       "id": "gtaa:aircraft:CRJ700",
       "name": "CRJ CRJ700",
       "source": {
@@ -1361,10 +1597,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "B"
+      "ICAO-code": "B",
+      "seats": 70
     },
     {
-      "iata-code": "CRV",
+      "IATA-type": "CR",
+      "IATA-subtype": "CRV",
+      "ICAO-type": "CRJ9",
       "id": "gtaa:aircraft:CRJ705",
       "name": "CRJ CRJ705",
       "source": {
@@ -1380,10 +1619,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 75
     },
     {
-      "iata-code": "CR9",
+      "IATA-type": "CR",
+      "IATA-subtype": "CR9",
+      "ICAO-type": "CRJ9",
       "id": "gtaa:aircraft:CRJ900",
       "name": "CRJ CRJ900",
       "source": {
@@ -1399,10 +1641,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 90
     },
     {
-      "iata-code": "D10",
+      "IATA-type": "D1",
+      "IATA-subtype": "D10",
+      "ICAO-type": "DC10",
       "id": "gtaa:aircraft:DC10-30",
       "name": "Douglas DC10-30",
       "source": {
@@ -1418,10 +1663,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 380
     },
     {
-      "iata-code": "D91",
+      "IATA-type": "D9",
+      "IATA-subtype": "D91",
+      "ICAO-type": "DC9",
       "id": "gtaa:aircraft:DC9-15",
       "name": "Douglas DC9-15",
       "source": {
@@ -1434,10 +1682,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row DC-9-15, -21, -32, -41 and -51, not the FAA group column"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 84
     },
     {
-      "iata-code": "D92",
+      "IATA-type": "D9",
+      "IATA-subtype": "D92",
+      "ICAO-type": "DC9",
       "id": "gtaa:aircraft:DC9-21",
       "name": "Douglas DC9-21",
       "source": {
@@ -1450,10 +1701,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row DC-9-15, -21, -32, -41 and -51, not the FAA group column"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 109
     },
     {
-      "iata-code": "D93",
+      "IATA-type": "D93",
+      "IATA-subtype": "D93",
+      "ICAO-type": "DC9",
       "id": "gtaa:aircraft:DC9-32",
       "name": "Douglas DC9-32",
       "source": {
@@ -1466,10 +1720,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row DC-9-15, -21, -32, -41 and -51, not the FAA group column"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 119
     },
     {
-      "iata-code": "D94",
+      "IATA-type": "D9",
+      "IATA-subtype": "D94",
+      "ICAO-type": "DC9",
       "id": "gtaa:aircraft:DC9-41",
       "name": "Douglas DC9-41",
       "source": {
@@ -1482,10 +1739,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row DC-9-15, -21, -32, -41 and -51, not the FAA group column"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 139
     },
     {
-      "iata-code": "D95",
+      "IATA-type": "D9",
+      "IATA-subtype": "D95",
+      "ICAO-type": "DC9",
       "id": "gtaa:aircraft:DC9-51",
       "name": "Douglas DC9-51",
       "source": {
@@ -1498,10 +1758,13 @@
           "locator": "Boeing Airport Compatibility, 4 November 2014, page 1, ICAO Aeroplane Design Code letter column; row DC-9-15, -21, -32, -41 and -51, not the FAA group column"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 139
     },
     {
-      "iata-code": "DH1",
+      "IATA-type": "DH",
+      "IATA-subtype": "DH1",
+      "ICAO-type": "DH8A",
       "id": "gtaa:aircraft:DH8-100",
       "name": "De Havilland DH8-100",
       "source": {
@@ -1517,10 +1780,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 37
     },
     {
-      "iata-code": "DH2",
+      "IATA-type": "DH",
+      "IATA-subtype": "DH2",
+      "ICAO-type": "DH8B",
       "id": "gtaa:aircraft:DH8-200",
       "name": "De Havilland DH8-200",
       "source": {
@@ -1536,10 +1802,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 39
     },
     {
-      "iata-code": "DH3",
+      "IATA-type": "DH",
+      "IATA-subtype": "DH3",
+      "ICAO-type": "DH8C",
       "id": "gtaa:aircraft:DH8-300",
       "name": "De Havilland DH8-300",
       "source": {
@@ -1555,10 +1824,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 50
     },
     {
-      "iata-code": "DH4",
+      "IATA-type": "DH",
+      "IATA-subtype": "DH4",
+      "ICAO-type": "DH8D",
       "id": "gtaa:aircraft:DH8-400",
       "name": "De Havilland DH8-400",
       "source": {
@@ -1574,10 +1846,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 78
     },
     {
-      "iata-code": "ER3",
+      "IATA-type": "ER",
+      "IATA-subtype": "ER3",
+      "ICAO-type": "E135",
       "id": "gtaa:aircraft:EMB135",
       "name": "Embraer EMB135",
       "source": {
@@ -1593,10 +1868,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "B"
+      "ICAO-code": "B",
+      "seats": 37
     },
     {
-      "iata-code": "ERD",
+      "IATA-type": "ER",
+      "IATA-subtype": "ERD",
+      "ICAO-type": "E140",
       "id": "gtaa:aircraft:EMB140",
       "name": "Embraer EMB140",
       "source": {
@@ -1612,10 +1890,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "B"
+      "ICAO-code": "B",
+      "seats": 44
     },
     {
-      "iata-code": "ER4",
+      "IATA-type": "ER",
+      "IATA-subtype": "ER4",
+      "ICAO-type": "E145",
       "id": "gtaa:aircraft:EMB145",
       "name": "Embraer EMB145",
       "source": {
@@ -1631,10 +1912,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "B"
+      "ICAO-code": "B",
+      "seats": 50
     },
     {
-      "iata-code": "E70",
+      "IATA-type": "E7",
+      "IATA-subtype": "E70",
+      "ICAO-type": "E170",
       "id": "gtaa:aircraft:EMB170",
       "name": "Embraer EMB170",
       "source": {
@@ -1650,10 +1934,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 70
     },
     {
-      "iata-code": "E75",
+      "IATA-type": "E7",
+      "IATA-subtype": "E75",
+      "ICAO-type": "E175",
       "id": "gtaa:aircraft:EMB175",
       "name": "Embraer EMB175",
       "source": {
@@ -1668,10 +1955,13 @@
           "classification_locator": "Page 3, ICAO/EASA wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 78
     },
     {
-      "iata-code": "E7W",
+      "IATA-type": "E7",
+      "IATA-subtype": "E7W",
+      "ICAO-type": "E175",
       "id": "gtaa:aircraft:EMB175-E2",
       "name": "Embraer EMB175E2",
       "source": {
@@ -1687,10 +1977,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 88
     },
     {
-      "iata-code": "E75",
+      "IATA-type": "E7",
+      "IATA-subtype": "E75",
+      "ICAO-type": "E175",
       "id": "gtaa:aircraft:EMB175-W",
       "name": "Embraer EMB175W",
       "source": {
@@ -1705,10 +1998,13 @@
           "classification_locator": "Page 3, ICAO/EASA wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 88
     },
     {
-      "iata-code": "E90",
+      "IATA-type": "E9",
+      "IATA-subtype": "E90",
+      "ICAO-type": "E190",
       "id": "gtaa:aircraft:EMB190",
       "name": "Embraer EMB190",
       "source": {
@@ -1724,10 +2020,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 100
     },
     {
-      "iata-code": "E9X",
+      "IATA-type": "E9",
+      "IATA-subtype": "E9X",
+      "ICAO-type": "E190",
       "id": "gtaa:aircraft:EMB190-E2",
       "name": "Embraer EMB190E2",
       "source": {
@@ -1743,10 +2042,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 114
     },
     {
-      "iata-code": "E95",
+      "IATA-type": "E9",
+      "IATA-subtype": "E95",
+      "ICAO-type": "E195",
       "id": "gtaa:aircraft:EMB195",
       "name": "Embraer EMB195",
       "source": {
@@ -1762,10 +2064,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 124
     },
     {
-      "iata-code": "E9Y",
+      "IATA-type": "E9",
+      "IATA-subtype": "E9Y",
+      "ICAO-type": "E195",
       "id": "gtaa:aircraft:EMB195-E2",
       "name": "Embraer EMB195E2",
       "source": {
@@ -1781,10 +2086,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 146
     },
     {
-      "iata-code": "IL6",
+      "IATA-type": "IL",
+      "IATA-subtype": "IL6",
+      "ICAO-type": "IL62",
       "id": "gtaa:aircraft:IL62",
       "name": "Ilyushin IL62",
       "source": {
@@ -1800,10 +2108,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 186
     },
     {
-      "iata-code": "IL7",
+      "IATA-type": "IL",
+      "IATA-subtype": "IL7",
+      "ICAO-type": "IL76",
       "id": "gtaa:aircraft:IL76",
       "name": "Ilyushin IL76",
       "source": {
@@ -1819,10 +2130,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 225
     },
     {
-      "iata-code": "IL9",
+      "IATA-type": "IL",
+      "IATA-subtype": "IL9",
+      "ICAO-type": "IL96",
       "id": "gtaa:aircraft:IL96",
       "name": "Ilyushin IL96",
       "source": {
@@ -1838,10 +2152,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "E"
+      "ICAO-code": "E",
+      "seats": 300
     },
     {
-      "iata-code": "M11",
+      "IATA-type": "M1",
+      "IATA-subtype": "M11",
+      "ICAO-type": "MD11",
       "id": "gtaa:aircraft:MD11",
       "name": "McDonnell Douglas MD11",
       "source": {
@@ -1857,10 +2174,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "D"
+      "ICAO-code": "D",
+      "seats": 293
     },
     {
-      "iata-code": "M81",
+      "IATA-type": "M8",
+      "IATA-subtype": "M81",
+      "ICAO-type": "MD81",
       "id": "gtaa:aircraft:MD81",
       "name": "McDonnell Douglas MD81",
       "source": {
@@ -1876,10 +2196,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 172
     },
     {
-      "iata-code": "M82",
+      "IATA-type": "M8",
+      "IATA-subtype": "M82",
+      "ICAO-type": "MD82",
       "id": "gtaa:aircraft:MD82",
       "name": "McDonnell Douglas MD82",
       "source": {
@@ -1895,10 +2218,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 172
     },
     {
-      "iata-code": "M83",
+      "IATA-type": "M8",
+      "IATA-subtype": "M83",
+      "ICAO-type": "MD83",
       "id": "gtaa:aircraft:MD83",
       "name": "McDonnell Douglas MD83",
       "source": {
@@ -1914,10 +2240,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 172
     },
     {
-      "iata-code": "M87",
+      "IATA-type": "M8",
+      "IATA-subtype": "M87",
+      "ICAO-type": "MD87",
       "id": "gtaa:aircraft:MD87",
       "name": "McDonnell Douglas MD87",
       "source": {
@@ -1933,10 +2262,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 130
     },
     {
-      "iata-code": "M88",
+      "IATA-type": "M8",
+      "IATA-subtype": "M88",
+      "ICAO-type": "MD88",
       "id": "gtaa:aircraft:MD88",
       "name": "McDonnell Douglas MD88",
       "source": {
@@ -1952,10 +2284,13 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 155
     },
     {
-      "iata-code": "M90",
+      "IATA-type": "M9",
+      "IATA-subtype": "M90",
+      "ICAO-type": "MD90",
       "id": "gtaa:aircraft:MD90",
       "name": "McDonnell Douglas MD90",
       "source": {
@@ -1971,7 +2306,8 @@
           "classification_locator": "Page 3, ICAO Annex 14 Amendment 14 / EASA CS-ADR-DSN Issue 4 wingspan code-letter table"
         }
       },
-      "ICAO-code": "C"
+      "ICAO-code": "C",
+      "seats": 172
     }
   ]
 }

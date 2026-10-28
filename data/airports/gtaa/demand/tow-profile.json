@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../schemas/tow-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "gtaa:stand-only:v1",
+  "description": "Synthetic initial stand-assignment baseline. Elective generated movements are disabled. The remaining experimental preparation knobs match Contoso; no GTAA tow-route, crew, clearance or operational feasibility is asserted.",
+  "method": "greedy-marginal-shortfall",
+  "minimum_parking_minutes": 60,
+  "movement_penalty_minutes": 15,
+  "minimum_net_benefit_minutes": 0,
+  "maximum_generated_movements": 0,
+  "parking_stand_kind": "non-contact"
+}

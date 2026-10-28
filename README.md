@@ -36,13 +36,24 @@ npm run preview
 
 ## Airport configuration
 
-The [GTAA airport draft](docs/gtaa-airport.md) covers Terminal 1, Terminal 3 and
+Use the [airport onboarding guide](docs/airport-onboarding.md) for source
+requirements, JSON formats, diagram alignment, GTAA aircraft reuse and the
+repository-shared `/add-airport` AI prompt.
+
+The [GTAA airport configuration](docs/gtaa-airport.md) covers Terminal 1, Terminal 3 and
 the Infield Concourse using the supplied maps and ASM documents. It includes
-source evidence and explicit data gaps, not an assignable airport model.
+source evidence, 168 user-ready stands and explicit operational data gaps.
 GTAA-local exact aircraft catalogs, service-leg permissions and supported ASM
 neighbor rules are included; procedural requirements remain manual review items.
 User-approved synthetic handling, tow and traffic defaults are configured
 separately from verified airport operating figures.
+Its [scenario profile](data/airports/gtaa/demand/scenario-profile.json) generates
+160 visits/320 legs for a Toronto local day: 64 domestic, 64 US transborder
+and 32 international visits. Both stand-only solver variants cover all visits
+under the authored rules. Choose **GTAA · Toronto Pearson** and **Full day**
+in Demo settings to inspect the prepared schedule. GTAA-specific analysis
+reviews are explicitly unavailable until their profiles and evidence are
+prepared. The schedule is synthetic and is not operationally approved.
 
 See [Stand configuration and occupancy-dependent rules](docs/stand-rules.md)
 for the airport data contract, closure/restriction examples, Contoso remote-stand
@@ -75,7 +86,8 @@ See [Repeatable airport demo scenarios](docs/scenario-generation.md) for seeded
 comfortable/constrained demand, overnight context and measured assignment/tow
 comparisons.
 Use [Demo settings](docs/demo-settings.md) beside the chart controls to switch
-between the original fixture and prepared Contoso plans without restarting.
+between the original fixture, prepared Contoso plans and GTAA's full-day
+schedule without restarting.
 Only the selected source/case/plan preferences are saved locally.
 
 Prepared Contoso plans also offer a [scheduled buffer review](docs/buffer-evaluation.md)

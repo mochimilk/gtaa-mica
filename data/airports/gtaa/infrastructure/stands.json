@@ -22,7 +22,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -96,7 +96,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -170,7 +170,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -244,7 +244,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -329,7 +329,7 @@
           "description": "asm-ifc, PDF page 6: occupying stand 526 closes stand 525. Source heading: 525 & 527 CLOSED."
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -409,7 +409,7 @@
           "description": "asm-ifc, PDF page 5: occupying stand 525 closes stand 525A. Source heading: 525A & 526 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -494,7 +494,7 @@
           "description": "asm-ifc, PDF page 7: occupying stand 527 closes stand 526. Source heading: 527A & 526 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -579,7 +579,7 @@
           "description": "asm-ifc, PDF page 7: occupying stand 527A closes stand 527. Source heading: 527 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -659,7 +659,7 @@
           "description": "asm-ifc, PDF page 7: occupying stand 527 closes stand 527A. Source heading: 527A & 526 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -739,7 +739,7 @@
           "description": "asm-ifc, PDF page 8: occupying stand 528A closes stand 528. Source heading: 528 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -817,7 +817,7 @@
           "description": "asm-ifc, PDF page 8: occupying stand 528 closes stand 528A. Source heading: 528A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Unreviewed source-backed stub. Coordinates are the supplied airport reference, not a stand position. Contact status, operational permissions and aircraft-specific rules remain pending.",
       "source": {
         "coordinate_status": "airport-reference-placeholder",
@@ -866,7 +866,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -940,7 +940,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1014,7 +1014,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1088,7 +1088,7 @@
       "departure-sector-group": "domestic-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1151,7 +1151,7 @@
       "departure-sector-group": "domestic-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1214,7 +1214,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1288,7 +1288,7 @@
       "departure-sector-group": "domestic-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1351,7 +1351,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1425,7 +1425,7 @@
       "departure-sector-group": "domestic-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1488,7 +1488,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1562,7 +1562,7 @@
       "departure-sector-group": "domestic-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1625,7 +1625,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1699,7 +1699,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1773,7 +1773,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1847,7 +1847,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -1927,7 +1927,7 @@
           "description": "asm-t1, PDF page 2: occupying stand 120A closes stand 120. Source heading: 120 & 122 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2012,7 +2012,7 @@
           "description": "asm-t1, PDF page 2: occupying stand 122 closes stand 120A. Source heading: 120A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2145,7 +2145,7 @@
           "description": "asm-t1, PDF page 2: occupying stand 120A closes stand 122. Source heading: 120 & 122 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2220,7 +2220,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2348,7 +2348,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2423,7 +2423,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2497,7 +2497,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2578,7 +2578,7 @@
           "description": "asm-t1, PDF page 17: occupying stand 134A closes stand 132. Source heading: 132, 134 & 136 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2652,7 +2652,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2732,7 +2732,7 @@
           "description": "asm-t1, PDF page 17: occupying stand 134A closes stand 134. Source heading: 132, 134 & 136 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2822,7 +2822,7 @@
           "description": "asm-t1, PDF page 16: occupying stand 136 closes stand 134A. Source heading: 138A & 134A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2896,7 +2896,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -2982,7 +2982,7 @@
           "description": "asm-t1, PDF page 16: occupying stand 138A closes stand 136. Source heading: 138 & 136 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3056,7 +3056,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3136,7 +3136,7 @@
           "description": "asm-t1, PDF page 16: occupying stand 138A closes stand 138. Source heading: 138 & 136 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3222,7 +3222,7 @@
           "description": "asm-t1, PDF page 16: occupying stand 138 closes stand 138A. Source heading: 138A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3297,7 +3297,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3371,7 +3371,7 @@
       "departure-sector-group": "domestic-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3456,7 +3456,7 @@
           "description": "asm-t1, PDF page 10: occupying stand 142 closes stand 141. Source heading: 141 & 143 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3540,7 +3540,7 @@
           "description": "asm-t1, PDF page 7: occupying stand 141 closes stand 141A. Source heading: 141A & 142 CLOSED (Stand 142 bridge must be parked in circle)"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3625,7 +3625,7 @@
           "description": "asm-t1, PDF page 10: occupying stand 143 closes stand 142. Source heading: 142, 143A & 144 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3715,7 +3715,7 @@
           "description": "asm-t1, PDF page 11: occupying stand 144 closes stand 143. Source heading: 143 & 145A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3795,7 +3795,7 @@
           "description": "asm-t1, PDF page 10: occupying stand 143 closes stand 143A. Source heading: 142, 143A & 144 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3880,7 +3880,7 @@
           "description": "asm-t1, PDF page 12: occupying stand 145A closes stand 144. Source heading: 144 & 145 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -3960,7 +3960,7 @@
           "description": "asm-t1, PDF page 12: occupying stand 145A closes stand 145. Source heading: 144 & 145 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4045,7 +4045,7 @@
           "description": "asm-t1, PDF page 12: occupying stand 145 closes stand 145A. Source heading: 145A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4132,7 +4132,7 @@
       "departure-sector-group": "domestic-transborder",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4224,7 +4224,7 @@
       "departure-sector-group": "domestic-transborder",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4299,7 +4299,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4374,7 +4374,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4448,7 +4448,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4522,7 +4522,7 @@
       "departure-sector-group": "transborder-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4591,7 +4591,7 @@
           "description": "asm-t1, PDF page 20: occupying stand 161A closes stand 161. Source heading: 161 and 163 Closed."
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4676,7 +4676,7 @@
           "description": "asm-t1, PDF page 20: occupying stand 163 closes stand 161A. Source heading: 161A Closed"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4750,7 +4750,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4824,7 +4824,7 @@
       "departure-sector-group": "transborder-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4887,7 +4887,7 @@
       "departure-sector-group": "transborder-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -4956,7 +4956,7 @@
           "description": "asm-t1, PDF page 20: occupying stand 161A closes stand 163. Source heading: 161 and 163 Closed."
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5030,7 +5030,7 @@
       "departure-sector-group": "transborder-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5093,7 +5093,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5167,7 +5167,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5247,7 +5247,7 @@
           "description": "asm-t1, PDF page 21: occupying stand 165A closes stand 165. Source heading: 165, 167 and 167A Closed"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5337,7 +5337,7 @@
           "description": "asm-t1, PDF page 21: occupying stand 167A closes stand 165A. Source heading: 167 &165A Closed"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5446,7 +5446,7 @@
           ]
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5531,7 +5531,7 @@
           "description": "asm-t1, PDF page 45: occupying stand 168B closes stand 166A. Source heading: 181, 168A AND 166A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5611,7 +5611,7 @@
           "description": "asm-t1, PDF page 46: occupying stand 166 closes stand 166B. Source heading: CLOSES STANDS 166A AND 166B"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5701,7 +5701,7 @@
           "description": "asm-t1, PDF page 22: occupying stand 169A closes stand 167. Source heading: 167 and 169 Closed"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5786,7 +5786,7 @@
           "description": "asm-t1, PDF page 21: occupying stand 167 closes stand 167A. Source heading: 165A,167A and 169A Closed"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5871,7 +5871,7 @@
           "description": "asm-t1, PDF page 44: occupying stand 181 closes stand 168A. Source heading: 181A, 168A & 168B CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -5961,7 +5961,7 @@
           "description": "asm-t1, PDF page 44: occupying stand 181 closes stand 168B. Source heading: 181A, 168A & 168B CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -6055,7 +6055,7 @@
           "description": "asm-t1, PDF page 23: occupying stand 170A closes stand 169. Source heading: 169 and 170 Closed"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -6140,7 +6140,7 @@
           "description": "asm-t1, PDF page 22: occupying stand 169 closes stand 169A. Source heading: 169A and 170A Closed"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -6220,7 +6220,7 @@
           "description": "asm-t1, PDF page 23: occupying stand 170A closes stand 170. Source heading: 169 and 170 Closed"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -6305,7 +6305,7 @@
           "description": "asm-t1, PDF page 23: occupying stand 170 closes stand 170A. Source heading: 170A Closed"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -6385,7 +6385,7 @@
           "description": "asm-t1, PDF page 27: occupying stand 171A closes stand 171. Source heading: STAND 171 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -6589,7 +6589,7 @@
           ]
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -6664,7 +6664,7 @@
       "departure-sector-group": "international-transborder",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -6761,7 +6761,7 @@
           "description": "asm-t1, PDF page 32: occupying stand 173A closes stand 173. Source heading: 173 CLOSED, 172 RESTRICTED TO CODE C AIRCRAFT OR SMALLER"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -6961,7 +6961,7 @@
           ]
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7035,7 +7035,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7123,7 +7123,7 @@
           "description": "asm-t1, PDF page 39: occupying stand 175A closes stand 175. Source heading: 175 CLOSED, 176 RESTRICTED TO B737-500 OR SMALLER"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7347,7 +7347,7 @@
           ]
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7421,7 +7421,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7495,7 +7495,7 @@
       "departure-sector-group": "international-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7570,7 +7570,7 @@
       "departure-sector-group": "international-transborder",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7645,7 +7645,7 @@
       "departure-sector-group": "international-transborder",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7725,7 +7725,7 @@
           "description": "asm-t1, PDF page 44: occupying stand 180A closes stand 180. Source heading: 180 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7805,7 +7805,7 @@
           "description": "asm-t1, PDF page 44: occupying stand 180 closes stand 180A. Source heading: 180A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7895,7 +7895,7 @@
           "description": "asm-t1, PDF page 45: occupying stand 181A closes stand 181. Source heading: 181 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -7975,7 +7975,7 @@
           "description": "asm-t1, PDF page 44: occupying stand 181 closes stand 181A. Source heading: 181A, 168A & 168B CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8049,7 +8049,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8121,7 +8121,7 @@
       "departure-sector-group": "transborder-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Unreviewed source-backed stub. Coordinates are the supplied airport reference, not a stand position. Contact status, operational permissions and aircraft-specific rules remain pending.",
       "source": {
         "coordinate_status": "airport-reference-placeholder",
@@ -8166,7 +8166,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8240,7 +8240,7 @@
       "departure-sector-group": "transborder-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed map-only stub with no current ASM aircraft authorization. Coordinates approximate map labels; current stand status and operating permissions require confirmation.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8303,7 +8303,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8377,7 +8377,7 @@
       "departure-sector-group": "transborder-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8447,7 +8447,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8521,7 +8521,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8595,7 +8595,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8669,7 +8669,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8743,7 +8743,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8817,7 +8817,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8891,7 +8891,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -8965,7 +8965,7 @@
       "departure-sector-group": "transborder-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9039,7 +9039,7 @@
       "departure-sector-group": "transborder-general",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9113,7 +9113,7 @@
       "departure-sector-group": "domestic-international",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9187,7 +9187,7 @@
       "departure-sector-group": "domestic-international",
       "closed": true,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9261,7 +9261,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9335,7 +9335,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9409,7 +9409,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9483,7 +9483,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9557,7 +9557,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9631,7 +9631,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9705,7 +9705,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9779,7 +9779,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9853,7 +9853,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -9927,7 +9927,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10001,7 +10001,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10086,7 +10086,7 @@
           "description": "asm-t3, PDF page 7: occupying stand B9B closes stand B9. Source heading: CLOSES B9"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10166,7 +10166,7 @@
           "description": "asm-t3, PDF page 7: occupying stand B9 closes stand B9A. Source heading: B9A and B9B CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10246,7 +10246,7 @@
           "description": "asm-t3, PDF page 7: occupying stand B9 closes stand B9B. Source heading: B9A and B9B CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10331,7 +10331,7 @@
           "description": "asm-t3, PDF page 8: occupying stand B10B closes stand B10. Source heading: B10 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10411,7 +10411,7 @@
           "description": "asm-t3, PDF page 8: occupying stand B10 closes stand B10A. Source heading: B10A & B10B CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10491,7 +10491,7 @@
           "description": "asm-t3, PDF page 8: occupying stand B10 closes stand B10B. Source heading: B10A & B10B CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10571,7 +10571,7 @@
           "description": "asm-t3, PDF page 8: occupying stand B11A closes stand B11. Source heading: B11 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10651,7 +10651,7 @@
           "description": "asm-t3, PDF page 8: occupying stand B11 closes stand B11A. Source heading: B11A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10725,7 +10725,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10799,7 +10799,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10873,7 +10873,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -10953,7 +10953,7 @@
           "description": "asm-t3, PDF page 10: occupying stand B15A closes stand B15. Source heading: B15 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11065,7 +11065,7 @@
           ]
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11140,7 +11140,7 @@
       "departure-sector-group": "transborder-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11215,7 +11215,7 @@
       "departure-sector-group": "all-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11290,7 +11290,7 @@
       "departure-sector-group": "all-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11365,7 +11365,7 @@
       "departure-sector-group": "all-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11440,7 +11440,7 @@
       "departure-sector-group": "all-general",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11514,7 +11514,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11588,7 +11588,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11662,7 +11662,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11736,7 +11736,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11821,7 +11821,7 @@
           "description": "asm-t3, PDF page 14: occupying stand C28 closes stand C27. Source heading: C27 and C29 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11901,7 +11901,7 @@
           "description": "asm-t3, PDF page 14: occupying stand C27 closes stand C27A. Source heading: C27A and C28 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -11986,7 +11986,7 @@
           "description": "asm-t3, PDF page 15: occupying stand C29 closes stand C28. Source heading: C28 and C29A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12071,7 +12071,7 @@
           "description": "asm-t3, PDF page 15: occupying stand C29A closes stand C29. Source heading: C29 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12151,7 +12151,7 @@
           "description": "asm-t3, PDF page 15: occupying stand C29 closes stand C29A. Source heading: C28 and C29A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12225,7 +12225,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12317,7 +12317,7 @@
           "description": "asm-t3, PDF page 20: occupying stand C31A closes stand C31. Source heading: CLOSES C31"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12397,7 +12397,7 @@
           "description": "asm-t3, PDF page 20: occupying stand C31 closes stand C31A. Source heading: CLOSES C31A"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12471,7 +12471,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12551,7 +12551,7 @@
           "description": "asm-t3, PDF page 21: occupying stand C33A closes stand C33. Source heading: CLOSES STAND C33"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12631,7 +12631,7 @@
           "description": "asm-t3, PDF page 21: occupying stand C33 closes stand C33A. Source heading: CLOSES STAND C33A"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12705,7 +12705,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12801,7 +12801,7 @@
           "description": "asm-t3, PDF page 22: occupying stand C34 closes stand C34A. Source heading: CLOSES STAND C34A"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12875,7 +12875,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -12958,7 +12958,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -13043,7 +13043,7 @@
           "description": "asm-t3, PDF page 30: occupying stand C38 closes stand C37. Source heading: C37 and C39 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -13123,7 +13123,7 @@
           "description": "asm-t3, PDF page 29: occupying stand C37 closes stand C37A. Source heading: C37A and C38 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -13208,7 +13208,7 @@
           "description": "asm-t3, PDF page 30: occupying stand C39 closes stand C38. Source heading: C38 and C39A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -13293,7 +13293,7 @@
           "description": "asm-t3, PDF page 30: occupying stand C39A closes stand C39. Source heading: C39 CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -13373,7 +13373,7 @@
           "description": "asm-t3, PDF page 30: occupying stand C39 closes stand C39A. Source heading: C38 and C39A CLOSED"
         }
       ],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -13447,7 +13447,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",
@@ -13521,7 +13521,7 @@
       "departure-sector-group": "domestic-international",
       "closed": false,
       "close-conditions": [],
-      "configuration_status": "geometry-only",
+      "configuration_status": "ready",
       "description": "Source-backed draft. Coordinates approximate map labels, not aircraft parking points. ASM aircraft permissions and supported neighbor rules are translated; manual procedures, contact, sectors, airline authorization and availability require review.",
       "source": {
         "coordinate_status": "approximate-georeferenced-label",

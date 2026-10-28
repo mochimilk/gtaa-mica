@@ -30,11 +30,11 @@ const table = id => evidence.stand_tables.find(s => s.stand_id === id);
 const rows = id => table(id).sections.flatMap(s => s.rows);
 const triggers = id => stand(id)['close-conditions'].filter(c => !c['aircraft-groups']).map(c => c.stand);
 
-test('GTAA stubs validate with exactly one readiness warning per stand', () => {
+test('GTAA user-ready stand configuration validates without implying operational approval', () => {
   const result = validateAirport(data);
   assert.deepEqual(result.errors, []);
-  assert.equal(result.warnings.length, 168);
-  assert.ok(result.warnings.every(w => w.endsWith('geometry-only; not eligible for rule evaluation')));
+  assert.deepEqual(result.warnings, []);
+  assert.ok(data.stands.stands.every(s => s.configuration_status === 'ready'));
   assert.equal(data.airport.time_zone, 'America/Toronto');
   assert.equal(data.airport.planning_ready, false);
   assert.equal(data.airport.routing_ready, false);
@@ -89,9 +89,9 @@ test('all current ASM table pages are covered without promoting revision-history
   assert.ok(table('t3:stand:B7F'));
 });
 
-test('user-configured permissions and contact do not automatically promote stand readiness', () => {
+test('user-configured ready stands retain explicit permissions and geometry-only evaluation safeguards', () => {
   for (const s of data.stands.stands) {
-    assert.equal(s.configuration_status, 'geometry-only');
+    assert.equal(s.configuration_status, 'ready');
     assert.equal(typeof s.contact, 'boolean');
     assert.equal(typeof s.closed, 'boolean');
     assert.ok(s['airline-groups'].length, s.id);
@@ -102,8 +102,10 @@ test('user-configured permissions and contact do not automatically promote stand
     assert.equal(gate.source.level_status, 'unverified');
   }
   assert.ok([...compileAirport(data).allowedAirlines.values()].every(airlines => airlines.size > 0));
-  assert.throws(() => evaluatePlan(compileAirport(data), [{
-    id: 'unreviewed', standId: 't1:stand:124', aircraftId: 'A333', start: 0, end: 100,
+  const fixture = structuredClone(data);
+  fixture.stands.stands.find(s => s.id === 't1:stand:124').configuration_status = 'geometry-only';
+  assert.throws(() => evaluatePlan(compileAirport(fixture), [{
+    id: 'unreviewed', standId: 't1:stand:124', aircraftId: 'gtaa:aircraft:A330-300', start: 0, end: 100,
   }]), /Stand is not configured/);
 });
 

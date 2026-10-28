@@ -24,7 +24,8 @@ export function PlanDecisionReview() {
   const otherVariant = prepared?.variant === "baseline" ? "tow-options" : "baseline";
   const [open, setOpen] = useState(false);
   const [choiceId, setChoiceId] = useState(acceptedOptionId ? `late:${acceptedOptionId}` : `variant:${otherVariant}`);
-  const [assumptionId, setAssumptionId] = useState(acceptedAssumptionId ?? DEFAULT_GATE_WAIT_PROFILE.default_assumption_id);
+  const [assumptionId, setAssumptionId] = useState(acceptedAssumptionId ??
+    prepared?.reviewProfiles?.waiting.default_assumption_id ?? DEFAULT_GATE_WAIT_PROFILE.default_assumption_id);
   const [reviewRequest, setReviewRequest] = useState<AccommodationReviewRequest | null>(null);
   const pendingAction = useRef<(() => void) | null>(null);
   const choiceLabelId = useId(), assumptionLabelId = useId();
@@ -41,14 +42,14 @@ export function PlanDecisionReview() {
     })),
   ], [otherVariant, repairChoices]);
   const choice = choices.find(item => item.id === choiceId);
-  const brief = useMemo(() => prepared && choice
-    ? buildDecisionBrief(prepared.snapshot, prepared.variant, choice.target, assumptionId, prepared.accommodation) : null,
+  const brief = useMemo(() => prepared?.reviewProfiles && choice
+    ? buildDecisionBrief(prepared.snapshot, prepared.variant, choice.target, assumptionId, prepared.accommodation, prepared.reviewProfiles) : null,
   [prepared, choice, assumptionId]);
-  if (!prepared) return null;
+  if (!prepared?.reviewProfiles) return null;
   if (!choice || !brief) throw new Error("Unknown decision-brief selection.");
   const selectedRepair = brief.option ? repairChoices.find(item => item.option.id === brief.option?.id) : null;
   if (brief.option && !selectedRepair) throw new Error("Selected repair is missing from comparison representatives.");
-  const { snapshot } = prepared;
+  const { snapshot, reviewProfiles } = prepared;
   const time = (value: string) => `${formatUtcWithDay(Date.parse(value), snapshot.plan_window.start.slice(0, 10))} UTC`;
   const row = (id: string) => {
     const found = snapshot.rows.find(item => item.id === id);
@@ -97,9 +98,9 @@ export function PlanDecisionReview() {
           </Field>
           <Field label={{ children: "Synthetic waiting assumption", htmlFor: assumptionLabelId }}>
             <Select id={assumptionLabelId} value={assumptionId} onChange={event => {
-              if (!DEFAULT_GATE_WAIT_PROFILE.assumptions.some(item => item.id === event.target.value)) throw new Error("Unknown decision-brief waiting assumption.");
+              if (!reviewProfiles.waiting.assumptions.some(item => item.id === event.target.value)) throw new Error("Unknown decision-brief waiting assumption.");
               setAssumptionId(event.target.value);
-            }}>{DEFAULT_GATE_WAIT_PROFILE.assumptions.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}</Select>
+            }}>{reviewProfiles.waiting.assumptions.map(item => <option key={item.id} value={item.id}>{item.label}</option>)}</Select>
           </Field>
           <p role="status">{acceptedOptionId
             ? choiceId === `late:${acceptedOptionId}` ? "The selected accommodation is active in the chart. The retained reference is unchanged."

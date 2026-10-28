@@ -1,9 +1,12 @@
 import validate from "./prepared-validator.mjs";
 import type { PreparedScenario } from "./dataset";
 
-export function validatePreparedSnapshot(value: unknown): PreparedScenario {
+export function validatePreparedSnapshot(value: unknown, expected?: { airportId: string; caseId: string }): PreparedScenario {
   if (!validate(value)) {
     throw new Error(`Prepared demo data is invalid: ${validate.errors?.map(error => `${error.instancePath} ${error.message}`).join("; ")}`);
+  }
+  if (expected && ((value.airport?.id ?? "contoso") !== expected.airportId || value.case_id !== expected.caseId)) {
+    throw new Error("Prepared demo airport or case does not match the selected demo.");
   }
   const times = [
     value.plan_window.start, value.plan_window.end, ...value.flights.map(flight => flight.scheduled),

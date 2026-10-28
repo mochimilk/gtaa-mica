@@ -5,7 +5,7 @@ import {
   Content,
   Panel,
 } from "@coral-ai/react";
-import { makeStyles } from "@fluentui/react-components";
+import { Button, makeStyles } from "@fluentui/react-components";
 import { useMemo, useState } from "react";
 import { StandTimelineDemo } from "./stand-timeline-demo/StandTimelineDemo";
 import { OperationsPanel } from "./operations/OperationsPanel";
@@ -42,13 +42,13 @@ const useNavbarStyles = makeStyles({
 function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void }) {
   const { acceptedOptionId } = useDemo();
   const { selection, applyChartIntent, matcher, dataset } = useOperations();
-  const [threshold, setThreshold] = useState(DEFAULT_BUFFER_PROFILE.threshold_minutes);
+  const [threshold, setThreshold] = useState(dataset.prepared?.reviewProfiles?.buffers.threshold_minutes ?? DEFAULT_BUFFER_PROFILE.threshold_minutes);
   const [showBuffers, setShowBuffers] = useState(false);
   const [bufferReviewOpen, setBufferReviewOpen] = useState(false);
   const [selectedBufferId, setSelectedBufferId] = useState("");
   const [reviewMetric, setReviewMetric] = useState<ReviewMetric>("buffers");
   const [showWaiting, setShowWaiting] = useState(false);
-  const [assumptionId, setAssumptionId] = useState(DEFAULT_GATE_WAIT_PROFILE.default_assumption_id);
+  const [assumptionId, setAssumptionId] = useState(dataset.prepared?.reviewProfiles?.waiting.default_assumption_id ?? DEFAULT_GATE_WAIT_PROFILE.default_assumption_id);
   const [showTowWindows, setShowTowWindows] = useState(false), [towReviewOpen, setTowReviewOpen] = useState(false);
   const [selectedTowVisit, setSelectedTowVisit] = useState("");
   const towEvidence = dataset.prepared?.towWindows;
@@ -71,12 +71,13 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
       return [{ probe, duration, color: capacityColor(index), opportunities: result.variants?.[prepared.variant].opportunities ?? [] }];
     });
   }, [capacity, dataset.prepared, capacityState.allProbes, capacityState.probeId, capacityState.duration, capacityState.start, capacityState.end]);
-  const evaluation = useMemo(() => dataset.prepared
-    ? evaluateBufferPlans(dataset.prepared.snapshot, { ...DEFAULT_BUFFER_PROFILE, threshold_minutes: threshold })
-    : null, [dataset, threshold]);
-  const gateEvaluation = useMemo(() => dataset.prepared
-    ? evaluateGateWaitPlans(dataset.prepared.snapshot, DEFAULT_GATE_WAIT_PROFILE, assumptionId)
-    : null, [dataset, assumptionId]);
+  const reviewProfiles = dataset.prepared?.reviewProfiles;
+  const evaluation = useMemo(() => dataset.prepared && reviewProfiles
+    ? evaluateBufferPlans(dataset.prepared.snapshot, { ...reviewProfiles.buffers, threshold_minutes: threshold })
+    : null, [dataset, reviewProfiles, threshold]);
+  const gateEvaluation = useMemo(() => dataset.prepared && reviewProfiles
+    ? evaluateGateWaitPlans(dataset.prepared.snapshot, reviewProfiles.waiting, assumptionId)
+    : null, [dataset, reviewProfiles, assumptionId]);
   return (
     <>
       {/* Details show in SelectionPopover, so the demo's own detail strip is hidden here.
@@ -94,6 +95,14 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
         toolbar={<>
           <ViewsFiltersToolbar />
           <PlanDecisionReview />
+          {dataset.prepared && !reviewProfiles && <>
+            <Button disabled title="Airport-specific review profiles are not prepared.">Compare plans</Button>
+            <Button disabled title="Airport-specific buffer profile is not prepared.">Buffers</Button>
+            <Button disabled title="Airport-specific waiting assumptions are not prepared.">Gate waiting</Button>
+          </>}
+          {dataset.prepared && !capacity && <Button disabled title="Airport-specific capacity and atlas evidence is not prepared.">Capacity</Button>}
+          {dataset.prepared && !dataset.prepared.accommodation && <Button disabled title="Airport-specific accommodation evidence is not prepared.">Late request</Button>}
+          {dataset.prepared && !towEvidence && <Button disabled title="Airport-specific tow-window evidence is not prepared.">Tow windows</Button>}
           {towEvidence && <TowWindowReview evidence={towEvidence} assessments={towAssessments}
             selectedId={selectedTowVisit} setSelectedId={setSelectedTowVisit} open={towReviewOpen} setOpen={setTowReviewOpen}
             show={showTowWindows} setShow={setShowTowWindows} />}
@@ -111,7 +120,9 @@ function ConnectedTimeline({ openDemoSettings }: { openDemoSettings: () => void 
           />}
           <DemoSettingsButton onClick={openDemoSettings} />
         </>}
-        notice={<><DemoStatus /><FilterStatus />{acceptedOptionId && <p className="ops-filter-status" role="status">
+        notice={<><DemoStatus /><FilterStatus />{dataset.prepared && !reviewProfiles && <p className="ops-filter-status" role="note">
+          Schedule-only demo. Airport-specific analysis profiles and evidence are not prepared; disabled reviews do not reuse Contoso assumptions.
+        </p>}{acceptedOptionId && <p className="ops-filter-status" role="status">
           Session-only accommodation accepted. Use Compare plans to review the retained reference; Late request to restore it.
           Reference capacity/atlas and chart-metric reviews are hidden, not reused against changed assignments.
         </p>}{showBuffers && evaluation && dataset.prepared && <p className="ops-filter-status" role="status">

@@ -1,7 +1,7 @@
 import { accommodationView, type PreparedAccommodation } from "./accommodation-evaluation";
 import { BUFFER_METRIC, calculatePreparedBuffers, DEFAULT_BUFFER_PROFILE } from "./buffer-evaluation";
 import { calculateWaiting, commonWaiting, DEFAULT_GATE_WAIT_PROFILE, GATE_WAIT_METRIC } from "./gate-wait-evaluation";
-import type { PreparedPlan, PreparedScenario, PreparedStay } from "./dataset";
+import type { PreparedPlan, PreparedReviewProfiles, PreparedScenario, PreparedStay } from "./dataset";
 import type { PlanVariant } from "./preferences";
 
 export type DecisionTarget = { kind: "variant"; variant: PlanVariant } | { kind: "accommodation"; optionId: string };
@@ -23,8 +23,9 @@ function measure(scenario: Scenario, plan: Plan) {
 export function buildDecisionBrief(
   snapshot: PreparedScenario, referenceVariant: PlanVariant, target: DecisionTarget,
   assumptionId: string, evidence?: PreparedAccommodation,
+  profiles: PreparedReviewProfiles = { buffers: DEFAULT_BUFFER_PROFILE, waiting: DEFAULT_GATE_WAIT_PROFILE },
 ) {
-  const assumption = DEFAULT_GATE_WAIT_PROFILE.assumptions.find(item => item.id === assumptionId);
+  const assumption = profiles.waiting.assumptions.find(item => item.id === assumptionId);
   if (!assumption) throw new Error("Unknown decision-brief waiting assumption.");
   const base = snapshot.variants[referenceVariant];
   if (!base) throw new Error("Unknown decision-brief reference plan.");
@@ -69,7 +70,7 @@ export function buildDecisionBrief(
     retainedIds, gainedIds, lostIds, addedIds, changedIds, retimedFlightIds, changes,
     originalUnresolvedAfter: snapshot.visits.filter(visit => !after.assignedVisitIds.has(visit.turnId)).length,
     incomingWait: incoming?.estimated_wait_minutes ?? null,
-    assumption, bufferProfile: DEFAULT_BUFFER_PROFILE, waitingProfile: DEFAULT_GATE_WAIT_PROFILE,
+    assumption, bufferProfile: profiles.buffers, waitingProfile: profiles.waiting,
     metricVersions: { buffers: BUFFER_METRIC, waiting: GATE_WAIT_METRIC },
     referenceSource: { variant: referenceVariant, requestFingerprint: base.request_fingerprint, solverStatus: base.solver_status },
     alternativeSource: target.kind === "variant"

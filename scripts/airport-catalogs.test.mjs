@@ -247,13 +247,58 @@ test('demand route sampling requires explicit keys and supported sector/market c
   });
   assert.throws(() => sampler.sample(), /nonblank seed/);
   assert.throws(() => sampler.sample({ seed: 's', key: ' ' }), /nonblank seed/);
-  assert.throws(() => sampler.validateRow('airline:ACA', 'transborder'), /sector policy/);
+  assert.throws(() => sampler.validateRow('airline:ACA', 'charter'), /sector policy/);
+  assert.throws(() => sampler.validateRow('airline:ACA', 'transborder'), /No transborder route/);
   assert.throws(() => sampler.validateRow('airline:BAW', 'domestic'), /No domestic route/);
   assert.throws(() => sampler.validateRow('airline:BAW', 'international', 'asia'), /Unknown route market/);
   assert.throws(() => sampler.validateRow('airline:UAL', 'international'), /No international route/);
   assert.deepEqual(sampler.sample({
     seed: 's', key: 'arrival:1', airline_id: 'airline:BAW', sector_id: 'international', market_id: 'europe',
   }), { airport_code: 'LHR', market_id: 'europe' });
+});
+
+test('manifest IATA identity excludes the host from domestic demand routes', () => {
+  const sampler = createDemandRouteSampler(fixture(), { id: 'gtaa', iata_code: 'YYZ', country: 'Canada' }, {
+    markets: [{ id: 'europe', weight: 1, airports: [{ airport_code: 'LHR', weight: 1 }] }],
+  });
+  for (let index = 0; index < 50; index++) {
+    const route = sampler.sample({ seed: 'host-identity', key: `arrival:${index}`, airline_id: 'airline:ACA', sector_id: 'domestic' });
+    assert.ok(['YUL', 'YVR'].includes(route.airport_code));
+  }
+});
+
+test('transborder routes use Canada-US geography, carrier hints and deterministic market sampling', () => {
+  const data = fixture();
+  const policy = { markets: [
+    { id: 'us', weight: 1, airports: [
+      { airport_code: 'ORD', weight: 3 }, { airport_code: 'SFO', weight: 1 }, { airport_code: 'LAX', weight: 1 },
+    ] },
+    { id: 'europe', weight: 1, airports: [{ airport_code: 'LHR', weight: 1 }] },
+  ] };
+  const sampler = createDemandRouteSampler(data, { id: 'gtaa', iata_code: 'YYZ', country: 'Canada' }, policy);
+  const args = { seed: 'transborder', key: 'arrival:1', airline_id: 'airline:UAL', sector_id: 'transborder', market_id: 'us' };
+  assert.deepEqual(sampler.sample(args), sampler.sample(args));
+  for (let index = 0; index < 50; index++) {
+    const route = sampler.sample({ ...args, key: `arrival:${index}` });
+    assert.ok(['ORD', 'SFO'].includes(route.airport_code));
+    assert.equal(route.market_id, 'us');
+    assert.equal(sampler.sample({ ...args, airline_id: 'airline:ACA', key: `arrival:${index}` }).market_id, 'us');
+  }
+  assert.throws(() => sampler.validateRow('airline:BAW', 'transborder', 'us'), /No transborder route/);
+  assert.throws(() => sampler.validateRow('airline:ACA', 'transborder', 'europe'), /No transborder route/);
+  assert.throws(() => sampler.validateRow('airline:ACA', 'transborder', 'missing'), /Unknown route market/);
+  const reordered = structuredClone(policy);
+  reordered.markets.reverse();
+  reordered.markets[1].airports.reverse();
+  assert.deepEqual(createDemandRouteSampler(data, { code: 'YYZ', country: 'Canada' }, reordered).sample(args), sampler.sample(args));
+  const reverse = createDemandRouteSampler(data, { code: 'ORD', country: 'United States' }, {
+    markets: [{ id: 'canada', weight: 1, airports: [{ airport_code: 'YVR', weight: 1 }] }],
+  });
+  assert.equal(reverse.sample({ ...args, market_id: 'canada' }).airport_code, 'YVR');
+  const unsupported = createDemandRouteSampler(data, { code: 'LHR', country: 'United Kingdom' }, {
+    markets: [{ id: 'us', weight: 1, airports: [{ airport_code: 'ORD', weight: 1 }] }],
+  });
+  assert.throws(() => unsupported.validateRow('airline:BAW', 'transborder'), /Canada or United States host/);
 });
 
 test('catalog CLI validates, previews routes and fails explicitly for invalid arguments/hosts', () => {

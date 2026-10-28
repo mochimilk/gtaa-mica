@@ -161,7 +161,7 @@ export function createDemandRouteSampler(data, host, policy) {
   if (typeof host.country !== 'string' || ![...airports.values()].some(airport => airport.country === host.country)) {
     throw new Error('Catalog route generation requires a known explicit host airport country');
   }
-  const reference = { code: host.code ?? host.id, country: host.country };
+  const reference = { code: host.iata_code ?? host.code ?? host.id, country: host.country };
   const marketIds = new Set();
   const endpointIds = new Set();
   const markets = policy.markets.map(market => {
@@ -186,14 +186,20 @@ export function createDemandRouteSampler(data, host, policy) {
       if (!routes.length) throw new Error(`No domestic route airports for ${airlineId}`);
       return [{ id: 'domestic', weight: 1, airports: routes }];
     }
-    if (sector !== 'international') throw new Error(`Catalog routes do not define sector policy for ${sector}`);
+    if (!['international', 'transborder'].includes(sector)) throw new Error(`Catalog routes do not define sector policy for ${sector}`);
     if (marketId !== undefined && !marketIds.has(marketId)) throw new Error(`Unknown route market: ${marketId}`);
+    const partnerCountry = { Canada: 'United States', 'United States': 'Canada' }[host.country];
+    if (sector === 'transborder' && partnerCountry === undefined) {
+      throw new Error('Transborder route policy requires a Canada or United States host');
+    }
     const foreignChoices = new Set(routeChoices(airline, reference, airports).map(route => route.airport_code));
     const result = markets.filter(market => marketId === undefined || market.id === marketId).flatMap(market => {
-      const endpoints = market.airports.filter(endpoint => airline.country === host.country || foreignChoices.has(endpoint.airport_code));
+      const endpoints = market.airports.filter(endpoint =>
+        (sector !== 'transborder' || airports.get(endpoint.airport_code).country === partnerCountry) &&
+        (airline.country === host.country || foreignChoices.has(endpoint.airport_code)));
       return endpoints.length ? [{ ...market, airports: endpoints }] : [];
     });
-    if (!result.length) throw new Error(`No international route airports for ${airlineId}${marketId ? ` in ${marketId}` : ''}`);
+    if (!result.length) throw new Error(`No ${sector} route airports for ${airlineId}${marketId ? ` in ${marketId}` : ''}`);
     return result;
   };
   return {

@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "airport_id": "gtaa",
-  "status": "draft-not-planning-ready",
+  "status": "synthetic-scenario-configured-operational-review-pending",
   "blockers": [
     {
       "id": "sectors",
@@ -45,7 +45,7 @@
       "id": "availability",
       "scope": "all-stands",
       "status": "user-configured-pending-operational-review",
-      "question": "Explicit open/closed values are user-configured. Confirm operational availability, alternative-position coexistence and source effective dates before promotion."
+      "question": "All 168 stands are user-configured as ready with explicit open/closed values. Confirm operational availability, alternative-position coexistence and source effective dates before operational use."
     },
     {
       "id": "contact-and-gates",
@@ -74,10 +74,10 @@
     {
       "id": "aircraft-generation-metadata",
       "scope": "gtaa-exact-aircraft-catalog",
-      "status": "pending",
-      "question": "All 112 ASM variants now have sourced ICAO size letters, with preliminary/folded and cancelled-model planning qualifications preserved. Supply scenario seat counts for synthetic generation; no generic seat/MTOW values were copied. The cancelled A350-800 is not a certified production aircraft and requires traffic-pool review.",
+      "status": "user-configured-seats-synthetic-profile-configured",
+      "question": "All 112 ASM variants have sourced ICAO size letters and user-configured seat counts. The synthetic scenario selects five exact production-aircraft identities; it excludes cancelled and preliminary types. External IATA/ICAO designator mappings still require review before feed integration. Seat counts represent authored simulation layouts, not universal aircraft capacities or verified operator configurations.",
       "aircraft_without_verified_size_code": [],
-      "aircraft_without_seat_counts": 112
+      "aircraft_without_seat_counts": 0
     }
   ],
   "source_reconciliation": [

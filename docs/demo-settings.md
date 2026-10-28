@@ -1,12 +1,12 @@
 ---
 title: Switch demo datasets without restarting
-description: Use local demo settings to switch the complete workspace between the original fixture and prepared Contoso plans.
+description: Switch the complete workspace between the original fixture, prepared Contoso plans and the GTAA full-day schedule.
 ---
 
 ## Presenter workflow
 
-Open **Demo** beside the chart's Views and Filters controls.
-Choose **Existing demo** or **Contoso scenarios**. For Contoso, choose
+Open **Demo settings**, the gear beside the chart's Views and Filters controls.
+Choose **Existing demo**, **Contoso scenarios** or **GTAA · Toronto Pearson**. For Contoso, choose
 **Comfortable**, **Constrained** or **Full day**, then **Baseline** or **Tow options**.
 Select **Apply** to change the whole workspace. **Cancel** leaves it unchanged.
 **Reset to original demo** restores the original source and default preferences.
@@ -15,12 +15,25 @@ The header always identifies the active source, case, plan, synthetic status
 and UTC display zone. Switching requires no shell commands, solver installation,
 server restart or page reload.
 
+For GTAA, **Full day** is the only scenario. Selecting GTAA switches the case
+to full day automatically. Both variants cover all 160 visits and 320 legs
+on 168 stands across Terminal 1, Terminal 3 and IFC, with zero generated tows.
+The Toronto local date is October 28, 2026; the UTC chart runs from
+October 28 at 04:00 through October 29 at 04:00.
+The mix is 64 domestic, 64 US transborder and 32 international visits.
+
+GTAA is schedule-only. **Buffers**, **Gate waiting**, **Capacity** and its atlas,
+**Late request**, **Compare plans** and **Tow windows** are visibly unavailable
+until GTAA-specific profiles and evidence are prepared. No Contoso assumptions
+or analysis artifacts are substituted. Both GTAA variants are stand-only;
+choosing **Tow options** does not enable elective tows.
+
 The original fixture remains the default on a fresh browser profile. Prepared
 plans show scheduled STA/STD times, while the original fixture retains its
 synthetic ETA/ETD presentation. All represented flights, including scheduled
 context outside the visible horizon, remain available in the lists.
 
-| Prepared case | Baseline                     | Tow options                    |
+| Contoso case  | Baseline                     | Tow options                    |
 |---------------|------------------------------|--------------------------------|
 | Comfortable   | 36 visits, no added movements | 36 visits, no added movements |
 | Constrained   | 40 of 41 visits assigned      | 41 assigned with 2 movements  |
@@ -36,7 +49,7 @@ An unassigned visit stays in the flight lists and produces unassigned-flight
 alerts; no chart stay is invented for it. Explicit tow endpoints are drawn on
 the selected plan's arrival, parking and departure stays.
 
-Prepared plans expose a **Buffers** control for
+Contoso plans expose a **Buffers** control for
 [scheduled buffer review](buffer-evaluation.md). It compares baseline/tow plans
 and can highlight tight handovers without changing occupancy or solver settings.
 The adjacent **Gate waiting** control adds
@@ -98,22 +111,23 @@ dataset still works for the session, with an explicit persistence warning.
 
 ## Prepared snapshots and developer maintenance
 
-The three [prepared snapshots](../src/demo/prepared) are checked-in, compact
+The [prepared snapshots](../src/demo/prepared) are checked-in, compact
 viewer projections of the existing
 [scenario generation and local solver](scenario-generation.md).
 They contain source flights, visits, stand rows, fixed selected stays, explicit
 tow endpoints, solver request fingerprints and measured coverage counts.
 They omit the solver's large candidate/conflict evidence.
 
-Snapshots and their validator load on demand when Contoso is selected. No
+Snapshots and their validator load on demand when an airport is selected. GTAA
+loads only its schedule snapshot, not Contoso analysis artifacts. No
 backend, native bridge, network solver or .NET process is used by the viewer.
 Adapters provide chart-neutral rows, visits and intervals to the reusable
 [timeline renderer](../src/stand-timeline). Its row labels expose stable row
 identities and programmatic focus for stand inspection; no planning logic
 is added to the renderer.
 
-Developers can regenerate all checked-in snapshots after intentionally
-changing the airport or scenario profile:
+Developers can regenerate Contoso's snapshots and analysis artifacts after
+intentionally changing its airport or scenario profile:
 
 ```powershell
 npm run prepare:demo
@@ -129,6 +143,30 @@ It also writes the generated [full-day raw demand](../data/airports/contoso/dema
 The validator requires no runtime code generation, preserving the packaged
 Electron app's content security policy. Presenters do not need this command.
 Airport configuration changes do not silently change the prepared viewer plans.
+
+Regenerate only [GTAA's compact snapshot](../src/demo/prepared/gtaa/full-day.json)
+with its explicit airport, scenario and stand-only tow profile:
+
+```powershell
+npm run prepare:demo:gtaa
+npm run test:demo
+npm run build
+```
+
+This command solves and validates both GTAA plans, then replaces its known
+snapshot and the shared CSP-safe validator. It does not replace Contoso
+snapshots, generate analysis evidence or change aircraft and stand catalogs.
+The compact viewer projection omits the much larger solved review.
+New snapshots include airport identity and time zone; the loader checks airport
+and case together. Existing Contoso snapshots without airport metadata remain
+supported.
+
+For another airport, build the local solver and invoke
+[the preparation script](../scripts/prepare-demo.mjs) with all five explicit
+arguments: `--airport`, `--profile`, `--case`, `--tow-profile` and `--output`.
+There are no airport or profile defaults on this path. Then register its
+source, supported cases and lazy import in the viewer; missing analysis
+profiles and artifacts must remain unavailable.
 
 The browser validates schema, IDs, endpoint associations, timing and displayed
 coverage/tow counts before applying a prepared plan. It does not rerun authored
