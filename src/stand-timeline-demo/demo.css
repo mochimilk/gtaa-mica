@@ -45,37 +45,6 @@
 }
 
 /*
- * The chart's frame takes its place in the page, and the chart fills it.
- * The host's summary (its KPIs, say) floats over the chart's foot, and the
- * rows can scroll up clear of it: the chart's canvas is padded at the bottom
- * by the summary's height (--demo-summary-height, kept by
- * StandTimelineDemo), so the last row comes to rest above it. The summary
- * takes no pointer itself, so the chart stays live between and around its
- * pieces, scrollbar too; its host gives its own pieces the pointer back.
- */
-.demo-chart-frame {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 0;
-  min-height: 120px;
-}
-
-.demo-chart-frame .st-canvas {
-  padding-bottom: var(--demo-summary-height, 0px);
-}
-
-/* Over the chart's rulers, pinned rows and fade (z-index 3–4, stand-timeline.css). */
-.demo-chart-summary {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 5;
-  pointer-events: none;
-}
-
-/*
  * The zoom row in the header's View menu (ZoomMenuRow.tsx), laid out like the
  * menu's rows (components/menu/menu.css): 40px tall, its 16px icon 10px in,
  * its label 34px in, in the menu's colours; the level, its value, in the
@@ -319,72 +288,18 @@
 }
 
 /*
- * The aircraft type in a bar's middle (theme.tsx, typeSlot; Figma GTAA-Dash
- * 151:3938, less its emblem): the type in Caption 1, then the size class tag,
- * 4px apart, in neutral Fluent colours whatever the bar's status.
+ * An aircraft type's drawing in its bars' middle (theme.tsx, drawingSlot):
+ * one colour, the bar's label colour, so on a dimmed bar it takes the
+ * dimmed labels' muted colour. It glows a little in that colour, within the
+ * room theme.tsx leaves around it (DRAWING_GLOW, 3px).
  */
-.demo-type {
-  display: flex;
-  align-items: center;
-  gap: var(--spacingHorizontalXS);
-  height: 20px;
-  color: var(--colorNeutralForeground2);
-  font-family: var(--fontFamilyBase);
-  font-size: var(--fontSizeBase200);
-  font-weight: var(--fontWeightRegular);
-  line-height: var(--lineHeightBase200);
-  white-space: nowrap;
+.demo-drawing {
+  display: block;
+  color: var(--st-text);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, currentColor 60%, transparent));
 }
 
-/*
- * A maker's emblem (emblems.tsx, MakerEmblem), on flight cards: a 20px
- * square holding it at its file's own size (Boeing 20 × 16.47, Airbus and
- * Embraer 20 × 20; height set per emblem), as a mask in the text colour.
- */
-.demo-emblem {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-}
-
-.demo-emblem > span {
-  width: 20px;
-  background-color: currentColor;
-  mask-size: 100% 100%;
-  mask-repeat: no-repeat;
-}
-
-/* Optically centred: 2px of room beneath, as in the design. */
-.demo-type-name {
-  padding-bottom: var(--spacingVerticalXXS);
-}
-
-/*
- * The size tag: Fluent's small Badge (16px tall, 4px radius) on the darkest
- * neutral background, in regular Caption 1 with 6px insets and 2px beneath
- * the text. Two classes, so these win over the Badge's own styles.
- */
-.demo-chart .demo-type-size {
-  padding: 0 calc(var(--spacingHorizontalXS) + var(--spacingHorizontalXXS)) var(--spacingVerticalXXS);
-  border-color: transparent;
-  background-color: var(--colorNeutralBackground3);
-  color: var(--colorNeutralForeground2);
-  font-size: var(--fontSizeBase200);
-  font-weight: var(--fontWeightRegular);
-  line-height: var(--lineHeightBase200);
-}
-
-/* On a dimmed bar: the muted text colour throughout, and an outline tag. */
-.demo-chart .demo-type--dimmed {
-  color: var(--flight-dim-text);
-}
-
-.demo-chart .demo-type--dimmed .demo-type-size {
-  border-color: var(--flight-dim-stroke);
-  background-color: transparent;
+.demo-chart .demo-drawing--dimmed {
   color: var(--flight-dim-text);
 }
 

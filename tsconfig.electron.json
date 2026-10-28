@@ -10,5 +10,5 @@
     "skipLibCheck": true,
     "types": ["node"]
   },
-  "include": ["electron/**/*.mjs", "scripts/*desktop*.mjs"]
+  "include": ["electron/**/*.mjs", "electron/**/*.cjs", "scripts/*desktop*.mjs"]
 }

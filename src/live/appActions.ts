@@ -45,8 +45,18 @@ import {
 } from "../operations/allocation.ts";
 import type { Millis } from "../stand-timeline/index.ts";
 import { utcAt } from "../stand-timeline-demo/adapter.ts";
-import { DEMO_DOMAIN, formatUtc } from "../stand-timeline-demo/demoData.ts";
+import { DEMO_DATA, DEMO_DOMAIN, formatUtc } from "../stand-timeline-demo/demoData.ts";
 import { SYNTHETIC_DATE, SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture.ts";
+import {
+  DISRUPTION,
+  explainPlan,
+  formatHold,
+  impactNow,
+  planDisruption,
+  rememberPlan,
+  runsInto,
+  type DisruptionPlan,
+} from "../operations/disruption.ts";
 import { movesLateStay, planFixAll, type AlertFix } from "../operations/priorities.ts";
 import { briefing, nextUp } from "./briefing.ts";
 import { callingNames, findPerson, guestNames, PEOPLE } from "./callGuests.ts";
@@ -126,7 +136,26 @@ export type AppAction =
       assigns: StandAssign[];
       left: { alertId: string; reason: string }[];
       conflictsCleared: number;
-    };
+    }
+  /**
+   * Clears a late flight's knock-on (the disruption demo; see
+   * ../operations/disruption): weighs it across the plan, then moves the
+   * stays it runs into, keeping the late aircraft on its stand, with Skye's
+   * helper cursors. Planned when the request is understood (planDisruption);
+   * carrying it out checks each move again, so it is idempotent.
+   * `considered` are the stands looked at before each one chosen, and why
+   * not, for Skye to show as she weighs it.
+   */
+  | {
+      name: "resolve_disruption";
+      flightId: string;
+      stayId: string;
+      moves: AreaMove[];
+      stuck: string[];
+      considered: DisruptionPlan["considered"];
+    }
+  /** Read-only: why Skye's plan for the disruption is what it is, and what it does to the board's figures. */
+  | { name: "explain_plan" };
 
 /** A flight `assign_stands` could not place, and why, in a sentence that names it. */
 export type Unplaceable = { flightId: string; reason: string };
@@ -171,6 +200,8 @@ export const ACTION_KIND: Record<AppActionName, AppActionKind> = {
   add_to_call: "write",
   remove_from_call: "write",
   fix_all: "write",
+  resolve_disruption: "write",
+  explain_plan: "read",
   // Only proposes; the move itself is a separate, confirmed request.
   suggest_move: "read",
 };
@@ -429,6 +460,26 @@ export function validateAppAction(name: unknown, args: Record<string, unknown> =
       const plan = planFixAll(currentAlerts(), scope);
       return { ok: true, action: { name: "fix_all", scope, ...plan } };
     }
+    case "resolve_disruption": {
+      // Absent means the flight the disruption is about.
+      const flightId = safeArgs.flightId == null ? DISRUPTION.flightId : asString(safeArgs.flightId);
+      const flight = flightId ? OPS_FLIGHTS_BY_ID.get(flightId) : undefined;
+      if (!flight) return reject("unknown_flight", `No flight with id ${String(safeArgs.flightId)} in the demo data.`);
+      const stay = stayOfFlight(flight);
+      if (!stay) return reject("no_stand", `${flight.flight} has no stay on the chart.`);
+      const delay = DEMO_DATA.delays.get(stay.id);
+      if (!delay?.in && !delay?.out) return reject("not_late", `${flight.flight} is on time: there is nothing to resolve.`);
+      if (runsInto(stay.id).length === 0) {
+        return reject("no_conflict", `${stayName(stay)} is late, but it runs into nothing on ${stay.rowId}: there is nothing to resolve.`);
+      }
+      const plan = planDisruption(stay.id);
+      return {
+        ok: true,
+        action: { name: "resolve_disruption", flightId: flight.id, stayId: stay.id, moves: plan.moves, stuck: plan.stuck, considered: plan.considered },
+      };
+    }
+    case "explain_plan":
+      return { ok: true, action: { name: "explain_plan" } };
     case "list_conflicts":
       return { ok: true, action: { name: "list_conflicts" } };
     case "brief":
@@ -713,12 +764,14 @@ function fixAction(fix: AlertFix): AppAction | undefined {
   const validated =
     fix.kind === "move"
       ? validateAppAction("move_stay", { flightId: fix.flightId, standId: fix.standId })
-      : validateAppAction("assign_stands", { flightIds: [fix.flightId], standId: fix.standId });
+      : fix.kind === "knock_on"
+        ? validateAppAction("resolve_disruption", { flightId: fix.flightId })
+        : validateAppAction("assign_stands", { flightIds: [fix.flightId], standId: fix.standId });
   return validated.ok ? validated.action : undefined;
 }
 
 /** Stand changes that can clear an alert, after which the next thing to do is offered. */
-const CLEARS_ALERTS = new Set<AppActionName>(["move_stay", "swap_stays", "assign_stands", "close_area"]);
+const CLEARS_ALERTS = new Set<AppActionName>(["move_stay", "swap_stays", "assign_stands", "close_area", "resolve_disruption"]);
 
 /** The open alerts that ask for something (not notices), as they are now. */
 export const openWork = (host: OperationsHost): OpsAlert[] =>
@@ -984,10 +1037,13 @@ function applyAction(action: AppAction, host: OperationsHost): ApplyResult {
       const assigns = action.assigns.filter((assign) => assignState(assign) !== "moved");
       host.applyFixes(plans, assigns, [...done, ...plans.map((plan) => plan.occupancyId), ...assigns.map((assign) => assign.stayId)]);
       const placed = action.assigns.filter((assign) => assignState(assign) === "done").length;
-      const cleared = landed.length;
       // Planned, but changed by someone before it could land.
-      const changed = action.moves.length - cleared + (action.assigns.length - placed);
+      const changed = action.moves.length - landed.length + (action.assigns.length - placed);
       const conflictsLeft = currentAlerts().some((alert) => alert.kind === "conflict");
+      // Conflicts, not moves: clearing a late stay's knock-on can take several.
+      const planned = action.conflictsCleared + action.left.filter((entry) => entry.alertId.startsWith("ALERT-CLASH")).length;
+      const cleared =
+        landed.length === 0 ? 0 : Math.max(0, planned - currentAlerts().filter((alert) => alert.kind === "conflict").length);
       // The outcome in one short sentence, so Skye gets to the approval
       // quickly; every move is listed in Outputs.
       const what = [
@@ -1020,6 +1076,49 @@ function applyAction(action: AppAction, host: OperationsHost): ApplyResult {
         " The details are in Outputs.";
       return { ok: true, spoken, mutated: true };
     }
+    case "resolve_disruption": {
+      // Skye's helpers have usually made these already; the rest are checked
+      // against the board as it is now before they land.
+      const plans: Extract<DropPlan, { kind: "move" }>[] = [];
+      const landed: AreaMove[] = [];
+      for (const move of action.moves) {
+        const state = areaMoveState(move);
+        const plan = state === "pending" ? planDrop(move.occupancyId, move.standId) : null;
+        if (plan?.kind === "move") plans.push(plan);
+        else if (state !== "done") continue;
+        landed.push(move);
+      }
+      // The late stay shows with what moved: what kept its stand and what made way.
+      host.applyFixes(plans, [], landed.length > 0 ? [action.stayId, ...landed.map((move) => move.occupancyId)] : []);
+      rememberPlan(action);
+      const late = occupancyById(action.stayId);
+      const lateName = late ? stayName(late) : (OPS_FLIGHTS_BY_ID.get(action.flightId)?.flight ?? action.flightId);
+      if (landed.length === 0) {
+        return {
+          ok: true,
+          spoken:
+            action.moves.length === 0
+              ? `${lateName} runs into ${listWords(action.stuck.map(stayLabel))}, and no stand that fits is free for ${action.stuck.length === 1 ? "it" : "them"}. It needs a person's call.`
+              : "The board changed since you asked, so I left it. Ask me again.",
+          mutated: false,
+        };
+      }
+      const impact = impactNow();
+      const moved = listWords(landed.map((move) => `${stayLabel(move.occupancyId)} to ${move.standId}`));
+      const figures =
+        impact && impact.gateHold.before !== impact.gateHold.after
+          ? ` Gate hold goes from ${formatHold(impact.gateHold.before)} to ${formatHold(impact.gateHold.after)}.`
+          : "";
+      const stuck =
+        action.stuck.length > 0 ? ` ${listWords(action.stuck.map(stayLabel))} still ${action.stuck.length === 1 ? "has" : "have"} no stand that fits.` : "";
+      return {
+        ok: true,
+        spoken: `Done: ${lateName} keeps ${late?.rowId ?? "its stand"}, and I moved ${moved}.${figures}${stuck}`,
+        mutated: true,
+      };
+    }
+    case "explain_plan":
+      return { ok: true, spoken: explainPlan(), mutated: false };
     case "add_to_call": {
       host.addToCall(action.person);
       return {

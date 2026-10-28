@@ -16,12 +16,20 @@ import {
   planAssign,
   resetStands,
   setClosure,
+  setRunningLate,
   unassignStays,
 } from "../src/operations/allocation.ts";
 import { currentAlerts } from "../src/operations/boardAlerts.ts";
+import { landDisruption } from "../src/operations/disruption.ts";
 import { OPS_FLIGHTS, OPS_FLIGHTS_BY_ID } from "../src/operations/operationsData.ts";
 import { DEMO_DATA, DEMO_DOMAIN } from "../src/stand-timeline-demo/demoData.ts";
 import { createFakeHost } from "./support/mocks.ts";
+
+// The plan starts clear; the day's news makes two conflicts. XA103/104 runs
+// 55 minutes late off A1, into XB210/211; and the disruption: XD472/473 is
+// 1h 50m late on B11, and runs into both arrivals behind it.
+setRunningLate("T02-1", 0, 55);
+landDisruption();
 
 afterEach(() => resetStands());
 
@@ -199,15 +207,15 @@ test("every open alert is read, grouped, and conflicts can be read on their own"
   const alerts = run("list_alerts").spoken;
   assert.match(alerts, /^9 open demo alerts\./);
   assert.match(alerts, /5 flights have no stand: XB240, XC350, XA130, XD480 and XB241\./);
-  assert.match(alerts, /2 conflicts: XA103\/104 runs 55m late off A1, into XB210\/211; XA107\/108 runs 1h 00m late onto A4, over XB214\/215\./);
+  assert.match(alerts, /2 conflicts: XA103\/104 runs 55m late off A1, into XB210\/211; XD472\/473 runs 1h 50m late off B11, into XC344\/345, XB232\/233\./);
   assert.match(alerts, /2 notices/);
 
   const conflicts = run("list_conflicts").spoken;
-  assert.match(conflicts, /^2 conflicts, from late stays: XA103\/104 .* A1.*; XA107\/108 .* A4/);
+  assert.match(conflicts, /^2 conflicts, from late stays: XA103\/104 .* A1.*; XD472\/473 .* B11/);
 
   // Moving XB210/211 off A1 clears that conflict.
   applyPlan({ kind: "move", occupancyId: "T03-1", standId: "C25" });
-  assert.match(run("list_conflicts").spoken, /^One conflict, from late stays: XA107\/108/);
+  assert.match(run("list_conflicts").spoken, /^One conflict, from late stays: XD472\/473/);
 });
 
 test("acknowledging an alert that has cleared says so instead of pretending", () => {

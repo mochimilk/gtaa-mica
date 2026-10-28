@@ -5,6 +5,7 @@ import "@coral-ai/markdown/styles";
 import App from "./App";
 import coralConfig from "../coral.config.json";
 import "./components/cursor/cursor.css";
+import "./components/grain/grain.css";
 import "./index.css";
 
 /**

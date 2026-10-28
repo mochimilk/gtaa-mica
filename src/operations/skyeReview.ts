@@ -26,6 +26,7 @@ import type { AppAction } from "../live/appActions";
 import type { ChangeWait } from "../live/opsHost";
 import {
   currentClosure,
+  planUpdating,
   restoreStays,
   sameClosure,
   samePlace,
@@ -41,6 +42,7 @@ import {
   describeClosure,
   describeMove,
   finishRequest,
+  logDecision,
   putStep,
   removeStep,
   describeUserChange,
@@ -48,13 +50,17 @@ import {
   setStepStatus,
   startRequest,
   stayLabel,
+  type DecisionFigure,
   type OutputActor,
+  type OutputDecision,
   type OutputStatus,
   type OutputStep,
 } from "./outputs";
+import { boardKpis } from "./boardKpis";
+import { formatDuration } from "./operationsData";
 
-/** How long a teammate takes to approve, ms. */
-export const SIGNOFF_MS = 5_000;
+/** How long a teammate takes to approve, ms: long enough for Skye to brief them first (DisruptionNotice). */
+export const SIGNOFF_MS = 10_000;
 
 /** One stay Skye changed: where it was before she did, and where she left it. */
 export type ReviewChange = {
@@ -366,6 +372,8 @@ function closeTrail(current: Trail): void {
 const stopFollowing = subscribeAllocation(() => {
   const before = board;
   board = standState();
+  // The plan moving on (a stay running late) is news, not anyone's change.
+  if (planUpdating()) return;
   const current = userTrail ?? skyeTrail;
   if (current) {
     follow(current, before, board);
@@ -477,10 +485,57 @@ export const readyForUser = (current: SkyeReview): boolean =>
 export function approveSkyeChanges(): boolean {
   if (!review || !readyForUser(review)) return false;
   clearTimers();
-  if (held) setStepStatus(held.steps.keys(), "done");
+  if (held) {
+    setStepStatus(held.steps.keys(), "done");
+    const decision = decide(review, held);
+    logDecision(held.steps.keys(), decision);
+    for (const listener of [...approvalListeners]) listener(decision);
+  }
   held = null;
   set(null);
   return true;
+}
+
+const approvalListeners = new Set<(decision: OutputDecision) => void>();
+
+/** Told of each approval as it is logged, with what it decided. */
+export function subscribeApprovals(listener: (decision: OutputDecision) => void): () => void {
+  approvalListeners.add(listener);
+  return () => approvalListeners.delete(listener);
+}
+
+/**
+ * What approving decides, for the log: who approved (the teammates, then the
+ * user), and the board's headline figures as they were before Skye's changes
+ * and as they are now, each with whether that is better.
+ */
+function decide(current: SkyeReview, waiting: Held): OutputDecision {
+  const now = standState();
+  const stays = new Map(now.stays);
+  for (const [id, was] of waiting.before) stays.set(id, was);
+  const closure = waiting.closureBefore !== undefined ? waiting.closureBefore : now.closure;
+  const [before, after] = [boardKpis({ stays, closure }), boardKpis(now)];
+  const figure = (label: string, from: number, to: number, say: (value: number) => string, lowerIsBetter: boolean | null) => ({
+    label,
+    before: say(from),
+    after: say(to),
+    better: lowerIsBetter === null || from === to ? null : (to < from) === lowerIsBetter,
+  });
+  const percent = (share: number) => Math.round(share * 100);
+  const hold = (minutes: number) => (minutes > 0 ? formatDuration(minutes) : "none");
+  // Gate hold and conflicts only when there were or are some; stand use always.
+  const figures = [
+    (before.gateHoldMinutes || after.gateHoldMinutes) &&
+      figure("Gate hold", before.gateHoldMinutes, after.gateHoldMinutes, hold, true),
+    (before.conflicts.length || after.conflicts.length) &&
+      figure("Conflicts", before.conflicts.length, after.conflicts.length, String, true),
+    figure("Stand use", percent(before.standUse), percent(after.standUse), (value) => `${value}%`, null),
+  ];
+  return {
+    at: Date.now(),
+    by: [...current.signoffs.map((entry) => entry.name), "You"],
+    figures: figures.filter((entry): entry is DecisionFigure => !!entry),
+  };
 }
 
 /**

@@ -206,6 +206,49 @@ export function standState(): StandState {
 /** Where every stay is in the plan (its fixture stand and times, or none), with no area closed. */
 export const planState = (): StandState => ({ stays: ORIGINAL, closure: null });
 
+/* ------------------------------------------------------- the plan moving on */
+
+/** Increments whenever the plan itself changes (a stay found to be running late), not on stand changes. */
+let planRevision = 0;
+/** True while the board changes because the plan did, not because anyone moved anything. */
+let updatingPlan = false;
+
+export const planVersion = () => planRevision;
+/** Whether the change being announced is the plan moving on (see setRunningLate), not someone's stand change. */
+export const planUpdating = () => updatingPlan;
+
+/**
+ * A stay found to be running late, as news from outside arrives: `delayIn`
+ * minutes later onto its stand than scheduled, `delayOut` later off it (see
+ * SyntheticStay). Its bar starts at the expected on-block, its ghosts show
+ * the rest, and its flights' estimates move with it. It is a fact, not a
+ * change anyone made: the plan (planState) takes it in, so Reset stands and
+ * Undo keep it, and it is not listed as anyone's change (planUpdating).
+ * Returns false when there is no such stay on the board.
+ */
+export function setRunningLate(stayId: string, delayIn: number, delayOut: number): boolean {
+  const stay = occupancyById(stayId);
+  if (!stay) return false;
+  const minute = 60_000;
+  const scheduledOn = stay.start - (DEMO_DATA.delays.get(stayId)?.in ?? 0);
+  // Its bar is the time it is both scheduled and expected there: none would be left.
+  if (scheduledOn + delayIn * minute >= stay.end) return false;
+  DEMO_DATA.delays.set(stayId, {
+    in: delayIn ? delayIn * minute : undefined,
+    out: delayOut ? delayOut * minute : undefined,
+  });
+  setTimes(stayId, scheduledOn + delayIn * minute, stay.end);
+  ORIGINAL.set(stayId, { rowId: stay.rowId, start: stay.start, end: stay.end });
+  planRevision += 1;
+  updatingPlan = true;
+  try {
+    changed();
+  } finally {
+    updatingPlan = false;
+  }
+  return true;
+}
+
 export const samePlace = (a: StayPlace | undefined, b: StayPlace | undefined) =>
   a?.rowId === b?.rowId && a?.start === b?.start && a?.end === b?.end;
 

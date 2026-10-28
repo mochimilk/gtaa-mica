@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { gtaaOpal, LiveOrb, skyeOrbStill } from "../orb";
-import { agentHelpers, AURA_RADIUS, SKYE_COLOURS } from "./agentSwarm";
+import { agentHelpers, AURA_RADIUS } from "./agentSwarm";
 import { agentCursor, type AgentCursorController } from "./cursorMotion";
 // The tag's typeface, in the two weights it uses (name, and task text).
 import "@fontsource/roboto-mono/400.css";
@@ -16,7 +16,7 @@ export type AgentCursorProps = {
   name?: string;
   /** What moves it; Skye's main cursor by default. */
   controller?: AgentCursorController;
-  /** One of Skye's helper cursors, which splits off from Skye's dot rather than the pill's orb. */
+  /** One of Skye's helper cursors, an orb of her light, which splits off from Skye's dot rather than the pill's orb. */
   helper?: boolean;
 };
 
@@ -44,9 +44,9 @@ const AURA_LENGTHS = {
  * The cursor is Skye's orb, shrunk to a dot: it leaves the orb in the Ask
  * pill (see `agentCursor.setHome`) as the thinking dots pulling together into
  * one, stays out where it last clicked, and returns to the orb when recalled
- * from the pill. Helper cursors (`helper`) split off from that dot instead,
- * and while they work it is a live orb of its own (`setOrb`), glowing, with
- * a ring round it filling as they work (`setProgress`).
+ * from the pill. Helper cursors (`helper`), small orbs of Skye's light, split
+ * off from that dot instead, and while they work it is a live orb of its own
+ * (`setOrb`), glowing, with a ring round it filling as they work (`setProgress`).
  */
 export function AgentCursor({ name, controller = agentCursor, helper = false }: AgentCursorProps) {
   const ref = React.useCallback((element: HTMLDivElement | null) => controller.attach(element), [controller]);
@@ -69,25 +69,32 @@ export function AgentCursor({ name, controller = agentCursor, helper = false }: 
           <span />
         </span>
         <span className="agent-cursor-body">
-          {/* A soft glow behind the dot. */}
-          <span className="agent-cursor-glow" />
-          {/* The dot and its ring as vectors, so they resize smoothly and the ring keeps its width. */}
-          <svg
-            className="agent-cursor-dot"
-            width={DOT_BOX}
-            height={DOT_BOX}
-            viewBox={`${-DOT_BOX / 2} ${-DOT_BOX / 2} ${DOT_BOX} ${DOT_BOX}`}
-          >
-            <circle className="agent-cursor-dot-fill" />
-            <circle className="agent-cursor-dot-ring" />
-          </svg>
+          {helper ? (
+            // A helper is an orb of Skye's light, as the light along her tethers is.
+            <span className="agent-cursor-echo" />
+          ) : (
+            <>
+              {/* A soft glow behind the dot. */}
+              <span className="agent-cursor-glow" />
+              {/* The dot and its ring as vectors, so they resize smoothly and the ring keeps its width. */}
+              <svg
+                className="agent-cursor-dot"
+                width={DOT_BOX}
+                height={DOT_BOX}
+                viewBox={`${-DOT_BOX / 2} ${-DOT_BOX / 2} ${DOT_BOX} ${DOT_BOX}`}
+              >
+                <circle className="agent-cursor-dot-fill" />
+                <circle className="agent-cursor-dot-ring" />
+              </svg>
+            </>
+          )}
           {/*
-            Skye's orb while its helpers work, in the skye's glow rather than
-            its own (the light along the bottom of the screen, in its colours),
-            with its aura round it. Its gradient stands in until the renderer is up.
+            Skye's orb while its helpers work, in the glow of their light
+            rather than its own (--agent-cursor-light), with its aura round
+            it. Its gradient stands in until the renderer is up.
           */}
           {!helper && (
-            <span className="agent-cursor-orb" style={SKYE_COLOURS as React.CSSProperties}>
+            <span className="agent-cursor-orb">
               <span className="agent-cursor-skye" />
               {/* A loading bar for the helpers' work (setProgress), the ring Skye's tethers leave from. */}
               <svg

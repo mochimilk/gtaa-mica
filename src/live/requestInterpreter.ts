@@ -23,6 +23,7 @@
 // Which model the backend interpreter uses is still the user's decision; see
 // docs/gpt-live-voice.md, "Remaining decision".
 import { currentAlerts } from "../operations/boardAlerts.ts";
+import { disruptionState } from "../operations/disruption.ts";
 import { OPS_FLIGHTS, OPS_FLIGHTS_BY_ID, standMinutes, type OpsFlight } from "../operations/operationsData.ts";
 import { FILTER_OPTIONS, UNASSIGNED_AREA, VIEWS, type FilterDim, type ViewKey } from "../operations/opsFilters.ts";
 import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture.ts";
@@ -215,6 +216,30 @@ export function matchAreaClosure(utterance: string): { area: string; from: strin
   return { area, ...closureWindow(normalized) };
 }
 
+/* -------------------------------------------------- the disruption (demo) */
+
+/** The late flight, or its knock-on, named: "the disruption", "the late arrival", "XD472", "B11". */
+const DISRUPTION_CUE = /\b(disruptions?|late (flights?|arrivals?|aircraft|inbound|one)|knock-?ons?|xd ?472|b ?11)\b/;
+/** Asking for it to be dealt with. */
+const RESOLVE_CUE = /\b(resolve|fix|sort( it)?( out)?|handle|work( it| on| out)?|deal with|take care of|run|re-?plan|clear|go)\b/;
+/** Asking why Skye's plan is what it is, or what it does. */
+const EXPLAIN_CUE =
+  /^(why|how come)\b|\bwhy (not|did|didn'?t|are|is|move|keep|those|that)\b|\b(explain|impact|trade-?offs?|compare[sd]?|comparison|what (does|did) (that|this|it|the plan) (do|change|cost)|what changed|what('?s| is) the (cost|catch|impact))\b/;
+
+/**
+ * A request about the day's disruption (see ../operations/disruption):
+ * dealing with it ("resolve the XD472 disruption", "fix the late arrival",
+ * "run it"), or, once it has arrived, asking why the plan is what it is
+ * ("why not move XD472 instead?", "what's the impact?"). Null otherwise.
+ */
+export function matchDisruptionRequest(utterance: string): "resolve" | "explain" | null {
+  const normalized = normalize(utterance);
+  if (disruptionState().landedAt === null) return null;
+  if (EXPLAIN_CUE.test(normalized)) return "explain";
+  if (DISRUPTION_CUE.test(normalized) && RESOLVE_CUE.test(normalized)) return "resolve";
+  return null;
+}
+
 /** Cue words that mean "keep the selection and add to it". */
 const ADD_CUE = /\b(also|add|too|as well|plus)\b/;
 
@@ -323,6 +348,9 @@ function interpretPhrase(
   // A whole area closing, with everything on it to move elsewhere.
   const closing = matchAreaClosure(utterance);
   if (closing) return action("close_area", closing);
+  // The day's disruption: dealing with it, or why the plan is what it is.
+  const disruption = matchDisruptionRequest(utterance);
+  if (disruption) return action(disruption === "resolve" ? "resolve_disruption" : "explain_plan");
   const spokenCodes = mentionedFlightCodes(squashed);
   if (SUGGEST_CUE.test(normalized) && STAND_CHANGE_CUE.test(normalized)) {
     if (spokenCodes.length === 0) return action("suggest_move", { flightId: null });
@@ -579,7 +607,12 @@ export function withDemoShortcuts(inner: RequestInterpreter): RequestInterpreter
     id: `${inner.id}+demo-shortcuts`,
     interpret(request, signal) {
       const closing = matchAreaClosure(request.utterance);
-      return closing ? Promise.resolve(action("close_area", closing)) : inner.interpret(request, signal);
+      if (closing) return Promise.resolve(action("close_area", closing));
+      // The same for the disruption demo (docs/disruption-demo.md): its Run
+      // button's request, and the follow-up questions, always land.
+      const disruption = matchDisruptionRequest(request.utterance);
+      if (disruption) return Promise.resolve(action(disruption === "resolve" ? "resolve_disruption" : "explain_plan"));
+      return inner.interpret(request, signal);
     },
   };
 }

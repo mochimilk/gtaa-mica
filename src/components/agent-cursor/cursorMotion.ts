@@ -35,8 +35,8 @@
 // Skye can also work with several cursors at once (see agentSwarm.ts): extra
 // controllers, each with its own overlay and pointer id, split off from the
 // main cursor (`spawnFrom`) and merge back into it (`retire`). Meanwhile the
-// main cursor is an orb (`setOrb`), Skye itself, directing them, its ring
-// filling as they work (`setProgress`). Their
+// main cursor is an orb (`setOrb`), Skye itself, directing them from where
+// it was put (`moveTo`), its ring filling as they work (`setProgress`). Their
 // pointer events are not primary, as a second finger's are not, so they never
 // drive what only the primary pointer should (the chart's autoscroll).
 
@@ -78,6 +78,12 @@ export type DragOptions = {
   visibleBox?: () => DOMRect | null;
   /** As ClickOptions.visibleBox, for bringing the source into view first. */
   scrollBox?: (scroller: HTMLElement) => DOMRect;
+  /**
+   * Whether to bring the source into view first, scrolling its list; true by
+   * default. A cursor sharing the page with others (Skye's helpers) leaves
+   * the scrolling to the primary one, and takes hold of what already shows.
+   */
+  reveal?: boolean;
 };
 
 const FADE_MS = 180;
@@ -422,6 +428,22 @@ export class AgentCursorController {
   }
 
   /**
+   * Moves to `point` on screen and rests there, as `hover` does over an
+   * element: for a place not over anything in particular, such as the middle
+   * of the screen. `point` is read once the cursor is out. Resolves once there.
+   */
+  moveTo(point: () => Point, options: { signal?: AbortSignal } = {}): Promise<void> {
+    return this.#enqueue(async () => {
+      const { signal } = options;
+      if (!this.#root || signal?.aborted) return;
+      await this.#appear(document.documentElement, point, signal);
+      if (signal?.aborted) return;
+      if (prefersReducedMotion()) this.#place(point(), "arrow");
+      else await this.#travel(point(), null, signal);
+    });
+  }
+
+  /**
    * Puts a helper cursor away after the gestures before it: it travels to
    * `to` (the main cursor's dot), shrinks into it and is gone. Without `to`,
    * or with reduced motion, it fades where it is.
@@ -530,14 +552,14 @@ export class AgentCursorController {
   async #drag(
     resolveSource: () => Element | null,
     resolveTarget: () => Point | null,
-    { signal, aim = defaultAim, visibleBox, scrollBox }: DragOptions,
+    { signal, aim = defaultAim, visibleBox, scrollBox, reveal = true }: DragOptions,
   ): Promise<void> {
     let source = resolveSource();
     if (!this.#root || !source || signal?.aborted) return;
     const reduced = prefersReducedMotion();
 
     await this.#appear(source, aim, signal);
-    source = await this.#reveal(source, resolveSource, scrollBox, signal);
+    if (reveal) source = await this.#reveal(source, resolveSource, scrollBox, signal);
     if (signal?.aborted) return;
 
     const grab = aim(source.getBoundingClientRect());
@@ -867,9 +889,13 @@ export class AgentCursorController {
     frame: (t: number) => boolean | void,
   ): Promise<void> {
     return new Promise((resolve) => {
-      const start = performance.now();
+      // Timed from the first frame: a frame's time can be earlier than now,
+      // when the page is busy, and a time before the start would run the
+      // path backwards, flinging the cursor off past where it set out from.
+      let start: number | undefined;
       const step = (now: number) => {
         if (signal?.aborted || !this.#root) return resolve();
+        start ??= now;
         const t = Math.min(1, (now - start) / duration);
         if (frame(t) === false || t >= 1) return resolve();
         requestAnimationFrame(step);

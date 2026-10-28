@@ -19,6 +19,7 @@ import { AskFloatSlot } from "./AskFloatingWindow";
 import { closeAskPanels, useAnyAskPanelOpen, useAskPanel } from "./askPanels";
 import { AskInput, type AskServiceStatus } from "./AskInput";
 import { LiquidGlassFilter } from "./LiquidGlassFilter";
+import { mergeSkyeNotes, skyeNotes, subscribeSkyeNotes } from "./skyeNotes";
 import { useAudioLevels } from "./useAudioLevels";
 import { mergeVoiceTurns, VOICE_MESSAGE_TYPE } from "./voiceMessages";
 import "./askSkye.css";
@@ -30,7 +31,23 @@ export type AskSkyeProps = {
    * hangs off its start. An AskFloatingWindow among them floats above the bar.
    */
   actionsEnd?: React.ReactNode;
+  /**
+   * What Skye brings up herself, stacked right above the bar (e.g.
+   * DisruptionNotice). They can send Skye a request with useAskRun.
+   */
+  notices?: React.ReactNode;
 };
+
+/**
+ * Sends Skye `text` as the user, as though typed in the chat: it shows in
+ * the conversation with her reply, and on a call she also says the reply.
+ */
+export type AskRun = (text: string) => void;
+
+const AskRunContext = React.createContext<AskRun | null>(null);
+
+/** For a notice above the bar: sends Skye a request (see AskRun); null outside Ask Skye. */
+export const useAskRun = (): AskRun | null => React.useContext(AskRunContext);
 
 /** A turn Skye spoke on a call, drawn with Coral's markdown and marked as spoken. */
 function SpokenReply({ message }: ChatMessageRendererProps) {
@@ -79,10 +96,11 @@ function useServiceStatus(phase: string): AskServiceStatus | undefined {
   return verified ? "verified" : health;
 }
 
-function AskSurface({ agentName, actionsEnd }: AskSkyeProps) {
+function AskSurface({ agentName, actionsEnd, notices, speakNext }: AskSkyeProps & { speakNext: React.RefObject<boolean> }) {
   const chat = useChatContext();
   const live = useLiveCall();
   const transcript = useLiveTranscript();
+  const notes = React.useSyncExternalStore(subscribeSkyeNotes, skyeNotes);
   const status = useServiceStatus(live.state.phase);
   // A chime as the call starts connecting; the ring is for calling people in.
   useConnectChime(isRinging(live.state));
@@ -110,6 +128,11 @@ function AskSurface({ agentName, actionsEnd }: AskSkyeProps) {
     if (streaming) return;
     setMessages((current) => mergeVoiceTurns(current, transcript.call, transcript.turns));
   }, [transcript, streaming, messages, setMessages]);
+  // So do what Skye says unasked, held back and put back the same way.
+  React.useEffect(() => {
+    if (streaming) return;
+    setMessages((current) => mergeSkyeNotes(current, notes));
+  }, [notes, streaming, messages, setMessages]);
 
   const thinking = streaming || live.state.working;
   // A reply stopped (Stop, or a new message cutting in) is cut off rather
@@ -141,6 +164,28 @@ function AskSurface({ agentName, actionsEnd }: AskSkyeProps) {
     pendingSend.current = false;
     if (draft.trim()) void chat.sendMessage();
   }, [streaming, draft, chat]);
+
+  // A request from a notice above the bar, sent as the user would. One
+  // under way is stopped first, as sending a typed message does.
+  const pendingRun = React.useRef<string | null>(null);
+  const run = React.useCallback<AskRun>(
+    (text) => {
+      if (streaming) {
+        pendingRun.current = text;
+        stop();
+        return;
+      }
+      speakNext.current = live.state.phase === "connected";
+      void chat.sendMessage(text);
+    },
+    [streaming, stop, chat, live.state.phase, speakNext],
+  );
+  React.useEffect(() => {
+    if (streaming || pendingRun.current === null) return;
+    const text = pendingRun.current;
+    pendingRun.current = null;
+    run(text);
+  }, [streaming, run]);
 
   // Only the chat toggle (or Ctrl+K) opens the chat: placing a call, or one
   // failing, leaves it as it was. The failure's notice floats above the bar.
@@ -221,6 +266,8 @@ function AskSurface({ agentName, actionsEnd }: AskSkyeProps) {
         <div ref={stackRef} className="mica-ask__stack">
           {/* An open AskFloatingWindow renders here, above the notice and the bar. */}
           <div ref={setFloatSlot} className="mica-ask__float-slot" />
+          {/* What Skye brings up herself, right above the bar (and above a connection notice). */}
+          <AskRunContext.Provider value={run}>{notices}</AskRunContext.Provider>
           {notice}
           {/* The toggles hang off the bar's ends, so the bar stays centred in the dock. */}
           <div className="mica-ask__row">
@@ -308,16 +355,28 @@ function AskSurface({ agentName, actionsEnd }: AskSkyeProps) {
  * `Chat.Canvas` owns the conversation and `Chat.Messages` draws it; the input,
  * buttons and voice bar are VelmAI's.
  */
-export function AskSkye({ agentName, actionsEnd }: AskSkyeProps) {
-  const { runTypedRequest, cancelTypedRequest } = useLiveCall();
-  const onSendMessage = React.useMemo(() => createMicaAgentHandler(runTypedRequest), [runTypedRequest]);
+export function AskSkye({ agentName, actionsEnd, notices }: AskSkyeProps) {
+  const { runTypedRequest, cancelTypedRequest, say } = useLiveCall();
+  // Set for a request a notice sends on a call (see AskRun): Skye says that reply too.
+  const speakNext = React.useRef(false);
+  const onSendMessage = React.useMemo(
+    () =>
+      createMicaAgentHandler(async (text) => {
+        const speak = speakNext.current;
+        speakNext.current = false;
+        const reply = await runTypedRequest(text);
+        if (speak && reply) say(reply);
+        return reply;
+      }),
+    [runTypedRequest, say],
+  );
   return (
     // Talking to Skye must not drop the selection being talked about; see
     // ViewsFiltersToolbar for the marker.
     <div className="mica-ask" {...KEEP_SELECTION_ATTR}>
       <LiquidGlassFilter />
       <Chat.Canvas onSendMessage={onSendMessage} onStop={cancelTypedRequest}>
-        <AskSurface agentName={agentName} actionsEnd={actionsEnd} />
+        <AskSurface agentName={agentName} actionsEnd={actionsEnd} notices={notices} speakNext={speakNext} />
       </Chat.Canvas>
     </div>
   );

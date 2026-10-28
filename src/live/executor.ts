@@ -539,6 +539,17 @@ export class DelegationExecutor {
     return this.#history;
   }
 
+  /**
+   * Something Skye brought up herself rather than was asked (the disruption
+   * notice), offering `proposal`: kept in the task history as an offer, so a
+   * yes in the next request ("go ahead", typed or said) carries it out, as
+   * with any suggestion. Saying it is the caller's business.
+   */
+  offer(said: string, proposal: AppAction): void {
+    if (this.#disposed) return;
+    this.#remember("(Skye raised this herself)", null, "applied", said, proposal);
+  }
+
   #finish(job: Job): void {
     if (this.#current === job) {
       this.#current = null;

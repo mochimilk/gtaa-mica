@@ -11,6 +11,14 @@ import {
 } from "../src/live/requestInterpreter.ts";
 import { TranscriptLog } from "../src/live/transcript.ts";
 import { createFakeHost, createScheduler, flush, type FakeHost } from "./support/mocks.ts";
+import { setRunningLate } from "../src/operations/allocation.ts";
+import { landDisruption } from "../src/operations/disruption.ts";
+
+// The plan starts clear; the day's news makes two conflicts. XA103/104 runs
+// 55 minutes late off A1, into XB210/211; and the disruption: XD472/473 is
+// 1h 50m late on B11, and runs into both arrivals behind it.
+setRunningLate("T02-1", 0, 55);
+landDisruption();
 
 const SETTLE_MS = 400;
 
@@ -637,9 +645,9 @@ test("on a call, what Skye talks about is selected as she says it, not during th
   // She gets to the first conflict: its two stays are selected, and it is picked out in the list.
   s.transcript.append("agent", " and a couple of notices. I'd start with the A1 conflict,", 4_000, 6_000);
   assert.deepEqual(s.host.calls.slice(1), ["selectFlights:replace:T02-ARR|T03-ARR", "showAlerts:ALERT-CLASH-T02-1-end"]);
-  // Then the next one: the selection moves with her.
-  s.transcript.append("agent", " then the A4 conflict after that.", 6_000, 8_000);
-  assert.deepEqual(s.host.calls.slice(-2), ["selectFlights:replace:T11-ARR|T10-ARR", "showAlerts:ALERT-CLASH-T11-1-start"]);
+  // Then the next one: the selection moves with her, to the late stay and what it runs into.
+  s.transcript.append("agent", " then the B11 conflict after that.", 6_000, 8_000);
+  assert.deepEqual(s.host.calls.slice(-2), ["selectFlights:replace:T24-ARR|T25-ARR|T26-ARR", "showAlerts:ALERT-CLASH-T24-1-end"]);
   // Quiet a while: the alerts close.
   s.scheduler.advance(5_000);
   assert.equal(s.host.calls.at(-1), "hideAlerts");

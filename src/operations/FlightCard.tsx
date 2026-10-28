@@ -1,9 +1,10 @@
 // The selection popover's cards, from the GTAA-Dash designs.
 // - FlightCard (Figma node 144:3130), for one flight or one chart stay: its
 //   arrival (left) and departure (right), as on its bar and in a box drawn in
-//   the board's flight style, with its aircraft maker's emblem centred between
-//   them; then its stand, aircraft and registration, each under a caption (a
-//   dash where one isn't known); then its actions. Swap
+//   the board's flight style, with its aircraft type's symbol (from the
+//   Studio) centred between them; then its stand, aircraft (with its size
+//   class, NB or WB) and registration, each under a caption (a dash where
+//   one isn't known); then its actions. Swap
 //   needs two stays, so here it is only ever disabled; Unassign takes the stay
 //   off its stand, and a flight waiting for a stand gets Assign stand in its
 //   place. Reset stands shows once anything has changed.
@@ -14,18 +15,14 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { Button, Divider, Tag, Tooltip } from "@fluentui/react-components";
 import {
-  ArrowCircleLeft20Regular,
-  ArrowCircleRight20Regular,
   ArrowReset20Regular,
   ArrowSwap20Regular,
   CalendarAdd20Regular,
   CalendarCancel20Regular,
-  VehicleTruckProfile20Regular,
 } from "@fluentui/react-icons";
 import { barEndDepth, barPath, type BarEnds, type Millis, type Occupancy } from "../stand-timeline";
 import { AIRPORT_NAMES } from "../stand-timeline-demo/airports";
 import { DEMO_DATA, formatUtc, formatUtcFull, formatUtcWithDay } from "../stand-timeline-demo/demoData";
-import { MakerEmblem, emblemOf } from "../stand-timeline-demo/emblems";
 import { AIRCRAFT_MAKER } from "../stand-timeline-demo/syntheticFixture";
 import { BAR_RADIUS, END_SHAPE } from "../stand-timeline-demo/theme";
 import {
@@ -39,6 +36,8 @@ import {
   standArea,
 } from "./allocation";
 import { selectedFlight, useOperations, type OpsSelection } from "./OperationsContext";
+import { useDrawings } from "../studio/drawings";
+import { PixelArt, crispSize } from "../studio/PixelArt";
 import type { OpsFlight } from "./operationsData";
 
 type Side = "start" | "end";
@@ -224,35 +223,58 @@ export function SwapCard({
 const aircraftTypeOf = (stay?: Occupancy, flight?: OpsFlight) =>
   (stay?.visitId && DEMO_DATA.turnsById.get(stay.visitId)?.aircraftType) || flight?.aircraftType || undefined;
 
+/** Coral's Large radius (borderRadiusLarge), aero's plain box's (operations.css), so its shaped box rounds the same. */
+const AERO_BOX_RADIUS = 12;
+
 /**
  * The stay's arrival (left) and departure (right) in their outlined box, as on
- * its bar, with its aircraft maker's emblem centred between them. Drawn in the
- * board's flight style: aero's box is rounded, with the icons; classic's is
- * shaped as its bar is (ShapedEnds).
+ * its bar, with its aircraft type's symbol centred between them, as on the
+ * bar too (none when the type has none). Its ends are shaped as its bar's are
+ * in the board's flight style (END_SHAPE): an aero box with no tow is the
+ * plain rounded box; any other is drawn in its shape (ShapedEnds).
  */
 function StayEnds({ stay, flight }: { stay?: Occupancy; flight?: OpsFlight }) {
   const { flightStyle } = useOperations();
-  const emblem = emblemOf(aircraftTypeOf(stay, flight));
+  const drawings = useDrawings();
+  const type = aircraftTypeOf(stay, flight);
+  const symbol = type ? drawings.get(type) : undefined;
   const start = cardEnd("start", stay, flight);
   const end = cardEnd("end", stay, flight);
-  const middle = emblem && <MakerEmblem emblem={emblem} className="ops-card-emblem" />;
-  if (flightStyle === "classic") return <ShapedEnds start={start} end={end} middle={middle} />;
-  return (
-    <div className="ops-card-ends ops-card-ends--aero">
-      <CardEndView side="start" end={start} icon />
-      {middle}
-      <CardEndView side="end" end={end} icon />
-    </div>
-  );
+  const middle = symbol && <PixelArt pixels={symbol} size={crispSize(20)} className="ops-card-symbol" />;
+  const shapes = END_SHAPE[flightStyle];
+  const ends: BarEnds = { start: shapes[start?.kind ?? "none"], end: shapes[end?.kind ?? "none"] };
+  if (flightStyle === "aero" && ends.start === "round" && ends.end === "round") {
+    return (
+      <div className="ops-card-ends ops-card-ends--aero">
+        <CardEndView side="start" end={start} />
+        {middle}
+        <CardEndView side="end" end={end} />
+      </div>
+    );
+  }
+  const radius = flightStyle === "aero" ? AERO_BOX_RADIUS : BAR_RADIUS;
+  return <ShapedEnds start={start} end={end} ends={ends} radius={radius} middle={middle} />;
 }
 
 /**
- * Classic: the box drawn with the chart's own bar shape at its size, tapered
- * at a flight's end and zigzagged at a tow's, so its ends match the bar's at
- * any height. Its 1px line sits just inside the box, as a border would, and
- * each end's text keeps clear of where its shape begins.
+ * The box drawn with the chart's own bar shape at its size, zigzagged at a
+ * tow's end and, in classic, tapered at a flight's, so its ends match the
+ * bar's at any height. Its 1px line sits just inside the box, as a border
+ * would, and each end's text keeps clear of where its shape begins.
  */
-function ShapedEnds({ start, end, middle }: { start?: CardEnd; end?: CardEnd; middle: ReactNode }) {
+function ShapedEnds({
+  start,
+  end,
+  ends,
+  radius,
+  middle,
+}: {
+  start?: CardEnd;
+  end?: CardEnd;
+  ends: BarEnds;
+  radius: number;
+  middle: ReactNode;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   useLayoutEffect(() => {
@@ -264,12 +286,11 @@ function ShapedEnds({ start, end, middle }: { start?: CardEnd; end?: CardEnd; mi
     observer.observe(box);
     return () => observer.disconnect();
   }, []);
-  const ends: BarEnds = { start: END_SHAPE[start?.kind ?? "none"], end: END_SHAPE[end?.kind ?? "none"] };
   return (
     <div ref={ref} className="ops-card-ends ops-card-ends--shaped">
       {size.width > 0 && (
         <svg className="ops-card-ends-outline" aria-hidden="true">
-          <path d={barPath({ x: 0.5, y: 0.5, width: size.width - 1, height: size.height - 1 }, ends, BAR_RADIUS)} />
+          <path d={barPath({ x: 0.5, y: 0.5, width: size.width - 1, height: size.height - 1 }, ends, radius)} />
         </svg>
       )}
       <CardEndView side="start" end={start} inset={barEndDepth(ends.start, size.height)} />
@@ -336,24 +357,16 @@ function Missing({ label }: { label: string }) {
 
 /**
  * One end of the stay: the flight (or tow) over its route endpoint (or stand)
- * and time, with an icon beside it in aero. The end side is right-aligned, as
- * on the bar. An end with nothing recorded is left empty. `inset` keeps the
- * text that far further in from its side, clear of a shaped end.
+ * and time. The end side is right-aligned, as on the bar. An end with nothing
+ * recorded is left empty. `inset` keeps the text that far further in from its
+ * side, clear of a shaped end.
  */
-function CardEndView({ side, end, icon: withIcon = false, inset = 0 }: { side: Side; end?: CardEnd; icon?: boolean; inset?: number }) {
+function CardEndView({ side, end, inset = 0 }: { side: Side; end?: CardEnd; inset?: number }) {
   const start = side === "start";
   if (!end) return <div className={`ops-card-end ops-card-end--${side}`} />;
-  const icon = !withIcon ? null : end.kind === "tow" ? (
-      <VehicleTruckProfile20Regular aria-hidden />
-    ) : start ? (
-      <ArrowCircleLeft20Regular aria-hidden />
-    ) : (
-      <ArrowCircleRight20Regular aria-hidden />
-    );
   return (
     <div className={`ops-card-end ops-card-end--${side}`}>
-      {start && icon}
-      {/* Padding inside the end, not on it, so both ends stay equal and the emblem centred. */}
+      {/* Padding inside the end, not on it, so both ends stay equal and the symbol centred. */}
       <div className="ops-card-end-text" style={inset ? { [start ? "paddingInlineStart" : "paddingInlineEnd"]: inset } : undefined}>
         <div className="ops-card-flight">
           {end.kind === "flight" && <span className="ops-visually-hidden">{start ? "Arrival " : "Departure "}</span>}
@@ -370,7 +383,6 @@ function CardEndView({ side, end, icon: withIcon = false, inset = 0 }: { side: S
           <span title={`${formatUtcFull(end.time)} (synthetic)`}>{formatUtcWithDay(end.time)}</span>
         </div>
       </div>
-      {!start && icon}
     </div>
   );
 }

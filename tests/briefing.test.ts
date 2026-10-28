@@ -6,10 +6,17 @@ import { afterEach, test } from "node:test";
 import { applyAppAction, openWork, validateAppAction, type AppAction } from "../src/live/appActions.ts";
 import { injectionByteLength, MAX_INJECTION_BYTES } from "../src/live/liveEvents.ts";
 import { phraseInterpreter } from "../src/live/requestInterpreter.ts";
-import { applyPlan, occupancyById, resetStands } from "../src/operations/allocation.ts";
+import { applyPlan, occupancyById, resetStands, setRunningLate } from "../src/operations/allocation.ts";
 import { currentAlerts } from "../src/operations/boardAlerts.ts";
+import { landDisruption } from "../src/operations/disruption.ts";
 import { fixFor, movesLateStay } from "../src/operations/priorities.ts";
 import { createFakeHost } from "./support/mocks.ts";
+
+// The plan starts clear; the day's news makes two conflicts. XA103/104 runs
+// 55 minutes late off A1, into XB210/211; and the disruption: XD472/473 is
+// 1h 50m late on B11, and runs into both arrivals behind it.
+setRunningLate("T02-1", 0, 55);
+landDisruption();
 
 afterEach(() => resetStands());
 
@@ -26,7 +33,7 @@ test("alerts are listed most pressing first: conflicts, flights that can be plac
     currentAlerts().map((alert) => alert.id),
     [
       "ALERT-CLASH-T02-1-end",
-      "ALERT-CLASH-T11-1-start",
+      "ALERT-CLASH-T24-1-end",
       "ALERT-U01",
       "ALERT-U04",
       "ALERT-U02",
@@ -50,11 +57,27 @@ test("a conflict's fix moves a stay to a nearby free stand, clearing it without 
   assert.equal(ids.filter((id) => id.startsWith("ALERT-CLASH")).length, 1);
 });
 
+test("a late stay running into several: everything it runs into moves, and the late aircraft keeps its stand", () => {
+  const conflict = currentAlerts()[1];
+  assert.deepEqual(conflict.conflict?.intoIds, ["T25-1", "T26-1"]);
+  // No one move clears it, so both arrivals behind XD472/473 move, rather than XD472/473 itself.
+  const fix = fixFor(conflict);
+  assert.equal(fix?.kind, "knock_on");
+  assert.deepEqual(
+    fix?.kind === "knock_on" && fix.moves.map((move) => [move.occupancyId, move.standId]),
+    [
+      ["T25-1", "A3"],
+      ["T26-1", "B10"],
+    ],
+  );
+  assert.equal(fix?.flightId, "T24-DEP");
+});
+
 test("the rundown names every open item, a few words each, and offers to take them as one plan", () => {
   const { spoken, proposal } = brief();
   assert.equal(
     spoken,
-    "9 open items. A1 conflict, XA103/104 55m late. A4 conflict, XA107/108 1h late. " +
+    "9 open items. A1 conflict, XA103/104 55m late. B11 conflict, XD472/473 1h 50m late. " +
       "XB240, XC350, XA130 and XD480 need stands. XB241 has no stay times yet. " +
       "For info: XD452/453 is towed twice and XC335 departs after 17:00 UTC. " +
       "I can take it as one plan: the late aircraft stay put and I fit everything else around them. Want me to?",
@@ -78,6 +101,8 @@ test("a yes to the rundown carries out the plan, says the outcome in a sentence 
     "Done: the late aircraft stayed put, both conflicts are clear and 4 flights have stands. XB241 is still open. The details are in Outputs.",
   );
   assert.equal(occupancyById("T03-1")?.rowId, "B12");
+  // XD472/473 keeps B11; both arrivals behind it moved.
+  assert.deepEqual(["T24-1", "T25-1", "T26-1"].map((id) => occupancyById(id)?.rowId), ["B11", "A3", "B10"]);
   assert.equal(currentAlerts().filter((alert) => alert.kind === "conflict").length, 0);
   // What's left is said, with nothing more to offer.
   const after = brief(host);
@@ -102,8 +127,9 @@ test("one at a time instead: after a change, each yes works through the next", (
     said.push(result.spoken);
     proposal = result.proposal;
   }
-  assert.match(said[0], /That clears the A1 conflict\. Next up: the A4 conflict/);
-  assert.match(said[1], /That clears the A4 conflict\. Next up: XB240/);
+  assert.match(said[0], /That clears the A1 conflict\. Next up: the B11 conflict: .+; moving XC344\/345 to A3 and XB232\/233 to B10 clears it\./);
+  // A yes to that clears XD472/473's knock-on in one go.
+  assert.match(said[1], /^Done: XD472\/473 keeps B11, and I moved XC344\/345 to A3 and XB232\/233 to B10\. .*That clears the B11 conflict\. Next up: XB240/);
   // Two conflicts and four placeable flights, one at a time.
   assert.equal(said.length, 6);
   assert.match(brief(host).spoken, /^3 open items\. XB241 has no stay times yet/);
@@ -161,7 +187,7 @@ test("what a reply talks about comes with cues, which select nothing until fired
   const result = brief(host);
   // Nothing selected by the rundown itself.
   assert.deepEqual(host.snapshot().selection.occupancyIds, []);
-  // A cue for each thing it names: the A1 conflict, the A4 conflict, each
+  // A cue for each thing it names: the A1 conflict, the B11 conflict, each
   // waiting flight, then the one that can't be placed.
   const cues = result.cues ?? [];
   assert.equal(cues.length, 7);
@@ -169,8 +195,10 @@ test("what a reply talks about comes with cues, which select nothing until fired
   assert.ok(cues[0].words.includes("A1 conflict") && cues[0].words.includes("XB210"));
   cues[0].show();
   assert.deepEqual([...host.snapshot().selection.occupancyIds].sort(), ["T02-1", "T03-1"]);
+  // The late stay and everything it runs into.
+  assert.ok(cues[1].words.includes("B11 conflict"));
   cues[1].show();
-  assert.deepEqual([...host.snapshot().selection.occupancyIds].sort(), ["T10-1", "T11-1"]);
+  assert.deepEqual([...host.snapshot().selection.occupancyIds].sort(), ["T24-1", "T25-1", "T26-1"]);
   // A flight with no stand is picked in its list.
   const waiting = validateAppAction("find_flights", { query: "no stand" });
   assert.ok(waiting.ok);
@@ -186,7 +214,9 @@ test("fix everything clears every conflict and places every waiting flight that 
   assert.equal(result.kind === "action" && result.action.name, "fix_all");
   const action = (result as { action: AppAction }).action;
   assert.ok(action.name === "fix_all");
-  assert.equal(action.moves.length, 2);
+  // XB210/211 off A1, and both arrivals behind XD472/473 off B11.
+  assert.equal(action.moves.length, 3);
+  assert.equal(action.conflictsCleared, 2);
   assert.equal(action.assigns.length, 4);
   const done = applyAppAction(action, host);
   assert.ok(done.ok);

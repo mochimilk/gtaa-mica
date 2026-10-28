@@ -1,0 +1,185 @@
+/*
+ * Skye's notices right above Ask Skye (DisruptionNotice): Ask Skye's notice
+ * glass (askSkye.css, .mica-ask__notice), laid out as a card, and lit in
+ * Skye's violet from its foot up, as the Outputs peek is once she is done
+ * (OutputsPeek.tsx, LIT), so it reads as hers. Its primary button is in her
+ * orb's colours (skyeGlow.css).
+ */
+.mica-ask__notice.skye-notice {
+  --skye-notice-lit: inset 0 -14px 18px -6px rgba(150, 138, 240, 0.55), inset 0 -34px 44px -18px rgba(84, 84, 228, 0.35);
+
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--ask-space-2);
+  width: min(440px, calc(100vw - 32px));
+  box-sizing: border-box;
+  padding: var(--ask-space-3) var(--ask-space-4) var(--ask-space-3);
+  border-color: rgba(122, 92, 255, 0.45);
+  border-radius: var(--ask-radius-m);
+  box-shadow: var(--ask-shadow), 0 0 24px rgba(122, 92, 255, 0.22);
+  color: var(--ask-text);
+  font: var(--ask-type-body);
+  animation: skye-notice-rise var(--ask-motion-normal) var(--ask-ease) both;
+}
+
+/* The light lies over the glass's tint (its layer), or the tint would hide it. */
+.mica-ask__notice.skye-notice::after {
+  border-radius: inherit;
+  box-shadow: var(--skye-notice-lit);
+}
+
+/*
+ * It rises into place while its glass and content fade in: never the notice
+ * itself, as a fading ancestor would stop its glass from blurring (see
+ * askSkye.css, Glass).
+ */
+.mica-ask__notice.skye-notice::before,
+.mica-ask__notice.skye-notice::after,
+.mica-ask__notice.skye-notice > * {
+  animation: skye-notice-fade var(--ask-motion-normal) var(--ask-ease) both;
+}
+
+@keyframes skye-notice-rise {
+  from {
+    transform: translateY(8px);
+  }
+}
+
+@keyframes skye-notice-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mica-ask__notice.skye-notice,
+  .mica-ask__notice.skye-notice::before,
+  .mica-ask__notice.skye-notice::after,
+  .mica-ask__notice.skye-notice > * {
+    animation: none;
+  }
+}
+
+.skye-notice__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--ask-space-2);
+  font: var(--ask-type-caption);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--ask-text);
+}
+
+.skye-notice__orb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(122, 92, 255, 0.6);
+}
+
+.skye-notice__when {
+  margin-left: auto;
+  font-weight: var(--fontWeightRegular);
+  color: var(--ask-muted);
+}
+
+.skye-notice__title {
+  margin: 0;
+  font-size: var(--fontSizeBase400);
+  line-height: var(--lineHeightBase400);
+  font-weight: var(--fontWeightSemibold);
+}
+
+/* Why, Conflict and Action: a label column, then what it says. */
+.skye-notice__facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--ask-space-1) var(--ask-space-3);
+  margin: 0;
+}
+
+.skye-notice__facts dt {
+  font: var(--ask-type-caption);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--ask-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding-top: 2px;
+}
+
+.skye-notice__facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* The conflict is the reason to act: in the board's conflict red. */
+.skye-notice__facts dt:nth-of-type(2) {
+  color: var(--colorPaletteRedForeground1);
+}
+
+.skye-notice__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--ask-space-2);
+  margin-top: var(--ask-space-1);
+}
+
+/* Skye's own button: her orb's blues and violet, as she outlines what she selects. */
+.skye-notice__run.fui-Button,
+.skye-notice__run.fui-Button:hover,
+.skye-notice__run.fui-Button:hover:active {
+  border-color: transparent;
+  background-image: linear-gradient(120deg, #0f6fff, #7a5cff 55%, #14b8e0);
+  color: #ffffff;
+}
+
+.skye-notice__run.fui-Button:hover {
+  filter: brightness(1.08);
+}
+
+.skye-notice__run.fui-Button:disabled {
+  filter: grayscale(0.6) opacity(0.6);
+}
+
+/* The approved plan's figures against the baseline. */
+.skye-notice__impact {
+  border-collapse: collapse;
+  width: 100%;
+  font-variant-numeric: tabular-nums;
+}
+
+.skye-notice__impact th,
+.skye-notice__impact td {
+  padding: 2px 0;
+  text-align: left;
+  font-weight: var(--fontWeightRegular);
+}
+
+.skye-notice__impact thead th {
+  font: var(--ask-type-caption);
+  color: var(--ask-muted);
+}
+
+.skye-notice__impact tbody th {
+  color: var(--ask-muted);
+  width: 30%;
+}
+
+.skye-notice__impact td:nth-child(3) {
+  width: 28px;
+  color: var(--ask-muted);
+  vertical-align: middle;
+}
+
+.skye-notice__impact td[data-better] {
+  color: var(--colorPaletteGreenForeground1);
+  font-weight: var(--fontWeightSemibold);
+}
+
+.skye-notice__by {
+  display: flex;
+  align-items: center;
+  gap: var(--ask-space-1);
+  margin: 0;
+  font: var(--ask-type-caption);
+  color: var(--ask-muted);
+}

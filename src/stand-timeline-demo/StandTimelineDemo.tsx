@@ -1,6 +1,7 @@
-import { useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Button } from "@fluentui/react-components";
 import { ContentToolbar } from "../components/content-toolbar";
+import { DateStepper } from "../components/date-stepper";
 import {
   BarBackdrop,
   BarGhosts,
@@ -11,6 +12,7 @@ import {
   StandTimeline,
   TimeAxis,
   TimeGrid,
+  type BarEnds,
   type ChartIntent,
   type DropPreview,
   type Occupancy,
@@ -30,6 +32,7 @@ import {
   DemoPatternDefs,
   GUTTER_WIDTH,
   LABEL_METRICS,
+  LABEL_PADDING,
   QUARTER_RULER,
   ROW_HEIGHT,
   fluentChartTheme,
@@ -39,6 +42,7 @@ import {
   type FlightStyle,
 } from "./theme";
 import { useDemoZoom } from "./ZoomMenuRow";
+import type { Pixels } from "../studio/drawings";
 import "./demo.css";
 
 const KIND_LABEL: Record<string, string> = {
@@ -48,8 +52,15 @@ const KIND_LABEL: Record<string, string> = {
   dep: "Departure stay",
 };
 
-/** In classic, each bar's ends by what starts and ends its stay: tapered for a flight, zigzagged for a tow. */
-const classicEnds = (o: Occupancy) => stayEnds(DATA.endpoints.get(o.id));
+/**
+ * Each bar's ends in each style, by what starts and ends its stay: zigzagged
+ * for a tow, round (aero) or tapered (classic) for a flight. One function per
+ * style, so the chart lays its bars out again only when the style changes.
+ */
+const BAR_ENDS: Record<FlightStyle, (o: Occupancy) => BarEnds> = {
+  aero: (o) => stayEnds(DATA.endpoints.get(o.id), "aero"),
+  classic: (o) => stayEnds(DATA.endpoints.get(o.id), "classic"),
+};
 
 export interface StandTimelineDemoProps {
   /** Controlled selection. Omit both props to use the demo standalone. */
@@ -112,11 +123,7 @@ export interface StandTimelineDemoProps {
   toolbarStart?: ReactNode;
   /** Optional controls rendered at the right of the header. */
   toolbar?: ReactNode;
-  /**
-   * Optional content floating over the foot of the chart, e.g. the host's
-   * KPIs. The rows can scroll up clear of it, and it takes the pointer only
-   * where its host gives it back (see demo.css, .demo-chart-summary).
-   */
+  /** Optional content under the chart, e.g. the host's KPIs. The chart gives it the height it needs. */
   summary?: ReactNode;
   /**
    * The board's zoom, from useDemoZoom(), when the host shows its controls
@@ -124,8 +131,10 @@ export interface StandTimelineDemoProps {
    * pinching it still changes.
    */
   zoom?: TimelineZoom;
-  /** How flights are drawn: aero (round ends, with icons; the default) or classic (shaped ends, no icons). */
+  /** How flights are drawn: aero (a flight's ends round; the default) or classic (tapered). Both zigzag a tow's. */
   flightStyle?: FlightStyle;
+  /** Each aircraft type's drawing from the Studio, by type, shown in the middle of its aircraft's bars. */
+  drawings?: ReadonlyMap<string, Pixels>;
 }
 
 export function StandTimelineDemo({
@@ -149,6 +158,7 @@ export function StandTimelineDemo({
   summary,
   zoom: hostZoom,
   flightStyle = "aero",
+  drawings,
 }: StandTimelineDemoProps = {}) {
   const ownZoom = useDemoZoom();
   const zoom = hostZoom ?? ownZoom;
@@ -172,9 +182,9 @@ export function StandTimelineDemo({
         hasSelection,
         new Set(skyeKey ? skyeKey.split("|") : []),
         new Set(pinnedKey ? pinnedKey.split("|") : []),
-        flightStyle,
+        drawings,
       ),
-    [clashes, isMatch, hasSelection, skyeKey, pinnedKey, flightStyle],
+    [clashes, isMatch, hasSelection, skyeKey, pinnedKey, drawings],
   );
   const renderLabel = useMemo(() => {
     if (!pinnedLabel) return undefined;
@@ -197,97 +207,73 @@ export function StandTimelineDemo({
     [selectedIds],
   );
 
-  // The summary's height, kept on the chart's frame (--demo-summary-height),
-  // so the chart's rows can scroll up clear of it (demo.css).
-  const frameRef = useRef<HTMLDivElement>(null);
-  const summaryRef = useRef<HTMLDivElement>(null);
-  const hasSummary = summary != null;
-  useLayoutEffect(() => {
-    const frame = frameRef.current;
-    const over = summaryRef.current;
-    if (!frame || !over) return undefined;
-    const sync = () => frame.style.setProperty("--demo-summary-height", `${over.offsetHeight}px`);
-    sync();
-    const observer = new ResizeObserver(sync);
-    observer.observe(over, { box: "border-box" });
-    return () => {
-      observer.disconnect();
-      frame.style.removeProperty("--demo-summary-height");
-    };
-  }, [hasSummary]);
-
   return (
     <div className="demo-timeline">
       <ContentToolbar
-        label={`Timeline · ${SYNTHETIC_DATE}`}
+        // The fixture is one day, so there is no day before or after to step to.
+        label={<DateStepper date={SYNTHETIC_DATE} />}
         actionsStart={toolbarStart}
         actionsEnd={toolbar}
       />
 
-      {/* The chart, with the summary floating over its foot. */}
-      <div className="demo-chart-frame" ref={frameRef}>
-        <StandTimeline
-          style={fluentChartTheme}
-          className="demo-chart"
-          fillHeight
-          rows={DATA.rows}
-          pinnedRows={pinnedRows}
-          visits={DATA.visits}
-          occupancies={occupancies}
-          previewDrop={previewDrop}
-          dragSnapMs={dragSnapMs}
-          domain={DOMAIN}
-          timeZone="UTC"
-          rowHeight={ROW_HEIGHT}
-          barInset={BAR_INSET}
-          barRadius={BAR_RADIUS}
-          barEnds={flightStyle === "classic" ? classicEnds : undefined}
-          zoom={zoom}
-          labelWidth={GUTTER_WIDTH}
-          selectedIds={selectedIds}
-          onIntent={onIntent}
-          ariaLabel="Synthetic stand occupancy timeline, times in UTC"
-          fade
-        >
-          <DemoPatternDefs />
-          {/* Synthetic piers only drive optional group dividers; no group-name column. */}
-          <StandRows zebra={false} title={null} showGroup={false} labelAlign="end" renderLabel={renderLabel} />
-          {/* The grid and the host's underlay show blurred and saturated through the glass bars. */}
-          <BarBackdrop blur={BAR_BACKDROP_BLUR} saturate={BAR_BACKDROP_SATURATE}>
-            <TimeGrid minorMs={QUARTER_RULER.stepMs} />
-            {underlay}
-          </BarBackdrop>
-          <OccupancyBars
-            barStyle={accessors.barStyle}
-            renderBar={accessors.renderBar}
-            describe={accessors.describe}
-          />
-          <BarLabels
-            slots={accessors.labelSlots}
-            color={accessors.labelColor}
-            className={accessors.labelClassName}
-            priority={["start", "end", "center"]}
-            {...LABEL_METRICS}
-          />
-          {/* Late stays' ghosts, over the bars so a clash shows over the stay it runs into. */}
-          <BarGhosts ghosts={accessors.ghosts} />
-          {/* Selection order is kept, so the link points at the most recent pick. */}
-          {(links ??
-            (selectedIds.length === 2
-              ? [{ fromId: selectedIds[0], toId: selectedIds[1], className: swapStatus ? `demo-link--${swapStatus}` : undefined }]
-              : [])
-          ).map((link) => (
-            <BarLink key={`${link.fromId}>${link.toId}`} fromId={link.fromId} toId={link.toId} className={link.className} />
-          ))}
-          {overlay}
-          <TimeAxis position="top" zoneLabel="UTC" {...rulerFor(zoom.hourWidth)} />
-        </StandTimeline>
-        {hasSummary && (
-          <div className="demo-chart-summary" ref={summaryRef}>
-            {summary}
-          </div>
-        )}
-      </div>
+      <StandTimeline
+        style={fluentChartTheme}
+        className="demo-chart"
+        fillHeight
+        rows={DATA.rows}
+        pinnedRows={pinnedRows}
+        visits={DATA.visits}
+        occupancies={occupancies}
+        previewDrop={previewDrop}
+        dragSnapMs={dragSnapMs}
+        domain={DOMAIN}
+        timeZone="UTC"
+        rowHeight={ROW_HEIGHT}
+        barInset={BAR_INSET}
+        barRadius={BAR_RADIUS}
+        barEnds={BAR_ENDS[flightStyle]}
+        zoom={zoom}
+        labelWidth={GUTTER_WIDTH}
+        selectedIds={selectedIds}
+        onIntent={onIntent}
+        ariaLabel="Synthetic stand occupancy timeline, times in UTC"
+        fade
+      >
+        <DemoPatternDefs />
+        {/* Synthetic piers only drive optional group dividers; no group-name column. */}
+        <StandRows zebra={false} title={null} showGroup={false} labelAlign="end" renderLabel={renderLabel} />
+        {/* The grid and the host's underlay show blurred and saturated through the glass bars. */}
+        <BarBackdrop blur={BAR_BACKDROP_BLUR} saturate={BAR_BACKDROP_SATURATE}>
+          <TimeGrid minorMs={QUARTER_RULER.stepMs} />
+          {underlay}
+        </BarBackdrop>
+        <OccupancyBars
+          barStyle={accessors.barStyle}
+          renderBar={accessors.renderBar}
+          describe={accessors.describe}
+        />
+        <BarLabels
+          slots={accessors.labelSlots}
+          color={accessors.labelColor}
+          className={accessors.labelClassName}
+          priority={["start", "end", "center"]}
+          padding={LABEL_PADDING[flightStyle]}
+          {...LABEL_METRICS}
+        />
+        {/* Late stays' ghosts, over the bars so a clash shows over the stay it runs into. */}
+        <BarGhosts ghosts={accessors.ghosts} />
+        {/* Selection order is kept, so the link points at the most recent pick. */}
+        {(links ??
+          (selectedIds.length === 2
+            ? [{ fromId: selectedIds[0], toId: selectedIds[1], className: swapStatus ? `demo-link--${swapStatus}` : undefined }]
+            : [])
+        ).map((link) => (
+          <BarLink key={`${link.fromId}>${link.toId}`} fromId={link.fromId} toId={link.toId} className={link.className} />
+        ))}
+        {overlay}
+        <TimeAxis position="top" zoneLabel="UTC" {...rulerFor(zoom.hourWidth)} />
+      </StandTimeline>
+      {summary}
 
       {showSelectionDetail && (
       <section className="demo-detail" aria-live="polite" aria-label="Selection detail">

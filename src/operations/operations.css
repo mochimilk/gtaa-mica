@@ -671,9 +671,9 @@ div.ops-menu-popover > .ops-menu-list {
 /*
  * Stroke 1 here and Stroke 3 on the divider (the design has Stroke 2 for both).
  * In the board's flight style: aero's box is rounded, as in the design;
- * classic's border is drawn (FlightCard, ShapedEnds) in its bar's shape, a
- * flight's end tapered and a tow's zigzagged, over padding that keeps the
- * border's 1px, so both boxes are the same size.
+ * any other, a tow's end zigzagged or, in classic, a flight's tapered, has
+ * its border drawn (FlightCard, ShapedEnds) in its bar's shape, over padding
+ * that keeps the border's 1px, so both boxes are the same size.
  */
 .ops-card-ends {
   position: relative;
@@ -711,7 +711,6 @@ div.ops-menu-popover > .ops-menu-list {
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: var(--spacingHorizontalS);
 }
 
 .ops-card-end--end {
@@ -719,14 +718,14 @@ div.ops-menu-popover > .ops-menu-list {
   text-align: end;
 }
 
-.ops-card-end > svg {
-  flex-shrink: 0;
-}
-
-/* The maker's emblem, in Foreground 3: the two ends share the rest equally, so it sits dead centre. */
-.ops-card-emblem {
+/*
+ * The aircraft type's symbol, in Foreground 1 as on its bar: the two ends
+ * share the rest equally, so it sits dead centre.
+ */
+.ops-card-symbol {
+  flex: none;
   margin: 0 var(--spacingHorizontalS);
-  color: var(--colorNeutralForeground3);
+  color: var(--colorNeutralForeground1);
 }
 
 .ops-card-end-text {
@@ -1086,47 +1085,71 @@ html.ops-flight-drag--blocked * {
 /* --------------------------------------------------------------- KPI strip */
 
 /*
- * The board's KPIs (KpiStrip.tsx), floating over the foot of its chart (the
- * demo page's summary; see demo.css, .demo-chart-summary): one row of tiles,
- * 16px in from the chart's sides and bottom, clear of its scrollbar, with 8px
- * of air above them that the rows come to rest on. The row itself has no
- * background and takes no pointer, so the chart is live between the tiles.
- * The tiles with a small chart take a little more of the row; narrower, all
- * four shrink, never scroll, so their shadows are not clipped.
+ * The board's KPIs (KpiStrip.tsx), a bar under its chart (the demo page's
+ * summary): no surface of its own and no glass, just Stroke 2 hairlines, its
+ * top one over the chart's bottom edge, so the two share a line. Four equal
+ * columns, then the 40px expand/collapse toggle, each column divided from
+ * the last, full height.
  */
 .ops-kpis {
+  position: relative;
+  flex: none;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 6fr)) minmax(0, 5fr);
-  gap: var(--spacingHorizontalS);
-  padding: 8px 16px 16px;
+  grid-template-columns: repeat(5, minmax(0, 1fr)) 40px;
+  margin-top: -1px;
+  border: 1px solid var(--colorNeutralStroke2);
   font-family: var(--fontFamilyBase);
   font-size: var(--fontSizeBase200);
   line-height: var(--lineHeightBase200);
   color: var(--colorNeutralForeground1);
 }
 
+.ops-kpis > * + * {
+  border-left: 1px solid var(--colorNeutralStroke2);
+}
+
 /*
- * A tile, in the Outputs peek's glass (OutputsPeek.tsx, from Ask Skye's
- * floating windows, askSkye.css), clearer: the gentle liquid-glass lens
- * (LiquidGlassFilter.tsx) over an 8px frost (the peek's is 12px), under a
- * darker background than the peek's as a 60% tint (its Background2 at 75%),
- * with a hairline edge and a deep shadow, so it lifts off the rows beneath.
- * The glass and tint lie in layers under the content, each rounded itself,
- * as the blur is not clipped to its parent's corners.
- *
- * On it, its label and, in the top-right corner, its delta; then 24px below,
- * the figure, a small chart beside it. The top row is the delta's height
- * whether there is one or not, so every tile's figure sits at the same
- * height. Explicit 12px corners, since Coral overrides Fluent's radius
- * tokens. Each tile is a container, so the small chart gives way as it
- * narrows.
+ * A column, collapsed: 40px, its label (Caption 1, in the disabled ink) and
+ * 16px on, its figure (Caption 1 Strong, in the tertiary ink), so the bar
+ * stays quiet under the board. The label gives way first. Each column is a
+ * container, so its small chart gives way as it narrows.
  */
 .ops-kpi {
-  --ops-kpi-radius: 12px;
   container: ops-kpi / inline-size;
-  position: relative;
-  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: var(--spacingHorizontalL);
+  min-width: 0;
+  height: 40px;
+  padding: 0 var(--spacingHorizontalL);
+  box-sizing: border-box;
+}
+
+.ops-kpi-label {
+  grid-area: label;
+  min-width: 0;
   overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--colorNeutralForegroundDisabled);
+}
+
+.ops-kpi-value {
+  grid-area: value;
+  flex: none;
+  white-space: nowrap;
+  font-weight: var(--fontWeightSemibold);
+  color: var(--colorNeutralForeground3);
+}
+
+/*
+ * Expanded, the column is laid out as a card: its label (in the secondary
+ * ink) and, in the top-right corner, its delta; then 24px below, the figure,
+ * large and in the primary ink, a small chart beside it. The top row is the
+ * delta's height whether there is one or not, so every column's figure sits
+ * at the same height.
+ */
+.ops-kpis[data-expanded] .ops-kpi {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   grid-template-rows: 20px auto;
@@ -1136,55 +1159,61 @@ html.ops-flight-drag--blocked * {
   align-items: center;
   column-gap: var(--spacingHorizontalM);
   row-gap: 24px;
-  min-width: 0;
+  height: auto;
   padding: var(--spacingVerticalL) var(--spacingHorizontalL);
-  border: 1px solid var(--colorNeutralStroke2);
-  border-radius: var(--ops-kpi-radius);
-  box-shadow: var(--shadow28);
-  pointer-events: auto;
 }
 
-.ops-kpi::before,
-.ops-kpi::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: calc(var(--ops-kpi-radius) - 1px);
-  pointer-events: none;
-}
-
-.ops-kpi::before {
-  z-index: -2;
-  filter: url(#mica-liquid-glass-open);
-  -webkit-backdrop-filter: blur(8px) saturate(140%);
-  backdrop-filter: blur(8px) saturate(140%);
-}
-
-.ops-kpi::after {
-  z-index: -1;
-  background: color-mix(in srgb, var(--colorNeutralBackground3) 60%, transparent);
-}
-
-.ops-kpi-label {
-  grid-area: label;
-  min-width: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+.ops-kpis[data-expanded] .ops-kpi-label {
   color: var(--colorNeutralForeground2);
 }
 
 /* Proportional figures: a big standalone number reads tighter without tabular-nums. */
-.ops-kpi-value {
-  grid-area: value;
+.ops-kpis[data-expanded] .ops-kpi-value {
+  color: var(--colorNeutralForeground1);
   min-width: 0;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
   font-size: var(--fontSizeBase600);
   line-height: 28px;
-  font-weight: var(--fontWeightSemibold);
   letter-spacing: -0.01em;
+}
+
+/*
+ * The toggle is the whole last column, the full height of the bar, its
+ * chevron centred in it, in the primary ink. Hovered and pressed, it takes
+ * Fluent's subtle backgrounds; focused from the keyboard, its focus ring
+ * inside the column.
+ */
+.ops-kpis-toggle {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-left: 1px solid var(--colorNeutralStroke2);
+  background: transparent;
+  color: var(--colorNeutralForeground1);
+  cursor: pointer;
+}
+
+.ops-kpis-toggle:hover {
+  background: var(--colorSubtleBackgroundHover);
+}
+
+.ops-kpis-toggle:hover:active {
+  background: var(--colorSubtleBackgroundPressed);
+}
+
+.ops-kpis-toggle:focus-visible {
+  outline: var(--strokeWidthThick) solid var(--colorStrokeFocus2);
+  outline-offset: calc(-1 * var(--strokeWidthThick));
+}
+
+.ops-kpis-toggle svg {
+  display: block;
+  width: 20px;
+  height: 20px;
 }
 
 /*
@@ -1228,7 +1257,7 @@ html.ops-flight-drag--blocked * {
   display: block;
 }
 
-/* The tile's content box, inside its padding. */
+/* The column's content box, inside its padding. */
 @container ops-kpi (max-width: 196px) {
   .ops-kpi-chart {
     display: none;

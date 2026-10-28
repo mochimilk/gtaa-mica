@@ -1,5 +1,5 @@
-// The board's KPIs (the strip above the chart): conflicts, flights with no
-// stand, stand use and free stand time, now and in the plan.
+// The board's KPIs (the strip under the chart): conflicts, gate hold, flights
+// with no stand, stand use and free stand time, now and in the plan.
 import assert from "node:assert/strict";
 import { afterEach, test } from "node:test";
 import {
@@ -8,6 +8,7 @@ import {
   planAssign,
   planDrop,
   resetStands,
+  setRunningLate,
   standState,
   unassignStays,
   type Closure,
@@ -30,22 +31,40 @@ const board = (closure: Closure | null, ...stays: [string, string, string, strin
   closure,
 });
 
-test("the fixture: two conflicts and five flights with no stand, as the plan has them", () => {
+test("the fixture: no conflicts, nobody waiting for a stand, and five flights with no stand, as the plan has them", () => {
   const now = boardKpis(standState());
-  // XA103/104 runs late off A1 at 08:20; XA107/108 was due onto A4 at 09:05.
-  assert.deepEqual(
-    now.conflicts.map((c) => [c.label, c.standId, c.start]),
-    [
-      ["XA103/104", "A1", at("08:20")],
-      ["XA107/108", "A4", at("09:05")],
-    ],
-  );
+  // The late stays it has (XA103/104 off A1, XA107/108 onto A4) run into nothing.
+  assert.deepEqual(now.conflicts, []);
+  assert.deepEqual(now.holds, []);
+  assert.equal(now.gateHoldMinutes, 0);
   // Four waiting in the No stand lane, earliest first, and XB241 with no stay times.
   assert.deepEqual(now.waiting.map((w) => w.label), ["XC350", "XB240", "XA130", "XD480"]);
   assert.equal(now.noStand, 5);
   assert.equal(now.untimed, 1);
   assert.equal(now.hourlyUse.length, 12);
   assert.deepEqual(now, planKpis());
+});
+
+test("gate hold: a late departure holds the next arrival, and the knock-on holds the ones after", () => {
+  // Due on B11 08:40–11:40, XD472/473 gets in 1h 50m late and leaves at 13:30.
+  assert.ok(setRunningLate("T24-1", 110, 110));
+  const kpis = boardKpis(standState());
+  // XC344/345 is due at 11:50 and gets on at 13:30; off at 14:35, so XB232/233
+  // (due 13:05) waits until then, and so on down B11.
+  assert.deepEqual(
+    kpis.holds.map((hold) => [hold.label, hold.standId, hold.due, hold.minutes]),
+    [
+      ["XC344/345", "B11", at("11:50"), 100],
+      ["XB232/233", "B11", at("13:05"), 90],
+      ["XC336/337", "B11", at("14:00"), 85],
+      ["XA109/110", "B11", at("15:45"), 70],
+    ],
+  );
+  assert.equal(kpis.gateHoldMinutes, 345);
+  // Only the first runs into its ghost; the rest are the knock-on.
+  assert.deepEqual(kpis.conflicts.map((c) => [c.label, c.standId, c.start]), [["XD472/473", "B11", at("11:40")]]);
+  // News, not a change: the plan takes it in.
+  assert.equal(planKpis().gateHoldMinutes, 345);
 });
 
 test("free stand time is the stretches of an hour or more on open stands", () => {
@@ -79,16 +98,25 @@ test("a closed area's stands are out of use while it is closed: that time is nei
 });
 
 test("the figures follow the board, while the plan's stay as they were", () => {
-  // XB210/211 off A1, out of XA103/104's way: one conflict left.
-  assert.ok(applyPlan(planDrop("T03-1", "C25")));
-  assert.equal(boardKpis(standState()).conflicts.length, 1);
+  assert.ok(setRunningLate("T24-1", 110, 110));
+  // XC344/345 off B11, out of XD472/473's way: the conflict goes, but
+  // XB232/233 still waits for B11, and the knock-on behind it.
+  assert.ok(applyPlan(planDrop("T25-1", "A3")));
+  const one = boardKpis(standState());
+  assert.equal(one.conflicts.length, 1);
+  assert.deepEqual(one.holds.map((hold) => hold.label), ["XB232/233", "XC336/337", "XA109/110"]);
+  // XB232/233 off too: nobody waits.
+  assert.ok(applyPlan(planDrop("T26-1", "B10")));
+  assert.equal(boardKpis(standState()).conflicts.length, 0);
+  assert.equal(boardKpis(standState()).gateHoldMinutes, 0);
 
   // XB240 gets a stand; XB210/211 (two flights) loses its own.
   assert.deepEqual(applyAssigns(planAssign(["U01-1"]).assigns), ["U01-1"]);
   assert.deepEqual(unassignStays(["T03-1"]), ["T03-1"]);
   assert.equal(boardKpis(standState()).noStand, 5 - 1 + 2);
 
-  // The plan's own figures never change.
-  assert.equal(planKpis().conflicts.length, 2);
+  // The plan's own figures stay as they were.
+  assert.equal(planKpis().conflicts.length, 1);
+  assert.equal(planKpis().gateHoldMinutes, 345);
   assert.equal(planKpis().noStand, 5);
 });

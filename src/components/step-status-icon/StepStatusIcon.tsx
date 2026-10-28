@@ -1,5 +1,5 @@
-import { makeStyles, mergeClasses, Spinner, tokens } from '@fluentui/react-components'
-import { CheckmarkCircle20Regular, Circle20Regular } from '@fluentui/react-icons'
+import { makeStyles, mergeClasses, tokens } from '@fluentui/react-components'
+import { CheckmarkCircle20Regular, Circle20Regular, CircleHintHalfVertical20Regular } from '@fluentui/react-icons'
 import { useLayoutEffect, useRef, useState } from 'react'
 /**
  * A task step's state; Luma's `TaskStepStatus` (src/types/conversation.ts
@@ -15,11 +15,11 @@ export type TaskStepStatus = 'done' | 'in-progress' | 'pending' | 'pending-appro
  * drawn inline so each dot can move. The finished ring and check trace
  * Fluent's CheckmarkCircle20Regular, which takes over when the transition ends.
  *
- * Pending approval is Mica's: Fluent's tiny Spinner, reached by the same
- * phases. The dots close into a ring as they do for the check, but one the
- * size of the Spinner's track, which then dims into the track as the
- * Spinner's arc comes in, so the Spinner takes over the same way. On approval
- * the arc fades, the track firms up into the check's ring, and the check
+ * Pending approval is Mica's: Fluent's half hint circle
+ * (CircleHintHalfVertical20Regular) in the warning colour, reached by the
+ * same phases. The dots close into the check's ring, which hands over to the
+ * hint's (the same ring, its right half dashed) where the check would draw
+ * on. On approval the hint fades back into the check's ring, and the check
  * draws on as it does after the dots.
  *
  * Every state draws a 20px icon centred in a 32px box, so none can sit off
@@ -30,7 +30,7 @@ export type TaskStepStatus = 'done' | 'in-progress' | 'pending' | 'pending-appro
 const spinMs = 1250
 /** From the status change to the finished check. */
 const completeMs = 875
-/** Pending approval to done: the arc fades as the track firms into the check's ring, then the check draws on. */
+/** Pending approval to done: the hint fades back into the check's ring, then the check draws on. */
 const approveMs = 375
 /** Dot centre distance from the icon centre: the 14px asset's corners turned 45°. */
 const orbit = 4 * Math.SQRT2
@@ -42,15 +42,8 @@ const easeInOutCubic = 'cubic-bezier(0.65, 0, 0.35, 1)'
 /** easeOutQuint starts at 1/0.22 of its average speed; this starts the spin-down 1.5× faster than the spin. */
 const spinDownMsPerDegree = 1 / 0.22 / (1.5 * (360 / spinMs))
 
-/** CheckmarkCircle20Regular's ring, as [outer radius, inner radius]. */
+/** CheckmarkCircle20Regular's ring (and CircleHintHalfVertical20Regular's), as [outer radius, inner radius]. */
 const checkRing = [8, 7] as const
-/**
- * The tiny Spinner's track: its mask draws a ring solid from radius 8 to 9
- * with a 1px soft edge either side, so it reads as a 2px ring from 7.5 to 9.5.
- */
-const trackRing = [9.5, 7.5] as const
-/** How strong the Spinner's track is against its arc, both in the icon's colour. */
-const trackAlpha = 0.2
 
 /** Keyframe offset of a moment in a transition `total` ms long (the dots closing, by default). */
 const at = (ms: number, total = completeMs) => `${((ms / total) * 100).toFixed(2)}%`
@@ -79,23 +72,19 @@ function ringStyle(outer: number, inner: number, opacity: number) {
   return { opacity, transform: `scale(${scale.toFixed(4)})`, strokeWidth: `${((outer - inner) / scale).toFixed(4)}px` }
 }
 
-/** The merged dot opening into a ring of `[outer, inner]`: ringFrames, stretched from the check's ring to it. */
-function ringOpening([outer, inner]: readonly [number, number]) {
-  const toOuter = (o: number) => 3 + ((o - 3) * (outer - 3)) / (checkRing[0] - 3)
-  const toInner = (i: number) => (i * inner) / checkRing[1]
-  return Object.fromEntries([
-    [at(0), ringStyle(3, 0, 0)],
-    [at(416), ringStyle(3, 0, 0)],
-    ...ringFrames.map(([ms, o, i]) => [at(ms), ringStyle(toOuter(o), toInner(i), 0.8 + (0.2 * (ms - 417)) / (708 - 417))]),
-  ])
-}
+/** The merged dot opening into the check's ring. */
+const ringOpening = Object.fromEntries([
+  [at(0), ringStyle(3, 0, 0)],
+  [at(416), ringStyle(3, 0, 0)],
+  ...ringFrames.map(([ms, outer, inner]) => [at(ms), ringStyle(outer, inner, 0.8 + (0.2 * (ms - 417)) / (708 - 417))]),
+])
 
-const ringKeyframes = { ...ringOpening(checkRing), '100%': ringStyle(...checkRing, 1) }
-// Opened to the track's size, the ring dims into the track as the arc comes in.
-const trackKeyframes = {
-  ...ringOpening(trackRing),
-  [at(708)]: { ...ringStyle(...trackRing, 1), animationTimingFunction: easeInOutCubic },
-  '100%': ringStyle(...trackRing, trackAlpha),
+const ringKeyframes = { ...ringOpening, '100%': ringStyle(...checkRing, 1) }
+// Opened, the ring fades as the hint comes in over it.
+const ringToHintKeyframes = {
+  ...ringOpening,
+  [at(708)]: { ...ringStyle(...checkRing, 1), animationTimingFunction: easeInOutCubic },
+  '100%': ringStyle(...checkRing, 0),
 }
 
 const useStyles = makeStyles({
@@ -111,8 +100,6 @@ const useStyles = makeStyles({
   },
   stage: { position: 'relative', width: '20px', height: '20px' },
   layer: { position: 'absolute', top: 0, left: 0, width: '20px', height: '20px', display: 'block' },
-  // The Spinner keeps its own display (flex, which lays out its ring).
-  spinnerLayer: { position: 'absolute', top: 0, left: 0 },
   root: { overflow: 'visible' },
   rotor: {
     transformBox: 'view-box',
@@ -151,13 +138,8 @@ const useStyles = makeStyles({
     strokeLinejoin: 'round',
     strokeDasharray: '1 1',
   },
-  // The Spinner in the icon's colour: its arc as is, its track faint.
-  spinnerRing: {
-    color: 'inherit',
-    backgroundColor: `color-mix(in srgb, currentColor ${trackAlpha * 100}%, transparent)`,
-  },
-  // While the drawn ring stands in for the track.
-  trackHidden: { backgroundColor: 'transparent' },
+  // Pending approval says so in Fluent's warning colour.
+  hint: { color: tokens.colorStatusWarningForeground1 },
 
   // Transition classes: one shared duration per transition so every phase stays in step.
   merge: {
@@ -184,8 +166,8 @@ const useStyles = makeStyles({
     animationTimingFunction: 'linear',
     animationFillMode: 'both',
   },
-  trackIn: {
-    animationName: trackKeyframes,
+  ringToHint: {
+    animationName: ringToHintKeyframes,
     animationDuration: `${completeMs}ms`,
     animationTimingFunction: 'linear',
     animationFillMode: 'both',
@@ -202,8 +184,8 @@ const useStyles = makeStyles({
     animationTimingFunction: 'linear',
     animationFillMode: 'both',
   },
-  // The Spinner's arc comes in as the ring dims, eased as the check draws.
-  arcIn: {
+  // The hint comes in as the ring fades, eased as the check draws.
+  hintIn: {
     animationName: {
       [at(0)]: { opacity: 0 },
       [at(708)]: { opacity: 0, animationTimingFunction: easeInOutCubic },
@@ -214,8 +196,8 @@ const useStyles = makeStyles({
     animationFillMode: 'both',
   },
 
-  // Approval: the arc fades, the track firms up into the check's ring, the check draws on.
-  arcOut: {
+  // Approval: the hint fades back into the check's ring, the check draws on.
+  hintOut: {
     animationName: {
       [at(0, approveMs)]: { opacity: 1, animationTimingFunction: easeOutCubic },
       [at(125, approveMs)]: { opacity: 0 },
@@ -225,17 +207,17 @@ const useStyles = makeStyles({
     animationTimingFunction: 'linear',
     animationFillMode: 'both',
   },
-  settle: {
+  ringBack: {
     animationName: {
-      [at(0, approveMs)]: { ...ringStyle(...trackRing, trackAlpha), animationTimingFunction: easeOutCubic },
-      [at(250, approveMs)]: ringStyle(...checkRing, 1),
+      [at(0, approveMs)]: { ...ringStyle(...checkRing, 0), animationTimingFunction: easeOutCubic },
+      [at(125, approveMs)]: ringStyle(...checkRing, 1),
       '100%': ringStyle(...checkRing, 1),
     },
     animationDuration: `${approveMs}ms`,
     animationTimingFunction: 'linear',
     animationFillMode: 'both',
   },
-  checkInAfterTrack: {
+  checkInAfterHint: {
     animationName: {
       [at(0, approveMs)]: { opacity: 0, strokeDashoffset: '1' },
       [at(124, approveMs)]: { opacity: 0, strokeDashoffset: '1' },
@@ -252,9 +234,9 @@ const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: r
 
 /**
  * The morph a status change plays while shown: the dots closing into the
- * check (`complete`) or the Spinner (`await`), or the Spinner closing into
- * the check (`approve`). Any other change, or any under reduced motion,
- * switches straight to the new icon.
+ * check (`complete`) or the hint (`await`), or the hint closing into the
+ * check (`approve`). Any other change, or any under reduced motion, switches
+ * straight to the new icon.
  */
 type Transition = 'complete' | 'await' | 'approve'
 
@@ -274,16 +256,16 @@ export interface StepStatusIconProps {
 
 /**
  * Status icon for a task step, 20px in a 32px box: an empty circle when
- * pending, the four-dot spinner while in progress, Fluent's Spinner while
- * pending approval, and a checkmark circle when done. A step that goes from
- * in progress to done or to pending approval while shown morphs from the dots
- * into the check or the Spinner, and one approved while shown morphs from the
- * Spinner into the check; under reduced motion each switches straight to its
- * new icon.
+ * pending, the four-dot spinner while in progress, a half hint circle in the
+ * warning colour while pending approval, and a checkmark circle when done. A
+ * step that goes from in progress to done or to pending approval while shown
+ * morphs from the dots into the check or the hint, and one approved while
+ * shown morphs from the hint into the check; under reduced motion each
+ * switches straight to its new icon.
  *
- * Its layers keep their places from state to state (the dots, the Spinner,
- * the still icons), so the dots and the Spinner keep turning through a morph
- * rather than starting over.
+ * Its layers keep their places from state to state (the dots, the hint, the
+ * still icons), so the dots keep turning through a morph rather than
+ * starting over.
  */
 export function StepStatusIcon({ status, className }: StepStatusIconProps) {
   const styles = useStyles()
@@ -294,7 +276,7 @@ export function StepStatusIcon({ status, className }: StepStatusIconProps) {
     setPreviousStatus(status)
     setTransition(transitionFor(previousStatus, status))
   }
-  // The dots close into the check and the Spinner alike.
+  // The dots close into the check and the hint alike.
   const closing = transition === 'complete' || transition === 'await'
 
   // The spin and the dot dips loop in CSS. Hand them over without a jump:
@@ -335,7 +317,7 @@ export function StepStatusIcon({ status, className }: StepStatusIconProps) {
   }, [closing])
 
   const dotsShown = status === 'in-progress' || closing
-  const spinnerShown = status === 'pending-approval' || transition === 'approve'
+  const hintShown = status === 'pending-approval' || transition === 'approve'
   const stillIcon =
     status === 'pending' ? (
       <Circle20Regular className={styles.layer} />
@@ -367,7 +349,7 @@ export function StepStatusIcon({ status, className }: StepStatusIconProps) {
                 className={mergeClasses(
                   styles.ring,
                   transition === 'complete' && styles.ringIn,
-                  transition === 'await' && styles.trackIn,
+                  transition === 'await' && styles.ringToHint,
                 )}
                 r="7.5"
               />
@@ -381,25 +363,23 @@ export function StepStatusIcon({ status, className }: StepStatusIconProps) {
         ) : transition === 'approve' ? (
           <svg className={mergeClasses(styles.layer, styles.root)} width="20" height="20" viewBox="0 0 20 20">
             <g transform="translate(10 10)">
-              <circle className={mergeClasses(styles.ring, styles.settle)} r="7.5" />
+              <circle className={mergeClasses(styles.ring, styles.ringBack)} r="7.5" />
               <path
-                className={mergeClasses(styles.check, styles.checkInAfterTrack)}
+                className={mergeClasses(styles.check, styles.checkInAfterHint)}
                 d="M-3.5 -0.5 L-1 2 L3 -2"
                 pathLength={1}
               />
             </g>
           </svg>
         ) : null}
-        {spinnerShown ? (
-          <Spinner
-            size="tiny"
-            aria-hidden
+        {hintShown ? (
+          <CircleHintHalfVertical20Regular
             className={mergeClasses(
-              styles.spinnerLayer,
-              transition === 'await' && styles.arcIn,
-              transition === 'approve' && styles.arcOut,
+              styles.layer,
+              styles.hint,
+              transition === 'await' && styles.hintIn,
+              transition === 'approve' && styles.hintOut,
             )}
-            spinner={{ className: mergeClasses(styles.spinnerRing, transition !== null && styles.trackHidden) }}
           />
         ) : null}
         {stillIcon}

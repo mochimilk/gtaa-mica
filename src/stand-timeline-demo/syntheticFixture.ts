@@ -165,9 +165,11 @@ const TOW_IN_OUT = { start: "tow", end: "tow" } as const;
 
 const HAND_WRITTEN_TURNS: SyntheticTurn[] = [
   turn("T01", "XA", ["101", "102"], ["SFO", "LAX"], "C-SYAA", "A320", [stay("A1", "04:10", "06:05")]),
-  // Leaves A1 55 minutes late, into T03's arrival at 09:00.
+  // Leaves A1 15 minutes late, clear of T03's arrival at 09:00. The plan
+  // starts with no conflicts: the day's disruption arrives live (see
+  // src/operations/disruption.ts).
   turn("T02", "XA", ["103", "104"], ["SEA", "SEA"], "C-SYAB", "A320", [
-    stay("A1", "06:40", "08:20", undefined, { delayOut: 55 }),
+    stay("A1", "06:40", "08:20", undefined, { delayOut: 15 }),
   ]),
   turn("T03", "XB", ["210", "211"], ["JFK", "BOS"], "C-SYBA", "B738", [stay("A1", "09:00", "10:15")]),
   turn("T04", "XC", ["330", "331"], ["ORD", "ORD"], "C-SYCA", "A321", [stay("A1", "12:30", "14:10")]),
@@ -187,15 +189,21 @@ const HAND_WRITTEN_TURNS: SyntheticTurn[] = [
     stay("A3", "13:40", "15:55", undefined, TOW_IN),
   ]),
   turn("T10", "XB", ["214", "215"], ["JFK", "JFK"], "C-SYBC", "B38M", [stay("A4", "08:00", "09:20")]),
-  // Reaches A4 an hour late; it was scheduled while T10 is still there.
+  // Reaches A4 half an hour late; T10 has left by its scheduled 09:35.
   turn("T11", "XA", ["107", "108"], ["SFO", "SEA"], "C-SYAD", "A320", [
-    stay("A4", "10:05", "11:15", undefined, { delayIn: 60 }),
+    stay("A4", "10:05", "11:15", undefined, { delayIn: 30 }),
   ]),
   turn("T12", "XC", ["334", "335"], ["LHR", "ORD"], "C-SYCC", "A321", [stay("A4", "15:20", "17:45")]),
   turn("T13", "XD", ["454", "455"], ["YUL", "YVR"], "C-SYDC", "A339", [stay("B10", "05:50", "09:10")]),
   turn("T14", "XB", ["216", "217"], ["BOS", "BOS"], "C-SYBD", "B738", [stay("B10", "11:00", "12:05")]),
-  turn("T15", "XA", ["109", "110"], ["LAX", "LAX"], "C-SYAE", "A319", [stay("B11", "09:30", "10:40")]),
+  // B11's midday bank, the disruption demo's (src/operations/disruption.ts):
+  // XD472/473 on time, then two arrivals close behind it. When XD472 runs
+  // late, its turn runs into both, and the knock-on holds T16 and T15 too.
+  turn("T24", "XD", ["472", "473"], ["LHR", "LHR"], "C-SYDG", "B789", [stay("B11", "08:40", "11:40")]),
+  turn("T25", "XC", ["344", "345"], ["ORD", "ORD"], "C-SYCG", "B788", [stay("B11", "11:50", "12:55")]),
+  turn("T26", "XB", ["232", "233"], ["BOS", "BOS"], "C-SYBH", "B738", [stay("B11", "13:05", "13:55")]),
   turn("T16", "XC", ["336", "337"], ["ORD", "LHR"], "C-SYCD", "E195", [stay("B11", "14:00", "15:30")]),
+  turn("T15", "XA", ["109", "110"], ["LAX", "LAX"], "C-SYAE", "A319", [stay("B11", "15:45", "16:50")]),
   turn("T17", "XB", ["218", "219"], ["JFK", "BOS"], "C-SYBE", "B38M", [stay("B12", "06:00", "06:55")]),
   turn("T18", "XD", ["456", "457"], ["YVR", "YUL"], "C-SYDD", "B789", [stay("B12", "10:20", "16:30")]),
   // Leaves B14 15 minutes late, clear of the 09:10 tow-in.

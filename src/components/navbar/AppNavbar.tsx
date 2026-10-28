@@ -37,10 +37,12 @@ export type AppNavbarProps = {
   actionsStart?: ReactNode;
   /** Beside Ask Skye's bar, right of Connect: e.g. AlertsMenu. */
   askActionsEnd?: ReactNode;
+  /** What Skye brings up herself, right above her bar: e.g. DisruptionNotice. */
+  askNotices?: ReactNode;
 };
 
 // App identity lives in the left panel's PanelHeader, so the bar has no branding.
-export function AppNavbar({ actionsStart, askActionsEnd }: AppNavbarProps) {
+export function AppNavbar({ actionsStart, askActionsEnd, askNotices }: AppNavbarProps) {
   const styles = useStyles();
   // The orb's state is no longer passed in: it follows the live call. Mute is
   // the user's for the whole call, Skye and anyone else, so it sits at the
@@ -51,7 +53,7 @@ export function AppNavbar({ actionsStart, askActionsEnd }: AppNavbarProps) {
       actionsStart={actionsStart}
       // Temporarily in place of <ViewSwitcher /> (Stand plan / 3D Map), which
       // nothing listened to yet; restore it here when the 3D map lands.
-      actionsCenter={<AskSkye agentName="Skye" actionsEnd={askActionsEnd} />}
+      actionsCenter={<AskSkye agentName="Skye" actionsEnd={askActionsEnd} notices={askNotices} />}
       actionsEnd={
         <Toolbar aria-label="Call" className={styles.callToolbar}>
           <PeopleCallButton agentName="Skye" />

@@ -37,12 +37,16 @@ many more moves and a longer run. For the demo, give a window.
 
 1. A red hatched band appears over Pier B's stands, 09:00–13:00, labelled
    "Pier B closed 09:00–13:00", and the chart glides to frame it.
-2. Skye's cursor leaves the orb and goes to the band. Its tag counts the
-   work: "Pier B closed · 0/11 moved".
-3. Skye splits into up to five helper cursors, dots just like its own, and
-   Skye's own dot becomes a live orb (32px, as in the Ask pill) while they
-   work, glowing in the colours of the skye along the bottom of the screen, so
-   it reads as Skye directing them rather than one more hand. A ring round the
+2. Skye's cursor leaves the orb and goes to the middle of the screen, over the
+   band. Its tag counts the work: "Pier B closed · 0/11 moved".
+3. There Skye splits into up to five helpers, small orbs of light, and Skye's
+   own dot becomes a live orb (32px, as in the Ask pill) that stays in the
+   middle of the screen while they work (going back if the window is
+   resized), glowing, so it reads as Skye directing them rather than one more
+   hand. Everything that glows here is one colour, `--agent-cursor-light` in
+   `agent-cursor.css`: by default black on a light page and white on a dark
+   one. The View menu's **Skye glow** row cycles it through Default, Aurora
+   (blue-violet) and Glacier (electric ice-blue). A ring round the
    orb fills as the stays move, a loading bar for the whole job. Solid, glowing
    lines run from the ring to each helper, and more join everyone in
    triangles, a web over the work. Every 2.6 seconds a glowing orb of light
@@ -137,7 +141,7 @@ piece it moved, turn by turn, like moves listed under a chess game
 - **Four dots** while Skye has hold of the piece.
 - **A check** once it lands, if nothing needs a teammate. Your own changes
   need no one's approval, so they show checks straight away.
-- **Fluent's spinner** while a teammate still has to approve it, then a check
+- **A half-dashed circle**, in amber, while a teammate still has to approve it, then a check
   once they have, with their avatar beside it.
 - **An undo arrow** once Skye's changes are undone.
 
@@ -160,7 +164,7 @@ asks: "It's waiting for approval: Travis Hughes for baggage operations
 first, then you. Want me to give Travis a call?" A "yes" calls him (her
 cursor uses the People list), which is the same as pressing **Review with
 baggage**. He looks at the change once he picks up, about 5 seconds later
-(`ANSWER_MS`), and approves 5 seconds after that (`SIGNOFF_MS`). If he's
+(`ANSWER_MS`), and approves 10 seconds after that (`SIGNOFF_MS`), once Skye has briefed him. If he's
 already on the call, the change goes straight to him. This call offer
 replaces any "want me to fix the next thing?" offer in the same reply, so a
 yes means one thing.

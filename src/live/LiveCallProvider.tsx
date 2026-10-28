@@ -23,6 +23,7 @@ import { inviteToCall, removeFromCall as removeGuest } from "./callGuests.ts";
 import { hideSkyeAlerts, showSkyeAlerts } from "../operations/skyeAlerts.ts";
 import { LiveTransport, type TransportHandlers } from "./liveTransport.ts";
 import { buildSnapshot, type OperationsHost, type OpsSnapshot } from "./opsHost.ts";
+import type { AppAction } from "./appActions.ts";
 import type { ExecutorLogEntry } from "./executor.ts";
 import type { TranscriptTurn } from "./transcript.ts";
 import { VoiceMeter } from "../components/luma-skye/voiceMeter";
@@ -52,6 +53,13 @@ export type LiveCallValue = {
    * alone. The stopped request resolves to null and changes nothing.
    */
   cancelTypedRequest: () => void;
+  /** Has Skye say `text` on the call, in her own words; false when no call is connected. */
+  say: (text: string) => boolean;
+  /**
+   * Skye brings something up herself, offering `proposal`: said on a call,
+   * and a yes (said or typed) carries it out.
+   */
+  offer: (text: string, proposal: AppAction) => void;
   /** The caller's microphone while a call holds it. For level meters only. */
   localStream: MediaStream | null;
   /** The agent's audio while a call is up. For level meters only; playback is handled here. */
@@ -241,6 +249,7 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
         try {
           await (action.name === "close_area" ||
           action.name === "fix_all" ||
+          action.name === "resolve_disruption" ||
           (action.name === "assign_stands" && action.assigns.length > 1)
             ? operationsRef.current.runSkyeBatch(() => playAgentGesture(action, signal))
             : playAgentGesture(action, signal));
@@ -319,6 +328,8 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
   const setMuted = React.useCallback((muted: boolean) => void controller.setMuted(muted), [controller]);
   const runTypedRequest = React.useCallback((text: string) => controller.runTypedRequest(text), [controller]);
   const cancelTypedRequest = React.useCallback(() => void controller.cancelTypedRequest(), [controller]);
+  const say = React.useCallback((text: string) => controller.say(text), [controller]);
+  const offer = React.useCallback((text: string, proposal: AppAction) => controller.offer(text, proposal), [controller]);
   const voiceLevel = React.useCallback((speaker: "user" | "agent") => {
     const current = controller.getState();
     if (current.phase !== "connected") return 0;
@@ -351,6 +362,8 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
       resumeAudio,
       runTypedRequest,
       cancelTypedRequest,
+      say,
+      offer,
       localStream,
       remoteStream,
       voiceLevel,
@@ -364,6 +377,8 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
       resumeAudio,
       runTypedRequest,
       cancelTypedRequest,
+      say,
+      offer,
       localStream,
       remoteStream,
       voiceLevel,

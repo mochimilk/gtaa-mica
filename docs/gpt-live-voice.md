@@ -142,6 +142,8 @@ it:
 | `assign_stands` | Gives stands to flights with none (named, or all of them), keeping their stay times: onto a named stand for one flight, otherwise the first free stand that takes each. Says why each flight it cannot place could not be placed. Skye drags each flight out of the Arrivals/Departures list and onto its stand, one at a time, even when asked to place them all; people can drag them the same way |
 | `add_to_call`, `remove_from_call` | Brings a teammate from the people list (Priya Raman, Marcus Chen, Aisha Okafor, Travis Hughes, each with an expertise; `TEAM` in `src/live/callGuests.ts`) into the call, or takes them off. Skye clicks the call window's **Add people** menu (or, off a call, the People list), or the tile's remove button. They only show on the call window; nothing reaches them |
 | `unassign_stands` | Takes flights' stays off their stands, and so off the chart; arrival and departure come off together. Skye clicks each bar, then the popover's **Unassign** |
+| `resolve_disruption` | Clears a late flight's knock-on: Skye's echoes weigh it across the plan, then move the stays it runs into, and the late aircraft keeps its stand. See [disruption-demo.md](disruption-demo.md) |
+| `explain_plan` | Read-only: why that plan is what it is, and what it does to gate hold and stand use |
 
 Stand changes are demo-only. They live in the open page (`src/operations/allocation.ts`):
 nothing is saved or sent, a reload restores the fixture, and the popover's

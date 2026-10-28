@@ -3,6 +3,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { ACTION_KIND, APP_ACTION_NAMES, applyAppAction, isAppActionName, validateAppAction } from "../src/live/appActions.ts";
 import { createFakeHost } from "./support/mocks.ts";
+import { setRunningLate } from "../src/operations/allocation.ts";
+import { landDisruption } from "../src/operations/disruption.ts";
+
+// The plan starts clear; the day's news makes two conflicts. XA103/104 runs
+// 55 minutes late off A1, into XB210/211; and the disruption: XD472/473 is
+// 1h 50m late on B11, and runs into both arrivals behind it.
+setRunningLate("T02-1", 0, 55);
+landDisruption();
 
 test("only allowlisted names are actions, including inherited ones", () => {
   // `"constructor" in ACTION_KIND` is true via Object.prototype; membership

@@ -6,11 +6,12 @@ import {
 } from "@coral-ai/react";
 import { ToolbarDivider, makeStyles, tokens } from "@fluentui/react-components";
 import { AppNavbar } from "./components/navbar";
-import { AppNavRail } from "./components/nav-rail";
+import { AppNavRail, type AppPage } from "./components/nav-rail";
 import { NorvaraLogo } from "./components/navbar/NorvaraLogo";
 import { PanelHeader } from "./components/panel-header";
 import { LeftPanelToggle } from "./components/panel-toggle";
-import { useMemo, useRef } from "react";
+import { DesktopTitleBar } from "./components/title-bar";
+import { useMemo, useRef, useState } from "react";
 import { MINUTE, type DropPreview } from "./stand-timeline";
 import { DEMO_DATA } from "./stand-timeline-demo/demoData";
 import { StandTimelineDemo } from "./stand-timeline-demo/StandTimelineDemo";
@@ -26,6 +27,7 @@ import {
   type NoStandLane,
 } from "./operations/noStandLane";
 import { AlertsMenu } from "./operations/AlertsMenu";
+import { DisruptionNotice } from "./operations/DisruptionNotice";
 import { KpiStrip } from "./operations/KpiStrip";
 import { ClosureBand, ClosureLabel } from "./operations/ClosureBand";
 import { FlightDragChip, FlightDropGhost } from "./operations/FlightDrag";
@@ -40,10 +42,15 @@ import { LiveCallProvider } from "./live";
 import { AgentCursor, AgentHelperCursors } from "./components/agent-cursor";
 import { SkyeGlowDefs } from "./components/skye-glow";
 import { LumaSkyeBackground } from "./components/luma-skye/LumaSkyeBackground";
+import { useDrawings } from "./studio/drawings";
+import { StudioPage } from "./studio/StudioPage";
 
-// Stable ID shared by the left panel and its toggle in the nav rail.
-const OPERATIONS_PANEL_ID = "operations-panel";
-const OPERATIONS_PANEL_LABEL = "operations panel";
+// Each page's left panel: its stable ID, shared with its toggle in the nav
+// rail, and its name in the toggle's label.
+const LEFT_PANELS: Record<AppPage, { id: string; label: string }> = {
+  planner: { id: "operations-panel", label: "operations panel" },
+  studio: { id: "studio-panel", label: "drawings panel" },
+};
 
 /** Bars drag anywhere on the board: to any stand, and along in time in 5-minute steps. */
 const DRAG_SNAP_MS = 5 * MINUTE;
@@ -126,6 +133,8 @@ function ConnectedTimeline() {
   const links = [...linkFor(selection.occupancyIds, false), ...linkFor(skyeSelection.occupancyIds, true)];
   // The board's zoom, shared with its controls in the header's View menu.
   const zoom = useDemoZoom();
+  // Each aircraft type's drawing from the Studio, in the middle of its aircraft's bars.
+  const drawings = useDrawings();
   return (
     <>
       {/* Details show in SelectionPopover, so the demo's own detail strip is hidden here.
@@ -163,6 +172,7 @@ function ConnectedTimeline() {
           summary={<KpiStrip />}
           zoom={zoom}
           flightStyle={flightStyle}
+          drawings={drawings}
         />
       </div>
       <SelectionPopover />
@@ -183,11 +193,19 @@ const useStyles = makeStyles({
     margin: 0,
     borderRight: `1px solid ${tokens.colorNeutralStroke2}`,
   },
+  // The window: the desktop title bar (none in a browser) over the shell.
+  window: {
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+  },
   // Beside the full-height nav rail, the content and app bar column takes the
-  // rest of the width (and may shrink below its content's).
+  // rest of the width (and may shrink below its content's), and the shell's
+  // height under the title bar in place of Coral's 100vh.
   main: {
     flex: "1 1 0",
     minWidth: 0,
+    height: "auto",
   },
   // Coral's content window keeps its glass (its own backdrop-filter value),
   // drawn by a layer behind its content instead of by the window itself. In
@@ -217,65 +235,78 @@ const useStyles = makeStyles({
 
 export default function App() {
   const styles = useStyles();
+  const [page, setPage] = useState<AppPage>("planner");
+  const leftPanel = LEFT_PANELS[page];
   return (
     // OperationsProvider first: the voice session reaches the app through the
     // same selection, views, filters and acknowledgements the UI uses.
     <OperationsProvider>
       <LiveCallProvider>
         <LumaSkyeBackground />
-        {/* The nav rail runs the full height, beside the content and the app bar. */}
-        <CoralShellRow>
-          <AppNavRail
-            actionsEnd={
-              <LeftPanelToggle
-                panelID={OPERATIONS_PANEL_ID}
-                panelLabel={OPERATIONS_PANEL_LABEL}
-                tooltipPositioning="after"
-              />
-            }
-          />
-          <CoralShellColumn className={styles.main}>
-            <CoralShellRow>
-              <Content className={styles.content}>
-                {/* The panel sits inside the content window, beside the timeline. */}
-                <div style={{ display: "flex", flex: "1 1 auto", minHeight: 0, position: "relative" }}>
-                  <Panel.Left panelWidth={320} panelID={OPERATIONS_PANEL_ID} className={styles.panel}>
-                    <PanelHeader logo={<NorvaraLogo />} />
-                    <OperationsPanel />
-                  </Panel.Left>
-                  {/*
-                    Bounded flex host: the timeline fills this height and scrolls its
-                    own rows between pinned rulers. overflowY stays as a fallback for
-                    viewports shorter than the timeline's minimum.
-                  */}
-                  <main
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      minWidth: 0,
-                      boxSizing: "border-box",
-                      flex: "1 1 0",
-                      height: "100%",
-                      minHeight: 0,
-                      overflowY: "auto",
-                    }}
-                  >
-                    <ConnectedTimeline />
-                  </main>
-                  {/* What Skye is changing, at the top right under the board's header, while the Outputs panel is closed. */}
-                  <OutputsPeek />
-                </div>
-              </Content>
-              {/* Beside the content window; its toggle ends the board's header. */}
-              <OutputsPanel />
-            </CoralShellRow>
-
-            <AppNavbar
-              askActionsEnd={<AlertsMenu />}
+        <div className={styles.window}>
+          <DesktopTitleBar />
+          {/* The nav rail runs the full height, beside the content and the app bar. */}
+          <CoralShellRow>
+            <AppNavRail
+              page={page}
+              onNavigate={setPage}
+              actionsEnd={
+                <LeftPanelToggle
+                  panelID={leftPanel.id}
+                  panelLabel={leftPanel.label}
+                  tooltipPositioning="after"
+                />
+              }
             />
+            <CoralShellColumn className={styles.main}>
+              <CoralShellRow>
+                <Content className={styles.content}>
+                  {page === "studio" ? (
+                    <StudioPage panelID={leftPanel.id} panelClassName={styles.panel} />
+                  ) : (
+                    /* The panel sits inside the content window, beside the timeline. */
+                    <div style={{ display: "flex", flex: "1 1 auto", minHeight: 0, position: "relative" }}>
+                      <Panel.Left panelWidth={320} panelID={leftPanel.id} className={styles.panel}>
+                        <PanelHeader logo={<NorvaraLogo />} />
+                        <OperationsPanel />
+                      </Panel.Left>
+                      {/*
+                        Bounded flex host: the timeline fills this height and scrolls its
+                        own rows between pinned rulers. overflowY stays as a fallback for
+                        viewports shorter than the timeline's minimum.
+                      */}
+                      <main
+                        style={{
+                          display: "flex",
+                          flexDirection: "column",
+                          minWidth: 0,
+                          boxSizing: "border-box",
+                          flex: "1 1 0",
+                          height: "100%",
+                          minHeight: 0,
+                          overflowY: "auto",
+                        }}
+                      >
+                        <ConnectedTimeline />
+                      </main>
+                      {/* What Skye is changing, at the top right under the board's header, while the Outputs panel is closed. */}
+                      <OutputsPeek />
+                    </div>
+                  )}
+                </Content>
+                {/* Beside the content window; its toggle ends the board's header. */}
+                {page === "planner" && <OutputsPanel />}
+              </CoralShellRow>
 
-          </CoralShellColumn>
-        </CoralShellRow>
+              <AppNavbar
+                askActionsEnd={<AlertsMenu />}
+                // Skye catching the day's disruption (see docs/disruption-demo.md).
+                askNotices={page === "planner" ? <DisruptionNotice /> : undefined}
+              />
+
+            </CoralShellColumn>
+          </CoralShellRow>
+        </div>
         {/* Skye's own cursor, shown while Skye clicks things in the app. */}
         <AgentCursor name="Skye" />
         {/* The cursors Skye splits into to work on several things at once. */}

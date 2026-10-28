@@ -878,7 +878,8 @@ export interface BarLabelSlot {
    * Optional host HTML drawn in place of the slot's text and icons, e.g. a
    * design-system tag. It sits in a <foreignObject> `height` px tall,
    * vertically centred and aligned like the slot's text; the chart never
-   * styles it. Fitting counts `primary` plus `padding` px. It is never
+   * styles it. Fitting counts `primary` plus `padding` px, so HTML with no
+   * text (e.g. a picture) may have an empty `primary`. It is never
    * truncated: when it does not fit whole, it is left out.
    */
   html?: BarLabelHtml;
@@ -933,6 +934,8 @@ export interface BarLabelsProps {
   iconGap?: number;
   /** Horizontal margin on both sides of each icon, inside its reserved block, px. */
   iconMargin?: number;
+  /** Space between each end of a bar and its labels, px, in from where a shaped end begins, as from a round one. */
+  padding?: number;
 }
 
 interface PlacedSlot {
@@ -982,7 +985,7 @@ export function layoutLabelSlots(
   gap: number,
   icon: SlotIconMetrics = { size: 16, gap: 3 },
 ): PlacedSlot[] {
-  const names = order.filter((n) => slots[n]?.primary);
+  const names = order.filter((n) => slots[n]?.primary || slots[n]?.html);
   const textOf = (s: BarLabelSlot) => {
     // Host HTML replaces the text and icons, so it has no second line or icon widths.
     if (s.html) return { primary: s.primary, html: s.html, leadW: 0, trailW: 0 };
@@ -1063,6 +1066,7 @@ export function BarLabels({
   iconSize = 16,
   iconGap = 3,
   iconMargin = 0,
+  padding = 5,
 }: BarLabelsProps) {
   const region = useTimelineRegion();
   const { bars, hover: hoverStore } = useTimeline();
@@ -1080,9 +1084,9 @@ export function BarLabels({
           if (!raw) return null;
           barSlots = { start: { primary: raw } };
         }
-        // 5px in from the bar's end, or from where a shaped end begins, as from a round one.
-        const padLeft = 5 + barEndDepth(bar.ends.start, bar.height);
-        const padRight = 5 + barEndDepth(bar.ends.end, bar.height);
+        // `padding` in from the bar's end, or from where a shaped end begins, as from a round one.
+        const padLeft = padding + barEndDepth(bar.ends.start, bar.height);
+        const padRight = padding + barEndDepth(bar.ends.end, bar.height);
         const w = bar.width - padLeft - padRight;
         if (w <= 0) return null;
         const twoLines = bar.height >= 2 * linePitch;

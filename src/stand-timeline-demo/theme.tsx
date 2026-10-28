@@ -2,12 +2,7 @@
 // FluentProvider, so light/dark and brand follow the app) onto the neutral
 // chart's --st-* variables and per-bar accessors. The chart never imports Fluent.
 import type { CSSProperties } from "react";
-import { Badge, tokens } from "@fluentui/react-components";
-import {
-  ArrowCircleLeftRegular,
-  ArrowCircleRightRegular,
-  VehicleTruckProfileRegular,
-} from "@fluentui/react-icons";
+import { tokens } from "@fluentui/react-components";
 import {
   DefaultBar,
   HOUR,
@@ -29,7 +24,9 @@ import {
 import type { StayDelay, StayEndpoints, StayPosition } from "./adapter";
 import { airportLabel } from "./airports";
 import { GHOST_SIDES, formatDelay, ghostKey, ghostMs, type GhostClashes } from "./delays";
-import { AIRCRAFT_SIZE, type StandSize, type SyntheticTurn } from "./syntheticFixture";
+import type { SyntheticTurn } from "./syntheticFixture";
+import type { Pixels } from "../studio/drawings";
+import { PixelArt } from "../studio/PixelArt";
 
 /** Chart theme: typography, spacing, strokes and neutral colours from Fluent tokens. */
 export const fluentChartTheme = {
@@ -88,7 +85,7 @@ export const fluentChartTheme = {
  *   healthy: neutral glass, so the board stays quiet and Skye's purple (her
  *     cursors' aura, her selections) stands out on it: faint white, fading
  *     left to right as the coloured bars do, over the blurred grid (BarBackdrop), inside
- *     Fluent's Stroke 1 at rest; the size tag says narrowbody or widebody,
+ *     Fluent's Stroke 1 at rest,
  *   conflict: red, a late stay whose delay runs into another stay on its
  *     stand (the clashes the Alerts list as conflicts; see ./delays),
  *   waiting: orange, a stay with no stand, in the No stand lane.
@@ -148,14 +145,14 @@ export const BAR_BACKDROP_SATURATE = 1.8;
  */
 const HATCH_OPACITY = 0.3;
 /**
- * The aircraft type in a bar's middle (Figma GTAA-Dash 151:3938), px, for
- * fitting: a 4px gap, then the two-letter size tag with its 6px insets and
- * border. The type itself counts as its characters.
+ * An aircraft type's drawing in its bars' middle, px square. Between the
+ * sizes where each of its pixels is a whole number of device pixels (9px,
+ * 18px at 1x), so at some display scales a row or column of its pixels
+ * comes out a device pixel wider than the rest.
  */
-const TYPE_CHIP = { height: 20, gap: 4, sizeTag: 32 };
-
-/** The size tag: narrowbody or widebody. */
-const SIZE_TAG: Record<StandSize, string> = { narrow: "NB", wide: "WB" };
+const DRAWING_SIZE = 14;
+/** Room, px, on each side of the drawing for its glow (demo.css), which the bar's label box would clip. */
+const DRAWING_GLOW = 3;
 
 export const STATUS_PALETTE: Record<FlightStatus, StatusPalette> = {
   healthy: GLASS,
@@ -208,16 +205,15 @@ export function DemoPatternDefs() {
   );
 }
 
-// Tow endpoint wording, used on the bar and in its description. The truck is a
-// provisional demo icon, not an established allocator symbol.
+// Tow endpoint wording, used on the bar and in its description.
 const TOW_IN = "Tow-in";
 const TOW_OUT = "Tow-out";
 
 /**
  * How flights are drawn, on the board and in the flight card, as chosen in
- * the View menu's Timeline row. Aero, the default, is the original look,
- * every end round, with the arrival, departure and tow icons; Classic shapes
- * each end of a bar by what happens there (END_SHAPE) and leaves the icons out.
+ * the View menu's Timeline row. Each shapes the ends of a bar by what happens
+ * there (END_SHAPE): Aero, the default, rounds a flight's; Classic tapers
+ * them. Both zigzag a tow's, and neither draws icons.
  */
 export type FlightStyle = "classic" | "aero";
 
@@ -225,22 +221,28 @@ export type FlightStyle = "classic" | "aero";
 export const FLIGHT_STYLE_LABEL: Record<FlightStyle, string> = { classic: "Classic", aero: "Aero" };
 
 /**
- * In classic, each end of a stay's bar, by what happens there: a flight
- * tapers it, its arrival to the left and its departure to the right; a tow
- * zigzags it; with neither it stays round. The flight card's box takes the
- * same shape.
+ * Each end of a stay's bar, by what happens there: a flight rounds it in aero
+ * and tapers it in classic, its arrival to the left and its departure to the
+ * right; a tow zigzags it in both; with neither it stays round. The flight
+ * card's box takes the same shape.
  */
-export const END_SHAPE: Record<StayEndpoints["start"]["kind"], BarEndShape> = {
-  flight: "taper",
-  tow: "zigzag",
-  none: "round",
+export const END_SHAPE: Record<FlightStyle, Record<StayEndpoints["start"]["kind"], BarEndShape>> = {
+  aero: { flight: "round", tow: "zigzag", none: "round" },
+  classic: { flight: "taper", tow: "zigzag", none: "round" },
 };
 
-/** A stay's end shapes, from its recorded endpoints; round where there are none. */
-export const stayEnds = (ep: StayEndpoints | undefined): BarEnds => ({
-  start: END_SHAPE[ep?.start.kind ?? "none"],
-  end: END_SHAPE[ep?.end.kind ?? "none"],
+/** A stay's end shapes in a style, from its recorded endpoints; round where there are none. */
+export const stayEnds = (ep: StayEndpoints | undefined, style: FlightStyle): BarEnds => ({
+  start: END_SHAPE[style][ep?.start.kind ?? "none"],
+  end: END_SHAPE[style][ep?.end.kind ?? "none"],
 });
+
+/**
+ * Space between a bar's end and its labels, px, in from where a shaped end
+ * begins (BarLabels' padding): aero's round ends keep its text well clear of
+ * the curve; classic's taper already does.
+ */
+export const LABEL_PADDING: Record<FlightStyle, number> = { aero: 8, classic: 5 };
 
 /**
  * @param delays How late each running-late stay is; drawn as ghosts.
@@ -262,10 +264,9 @@ export function makeDemoAccessors(
   skyeIds: ReadonlySet<string> = new Set(),
   /** Rows of stays waiting for a stand (the chart's pinned rows), described as waiting rather than by stand. */
   waitingRows: ReadonlySet<string> = new Set(),
-  /** Aero labels a bar's ends with icons; classic leaves them out. */
-  flightStyle: FlightStyle = "aero",
+  /** Each aircraft type's drawing from the Studio, by type; drawn in the middle of the bars of every aircraft of it. */
+  drawings: ReadonlyMap<string, Pixels> = new Map(),
 ) {
-  const icons = flightStyle === "aero";
   const turnOf = (bar: BarDatum) =>
     bar.occupancy.visitId ? turnsById.get(bar.occupancy.visitId) : undefined;
   /** A stay's flights, e.g. "XB210/211", or the one flight of a one-flight visit. */
@@ -318,17 +319,16 @@ export function makeDemoAccessors(
   };
 
   /*
-   * Allocator label arrangement: inbound flight over origin (left),
-   * aircraft type (centre), outbound flight over destination (right).
+   * Allocator label arrangement: inbound flight over origin (left), the
+   * aircraft type's drawing (centre), outbound flight over destination (right).
    * Each side shows exactly the stay's recorded endpoint (see adapter
    * `endpoints`): a flight (flight over route endpoint), an explicit tow
    * ("Tow-in"/"Tow-out"), or nothing. A missing flight never produces a tow
-   * marker. In aero, a circle arrow or truck sits beside the whole text
-   * stack; icons are decorative, and `describe` (the accessible name) carries
-   * the meaning.
-   * The centre is the aircraft type (typeSlot), with its size class, rather
-   * than the registration, since stand fit depends on
-   * type; the registration is in the accessible name and the selection details.
+   * marker. The bar's end shapes (END_SHAPE) are decorative; `describe` (the
+   * accessible name) carries the meaning.
+   * The centre is the aircraft type's drawing from the Studio (drawingSlot),
+   * empty when it has none; the type itself and the registration are in the
+   * accessible name and the selection details.
    * Dimmed bars keep the same labels in the muted --flight-dim-text colour.
    */
   const labelSlots = (bar: BarDatum): BarLabelSlots | undefined => {
@@ -339,51 +339,37 @@ export function makeDemoAccessors(
     return {
       start:
         s.kind === "flight"
-          ? {
-              primary: s.flight,
-              secondary: s.origin,
-              leading: icons ? <ArrowCircleLeftRegular aria-hidden /> : undefined,
-            }
+          ? { primary: s.flight, secondary: s.origin }
           : s.kind === "tow"
-            ? { primary: TOW_IN, leading: icons ? <VehicleTruckProfileRegular aria-hidden /> : undefined }
+            ? { primary: TOW_IN }
             : undefined,
-      center: t.aircraftType ? typeSlot(bar, t.aircraftType) : undefined,
+      center: drawingSlot(bar, drawings.get(t.aircraftType)),
       end:
         e.kind === "flight"
-          ? {
-              primary: e.flight,
-              secondary: e.destination,
-              trailing: icons ? <ArrowCircleRightRegular aria-hidden /> : undefined,
-            }
+          ? { primary: e.flight, secondary: e.destination }
           : e.kind === "tow"
-            ? { primary: TOW_OUT, trailing: icons ? <VehicleTruckProfileRegular aria-hidden /> : undefined }
+            ? { primary: TOW_OUT }
             : undefined,
     };
   };
 
   /**
-   * The aircraft type in the middle (Figma GTAA-Dash 151:3938, less its
-   * emblem, which the flight card shows instead): the type, then its size
-   * class as a small Fluent Badge ("NB"/"WB"), 4px apart. Short of room it
-   * sheds the size tag first and keeps the type (the slot's `narrower` form).
-   * On a dimmed bar both take the dimmed bar's muted colours.
+   * The aircraft type's drawing in the middle, at DRAWING_SIZE, glowing a
+   * little; none when it has none. The first label a bar too short sheds.
+   * One colour, its labels' (demo.css), muted on a dimmed bar as they are.
    */
-  const typeSlot = (bar: BarDatum, type: string): BarLabelSlot => {
-    const size = AIRCRAFT_SIZE[type];
-    const chip = (showSize: boolean) => (
-      <span className={isDimmed(bar) ? "demo-type demo-type--dimmed" : "demo-type"}>
-        <span className="demo-type-name">{type}</span>
-        {showSize && size && (
-          <Badge size="small" shape="rounded" className="demo-type-size">
-            {SIZE_TAG[size]}
-          </Badge>
-        )}
-      </span>
-    );
-    const { height, gap, sizeTag } = TYPE_CHIP;
-    const typeOnly = { primary: type, html: { node: chip(false), height, padding: 0 } };
-    if (!size) return typeOnly;
-    return { primary: type, html: { node: chip(true), height, padding: gap + sizeTag }, narrower: [typeOnly] };
+  const drawingSlot = (bar: BarDatum, pixels: Pixels | undefined): BarLabelSlot | undefined => {
+    if (!pixels) return undefined;
+    const className = isDimmed(bar) ? "demo-drawing demo-drawing--dimmed" : "demo-drawing";
+    const node = <PixelArt pixels={pixels} size={DRAWING_SIZE} className={className} />;
+    return {
+      primary: "",
+      html: {
+        node,
+        height: DRAWING_SIZE + 2 * DRAWING_GLOW,
+        padding: DRAWING_SIZE + 2 * DRAWING_GLOW,
+      },
+    };
   };
 
   const labelColor = (bar: BarDatum) => (isDimmed(bar) ? "var(--flight-dim-text)" : "var(--st-text)");
@@ -484,14 +470,10 @@ export function makeDemoAccessors(
  * (fontSizeBase200 = 12px). Use a conservative width for the synthetic uppercase
  * identifiers; Fluent semibold glyphs are wider than the old 7px average.
  */
-// iconMargin 2 = Fluent spacingHorizontalXXS (2px); SVG geometry needs the number.
 export const LABEL_METRICS = {
   charWidth: 9,
   linePitch: 14,
   slotGap: 8,
-  iconSize: 16,
-  iconGap: 3,
-  iconMargin: 2,
 };
 export const ROW_HEIGHT = 40;
 export const BAR_INSET = 3;

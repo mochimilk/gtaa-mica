@@ -41,7 +41,7 @@ There are three ways to customize it:
    - `BarLabels.slots` returns `start`, `center` and `end` slots, each with a primary line and an optional second line. A second line is shown only when the bar is at least 2 × `linePitch` tall.
    - When space is short, the longest prefix of `priority` that fits without truncation is shown. Otherwise only the first slot is shown, truncated with an ellipsis; if not even that fits, nothing is shown.
    - A slot can carry decorative `leading` or `trailing` icons: any SVG node sized at 1em. They are vertically centred beside the whole text stack, sized by `iconSize`, and inset by `iconMargin` on both sides. Each icon counts as `iconMargin + iconSize + iconMargin + iconGap` toward the fit. An icon is only ever shown together with its text.
-   - A slot can instead carry host HTML in `html` (e.g. a design-system tag), drawn in a `<foreignObject>` of the given `height` in place of its text and icons. It fits as `primary` plus `padding` px and is left out, never truncated, when it does not fit.
+   - A slot can instead carry host HTML in `html` (e.g. a design-system tag), drawn in a `<foreignObject>` of the given `height` in place of its text and icons. It fits as `primary` plus `padding` px, so HTML with no text (e.g. a picture) may leave `primary` empty, and is left out, never truncated, when it does not fit.
    - A slot can list `narrower` forms of itself, widest first (e.g. the same tag with fewer parts). When it is the lowest-priority slot shown and does not fit, each form is tried before the slot is left out.
    - Bars are rounded rectangles unless `barEnds` shapes their ends (see [Bar shapes](#bar-shapes)). Clipping at the window edge is described in text through `describeClipping(bar)`.
    - Slots never overlap, and each is clipped to its own width. Full details belong in `describe`, which supplies the accessible name. Bars have no hover tooltip; the host shows details on selection.
@@ -51,9 +51,9 @@ There are three ways to customize it:
 
 ## Bar shapes
 
-`barRadius` (3px by default) rounds the bars' corners. `barEnds={(occupancy) => ({ start, end })}` shapes each end: `"round"` (the default), `"taper"` (to a point at mid-height) or `"zigzag"`. What a shape means is the host's choice; the demo tapers a flight's end and zigzags a tow's. The shapes scale with the bar's height and never reach past its middle. An end cut off at the window's edge is drawn round, since what it marks is out of view. The chart resolves both into `bar.ends`.
+`barRadius` (3px by default) rounds the bars' corners. `barEnds={(occupancy) => ({ start, end })}` shapes each end: `"round"` (the default), `"taper"` (to a point at mid-height) or `"zigzag"`. What a shape means is the host's choice; the demo zigzags a tow's end in both its flight styles, and tapers a flight's in classic. The shapes scale with the bar's height and never reach past its middle. An end cut off at the window's edge is drawn round, since what it marks is out of view. The chart resolves both into `bar.ends`.
 
-Everything drawn in a bar's shape follows it: the bar, its selection outline (grown 1.5px all round, with parallel edges), its backdrop, the drop ghost and the cut-out under a delay ghost. Labels keep 5px in from where a shaped end begins, as from a round end. To draw the same shape elsewhere at any size (a card, say), use `barPath(box, ends, radius, outset?)`, which returns an SVG path.
+Everything drawn in a bar's shape follows it: the bar, its selection outline (grown 1.5px all round, with parallel edges), its backdrop, the drop ghost and the cut-out under a delay ghost. Labels keep `BarLabels.padding` (5px by default) in from where a shaped end begins, as from a round end. To draw the same shape elsewhere at any size (a card, say), use `barPath(box, ends, radius, outset?)`, which returns an SVG path.
 
 ## Bar link
 

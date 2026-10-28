@@ -89,6 +89,8 @@ export const INTERPRETER_ACTION_NAMES = [
   "add_to_call",
   "remove_from_call",
   "fix_all",
+  "resolve_disruption",
+  "explain_plan",
   "suggest_move",
 ];
 
@@ -142,7 +144,7 @@ export const MICA_ACTION_SCHEMA = {
       properties: {
         flightId: {
           type: ["string", "null"],
-          description: 'A flight id: the part before " — " in an allowed_flights entry (for example "T02-ARR"), never the flight number.',
+          description: 'A flight id: the part before " — " in an allowed_flights entry (for example "T02-ARR"), never the flight number. resolve_disruption: the late flight, or null for the one the disruption notice is about.',
         },
         flightIds: {
           type: ["array", "null"],
@@ -214,6 +216,7 @@ export const INTERPRETER_INSTRUCTIONS = [
   'When the user asks to unassign, deallocate or release the stand of a flight, or take a flight off its stand or off the chart, use unassign_stands with its flightIds; its whole stay comes off, arrival and departure together. To clear a stand, use the flights on it from allowed_flights.',
   'When the user says a stand area (a pier such as "Pier B", or "Remote") is closed, shut, unavailable or must be emptied, optionally for a time window, use close_area: Mica closes the area and moves every stay on it in that window to free stands elsewhere, working on several at once. Give area exactly as in allowed_stands, and from and to as UTC HH:MM in 24-hour time, reading hours as the working day ("9 to 1" is 09:00 to 13:00); use null for an end the user did not give.',
   "A stand change moves a whole stay, and one stay usually carries both an arrival and a departure (XA103 arrives and XA104 departs from the same stay). So for move_stay, swap_stays and suggest_move, use the flight id of the flight number the user said, whichever direction it is, and never ask whether they mean the arrival or the departure.",
+  'When a flight is running late and its turn runs into the stays behind it on its stand (a disruption; open_alerts lists it as a conflict), and the user asks Mica to resolve, fix, handle, re-plan or work it ("resolve the XD472 disruption", "fix the late arrival", "deal with the knock-on"), use resolve_disruption with that late flight\'s flightId, or null for the one Mica raised. Mica weighs it across the plan and moves the stays it runs into, keeping the late aircraft on its stand. When the user then asks why the plan is what it is, what it changes or costs, or how it compares ("why not move XD472 instead?", "what\'s the impact?"), use explain_plan.',
   'When the user asks Mica to find, suggest or recommend a move or swap (for example "the best swap", "a better stand for XA101"), use suggest_move, with flightId for one flight or null for the whole board. Never choose move_stay or swap_stays for such a request: the suggestion is read back and the user decides.',
   'When the last entry in recent_tasks has a proposal and the user confirms it ("yes", "do it", "go ahead"), choose exactly that proposal\'s action and arguments. If they decline or ask for something else, do not carry it out.',
   `To bring someone into the call ("add Marcus Chen to the call", "get Priya on", "loop in Aisha", "call Marcus"), use add_to_call with person copied from allowed_people; a first name is enough when it names one person there. To take someone off ("drop Marcus", "remove Priya from the call"), use remove_from_call. People only show on Mica's call window; nothing reaches them, so these are never unsupported. Someone not in allowed_people cannot be added: use unclear, naming who can be. on_call lists who is on already; calling lists who is being called and has not answered yet (remove_from_call stops calling them).`,

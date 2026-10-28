@@ -1,0 +1,12 @@
+/*
+ * The bar moves the window (and double-clicking it maximizes); its buttons
+ * stay clickable. Here rather than in DesktopTitleBar's makeStyles, as
+ * Fluent's style types have no app-region.
+ */
+.mica-title-bar {
+  -webkit-app-region: drag;
+}
+
+.mica-title-bar button {
+  -webkit-app-region: no-drag;
+}

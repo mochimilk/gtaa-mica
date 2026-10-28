@@ -23,11 +23,18 @@ import {
   type StandAssign,
 } from "./allocation";
 import type { OpsAlert } from "./boardAlerts";
+import { planDisruption, planKnockOn } from "./disruption";
 import { OPS_FLIGHTS_BY_ID } from "./operationsData";
 
 export type AlertFix =
   /** Move a stay (named by one of its flights) to another stand, keeping its times. */
   | { kind: "move"; stayId: string; flightId: string; fromStand: string; standId: string }
+  /**
+   * Move every stay a late stay runs into (its knock-on, see planKnockOn),
+   * when no one move clears it; the late stay, named by its flight, keeps
+   * its stand.
+   */
+  | { kind: "knock_on"; stayId: string; flightId: string; moves: AreaMove[] }
   /** Give a flight with no stand its first free stand. */
   | { kind: "assign"; stayId: string; flightId: string; standId: string };
 
@@ -43,10 +50,10 @@ function conflictFix(alert: OpsAlert): AlertFix | null {
   if (!conflict) return null;
   const before = ghostClashes(DEMO_DATA.occupancies, DEMO_DATA.delays).size;
   const key = ghostKey(conflict.stayId, conflict.side);
-  for (const stayId of [...conflict.intoIds, conflict.stayId]) {
+  const moveOne = (stayId: string): AlertFix | null => {
     const stay = occupancyById(stayId);
     const flight = flightsAtStay(stayId)[0];
-    if (!stay || !flight) continue;
+    if (!stay || !flight) return null;
     const area = standArea(stay.rowId);
     const nearestFirst = [...SYNTHETIC_STANDS].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
     for (const stand of nearestFirst) {
@@ -56,8 +63,23 @@ function conflictFix(alert: OpsAlert): AlertFix | null {
         return { kind: "move", stayId, flightId: flight.id, fromStand: stay.rowId, standId: stand.code };
       }
     }
+    return null;
+  };
+  // What it runs into, one at a time; then all of it, the late aircraft
+  // keeping its stand; and the late aircraft only when nothing else clears it.
+  for (const stayId of conflict.intoIds) {
+    const fix = moveOne(stayId);
+    if (fix) return fix;
   }
-  return null;
+  const late = flightsAtStay(conflict.stayId);
+  if (conflict.intoIds.length > 1 && late.length > 0) {
+    const knockOn = planDisruption(conflict.stayId);
+    if (knockOn.stuck.length === 0 && knockOn.moves.length > 0) {
+      const flight = late.find((entry) => entry.direction === (conflict.side === "start" ? "arrival" : "departure")) ?? late[0];
+      return { kind: "knock_on", stayId: conflict.stayId, flightId: flight.id, moves: knockOn.moves };
+    }
+  }
+  return moveOne(conflict.stayId);
 }
 
 /** Everything "fix it all" will do, planned against the board as it is, before anything moves. */
@@ -91,16 +113,26 @@ export function planFixAll(alerts: readonly OpsAlert[], scope: "all" | "conflict
   const left: FixAllPlan["left"] = [];
   let conflictsCleared = 0;
 
+  /** Plans `stayId` onto `standId` on the board copy. */
+  const plan = (stayId: string, standId: string) => {
+    const stay = byId.get(stayId);
+    if (!stay) return;
+    const live = occupancyById(stayId);
+    const from = moved.get(stayId) ?? { occupancyId: stayId, fromStand: live?.rowId ?? stay.rowId, fromStart: stay.start, standId, shiftMs: 0 };
+    moved.set(stayId, { ...from, standId });
+    stay.rowId = standId;
+  };
+
   for (const alert of alerts) {
     if (alert.kind !== "conflict" || !alert.conflict) continue;
     const key = ghostKey(alert.conflict.stayId, alert.conflict.side);
     const now = ghostClashes(board, DEMO_DATA.delays);
     // Cleared already, by an earlier fix.
     if (!now.has(key)) continue;
-    let fixed = false;
-    for (const stayId of [...alert.conflict.intoIds, alert.conflict.stayId]) {
+    /** One stay moved to the nearest free stand that clears the conflict on its own. */
+    const moveOne = (stayId: string): boolean => {
       const stay = byId.get(stayId);
-      if (!stay || fixed) continue;
+      if (!stay) return false;
       const area = standArea(stay.rowId);
       const nearestFirst = [...SYNTHETIC_STANDS].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
       for (const stand of nearestFirst) {
@@ -117,16 +149,30 @@ export function planFixAll(alerts: readonly OpsAlert[], scope: "all" | "conflict
           DEMO_DATA.delays,
         );
         if (after.has(key) || after.size >= now.size) continue;
-        const live = occupancyById(stayId);
-        const from = moved.get(stayId) ?? { occupancyId: stayId, fromStand: live?.rowId ?? stay.rowId, fromStart: stay.start, standId: stand.code, shiftMs: 0 };
-        moved.set(stayId, { ...from, standId: stand.code });
-        stay.rowId = stand.code;
-        conflictsCleared += 1;
-        fixed = true;
-        break;
+        plan(stayId, stand.code);
+        return true;
       }
-    }
-    if (!fixed) left.push({ alertId: alert.id, reason: `The ${alert.conflict.standId} conflict has no free stand that clears it.` });
+      return false;
+    };
+    /**
+     * A late stay running into several: each of them moved (the knock-on;
+     * see planKnockOn), so the late aircraft can still keep its stand.
+     */
+    const moveAllInto = (): boolean => {
+      const trial = board.map((o) => ({ ...o }));
+      const knockOn = planKnockOn(alert.conflict!.stayId, trial);
+      const after = ghostClashes(trial, DEMO_DATA.delays);
+      if (knockOn.stuck.length > 0 || knockOn.moves.length === 0 || after.has(key) || after.size >= now.size) return false;
+      for (const move of knockOn.moves) plan(move.occupancyId, move.standId);
+      return true;
+    };
+    // What it runs into first, one at a time, then all of them, and the late aircraft only when nothing else clears it.
+    const fixed =
+      alert.conflict.intoIds.some(moveOne) ||
+      (alert.conflict.intoIds.length > 1 && moveAllInto()) ||
+      moveOne(alert.conflict.stayId);
+    if (fixed) conflictsCleared += 1;
+    else left.push({ alertId: alert.id, reason: `The ${alert.conflict.standId} conflict has no free stand that clears it.` });
   }
 
   const assigns: StandAssign[] = [];

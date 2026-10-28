@@ -9,7 +9,7 @@
 // there is nothing to list the toggle is greyed out and an open panel closes.
 // While it is closed, the request Skye is on peeks out under the header
 // (OutputsPeek).
-import { useEffect, useMemo, useSyncExternalStore } from "react";
+import { Fragment, useEffect, useMemo, useSyncExternalStore } from "react";
 import { Panel, eventBus, useCoralAuth } from "@coral-ai/react";
 import { Avatar, Caption1, makeStyles, tokens } from "@fluentui/react-components";
 import { Branch20Filled, Branch20Regular, bundleIcon, createFluentIcon } from "@fluentui/react-icons";
@@ -17,7 +17,7 @@ import { skyeOrbStill } from "../components/orb";
 import { RightPanelToggle } from "../components/panel-toggle";
 import { flightsAtStay } from "./allocation";
 import { selectedFlight, useOperations } from "./OperationsContext";
-import type { OutputActor, OutputRequest, OutputStep } from "./outputs";
+import { describeApprovers, formatLogTime, type OutputActor, type OutputDecision, type OutputRequest, type OutputStep } from "./outputs";
 import { OutputsApproval } from "./OutputsApproval";
 import { OUTPUT_ICON_GAP, OutputSteps, RequestMeta, useOutputs } from "./OutputSteps";
 import { revealRect } from "./SelectionPopover";
@@ -114,6 +114,34 @@ const useStyles = makeStyles({
   content: {
     overflowY: "hidden",
   },
+  // An approved request's log, under its pieces: who approved it and when,
+  // then each figure before and after, the better ones in the success colour.
+  decision: {
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalXXS,
+    margin: `${tokens.spacingVerticalXS} ${tokens.spacingHorizontalS} ${tokens.spacingVerticalS}`,
+    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalM}`,
+    borderRadius: tokens.borderRadiusMedium,
+    border: `1px solid ${tokens.colorNeutralStroke2}`,
+    backgroundColor: tokens.colorNeutralBackground2,
+  },
+  decisionBy: {
+    color: tokens.colorNeutralForeground2,
+  },
+  decisionFigures: {
+    display: "grid",
+    gridTemplateColumns: "auto 1fr",
+    columnGap: tokens.spacingHorizontalM,
+    margin: 0,
+    fontVariantNumeric: "tabular-nums",
+    "& dt": { color: tokens.colorNeutralForeground3 },
+    "& dd": { margin: 0, color: tokens.colorNeutralForeground1 },
+  },
+  better: {
+    color: tokens.colorStatusSuccessForeground1,
+    fontWeight: tokens.fontWeightSemibold,
+  },
   requests: {
     display: "flex",
     flexDirection: "column",
@@ -203,6 +231,32 @@ function RequestLabel({ request }: { request: OutputRequest }) {
   );
 }
 
+/** An approved request's logged decision (see skyeReview's approveSkyeChanges). */
+function DecisionLog({ decision }: { decision: OutputDecision }) {
+  const styles = useStyles();
+  return (
+    <section className={styles.decision} aria-label="Decision log">
+      <Caption1 className={styles.decisionBy}>
+        Approved {formatLogTime(decision.at)} by {describeApprovers(decision.by)}
+      </Caption1>
+      <dl className={styles.decisionFigures}>
+        {decision.figures.map((figure) => (
+          <Fragment key={figure.label}>
+            <dt>
+              <Caption1>{figure.label}</Caption1>
+            </dt>
+            <dd>
+              <Caption1>
+                {figure.before} → <span className={figure.better ? styles.better : undefined}>{figure.after}</span>
+              </Caption1>
+            </dd>
+          </Fragment>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
 /**
  * Opens and closes the Outputs panel, subtle as the Filters and Views beside
  * it; greyed out while there is nothing to list. Its icon is the panel's.
@@ -282,6 +336,7 @@ export function OutputsPanel() {
               onOpen={openStep}
               selectedStayIds={selectedStayIds}
             />
+            {request.decision && <DecisionLog decision={request.decision} />}
           </Panel.NavGroup>
         ))}
       </div>

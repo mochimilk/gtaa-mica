@@ -30,8 +30,9 @@ const STATUS_LABEL: Record<OutputStatus, string> = {
 
 /**
  * The spinner's state for each piece's: the dots while Skye has hold of it,
- * Fluent's Spinner only while a teammate still has to approve it, and the
- * check once Skye's part is done; an undone one has its own icon, boxed the same.
+ * the half hint circle in the warning colour only while a teammate still has
+ * to approve it, and the check once Skye's part is done; an undone one has
+ * its own icon, boxed the same.
  */
 const STEP_STATUS: Record<Exclude<OutputStatus, "undone">, TaskStepStatus> = {
   working: "in-progress",

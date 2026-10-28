@@ -3,8 +3,8 @@
  * dark outline in dark mode), softly glowing. It starts as the orb's
  * thinking dots in the Ask pill, which pull together into the one dot on its
  * way out, and it grows back into the orb when it returns. While its helpers
- * work, it is a live orb itself, the pill orb's size, in the skye's glow.
- * Left idle, its name tag dims and the dot breathes, easing smaller and back.
+ * work, it is a live orb itself, the pill orb's size, in the skye's glow, and
+ * they are small orbs of its light. Left idle, its name tag dims and the dot breathes, easing smaller and back.
  * The element's origin is the click point; the dot is centred on it.
  *
  * The dot is never scaled. Each state sets its diameter (--agent-cursor-dot),
@@ -44,6 +44,14 @@
   /* One of the orb's thinking dots: r 3 in StepStatusIcon's 20px box (the script scales it to the spinner's size). */
   --agent-cursor-swarm-size: 6px;
   --agent-cursor-morph: 360ms cubic-bezier(0.2, 0, 0, 1);
+  /*
+   * The colour of everything that glows while Skye's helpers work (her orb's
+   * glow and the ring round it, the helpers, the tethers and the light along
+   * them), as channels; change it here. By default it is ink, the dot's own
+   * black, white over a dark page; the View menu's Skye glow (skyeGlow.ts)
+   * picks another (below).
+   */
+  --agent-cursor-light: 27, 27, 31;
 
   position: fixed;
   inset: 0;
@@ -58,6 +66,26 @@
     --agent-cursor-ring: #1b1b1f;
     --agent-cursor-ink: #1b1b1f;
     --agent-cursor-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    --agent-cursor-light: 255, 255, 255;
+  }
+}
+
+/* The other Skye glows (skyeGlow.ts): Aurora, the northern lights' blue-violet; Glacier, an electric ice-blue. */
+:root[data-skye-glow="aurora"] .agent-cursor-layer {
+  --agent-cursor-light: 92, 64, 224;
+}
+
+:root[data-skye-glow="glacier"] .agent-cursor-layer {
+  --agent-cursor-light: 0, 140, 190;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-skye-glow="aurora"] .agent-cursor-layer {
+    --agent-cursor-light: 156, 136, 255;
+  }
+
+  :root[data-skye-glow="glacier"] .agent-cursor-layer {
+    --agent-cursor-light: 0, 229, 255;
   }
 }
 
@@ -182,11 +210,10 @@
 }
 
 /*
- * The orb's glow while it multitasks: the light along the bottom of the
- * screen (VoiceSkye), in its colours (skyePalettes.luma, set on the orb by
- * AgentCursor), turned outward round the ball. As the skye's rim rises
- * from the screen's edge, from the ball out: a thin bright line, the pale
- * core, the light, and the deep blue widest of all, leaning to one side as
+ * The orb's glow while it multitasks, in the light's colour
+ * (--agent-cursor-light), turned outward round the ball as the light along
+ * the bottom of the screen (VoiceSkye) rises from its edge: a fine bright
+ * line round the ball, then the glow, widest of all, leaning to one side as
  * the skye's crest does and swinging slowly round. It comes up once the orb
  * has formed, and breathes as the skye does while Skye works.
  */
@@ -216,19 +243,19 @@
   border-radius: 50%;
 }
 
-/* The deep wave, beneath. */
+/* The wide glow, beneath. */
 .agent-cursor-skye::before {
   box-shadow:
-    5px 0 18px 6px rgba(var(--agent-cursor-skye-deep), 0.55),
-    -2px 0 26px 8px rgba(var(--agent-cursor-skye-deep), 0.3);
+    4px 0 16px 4px rgba(var(--agent-cursor-light), 0.3),
+    -2px 0 22px 6px rgba(var(--agent-cursor-light), 0.15);
 }
 
-/* The rim, close in: edge, core and light. */
+/* The rim, close in. */
 .agent-cursor-skye::after {
   box-shadow:
-    0 0 1px 1px rgba(var(--agent-cursor-skye-edge), 0.6),
-    0 0 5px 2px rgba(var(--agent-cursor-skye-core), 0.7),
-    0 0 12px 4px rgba(var(--agent-cursor-skye-light), 0.55);
+    0 0 1px 1px rgba(var(--agent-cursor-light), 0.7),
+    0 0 5px 2px rgba(var(--agent-cursor-light), 0.4),
+    0 0 10px 3px rgba(var(--agent-cursor-light), 0.2);
 }
 
 /* The skye's breath while Skye works: one every 2.4s. */
@@ -268,7 +295,7 @@
  * The orb's aura while its helpers work: a ring round it that is a loading
  * bar for their work (setProgress), and where Skye's tethers leave from (see
  * agentSwarm.ts), after the HUD rings in reference art. A thin track; the
- * bar along it from the top, clockwise, glowing in the skye's colours; a
+ * bar along it from the top, clockwise, in the light (--agent-cursor-light); a
  * notch just outside marking how far it has come; and a dotted orbit round
  * it all, creeping slowly round. The track draws itself round as the orb
  * forms. The circles' lengths come from the script, for their dashes.
@@ -300,11 +327,11 @@
 }
 
 .agent-cursor-aura-bar {
-  stroke: rgb(var(--agent-cursor-skye-edge));
+  stroke: rgb(var(--agent-cursor-light));
   stroke-width: 2.5px;
   stroke-dasharray: var(--agent-cursor-aura-ring);
   stroke-dashoffset: calc(var(--agent-cursor-aura-ring) * (1 - var(--agent-cursor-progress)));
-  filter: drop-shadow(0 0 3px rgba(var(--agent-cursor-skye-light), 0.9));
+  filter: drop-shadow(0 0 3px rgba(var(--agent-cursor-light), 0.6));
 }
 
 /* A 3px square: one dash, as long as the stroke is wide, at the bar's head. */
@@ -321,12 +348,6 @@
   stroke-width: 1px;
   stroke-dasharray: 0 4px;
   stroke-linecap: round;
-}
-
-@media (prefers-color-scheme: dark) {
-  .agent-cursor-aura-bar {
-    stroke: rgb(var(--agent-cursor-skye-core));
-  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -348,6 +369,51 @@
 @keyframes agent-cursor-aura-creep {
   to {
     stroke-dashoffset: -4px;
+  }
+}
+
+/*
+ * Skye's helpers (her echoes) are orbs of her light (--agent-cursor-light),
+ * as the light along her tethers is, a little bigger than the dot, in a
+ * soft bloom breathing as Skye's orb does. They size by --agent-cursor-dot,
+ * so they dip as they press and shrink away as they merge back, as the dot
+ * does.
+ */
+.agent-cursor[data-helper] {
+  --agent-cursor-size: 10px;
+}
+
+.agent-cursor-echo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--agent-cursor-dot);
+  height: var(--agent-cursor-dot);
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: rgb(var(--agent-cursor-light));
+  box-shadow: 0 0 4px 1px rgba(var(--agent-cursor-light), 0.6);
+}
+
+/* The bloom. */
+.agent-cursor-echo::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow: 0 0 12px 3px rgba(var(--agent-cursor-light), 0.3);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .agent-cursor-echo::before {
+    animation: agent-cursor-echo-breathe 1.2s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes agent-cursor-echo-breathe {
+  from {
+    opacity: 0.65;
+    scale: 0.9;
   }
 }
 
@@ -548,6 +614,12 @@
   animation: agent-cursor-ripple 450ms ease-out forwards;
 }
 
+/* A helper's click (its ripple follows it in the layer) is a ring of its light. */
+.agent-cursor[data-helper] ~ .agent-cursor-ripple::after {
+  border: 1.5px solid rgb(var(--agent-cursor-light));
+  box-shadow: 0 0 4px rgba(var(--agent-cursor-light), 0.5);
+}
+
 @keyframes agent-cursor-ripple {
   from {
     opacity: 0.9;
@@ -594,69 +666,56 @@
 }
 
 /*
- * Every line glows evenly, as a filament does: a fine line in the skye's
- * blue (near white over a dark page) in the blue-violet halo the orb glows
- * in (.agent-cursor-skye), its light close in and its deep wave wider, the
- * same all along every line.
+ * Every line glows evenly, as a filament does: a fine line in the light
+ * (--agent-cursor-light), in a soft glow of it, the same all along every line.
  */
 .agent-tether-lines {
-  filter: drop-shadow(0 0 1.5px rgba(var(--agent-cursor-skye-light), 0.9))
-    drop-shadow(0 0 6px rgba(var(--agent-cursor-skye-deep), 0.75));
+  filter: drop-shadow(0 0 2px rgba(var(--agent-cursor-light), 0.6))
+    drop-shadow(0 0 5px rgba(var(--agent-cursor-light), 0.25));
 }
 
 .agent-tether {
-  stroke: rgb(var(--agent-cursor-skye-edge));
+  stroke: rgb(var(--agent-cursor-light));
   stroke-width: 1px;
-  stroke-opacity: 0.55;
+  stroke-opacity: 0.6;
   stroke-linecap: round;
 }
 
 /*
  * The light Skye sends down them, brighter than the lines it runs along: an
- * orb, white at its heart in the skye's blue (the script sets its colours on
- * the layer), in a wide bloom, with a streak behind it; a smaller, fainter
- * spark along the web; and a flare round each helper it reaches. Over a dark
- * page it adds to what is behind it, as light does.
+ * orb of it, brightest at its heart, in a bloom, with a streak behind it; a
+ * smaller, fainter spark along the web; and a flare round each helper it
+ * reaches. Over a dark page it adds to what is behind it, as light does.
  */
 .agent-tether-lights {
-  filter: drop-shadow(0 0 4px rgba(var(--agent-cursor-skye-light), 0.95))
-    drop-shadow(0 0 14px rgba(var(--agent-cursor-skye-deep), 0.8));
+  filter: drop-shadow(0 0 3px rgba(var(--agent-cursor-light), 0.8))
+    drop-shadow(0 0 10px rgba(var(--agent-cursor-light), 0.35));
 }
 
-.agent-tether-glow-heart {
-  stop-color: rgb(var(--agent-cursor-skye-core));
+.agent-tether-glow-heart,
+.agent-tether-glow-light,
+.agent-tether-glow-rim,
+.agent-tether-streak-tail,
+.agent-tether-streak-head {
+  stop-color: rgb(var(--agent-cursor-light));
 }
 
 .agent-tether-glow-light {
-  stop-color: rgb(var(--agent-cursor-skye-light));
-  stop-opacity: 0.7;
+  stop-opacity: 0.5;
 }
 
-.agent-tether-glow-rim {
-  stop-color: rgb(var(--agent-cursor-skye-edge));
+.agent-tether-glow-rim,
+.agent-tether-streak-tail {
   stop-opacity: 0;
 }
 
 .agent-tether-heart {
-  fill: rgb(var(--agent-cursor-skye-core));
+  fill: rgb(var(--agent-cursor-light));
 }
 
 .agent-tether-streak {
   stroke-width: 2.5px;
   stroke-linecap: round;
-}
-
-.agent-tether-streak-tail,
-.agent-tether-streak-head {
-  stop-color: rgb(var(--agent-cursor-skye-light));
-}
-
-.agent-tether-streak-tail {
-  stop-opacity: 0;
-}
-
-.agent-tether-streak-head {
-  stop-opacity: 1;
 }
 
 .agent-tether-pulse[data-spark] {
@@ -668,11 +727,6 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .agent-tether {
-    stroke: rgb(var(--agent-cursor-skye-core));
-    stroke-opacity: 0.6;
-  }
-
   .agent-tether-lights {
     mix-blend-mode: plus-lighter;
   }

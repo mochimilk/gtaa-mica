@@ -35,13 +35,18 @@ export function workItem(alert: OpsAlert): WorkItem {
   const flight = OPS_FLIGHTS_BY_ID.get(alert.flightId);
   if (alert.kind === "conflict") {
     const stand = alert.conflict?.standId ?? "";
-    const offer = fix?.kind === "move" ? `move ${stayLabel(fix.stayId)} to ${fix.standId}` : null;
+    // The moves that clear it: one stay, or everything a late stay runs into.
+    const moves =
+      fix?.kind === "move"
+        ? `${stayLabel(fix.stayId)} to ${fix.standId}`
+        : fix?.kind === "knock_on"
+          ? listWords(fix.moves.map((move) => `${stayLabel(move.occupancyId)} to ${move.standId}`))
+          : null;
+    const offer = moves ? `move ${moves}` : null;
     return {
       alert,
       fix,
-      said:
-        `the ${stand} conflict: ${alert.title}` +
-        (offer && fix ? `; moving ${stayLabel(fix.stayId)} to ${fix.standId} clears it` : "; no free stand clears it"),
+      said: `the ${stand} conflict: ${alert.title}` + (moves ? `; moving ${moves} clears it` : "; no free stand clears it"),
       offer,
     };
   }
@@ -51,7 +56,7 @@ export function workItem(alert: OpsAlert): WorkItem {
       return { alert, fix, said: `${flight.flight}, which has no stay times yet, so it can't be placed`, offer: null };
     }
     const from = formatUtc(stay.start);
-    return fix
+    return fix?.kind === "assign"
       ? {
           alert,
           fix,

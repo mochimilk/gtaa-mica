@@ -75,7 +75,11 @@ protocol (`mica://app`). The packaged app loads `dist/` without a web server;
 root-relative public assets, including the Norvara Intl Airport logo, resolve on that origin.
 The renderer has Node integration disabled, context isolation and sandboxing
 enabled, denied native permission requests, and restricted navigation/popups.
-No preload or IPC is needed for this UI. Packaged content has a CSP; inline
+On Windows and Linux the page draws the title bar (`src/components/title-bar`):
+File, Edit, View and Window at its start, the native window controls over its
+end, in the page's colour. Its menus are the only preload API
+(`electron/preload.cjs`), checked in `electron/titleBar.mjs`; macOS keeps its
+own title bar and menu bar. Packaged content has a CSP; inline
 styles remain allowed for Fluent/Griffel. Development uses Vite's usual HMR
 scripts. A future native capability should expose a narrow validated preload
 API rather than adding Node access to React.

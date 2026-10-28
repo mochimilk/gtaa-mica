@@ -13,12 +13,11 @@
 // one drag per pointer). They are not primary pointers, so none of them
 // scrolls the chart under the others. The pool is fixed and mounted once
 // (<AgentHelperCursors />); a helper stays hidden until it is given work.
-import { skyePalettes } from "../luma-skye/skye";
 import { AgentCursorController, type Point } from "./cursorMotion";
 
 /**
- * A helper: it looks just like Skye's own cursor, with no name. Its tag shows
- * only while it has a task ("XD456/457 → C25").
+ * A helper: a small orb of Skye's light, as the light along her tethers is,
+ * with no name. Its tag shows only while it has a task ("XD456/457 → C25").
  */
 export type AgentHelper = {
   controller: AgentCursorController;
@@ -38,18 +37,6 @@ export const agentHelpers: readonly AgentHelper[] = Array.from({ length: HELPER_
  * leave from.
  */
 export const AURA_RADIUS = 22;
-
-/**
- * The skye's colours (skyePalettes.luma, the light along the bottom of the
- * screen), as the stylesheet's channels for them: Skye's orb glows in them
- * while her helpers work, and the light along her tethers is theirs.
- */
-export const SKYE_COLOURS: Readonly<Record<string, string>> = {
-  "--agent-cursor-skye-deep": skyePalettes.luma.deep,
-  "--agent-cursor-skye-light": skyePalettes.luma.light,
-  "--agent-cursor-skye-core": skyePalettes.luma.core,
-  "--agent-cursor-skye-edge": skyePalettes.luma.edge,
-};
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 /** Matches .agent-tether-layer's fade. */
@@ -102,10 +89,9 @@ export function showTethers(main: AgentCursorController, helpers: readonly Agent
   const layer = document.createElement("div");
   layer.className = "agent-cursor-layer agent-tether-layer";
   layer.setAttribute("aria-hidden", "true");
-  for (const [name, value] of Object.entries(SKYE_COLOURS)) layer.style.setProperty(name, value);
   const svg = svgElement("svg", { class: "agent-tethers" }, layer);
   const defs = svgElement("defs", {}, svg);
-  // The light's glow: white across its heart, in the skye's blue, fading out.
+  // The light's glow: brightest across its heart, fading out.
   const glow = svgElement("radialGradient", { id: `${id}-glow` }, defs);
   svgElement("stop", { offset: 0, class: "agent-tether-glow-heart" }, glow);
   svgElement("stop", { offset: 0.15, class: "agent-tether-glow-heart" }, glow);
@@ -182,7 +168,9 @@ export function showTethers(main: AgentCursorController, helpers: readonly Agent
   };
 
   let frame = 0;
-  const draw = (now: number) => {
+  const draw = (frameTime: number) => {
+    // A frame's time can be earlier than the last, when the page is busy; it never goes back here.
+    const now = Math.max(last, frameTime);
     const elapsed = now - last;
     last = now;
     const centre = main.out ? main.position : null;
@@ -240,7 +228,9 @@ export function showTethers(main: AgentCursorController, helpers: readonly Agent
       nextPulse = now + PULSE_EVERY_MS;
       spread(0, new Set(), now);
     }
-    for (const pulse of [...pulses]) {
+    // Over the set itself, so light that splits off at a helper this frame is
+    // placed this frame too, rather than drawn once where nothing has placed it.
+    for (const pulse of pulses) {
       if (!points[pulse.from] || !points[pulse.to] || !wanted.has(lineKey(pulse.from, pulse.to))) {
         drop(pulse);
         continue;

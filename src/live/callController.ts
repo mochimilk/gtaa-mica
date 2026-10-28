@@ -9,6 +9,7 @@
 //   - `agentSpeaking` follows output transcript activity (playback)
 //   - `working` follows the executor (delegated app work)
 // Conflating them would make the orb go calm while a task was still running.
+import type { AppAction } from "./appActions.ts";
 import { DelegationExecutor, type ExecutorLogEntry, type ScheduleFn } from "./executor.ts";
 import { injectionEvent, type LiveIncomingEvent } from "./liveEvents.ts";
 import { LiveCallError } from "./liveBackend.ts";
@@ -68,6 +69,10 @@ export const GREETING_INSTRUCTIONS =
   "A coworker just called you and you picked up. Speak first, in English, with a short, natural, casual " +
   "greeting in your own words, the way you would answer a colleague on the stand-allocation desk; vary it " +
   "from call to call. Do not introduce yourself or explain what you can do. Then stop and listen.";
+
+/** Put before what Skye is to say herself (see `say`). App-authored; what follows is too. */
+export const SAY_INSTRUCTIONS =
+  "Say this to the caller now, briefly and in your own words, without adding anything that is not in it: ";
 
 const IDLE_STATE: LiveCallState = {
   phase: "idle",
@@ -371,6 +376,31 @@ export class LiveCallController {
    */
   cancelTypedRequest(): boolean {
     return this.#executor.cancelTyped();
+  }
+
+  /**
+   * Has Skye say `text` on the call, in her own words, as she says hello:
+   * app-authored, never caller text. Only while connected; returns whether
+   * she was asked to. For what Skye brings up herself (see `offer`), and for
+   * a reply to a request the app made for the user (the disruption's Run).
+   */
+  say(text: string): boolean {
+    if (this.#state.phase !== "connected" || !this.#transport) return false;
+    this.#eventSeq += 1;
+    this.#transport.send(
+      injectionEvent("instructions", `mica_inj_${this.#eventSeq}`, null, `${SAY_INSTRUCTIONS}${text}`),
+    );
+    return true;
+  }
+
+  /**
+   * Skye brings something up herself, offering to do `proposal` (the
+   * disruption notice): said on a call, and kept as her offer either way, so
+   * a yes, said or typed, carries it out.
+   */
+  offer(text: string, proposal: AppAction): void {
+    this.#executor.offer(text, proposal);
+    this.say(text);
   }
 
   /** The user changed the board by hand. */

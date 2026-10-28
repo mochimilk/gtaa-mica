@@ -1,5 +1,5 @@
-// The board's headline numbers, for the KPI strip over the foot of its
-// chart (see KpiStrip.tsx). Each is worked out from where every stay is (a
+// The board's headline numbers, for the KPI strip under its chart (see
+// KpiStrip.tsx). Each is worked out from where every stay is (a
 // StandState), so the board as it is now and the plan (the fixture's stands
 // and times; see planState) are measured alike, and the strip can say how
 // far the board has come from the plan. Measured over the chart's window
@@ -20,6 +20,7 @@ import {
   occupancyById,
   offBoardStay,
   planState,
+  planVersion,
   standArea,
   stayName,
   type StandState,
@@ -55,7 +56,43 @@ export type BoardKpis = {
   windows: number;
   /** Their total length, minutes. */
   freeMinutes: number;
+  /** Aircraft that would wait for their stand to come free (see gateHolds), soonest first. */
+  holds: GateHold[];
+  /** How long they would wait between them, minutes. */
+  gateHoldMinutes: number;
 };
+
+/**
+ * An aircraft that would wait for its stand: it is due on at `due`, but the
+ * aircraft before it on the stand is still there (running late, or held up
+ * itself), so it gets on `minutes` later.
+ */
+export type GateHold = { stayId: string; standId: string; label: string; due: Millis; minutes: number };
+
+/**
+ * Who would wait for their stand, and how long, as the stays sit in `onStands`:
+ * on each stand in turn, each aircraft gets on when it is due or once the one
+ * before has left, whichever is later, and stays its expected time (to its
+ * end, plus any delay out). So one late departure holds the next arrival, and
+ * that one, now late itself, can hold the one after: the knock-on, which a
+ * conflict alone (a ghost running into the next stay) does not show.
+ */
+export function gateHolds(onStands: readonly Occupancy[]): GateHold[] {
+  const holds: GateHold[] = [];
+  const byStand = new Map<string, Occupancy[]>();
+  for (const stay of onStands) byStand.set(stay.rowId, [...(byStand.get(stay.rowId) ?? []), stay]);
+  for (const [standId, stays] of byStand) {
+    let free = -Infinity;
+    for (const stay of [...stays].sort((a, b) => a.start - b.start || a.end - b.end)) {
+      const waits = Math.max(0, free - stay.start);
+      const onFor = stay.end + (DEMO_DATA.delays.get(stay.id)?.out ?? 0) - stay.start;
+      free = Math.max(free, stay.start + waits + onFor);
+      const minutes = Math.round(waits / MINUTE);
+      if (minutes > 0) holds.push({ stayId: stay.id, standId, label: stayName(stay), due: stay.start, minutes });
+    }
+  }
+  return holds.sort((a, b) => a.due - b.due);
+}
 
 type Span = [Millis, Millis];
 
@@ -158,6 +195,7 @@ export function boardKpis({ stays, closure }: StandState): BoardKpis {
   }
 
   const bySoonest = (a: KpiSpan, b: KpiSpan) => a.start - b.start || a.end - b.end;
+  const holds = gateHolds(onStands);
   return {
     conflicts: conflicts.sort(bySoonest),
     noStand: noStand + untimed,
@@ -167,10 +205,18 @@ export function boardKpis({ stays, closure }: StandState): BoardKpis {
     hourlyUse: hours.map((hour, index) => ({ from: hour, use: hourOpen[index] ? hourBusy[index] / hourOpen[index] : 0 })),
     windows,
     freeMinutes: Math.round(free / MINUTE),
+    holds,
+    gateHoldMinutes: holds.reduce((sum, hold) => sum + hold.minutes, 0),
   };
 }
 
-let plan: BoardKpis | undefined;
+let plan: { version: number; kpis: BoardKpis } | undefined;
 
-/** The plan's figures. The plan never changes, so they are worked out once. */
-export const planKpis = (): BoardKpis => (plan ??= boardKpis(planState()));
+/**
+ * The plan's figures: the current plan, which a stay found running late
+ * changes (planVersion), so they are worked out again only then.
+ */
+export function planKpis(): BoardKpis {
+  if (plan?.version !== planVersion()) plan = { version: planVersion(), kpis: boardKpis(planState()) };
+  return plan.kpis;
+}

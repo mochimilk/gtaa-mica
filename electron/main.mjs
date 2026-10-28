@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, net, protocol, session } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeTheme, net, protocol, session } from 'electron';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
@@ -7,8 +7,9 @@ import {
   contentSecurityPolicy,
   resolveBrokerOrigin,
 } from './permissionPolicy.mjs';
+import { TITLE_BAR_HEIGHT, WINDOW_MENUS, menuRequest, titleBarOverlayColors } from './titleBar.mjs';
 
-// No preload or IPC: the current UI needs no native privileges.
+// The only preload and IPC are the title bar's; the UI needs no other native privileges.
 protocol.registerSchemesAsPrivileged([
   { scheme: 'mica', privileges: { standard: true, secure: true, supportFetchAPI: true } },
 ]);
@@ -47,12 +48,34 @@ const renderCsp = contentSecurityPolicy(brokerOrigin);
 /** Undefined when packaged, which selects the mica://app policy. */
 const devOrigin = devUrl ? new URL(devUrl).origin : undefined;
 
+/*
+ * Title bar. On Windows and Linux the page draws it, the page's colour: the
+ * window menus at its start, the native window controls over its end (the
+ * title bar overlay), and no title, which the app shows itself. macOS keeps
+ * its own title bar and the system menu bar. The page only opens the menus,
+ * through preload.cjs; the controls' colours follow the system theme here,
+ * as the page's own theme does.
+ */
+const customTitleBar = process.platform !== 'darwin';
+
 async function createWindow() {
   const window = new BrowserWindow({
     title: 'GTAA Mica', width: 1440, height: 960, minWidth: 900, minHeight: 640,
     show: false,
-    webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true },
+    ...(customTitleBar && {
+      titleBarStyle: 'hidden',
+      titleBarOverlay: { ...titleBarOverlayColors(nativeTheme.shouldUseDarkColors), height: TITLE_BAR_HEIGHT },
+    }),
+    webPreferences: {
+      nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true,
+      ...(customTitleBar && { preload: path.join(app.getAppPath(), 'electron', 'preload.cjs') }),
+    },
   });
+  if (customTitleBar) {
+    const recolor = () => window.setTitleBarOverlay(titleBarOverlayColors(nativeTheme.shouldUseDarkColors));
+    nativeTheme.on('updated', recolor);
+    window.once('closed', () => nativeTheme.off('updated', recolor));
+  }
   window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   window.webContents.on('will-navigate', (event, url) => { if (!isAppUrl(url)) event.preventDefault(); });
   window.webContents.on('will-redirect', (event, url) => { if (!isAppUrl(url)) event.preventDefault(); });
@@ -89,6 +112,19 @@ app.whenReady().then(async () => {
   );
   // getDisplayMedia is never part of Mica; deny it explicitly.
   session.defaultSession.setDisplayMediaRequestHandler((_request, callback) => callback({}));
+  if (customTitleBar) {
+    // Also the application menu, unshown, so its shortcuts (Ctrl+R, Ctrl+Shift+I, zoom…) keep working.
+    const menu = Menu.buildFromTemplate(WINDOW_MENUS);
+    Menu.setApplicationMenu(menu);
+    // Opens a menu under its title-bar button, resolving once it closes.
+    ipcMain.handle('mica:open-menu', (event, input) => {
+      const request = menuRequest(input);
+      const submenu = request && menu.getMenuItemById(request.name)?.submenu;
+      const window = BrowserWindow.fromWebContents(event.sender);
+      if (!request || !submenu || !window || !isAppUrl(event.senderFrame?.url ?? '')) return;
+      return new Promise((resolve) => submenu.popup({ window, x: request.x, y: request.y, callback: () => resolve(undefined) }));
+    });
+  }
   if (!devUrl) {
     const root = path.join(app.getAppPath(), 'dist');
     protocol.handle('mica', async (request) => {

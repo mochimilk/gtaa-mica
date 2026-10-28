@@ -55,7 +55,15 @@ export type OutputRequest = {
   /** While Skye is still on it. */
   working: boolean;
   steps: readonly OutputStep[];
+  /** Once Skye's changes for it are approved: who approved them, when, and what they did to the board. */
+  decision?: OutputDecision;
 };
+
+/** One of the board's figures before Skye's changes and after: "Gate hold", "5h 45m", "none". */
+export type DecisionFigure = { label: string; before: string; after: string; better: boolean | null };
+
+/** The log of an approval: when (Date.now()), who approved, in order (the user last), and the figures. */
+export type OutputDecision = { at: number; by: readonly string[]; figures: readonly DecisionFigure[] };
 
 let requests: readonly OutputRequest[] = [];
 const listeners = new Set<() => void>();
@@ -134,6 +142,24 @@ export function setStepApprover(stepIds: Iterable<string>, name: string): void {
   );
 }
 
+/** "Travis Hughes and you": who approved a decision, as said. */
+export function describeApprovers(names: readonly string[]): string {
+  const said = names.map((name) => (name === "You" ? "you" : name));
+  return said.length <= 1 ? (said[0] ?? "") : `${said.slice(0, -1).join(", ")} and ${said.at(-1)}`;
+}
+
+const logClock = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" });
+
+/** "14:32", on the user's own clock: when a decision was logged. */
+export const formatLogTime = (at: number) => logClock.format(at);
+
+/** Logs an approval on each request that has any of the pieces named. */
+export function logDecision(stepIds: Iterable<string>, decision: OutputDecision): void {
+  const named = new Set(stepIds);
+  if (!requests.some((request) => request.steps.some((step) => named.has(step.id)))) return;
+  set(requests.map((request) => (request.steps.some((step) => named.has(step.id)) ? { ...request, decision } : request)));
+}
+
 export function clearOutputs(): void {
   if (requests.length > 0) set([]);
 }
@@ -192,6 +218,8 @@ export function describeBoardAction(action: AppAction): string | null {
     }
     case "fix_all":
       return action.scope === "conflicts" ? "Fix all conflicts" : "Fix conflicts and flights with no stand";
+    case "resolve_disruption":
+      return `Clear ${flightLabel(action.flightId)}'s knock-on`;
     default:
       return null;
   }

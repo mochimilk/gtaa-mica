@@ -1,23 +1,25 @@
-// The board's KPIs, floating over the foot of its chart: what needs
-// attention (conflicts, flights with no stand), how busy the stands are, and
-// how much free stand time is left, each worked out from the board as it is
-// now (see ./boardKpis). Once the board differs from the plan, each figure
-// also says how far it has moved from the plan's. Synthetic demo figures,
-// like the board's.
+// The board's KPIs, in a bar under its chart: what needs attention
+// (conflicts, flights with no stand), how busy the stands are, and how much
+// free stand time is left, each worked out from the board as it is now (see
+// ./boardKpis). Collapsed, the default, the bar is one row of figures;
+// expanded, each is a card, also saying how far it has moved from the plan's,
+// most with a small chart. Synthetic demo figures, like the board's.
 //
 // Colour follows the board: a conflict's red and a waiting flight's orange
 // are its bars' (demo.css, --flight-*), and the hourly stand use is in the
 // healthy bars' blue. Text stays in neutral tokens: a status colour is only
-// ever a chart's marks, which the tile's label names, and every small chart
+// ever a chart's marks, which the column's label names, and every small chart
 // has a title on each mark and a summary for screen readers.
-import { useMemo, type ReactNode } from "react";
-import { ArrowDown12Filled, ArrowUp12Filled } from "@fluentui/react-icons";
+import { useId, useMemo, useState, type ReactNode } from "react";
+import { Tooltip } from "@fluentui/react-components";
+import { ArrowDown12Filled, ArrowUp12Filled, ChevronDown20Regular, ChevronUp20Regular } from "@fluentui/react-icons";
 import type { Millis } from "../stand-timeline";
 import { DEMO_DOMAIN, formatUtc } from "../stand-timeline-demo/demoData";
 import { standState } from "./allocation";
 import { boardKpis, MIN_WINDOW_MINUTES, planKpis, type KpiSpan } from "./boardKpis";
 import { useOperations } from "./OperationsContext";
 import { formatDuration } from "./operationsData";
+import { KEEP_SELECTION_ATTR } from "./ViewsFiltersToolbar";
 import "./operations.css";
 
 const [FROM, TO] = DEMO_DOMAIN;
@@ -49,9 +51,10 @@ function Delta({ by, text, better }: { by: number; text: string; better?: "up" |
 }
 
 /**
- * One KPI: its label, with how far it is from the plan in the top-right
- * corner, then the figure, with an optional small chart beside it.
- * `detail`, a line of context, is the tile's tooltip.
+ * One KPI, a column of the bar: its label and figure, and while the bar is
+ * expanded, how far it is from the plan in the top-right corner and an
+ * optional small chart beside the figure. `detail`, a line of context, is
+ * the column's tooltip.
  */
 function KpiTile({
   label,
@@ -59,19 +62,21 @@ function KpiTile({
   delta,
   detail,
   chart,
+  expanded,
 }: {
   label: string;
   value: ReactNode;
   delta?: ReactNode;
   detail: string;
   chart?: ReactNode;
+  expanded: boolean;
 }) {
   return (
     <div className="ops-kpi" role="group" aria-label={label} title={detail}>
       <div className="ops-kpi-label">{label}</div>
       <div className="ops-kpi-value">{value}</div>
-      {delta}
-      {chart && <div className="ops-kpi-chart">{chart}</div>}
+      {expanded && delta}
+      {expanded && chart && <div className="ops-kpi-chart">{chart}</div>}
     </div>
   );
 }
@@ -160,12 +165,21 @@ function HourlyUse({ hours, busiest }: { hours: readonly { from: Millis; use: nu
 
 export function KpiStrip() {
   const { allocationVersion } = useOperations();
+  const [expanded, setExpanded] = useState(false);
+  const id = useId();
+  const toggleLabel = expanded ? "Hide KPI details" : "Show KPI details";
   // Read on every stand change (allocationVersion re-renders this).
   const now = useMemo(() => boardKpis(standState()), [allocationVersion]);
   const plan = planKpis();
 
   const conflicts = now.conflicts.length;
   const firstConflict = now.conflicts[0];
+  const holdBy = now.gateHoldMinutes - plan.gateHoldMinutes;
+  const firstHold = now.holds[0];
+  // Each wait, from when the aircraft is due until it gets on its stand.
+  const holdSpans = now.holds.map(
+    (hold): KpiSpan => ({ id: hold.stayId, start: hold.due, end: hold.due + hold.minutes * 60_000, label: hold.label, standId: hold.standId }),
+  );
   const firstWaiting = now.waiting[0];
   const busiest = now.hourlyUse.reduce((best, hour, index, hours) => (hour.use > hours[best].use ? index : best), 0);
   const usePoints = Math.round(now.standUse * 100) - Math.round(plan.standUse * 100);
@@ -173,9 +187,10 @@ export function KpiStrip() {
   const windowsBy = now.windows - plan.windows;
 
   return (
-    <section className="ops-kpis" aria-label="Board KPIs">
+    <section id={id} className="ops-kpis" aria-label="Board KPIs" data-expanded={expanded || undefined}>
       <KpiTile
         label="Conflicts"
+        expanded={expanded}
         value={conflicts}
         delta={<Delta by={conflicts - plan.conflicts.length} text={`${Math.abs(conflicts - plan.conflicts.length)}`} better="down" />}
         detail={firstConflict ? `First ${formatUtc(firstConflict.start)} on ${firstConflict.standId}` : "None on the board"}
@@ -188,12 +203,35 @@ export function KpiStrip() {
         }
       />
       <KpiTile
-        label="Flights with no stand"
+        label="Gate hold"
+        expanded={expanded}
+        value={now.gateHoldMinutes > 0 ? formatDuration(now.gateHoldMinutes) : "None"}
+        delta={<Delta by={holdBy} text={formatDuration(Math.abs(holdBy))} better="down" />}
+        detail={
+          firstHold
+            ? `${plural(now.holds.length, "aircraft", "aircraft")} would wait for a stand · first ${firstHold.label} on ${firstHold.standId} at ${formatUtc(firstHold.due)}`
+            : "No aircraft waits for its stand"
+        }
+        chart={
+          <DaySpans
+            spans={holdSpans}
+            tone="conflict"
+            summary={
+              firstHold
+                ? `${plural(now.holds.length, "aircraft", "aircraft")} waiting for a stand, the first from ${formatUtc(firstHold.due)} UTC`
+                : "No aircraft waits for its stand"
+            }
+          />
+        }
+      />
+      <KpiTile
+        label="Unassigned"
+        expanded={expanded}
         value={now.noStand}
         delta={<Delta by={now.noStand - plan.noStand} text={`${Math.abs(now.noStand - plan.noStand)}`} better="down" />}
         detail={
           [
-            firstWaiting && `First needs one ${formatUtc(firstWaiting.start)}`,
+            firstWaiting && `First needs a stand ${formatUtc(firstWaiting.start)}`,
             now.untimed && `${now.untimed} without times`,
           ]
             .filter(Boolean)
@@ -209,20 +247,34 @@ export function KpiStrip() {
       />
       <KpiTile
         label="Stand use"
+        expanded={expanded}
         value={percent(now.standUse)}
         delta={<Delta by={usePoints} text={plural(Math.abs(usePoints), "pt")} />}
         detail={`Busiest ${formatUtc(now.hourlyUse[busiest].from)}–${formatUtc(now.hourlyUse[busiest].from + HOUR)} · ${percent(now.hourlyUse[busiest].use)}`}
         chart={<HourlyUse hours={now.hourlyUse} busiest={busiest} />}
       />
       <KpiTile
-        label="Free stand time"
+        label="Stand time"
+        expanded={expanded}
         value={formatDuration(now.freeMinutes)}
         delta={<Delta by={freeBy} text={formatDuration(Math.abs(freeBy))} better="up" />}
         detail={
-          `In ${plural(now.windows, "window")} of ${MIN_WINDOW_MINUTES / 60}h+` +
+          `Free in ${plural(now.windows, "window")} of ${MIN_WINDOW_MINUTES / 60}h+` +
           (windowsBy ? ` (${windowsBy > 0 ? "+" : "−"}${Math.abs(windowsBy)})` : "")
         }
       />
+      <Tooltip content={toggleLabel} relationship="label">
+        <button
+          {...KEEP_SELECTION_ATTR}
+          type="button"
+          className="ops-kpis-toggle"
+          aria-expanded={expanded}
+          aria-controls={id}
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded ? <ChevronDown20Regular aria-hidden="true" /> : <ChevronUp20Regular aria-hidden="true" />}
+        </button>
+      </Tooltip>
     </section>
   );
 }

@@ -157,6 +157,9 @@ function actionArguments(name: AppActionName, args: Record<string, unknown> | nu
     case "fix_all":
       // Not given means everything.
       return { scope: source.scope ?? "all" };
+    case "resolve_disruption":
+      // Not given means the flight the disruption notice is about.
+      return { flightId: source.flightId ?? null };
     case "unassign_stands":
       return { flightIds: source.flightIds ?? (source.flightId == null ? null : [source.flightId]) };
     default:

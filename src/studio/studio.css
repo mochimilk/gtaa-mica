@@ -1,0 +1,182 @@
+/* The Studio page (StudioPage.tsx): the drawings panel beside the editor. */
+.studio {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+}
+
+/* The list scrolls under the panel's header, which stays put. */
+.studio-panel {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* A drawing in the list, centred in a 32px square. */
+.studio-thumb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+/* The list's items: 48px tall (Coral's are 36px), for the maker under the type. */
+.studio-panel .studio-nav-item {
+  height: 48px;
+}
+
+/* An item with unsaved edits: a dot in the brand colour at its end. */
+.studio-unsaved {
+  width: 8px;
+  height: 8px;
+  margin-inline-end: var(--spacingHorizontalXS);
+  border-radius: var(--borderRadiusCircular);
+  background-color: var(--colorBrandForeground1);
+}
+
+/* A blank drawing's place in the list: its 18px square, dashed. */
+.studio-thumb-blank {
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
+  border: 1px dashed var(--colorNeutralStroke1);
+  border-radius: var(--borderRadiusSmall);
+}
+
+.studio-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* How many of the aircraft are on the board, after its name in the header, quieter. */
+.studio-title-meta {
+  color: var(--colorNeutralForeground3);
+  font-weight: var(--fontWeightRegular);
+}
+
+/*
+ * The canvas, centred, the floating toolbar down its left. A size container,
+ * so the canvas can fit its height as well as its width.
+ */
+.studio-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  container-type: size;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.studio-empty {
+  margin: 0;
+  color: var(--colorNeutralForeground3);
+  font-size: var(--fontSizeBase300);
+  line-height: var(--lineHeightBase300);
+}
+
+/*
+ * The 9 × 9 grid: up to 432px (48px a pixel), smaller to fit (clear of the
+ * toolbar on either side, so it stays centred), each pixel divided from the
+ * next by a 1px line. Its rows are for screen readers only
+ * (display: contents), so the pixels lay out as one grid.
+ */
+.studio-canvas {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  grid-template-rows: repeat(9, 1fr);
+  gap: 1px;
+  padding: 1px;
+  width: max(180px, min(432px, 100cqw - 176px, 100cqh - 48px));
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  border-radius: var(--borderRadiusLarge);
+  overflow: hidden;
+  background-color: var(--colorNeutralStroke2);
+  box-shadow: var(--shadow8);
+  cursor: var(--cursor-crosshair);
+  touch-action: none;
+  user-select: none;
+  outline: none;
+}
+
+.studio-canvas:focus-visible {
+  outline: var(--strokeWidthThick) solid var(--colorStrokeFocus2);
+  outline-offset: 2px;
+}
+
+.studio-canvas-row {
+  display: contents;
+}
+
+/* Pixels that are off in a faint checkerboard; those on in the default text colour, as symbols show. */
+.studio-pixel {
+  background-color: var(--colorNeutralBackground1);
+}
+
+.studio-pixel--alt {
+  background-color: var(--colorNeutralBackground2);
+}
+
+.studio-pixel--on {
+  background-color: var(--colorNeutralForeground1);
+}
+
+/* The pixel under the pointer, and the keyboard's cursor while the canvas has keyboard focus. */
+.studio-pixel:hover,
+.studio-canvas:focus-visible .studio-pixel--cursor {
+  box-shadow:
+    inset 0 0 0 2px var(--colorStrokeFocus2),
+    inset 0 0 0 3px var(--colorStrokeFocus1);
+}
+
+/*
+ * The floating toolbar, down the stage's left, centred: frosted, on Fluent's
+ * 16 shadow, its groups split by a short divider.
+ */
+.studio-tools {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacingVerticalXS);
+  max-height: calc(100% - 32px);
+  padding: var(--spacingVerticalS) var(--spacingHorizontalXS);
+  box-sizing: border-box;
+  border-radius: var(--borderRadiusXLarge);
+  background-color: color-mix(in srgb, var(--colorNeutralBackground1) 85%, transparent);
+  backdrop-filter: saturate(150%) blur(20px);
+  box-shadow: var(--shadow16);
+  overflow-y: auto;
+}
+
+.studio-tools .fui-Toolbar {
+  padding: 0;
+}
+
+/* Across the toolbar, between its groups: short, and never growing, as Fluent's would. */
+.studio .studio-tools-divider {
+  flex: none;
+  width: 24px;
+}
+
+.studio-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

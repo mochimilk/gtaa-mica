@@ -10,7 +10,7 @@
 // the way Skye's cursor does it, so she never works in the panel.
 import { useSyncExternalStore, type PointerEvent as ReactPointerEvent } from "react";
 import { Portal } from "@fluentui/react-components";
-import { ROUND_ENDS, barPath, rowsViewport, useTimeline, useTimelineRegion, type Millis } from "../stand-timeline";
+import { barPath, rowsViewport, useTimeline, useTimelineRegion, type Millis } from "../stand-timeline";
 import { DEMO_DATA, formatUtc } from "../stand-timeline-demo/demoData";
 import { BAR_INSET, stayEnds } from "../stand-timeline-demo/theme";
 import { planAssign } from "./allocation";
@@ -282,7 +282,7 @@ export function FlightDropGhost() {
               className="st-drop-rect"
               d={barPath(
                 { x: x0, y, width: Math.max(2, x1 - x0), height },
-                flightStyle === "classic" ? stayEnds(DEMO_DATA.endpoints.get(drag.stayId)) : ROUND_ENDS,
+                stayEnds(DEMO_DATA.endpoints.get(drag.stayId), flightStyle),
                 barRadius,
               )}
             />
