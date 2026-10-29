@@ -304,8 +304,9 @@ underlay and overlay slots, and `OverlayReviews`. Reattach those composition
 points after a host UI merge instead of copying feature-specific UI logic.
 Use the same isolated composition pattern for later prototype analyses.
 
-The migrated features include scheduled buffers, synthetic gate waiting and
-single-turn capacity for both Contoso plans. GTAA and the original fixture have no registered
+The migrated features include scheduled buffers, synthetic gate waiting,
+single-turn capacity and one-way tow windows for both Contoso plans.
+GTAA and the original fixture have no registered
 profiles, so their toolbar is hidden. Availability comes from the active
 dataset, not an airport-name condition or a global list of enabled features.
 Overlays start off; toggles work independently. Inspect opens a feature's
@@ -344,7 +345,7 @@ No applicable handovers is not evidence of zero risk or zero delay.
 Overlapping occupancies invalidate both analyses. Neither overlay changes
 assignments, defines stand-safety rules or supplies operational certification.
 
-Atlas frequency modes, accommodation, decision review and tow windows remain later
+Atlas frequency modes, accommodation and decision review remain later
 phases. Their prepared evidence must match airport, case, variant and request
 fingerprint before registration. Regenerate evidence for the current plan;
 do not attach stale prototype results or claim they remain current after edits.
@@ -390,6 +391,60 @@ Browser fingerprint verification requires HTTPS or localhost.
 Run `npm run test:capacity` for preparation/rule replay regressions and
 `npm test` for source-binding and UI-query calculation regressions.
 The atlas's synthetic multi-day frequencies are not part of this increment.
+
+### Prepare and inspect one-way tow windows
+
+The [tow-window feature](../src/overlays/TowWindowFeature.tsx) registers its own
+provider, annotations and review without changes to the host application.
+Select **Inspect One-way tow windows**, choose a visit, and optionally show
+only that visit's annotations. Inspecting does not enable the overlay.
+
+Hatched bands inside assigned stays show inclusive possible tow-start times,
+not scheduled movements or movement durations. A point is an exact fit.
+Each opportunity moves from the current stand to a compatible departure
+stand, which must remain available from tow arrival through departure.
+Arrival handling, departure handling and one configured tow travel time
+bound the range. Fixed assignments and bidirectional adjacency conflicts
+can delay its start or exclude a destination. The review retains assignment
+IDs, release times, rule paths and static exclusion reasons.
+
+Only complete, single assigned stays are assessed. Unassigned visits,
+incomplete boundaries, existing movement chains, insufficient handling/travel
+time and no compatible available destination have distinct statuses.
+Known context times are retained; unknown boundaries are not invented.
+Display ranges are clipped to the half-open horizon, skip pinned No stand
+rows, dim with filters and do not intercept allocation selection.
+
+Generate against the current frozen schedule with explicit inputs:
+
+```powershell
+node scripts\prepare-tow-windows.mjs --airport data\airports\contoso\airport.json --profile data\airports\contoso\demand\full-day-profile.json --case full-day --snapshot src\data-sources\prepared\contoso\full-day.json --output src\data-sources\prepared\contoso\full-day.tow-windows.json
+```
+
+The command uses the selected airport's operating-policy handling minima
+and default one-way travel time, not the solver's optional tow-selection
+profile. It replays stand rules against the fixed plan; it neither runs the
+solver nor applies movements. No implicit airport or case is selected.
+It writes a sidecar and standalone browser schema validator.
+`npm run test:tow-windows` checks preparation and independent full-plan replay;
+`npm test` checks source binding, statuses and display ranges.
+
+Evidence version 3.0.0 adds explicit case, demand, horizon, both request
+fingerprints and destination-blocking evidence to the prototype's version 2
+contract. Regenerate rather than attaching old prototype files.
+Startup verifies the full snapshot SHA-256, both requests, exact flight and
+stay links, handling/travel bounds, destination coverage and blocking references.
+The selected dataset is checked again before registration.
+Contoso's capacity and tow sidecars must also agree on airport and demand
+fingerprints. Regenerate both after changing airport rules or demand, and all
+sidecars after regenerating a schedule. GTAA remains unavailable until its own
+evidence is prepared and registered; Contoso assumptions never fill its gaps.
+
+These are independent opportunities, not a jointly feasible movement plan,
+added flights or operational authorization. Parking-and-return cycles,
+adjustments to existing chains, tow routes, crews, tugs and shared-gate
+resources are not assessed. Ordinary turn handling rules and flight times
+are unchanged.
 
 ## Validate the imported foundation
 

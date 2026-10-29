@@ -1,10 +1,10 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "urn:gtaa-mica:tow-windows:2.0.0",
+  "$id": "urn:gtaa-mica:tow-windows:3.0.0",
   "type": "object", "additionalProperties": false,
-  "required": ["schema_version", "source", "movement_kind", "stand_validation_passed", "airport", "snapshot_fingerprint", "airport_fingerprint", "demand_fingerprint", "default_tow_minutes", "visits"],
+  "required": ["schema_version", "source", "movement_kind", "stand_validation_passed", "airport", "case_id", "demand_id", "plan_window", "variants", "snapshot_fingerprint", "airport_fingerprint", "demand_fingerprint", "default_tow_minutes", "visits"],
   "properties": {
-    "schema_version": { "const": "2.0.0" }, "source": { "const": "synthetic" },
+    "schema_version": { "const": "3.0.0" }, "source": { "const": "synthetic" },
     "movement_kind": { "const": "one-way-relocation" }, "stand_validation_passed": { "const": true },
     "airport": {
       "type": "object", "additionalProperties": false, "required": ["id", "name"],
@@ -13,6 +13,16 @@
     "snapshot_fingerprint": { "$ref": "#/definitions/hash" },
     "airport_fingerprint": { "$ref": "#/definitions/hash" },
     "demand_fingerprint": { "$ref": "#/definitions/hash" },
+    "case_id": { "$ref": "#/definitions/id" },
+    "demand_id": { "$ref": "#/definitions/id" },
+    "plan_window": {
+      "type": "object", "additionalProperties": false, "required": ["start", "end"],
+      "properties": { "start": { "type": "string", "format": "date-time" }, "end": { "type": "string", "format": "date-time" } }
+    },
+    "variants": {
+      "type": "object", "additionalProperties": false, "required": ["baseline", "tow-options"],
+      "properties": { "baseline": { "$ref": "#/definitions/plan" }, "tow-options": { "$ref": "#/definitions/plan" } }
+    },
     "default_tow_minutes": { "type": "number", "exclusiveMinimum": 0 },
     "visits": { "type": "array", "items": {
       "type": "object", "additionalProperties": false,
@@ -33,15 +43,38 @@
   "definitions": {
     "id": { "type": "string", "pattern": "^\\S+$" },
     "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "strings": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "\\S" } },
+    "plan": {
+      "type": "object", "additionalProperties": false, "required": ["request_fingerprint"],
+      "properties": { "request_fingerprint": { "$ref": "#/definitions/hash" } }
+    },
+    "blocker": {
+      "type": "object", "additionalProperties": false, "required": ["assignment_id", "release", "reasons", "rule_paths"],
+      "properties": {
+        "assignment_id": { "$ref": "#/definitions/id" }, "release": { "type": "integer" },
+        "reasons": { "allOf": [{ "$ref": "#/definitions/strings" }], "minItems": 1, "type": "array" },
+        "rule_paths": { "$ref": "#/definitions/strings" }
+      }
+    },
     "assessment": {
-      "type": "object", "additionalProperties": false, "required": ["source_stay_id", "destinations"],
+      "type": "object", "additionalProperties": false, "required": ["source_stay_id", "destinations", "exclusions"],
       "properties": {
         "source_stay_id": { "anyOf": [{ "$ref": "#/definitions/id" }, { "type": "null" }] },
         "destinations": { "type": "array", "items": {
-          "type": "object", "additionalProperties": false, "required": ["stand_id", "earliest_start", "latest_start"],
+          "type": "object", "additionalProperties": false, "required": ["stand_id", "earliest_start", "latest_start", "blockers"],
           "properties": {
             "stand_id": { "$ref": "#/definitions/id" },
-            "earliest_start": { "type": "integer" }, "latest_start": { "type": "integer" }
+            "earliest_start": { "type": "integer" }, "latest_start": { "type": "integer" },
+            "blockers": { "type": "array", "items": { "$ref": "#/definitions/blocker" } }
+          }
+        } },
+        "exclusions": { "type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["stand_id", "assignment_ids", "reasons", "rule_paths"],
+          "properties": {
+            "stand_id": { "$ref": "#/definitions/id" },
+            "assignment_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "$ref": "#/definitions/id" } },
+            "reasons": { "allOf": [{ "$ref": "#/definitions/strings" }], "minItems": 1, "type": "array" },
+            "rule_paths": { "$ref": "#/definitions/strings" }
           }
         } }
       }

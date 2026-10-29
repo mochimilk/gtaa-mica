@@ -16,7 +16,7 @@ const contoso = await loadSourceDataset({ source: "contoso", plan: "baseline" })
 test("overlays register from source data, without Contoso defaults leaking to other sources", async () => {
   for (const plan of ["baseline", "tow-options"] as const) {
     const source = await loadSourceDataset({ source: "contoso", plan });
-    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait", "capacity"]);
+    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait", "capacity", "tow-windows"]);
     assert.equal(source.overlays?.datasetId, source.id);
     assert.deepEqual(availableOverlays(await loadSourceDataset({ source: "gtaa", plan })), []);
   }
@@ -38,7 +38,7 @@ test("overlay input validation rejects wrong airports, plans, unsupported data a
 test("duplicate registrations and attempts to enable unavailable overlays explicitly fail", () => {
   const registered = availableOverlays(contoso);
   assert.throws(() => availableOverlays(contoso, [...registered, registered[0]]), /Duplicate/);
-  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "tow-windows" }), /unavailable/);
+  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "accommodation" }), /unavailable/);
 });
 
 test("overlay toggle, inspection and reset remain independent and prune unavailable features", () => {

@@ -11,6 +11,7 @@ import {
 } from "./registry";
 import { BufferLayer, BufferProvider, BufferReview, WaitingLayer, WaitingProvider, WaitingReview } from "./StandOverlayFeatures";
 import { CapacityLayer, CapacityProvider, CapacityReview } from "./CapacityFeature";
+import { TowWindowLayer, TowWindowProvider, TowWindowReview } from "./TowWindowFeature";
 import "./overlays.css";
 
 type FeatureProps = { dataset: OperationsDataset; isMatch?: (stayId: string) => boolean };
@@ -26,6 +27,7 @@ const PRESENTATIONS = {
   buffers: { Provider: BufferProvider, Underlay: BufferLayer, Review: BufferReview },
   "gate-wait": { Provider: WaitingProvider, Underlay: WaitingLayer, Review: WaitingReview },
   capacity: { Provider: CapacityProvider, Underlay: CapacityLayer, Review: CapacityReview },
+  "tow-windows": { Provider: TowWindowProvider, Overlay: TowWindowLayer, Review: TowWindowReview },
 } satisfies Record<OverlayId, OverlayPresentation>;
 const presentations = new Map<string, OverlayPresentation>(Object.entries(PRESENTATIONS));
 

@@ -11,6 +11,7 @@ export const OVERLAY_REGISTRATIONS = [
   { id: "buffers", label: "Scheduled buffers", description: "Scheduled stand-release gaps, not minimum operational separation rules." },
   { id: "gate-wait", label: "Synthetic gate waiting", description: "Illustrative release-delay assumptions, not a forecast or actual delay." },
   { id: "capacity", label: "Single-turn capacity", description: "Feasible arrival starts for one additional turn against the fixed plan, not additive slots." },
+  { id: "tow-windows", label: "One-way tow windows", description: "Destination-checked relocation start ranges, not scheduled movements or parking-and-return cycles." },
 ] as const satisfies readonly OverlayRegistration[];
 
 export type OverlayId = typeof OVERLAY_REGISTRATIONS[number]["id"];

@@ -3,6 +3,7 @@ import { createFixtureDataset } from "../stand-timeline-demo/fixtureDataset";
 import { adaptPreparedSchedule } from "./preparedAdapter";
 import type { PlanVariant } from "./preparedTypes";
 import { validateCapacitySnapshot } from "../overlays/capacity";
+import { validateTowWindowsSnapshot } from "../overlays/towWindows";
 
 export interface SourceSelection {
   source: string;
@@ -36,12 +37,20 @@ function preparedSource(
 export const SCHEDULE_SOURCES: readonly ScheduleSource[] = [
   { id: "fixture", label: "Original fixture", plans: ["baseline"], load: async () => createFixtureDataset() },
   preparedSource("contoso", "Contoso", () => import("./prepared/contoso/full-day.json", { with: { type: "json" } }), async snapshot => {
-    const [buffers, waiting, capacity] = await Promise.all([
+    const [buffers, waiting, capacity, towWindows] = await Promise.all([
       import("../../data/airports/contoso/evaluation/buffer-profile.json", { with: { type: "json" } }),
       import("../../data/airports/contoso/evaluation/gate-wait-profile.json", { with: { type: "json" } }),
       import("./prepared/contoso/full-day.capacity.json", { with: { type: "json" } }),
+      import("./prepared/contoso/full-day.tow-windows.json", { with: { type: "json" } }),
     ]);
-    return { buffers: buffers.default, "gate-wait": waiting.default, capacity: await validateCapacitySnapshot(capacity.default, snapshot) };
+    const [capacityEvidence, towEvidence] = await Promise.all([
+      validateCapacitySnapshot(capacity.default, snapshot), validateTowWindowsSnapshot(towWindows.default, snapshot),
+    ]);
+    if (capacityEvidence.airport_fingerprint !== towEvidence.airport_fingerprint ||
+        capacityEvidence.demand_fingerprint !== towEvidence.demand_fingerprint) {
+      throw new Error("Prepared overlays have different airport or demand provenance. Regenerate their evidence together.");
+    }
+    return { buffers: buffers.default, "gate-wait": waiting.default, capacity: capacityEvidence, "tow-windows": towEvidence };
   }),
   preparedSource("gtaa", "GTAA - Toronto Pearson", () => import("./prepared/gtaa/full-day.json", { with: { type: "json" } })),
 ];

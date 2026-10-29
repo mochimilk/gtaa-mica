@@ -285,9 +285,14 @@ Never reuse Contoso assumptions to fill gaps. Evidence for an approved plan
 must not be presented as current after that plan changes.
 The [isolated overlay registration guide](local-assignment.md#register-isolated-timeline-features)
 describes the UI extension points. Migrated overlays use Contoso's buffer,
-synthetic waiting and single-turn capacity profiles. Capacity requires a
-fresh sidecar matched to the schedule and both plan request fingerprints;
-regenerate it when the schedule changes. GTAA has no evaluation profiles yet.
+synthetic waiting, single-turn capacity and one-way tow-window evidence.
+Capacity and tow windows require fresh sidecars matched to the exact schedule
+and both plan request fingerprints. Their airport and demand provenance must
+agree. Regenerate them when the schedule, airport rules or demand changes.
+The [tow-window preparation guide](local-assignment.md#prepare-and-inspect-one-way-tow-windows)
+describes the explicit inputs, operating-policy requirements and exclusions.
+Tow windows do not apply movements or assess parking-and-return cycles.
+GTAA has no evaluation profiles yet.
 
 ## Use the AI onboarding prompt
 

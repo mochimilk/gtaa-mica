@@ -21,6 +21,8 @@
     "prepare:schedule": "npm run build:solver && node scripts/prepare-schedule.mjs",
     "prepare:capacity": "node scripts/prepare-capacity.mjs",
     "test:capacity": "node --test scripts/capacity-probe.test.mjs",
+    "prepare:tow-windows": "node scripts/prepare-tow-windows.mjs",
+    "test:tow-windows": "node --test scripts/tow-windows.test.mjs",
     "validate:catalogs": "node scripts/validate-catalogs.mjs",
     "test:catalogs": "node --test scripts/airport-catalogs.test.mjs",
     "validate:demand": "node scripts/validate-demand.mjs",

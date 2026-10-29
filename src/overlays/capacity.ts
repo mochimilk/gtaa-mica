@@ -105,7 +105,7 @@ export function parseCapacitySnapshot(value: unknown): PreparedCapacity {
 }
 
 export async function fingerprintJson(value: unknown): Promise<string> {
-  if (!globalThis.crypto?.subtle) throw new Error("Capacity source verification requires a secure browser context (localhost or HTTPS).");
+  if (!globalThis.crypto?.subtle) throw new Error("Prepared overlay source verification requires a secure browser context (localhost or HTTPS).");
   const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(JSON.stringify(value)));
   return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
 }
