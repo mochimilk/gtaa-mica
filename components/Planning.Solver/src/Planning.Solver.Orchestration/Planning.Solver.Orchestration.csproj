@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Planning.Solver.Orchestration</PackageId>
+    <RootNamespace>Planning.Solver.Orchestration</RootNamespace>
+    <Description>Transport-neutral optimization job coordination and worker contracts.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Planning.Solver.Core\Planning.Solver.Core.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:occupancy:1.0.0",
+  "title": "Derived stand occupancy with explicit unresolved boundaries",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "airport_id", "demand_id", "boundary_policy", "plan_window",
+    "linked_demand", "segments", "unresolved_segment_ids", "blocked_source_leg_ids", "timing_complete", "findings"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "airport_id": { "$ref": "#/definitions/id" },
+    "demand_id": { "$ref": "#/definitions/id" },
+    "boundary_policy": { "const": "preserve-unknown" },
+    "plan_window": { "$ref": "urn:gtaa-mica:linked-demand:2.0.0#/definitions/window" },
+    "linked_demand": { "$ref": "urn:gtaa-mica:linked-demand:2.0.0" },
+    "segments": { "type": "array", "items": { "$ref": "#/definitions/segment" } },
+    "unresolved_segment_ids": { "$ref": "#/definitions/ids" },
+    "blocked_source_leg_ids": { "$ref": "#/definitions/ids" },
+    "timing_complete": { "type": "boolean" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "leg_ids", "segment_ids", "message"],
+        "properties": {
+          "code": { "$ref": "#/definitions/id" },
+          "severity": { "enum": ["warning", "error"] },
+          "leg_ids": { "$ref": "#/definitions/ids" },
+          "segment_ids": { "$ref": "#/definitions/ids" },
+          "message": { "type": "string", "pattern": "\\S" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "id": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/id" },
+    "instant": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/instant" },
+    "ids": { "$ref": "urn:gtaa-mica:linked-demand:2.0.0#/definitions/ids" },
+    "boundary": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": { "kind": { "const": "unknown" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "event", "source_leg_id", "time"],
+          "properties": {
+            "kind": { "const": "fixed" },
+            "event": { "enum": ["arrival-on-block", "departure-off-block", "movement-on-block", "movement-off-block"] },
+            "source_leg_id": { "$ref": "#/definitions/id" },
+            "time": { "$ref": "#/definitions/instant" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "event", "source_leg_id", "tow_requirement_id"],
+          "properties": {
+            "kind": { "const": "flexible" },
+            "event": { "enum": ["pending-tow-in", "pending-tow-out"] },
+            "source_leg_id": { "$ref": "#/definitions/id" },
+            "tow_requirement_id": { "$ref": "#/definitions/id" },
+            "earliest": { "$ref": "#/definitions/instant" },
+            "latest": { "$ref": "#/definitions/instant" }
+          },
+          "oneOf": [
+            {
+              "properties": { "event": { "const": "pending-tow-in" }, "earliest": false },
+              "required": ["latest"]
+            },
+            {
+              "properties": { "event": { "const": "pending-tow-out" }, "latest": false },
+              "required": ["earliest"]
+            }
+          ]
+        }
+      ]
+    },
+    "segment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "aircraft_registration", "aircraft_id", "source_leg_ids", "start", "end", "timing_status"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "aircraft_registration": { "$ref": "#/definitions/id" },
+        "aircraft_id": { "$ref": "#/definitions/id" },
+        "visit_id": { "$ref": "#/definitions/id" },
+        "stand_id": { "$ref": "#/definitions/id" },
+        "arrival_leg_id": { "$ref": "#/definitions/id" },
+        "departure_leg_id": { "$ref": "#/definitions/id" },
+        "source_leg_ids": {
+          "type": "array", "minItems": 1, "uniqueItems": true,
+          "items": { "$ref": "#/definitions/id" }
+        },
+        "start": {
+          "type": "object",
+          "allOf": [{ "$ref": "#/definitions/boundary" }],
+          "properties": { "event": { "enum": ["arrival-on-block", "movement-on-block", "pending-tow-in"] } }
+        },
+        "end": {
+          "type": "object",
+          "allOf": [{ "$ref": "#/definitions/boundary" }],
+          "properties": { "event": { "enum": ["departure-off-block", "movement-off-block", "pending-tow-out"] } }
+        },
+        "timing_status": { "enum": ["fixed", "flexible", "open"] }
+      },
+      "anyOf": [
+        { "properties": { "start": { "type": "object", "properties": { "kind": { "const": "fixed" } } } } },
+        { "properties": { "end": { "type": "object", "properties": { "kind": { "const": "fixed" } } } } }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "anyOf": [
+              { "properties": { "start": { "type": "object", "properties": { "kind": { "const": "unknown" } } } } },
+              { "properties": { "end": { "type": "object", "properties": { "kind": { "const": "unknown" } } } } }
+            ]
+          },
+          "then": { "properties": { "timing_status": { "const": "open" } } },
+          "else": {
+            "if": {
+              "anyOf": [
+                { "properties": { "start": { "type": "object", "properties": { "kind": { "const": "flexible" } } } } },
+                { "properties": { "end": { "type": "object", "properties": { "kind": { "const": "flexible" } } } } }
+              ]
+            },
+            "then": { "properties": { "timing_status": { "const": "flexible" } } },
+            "else": { "properties": { "timing_status": { "const": "fixed" } } }
+          }
+        }
+      ]
+    }
+  }
+}

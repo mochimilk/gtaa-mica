@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:traffic-profile:1.0.0",
+  "title": "Airport-local sector traffic weights",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "airport_id", "synthetic", "description", "time_basis", "sector-patterns"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "airport_id": { "type": "string", "pattern": "^\\S+$" },
+    "synthetic": { "type": "boolean" },
+    "description": { "type": "string", "pattern": "\\S" },
+    "time_basis": { "const": "airport-local" },
+    "sector-patterns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sector", "arrival-hourly-weights", "departure-hourly-weights"],
+        "properties": {
+          "sector": { "type": "string", "pattern": "^\\S+$" },
+          "arrival-hourly-weights": { "$ref": "#/definitions/weights" },
+          "departure-hourly-weights": { "$ref": "#/definitions/weights" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "weights": {
+      "type": "array",
+      "minItems": 24,
+      "maxItems": 24,
+      "items": { "type": "number", "minimum": 0 }
+    }
+  }
+}

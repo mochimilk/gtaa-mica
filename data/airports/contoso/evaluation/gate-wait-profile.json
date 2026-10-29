@@ -1,0 +1,25 @@
+{
+  "$schema": "../../../schemas/gate-wait-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "contoso:synthetic-gate-wait-review:v1",
+  "metric_id": "airport-predicted-stand-wait",
+  "metric_version": "1.0.0",
+  "model_id": "contoso:illustrative-stand-release-delay",
+  "model_version": "1.0.0",
+  "source": "synthetic",
+  "default_assumption_id": "routine",
+  "assumptions": [
+    {
+      "id": "routine",
+      "label": "Illustrative routine releases",
+      "release_delay_probability": 0.25,
+      "expected_release_delay_minutes_given_delay": 20
+    },
+    {
+      "id": "stressed",
+      "label": "Illustrative stressed releases",
+      "release_delay_probability": 0.5,
+      "expected_release_delay_minutes_given_delay": 40
+    }
+  ]
+}

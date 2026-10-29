@@ -1,0 +1,57 @@
+{
+  "schema_version": "1.0.0",
+  "airport_id": "gtaa",
+  "buildings": [
+    {
+      "id": "t1",
+      "name": "Terminal 1",
+      "description": "Building identity only. Geographic footprint, levels, elevations and interior spaces require confirmation.",
+      "configuration_status": "stub",
+      "levels": [
+        {
+          "id": "t1:level:unverified",
+          "name": "Unverified passenger level",
+          "configuration_status": "stub"
+        }
+      ],
+      "source": {
+        "source_id": "map-t1",
+        "pdf_page": 1
+      }
+    },
+    {
+      "id": "t3",
+      "name": "Terminal 3",
+      "description": "Building identity only. Geographic footprint, levels, elevations and interior spaces require confirmation.",
+      "configuration_status": "stub",
+      "levels": [
+        {
+          "id": "t3:level:unverified",
+          "name": "Unverified passenger level",
+          "configuration_status": "stub"
+        }
+      ],
+      "source": {
+        "source_id": "map-t3",
+        "pdf_page": 1
+      }
+    },
+    {
+      "id": "ifc",
+      "name": "Infield Concourse",
+      "description": "Building identity only. Geographic footprint, levels, elevations and interior spaces require confirmation.",
+      "configuration_status": "stub",
+      "levels": [
+        {
+          "id": "ifc:level:unverified",
+          "name": "Unverified passenger level",
+          "configuration_status": "stub"
+        }
+      ],
+      "source": {
+        "source_id": "map-ifc",
+        "pdf_page": 1
+      }
+    }
+  ]
+}

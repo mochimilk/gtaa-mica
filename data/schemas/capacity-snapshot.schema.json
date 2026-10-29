@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:capacity-snapshot:1.0.0",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "metric_id", "metric_version", "airport_id", "case_id", "demand_id", "snapshot_fingerprint", "airport_fingerprint", "demand_fingerprint", "plan_window", "profile", "variants"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "metric_id": { "const": "airport-single-turn-capacity" }, "metric_version": { "const": "1.0.0" },
+    "airport_id": { "$ref": "#/definitions/id" }, "demand_id": { "$ref": "#/definitions/id" },
+    "case_id": { "enum": ["comfortable", "constrained", "full-day"] },
+    "snapshot_fingerprint": { "$ref": "#/definitions/hash" },
+    "airport_fingerprint": { "$ref": "#/definitions/hash" }, "demand_fingerprint": { "$ref": "#/definitions/hash" },
+    "profile": { "$ref": "urn:gtaa-mica:capacity-profile:1.0.0" },
+    "plan_window": {
+      "type": "object", "additionalProperties": false, "required": ["start", "end"],
+      "properties": { "start": { "$ref": "#/definitions/instant" }, "end": { "$ref": "#/definitions/instant" } }
+    },
+    "variants": {
+      "type": "object", "additionalProperties": false, "required": ["baseline", "tow-options"],
+      "properties": { "baseline": { "$ref": "#/definitions/plan" }, "tow-options": { "$ref": "#/definitions/plan" } }
+    }
+  },
+  "definitions": {
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "instant": { "type": "string", "format": "date-time" },
+    "ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "$ref": "#/definitions/id" } },
+    "boundary": { "type": ["integer", "null"], "minimum": 0 },
+    "window": {
+      "type": "object", "additionalProperties": false, "required": ["start", "end", "before", "after"],
+      "properties": {
+        "start": { "$ref": "#/definitions/instant" }, "end": { "$ref": "#/definitions/instant" },
+        "before": { "$ref": "#/definitions/boundary" }, "after": { "$ref": "#/definitions/boundary" }
+      }
+    },
+    "block": {
+      "type": "object", "additionalProperties": false, "required": ["start", "end", "assignment_ids", "reasons", "rule_paths"],
+      "properties": {
+        "start": { "$ref": "#/definitions/instant" }, "end": { "$ref": "#/definitions/instant" },
+        "assignment_ids": { "$ref": "#/definitions/ids", "type": "array", "minItems": 1 },
+        "reasons": { "$ref": "#/definitions/ids", "type": "array", "minItems": 1 },
+        "rule_paths": { "$ref": "#/definitions/ids" }
+      }
+    },
+    "row": {
+      "type": "object", "additionalProperties": false, "required": ["stand_id", "windows", "blocks"],
+      "properties": {
+        "stand_id": { "$ref": "#/definitions/id" },
+        "windows": { "type": "array", "items": { "$ref": "#/definitions/window" } },
+        "blocks": { "type": "array", "items": { "$ref": "#/definitions/block" } }
+      }
+    },
+    "probe": {
+      "type": "object", "additionalProperties": false, "required": ["id", "rows", "excluded_stands"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "rows": { "type": "array", "items": { "$ref": "#/definitions/row" } },
+        "excluded_stands": {
+          "type": "array", "items": {
+            "type": "object", "additionalProperties": false, "required": ["stand_id", "reasons"],
+            "properties": { "stand_id": { "$ref": "#/definitions/id" }, "reasons": { "$ref": "#/definitions/ids", "type": "array", "minItems": 1 } }
+          }
+        }
+      }
+    },
+    "plan": {
+      "type": "object", "additionalProperties": false, "required": ["request_fingerprint", "probes"],
+      "properties": {
+        "request_fingerprint": { "$ref": "#/definitions/hash" },
+        "probes": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/probe" } }
+      }
+    }
+  }
+}

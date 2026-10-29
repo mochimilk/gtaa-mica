@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../schemas/buffer-evaluation-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "contoso:scheduled-buffer-review:v1",
+  "metric_id": "airport-scheduled-stand-buffer",
+  "metric_version": "1.0.0",
+  "threshold_minutes": 20
+}

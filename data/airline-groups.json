@@ -1,0 +1,60 @@
+{
+  "$schema": "schemas/airline-groups.schema.json",
+  "groups": [
+    {
+      "id": "group:alliance:oneworld",
+      "name": "Oneworld",
+      "airlines": [
+        "airline:ASA",
+        "airline:AAL",
+        "airline:BAW",
+        "airline:CPA",
+        "airline:FIN",
+        "airline:IBE",
+        "airline:HA",
+        "airline:JAL",
+        "airline:MAS",
+        "airline:QFA",
+        "airline:QTR"
+      ]
+    },
+    {
+      "id": "group:alliance:star",
+      "name": "Star Alliance",
+      "airlines": [
+        "airline:ACA",
+        "airline:CCA",
+        "airline:AIC",
+        "airline:ANT",
+        "airline:AVA",
+        "airline:CMP",
+        "airline:MSR",
+        "airline:UAE",
+        "airline:ETH",
+        "airline:ETD",
+        "airline:EVA",
+        "airline:ITY",
+        "airline:DLH",
+        "airline:RAM",
+        "airline:SWR",
+        "airline:TAP",
+        "airline:THY",
+        "airline:UAL"
+      ]
+    },
+    {
+      "id": "group:alliance:skyteam",
+      "name": "SkyTeam",
+      "airlines": [
+        "airline:AMX",
+        "airline:AFR",
+        "airline:CES",
+        "airline:DAL",
+        "airline:KLM",
+        "airline:SAS",
+        "airline:SVA",
+        "airline:VIR"
+      ]
+    }
+  ]
+}
