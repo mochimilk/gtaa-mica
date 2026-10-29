@@ -9,8 +9,9 @@ ms.date: 2026-10-28
 The [GTAA manifest](../data/airports/gtaa/airport.json) follows Contoso's
 infrastructure and routing layout. It identifies Toronto Pearson as YYZ/CYYZ
 with the `America/Toronto` time zone. This integration includes the headless
-airport model and synthetic scenario tools. Main's existing application UI
-is unchanged; selectable solver datasets and overlays are a later integration.
+airport model, synthetic scenario tools and a selectable read-only full-day
+schedule. The original editable fixture remains available. Analysis overlays
+and airport branding remain separate integrations.
 
 | Area | Stand stubs | Interior gates | Stands in current ASM tables | Stand-level directional closures |
 |------|-------------|----------------|------------------------------|---------------------------------|
@@ -250,9 +251,13 @@ Use fresh output filenames; existing files are not overwritten. Generation
 returns exit `0`; a solved review matching expectations returns `3`, while
 failed expectations return `2`. These commands create synthetic CLI artifacts;
 they do not register GTAA in the application or replace main's fixture.
-The prototype viewer and analysis tooling remain on `feature/solver` for a
-separate modular integration. Airport-specific analysis assumptions must not
-be replaced with Contoso defaults during that integration.
+To view GTAA, open Settings > Schedule source or use
+`?source=gtaa&plan=baseline` (also `plan=tow-options`).
+The compact preparation and reload lifecycle are documented in the
+[schedule integration guide](local-assignment.md#select-or-prepare-an-airport-schedule).
+The application displays scheduled UTC values and solver coverage, not
+fixture KPIs or operational certification. Airport-specific analysis
+assumptions must not be replaced with Contoso defaults.
 See the [onboarding guide](airport-onboarding.md) for reusable input requirements,
 formats, diagram alignment and AI assistance.
 

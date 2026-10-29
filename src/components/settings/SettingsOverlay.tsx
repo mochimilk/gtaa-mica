@@ -8,9 +8,11 @@ import { Key } from "@coral-ai/bundleicons/Key";
 import { Portal } from "@fluentui/react-components";
 import { ApiSettings } from "./ApiSettings";
 import { AppearanceSettings } from "./AppearanceSettings";
+import { SourceSettings } from "./SourceSettings";
 
 const PAGES: OverlayMenuItem[] = [
   { value: "appearance", label: "Appearance", icon: <Color />, content: <AppearanceSettings /> },
+  { value: "source", label: "Schedule source", content: <SourceSettings /> },
   { value: "api", label: "API", icon: <Key />, content: <ApiSettings /> },
 ];
 

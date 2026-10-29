@@ -1,10 +1,11 @@
 // Compatibility entry point for the lists, editor and agent. These are the
 // same mutable flight objects owned by the chart's active dataset.
-import { ACTIVE_DATASET } from "./activeDataset";
+import { ACTIVE_DATASET, sealActiveDataset } from "./activeDataset";
 import type { OpsFlight } from "./dataset";
 
 export type { FlightDirection, OpsFlight, UnplacedStay } from "./dataset";
 
+sealActiveDataset();
 export const NO_STAND_STAYS = ACTIVE_DATASET.noStandStays;
 export const OPS_FLIGHTS = ACTIVE_DATASET.flights;
 export const OPS_FLIGHTS_BY_ID = ACTIVE_DATASET.flightsById;

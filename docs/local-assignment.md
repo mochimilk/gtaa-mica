@@ -225,10 +225,10 @@ assignments take precedence over review-only status.
 
 ## Preserve the current Gantt
 
-The assignment runner writes comparison JSON only. This foundation does not
-change main's UI, agent actions, mutable allocation model or fixture.
-Source selection, compact viewer projections and analysis overlays remain a
-separate integration. The scenario runner resolves boundary state for its
+The assignment runner writes comparison JSON only. The original fixture and
+its editing behavior remain available. Source selection uses separately
+prepared compact schedules; analysis overlays remain deferred.
+The scenario runner resolves boundary state for its
 complete scheduled feed; generic initial-state overlays, single-leg tow
 scheduling and explicit gate/towing resources remain separate modeling steps.
 
@@ -249,12 +249,50 @@ single dataset. Allocation, KPIs, agent stand validation, chart dates and Studio
 aircraft metadata now read that dataset rather than importing fixture values.
 The original records, sample editing rules and UTC presentation are unchanged.
 
-This boundary does not yet enable source switching. The allocation baseline,
-filters, pending agent work, selections and review state are session-scoped.
-Do not replace the active dataset in place or pass a different dataset only to
-the chart. A future selection flow must initialize or reset all those consumers
-together and explicitly gate editing and analyses for a prepared solver plan.
-The sample narrow/wide size rules are not GTAA ASM compatibility rules.
+The allocation baseline, filters, pending agent work, selections and review
+state are session-scoped. Bootstrap loads and validates the selected dataset
+before importing App. Compatibility consumers seal that choice; replacing it
+later throws. Do not pass a different dataset only to the chart.
+
+## Select or prepare an airport schedule
+
+Open Settings > Schedule source to choose the original editable fixture,
+Contoso or GTAA, with baseline and tow-options plans for each airport.
+The confirmation reloads the page, clearing stand changes, selections,
+reviews, pending agent work and active calls. Appearance settings and saved
+drawings remain. Selection is URL-backed, for example
+`?source=gtaa&plan=baseline`, so reloads, bookmarks and shared links retain it.
+Invalid sources or corrupt snapshots show a startup error with explicit retry
+and original-fixture recovery, never a silent airport fallback.
+
+[The source registry](../src/data-sources/registry.ts) is the extension point.
+Prepared plans preserve exact source IDs and scheduled UTC times, including
+context flights outside the displayed window. Wholly unassigned paired visits
+appear in the No stand lane with both original flights. Current full-day
+snapshots contain 160 visits and 320 legs each: GTAA assigns all legs; Contoso
+assigns 298 and leaves 11 paired visits visible without stands.
+
+Prepared sources disable dragging, stand mutations and agent proposals at both
+UI and core boundaries. Their summary reports coverage, tow count and solver
+status instead of fixture KPIs. Fixture notices, disruptions and analyses do
+not run. The sample narrow/wide rules are not GTAA ASM compatibility rules;
+unknown metadata is not labeled as narrowbody or unrestricted compatibility.
+
+Build the native CLI once, then regenerate each compact snapshot explicitly:
+
+```powershell
+npm run build:solver
+node scripts\prepare-schedule.mjs --airport data\airports\gtaa\airport.json --profile data\airports\gtaa\demand\scenario-profile.json --case full-day --tow-profile data\airports\gtaa\demand\tow-profile.json --output src\data-sources\prepared\gtaa\full-day.json
+node scripts\prepare-schedule.mjs --airport data\airports\contoso\airport.json --profile data\airports\contoso\demand\full-day-profile.json --case full-day --tow-profile data\airports\contoso\demand\tow-profile.json --output src\data-sources\prepared\contoso\full-day.json
+```
+
+Alternatively, `npm run prepare:schedule -- <explicit arguments>` builds first.
+The preparation command overwrites its output and generates the browser-safe
+standalone schema validator; AJV compilation stays in Node, not the browser.
+Runtime validation also checks source/case identity, flight endpoints,
+complete assignments, tow chains, same-stand overlap and displayed counts.
+Neither solver status nor independent stand-rule validation is operational
+certification. No capacity, accommodation or tow-window evidence is inferred.
 
 ## Validate the imported foundation
 
@@ -282,5 +320,5 @@ npm test
 The component's own build and central package files apply only beneath
 `components/Planning.Solver`; the migration does not introduce global .NET
 settings or overwrite main's dependencies and scripts. Other copied component
-families, prototype viewer tests and viewer-specific preparation commands
+families, prototype analysis tests and analysis-specific preparation commands
 remain on `feature/solver` until their own integration work.

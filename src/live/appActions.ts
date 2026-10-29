@@ -46,7 +46,7 @@ import {
 import type { Millis } from "../stand-timeline/index.ts";
 import { utcAt } from "../stand-timeline-demo/adapter.ts";
 import { DEMO_DATA, DEMO_DOMAIN, formatUtc } from "../stand-timeline-demo/demoData.ts";
-import { ACTIVE_DATASET } from "../operations/activeDataset.ts";
+import { ACTIVE_DATASET, READ_ONLY_REASON } from "../operations/activeDataset.ts";
 import {
   DISRUPTION,
   explainPlan,
@@ -253,6 +253,18 @@ export const MAX_SELECT_FLIGHTS = 12;
 
 const reject = (code: string, message: string): ValidationResult => ({ ok: false, code, message });
 
+const STAND_ACTIONS = new Set<AppActionName>(["move_stay", "swap_stays", "close_area", "assign_stands", "unassign_stands", "fix_all", "resolve_disruption", "suggest_move"]);
+const FIXTURE_ANALYSES = new Set<AppActionName>(["explain_plan", "list_conflicts"]);
+
+function sourceRefusal(name: AppActionName): { ok: false; code: string; message: string } | undefined {
+  if (!ACTIVE_DATASET.capabilities.editStands && STAND_ACTIONS.has(name)) {
+    return { ok: false, code: "read_only_source", message: READ_ONLY_REASON };
+  }
+  if (!ACTIVE_DATASET.capabilities.fixtureAnalyses && FIXTURE_ANALYSES.has(name)) {
+    return { ok: false, code: "unsupported_analysis", message: "Fixture-only analysis is unavailable for this schedule. The prepared plan is not operational certification." };
+  }
+}
+
 function asString(value: unknown): string | null {
   return typeof value === "string" && value.trim() !== "" ? value.trim() : null;
 }
@@ -268,6 +280,8 @@ export function validateAppAction(name: unknown, args: Record<string, unknown> =
   if (!isAppActionName(actionName)) {
     return reject("unknown_action", `"${String(name)}" is not a Mica action.`);
   }
+  const refusal = sourceRefusal(actionName);
+  if (refusal) return refusal;
   // Arguments arrive from a model decision or a test; a prototype-polluted or
   // non-object value must not reach the per-action readers below.
   const safeArgs: Record<string, unknown> =
@@ -799,6 +813,11 @@ export function applyAppAction(
    */
   openBefore: readonly OpsAlert[] = openWork(host),
 ): ApplyResult {
+  const refusal = sourceRefusal(action.name);
+  if (refusal) return refusal;
+  if (action.name === "brief" && !ACTIVE_DATASET.capabilities.fixtureAnalyses) {
+    return { ok: true, mutated: false, spoken: `${ACTIVE_DATASET.label}. ${ACTIVE_DATASET.summary ?? READ_ONLY_REASON}` };
+  }
   if (!CLEARS_ALERTS.has(action.name)) return applyAction(action, host);
   const before = openBefore;
   const result = applyAction(action, host);

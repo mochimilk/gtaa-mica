@@ -99,5 +99,6 @@ export function createFixtureDataset() {
     timeline,
     flights: [...assignedFlights(timeline), ...unassigned],
     noStandStays,
+    capabilities: { editStands: true, fixtureAnalyses: true },
   });
 }

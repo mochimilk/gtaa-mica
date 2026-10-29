@@ -28,7 +28,8 @@ import {
 } from "./operations/noStandLane";
 import { AlertsMenu } from "./operations/AlertsMenu";
 import { DisruptionNotice } from "./operations/DisruptionNotice";
-import { KpiStrip } from "./operations/KpiStrip";
+import { SourceSummary } from "./data-sources/SourceSummary";
+import { ACTIVE_DATASET } from "./operations/activeDataset";
 import { ClosureBand, ClosureLabel } from "./operations/ClosureBand";
 import { FlightDragChip, FlightDropGhost } from "./operations/FlightDrag";
 import { OperationsPanel } from "./operations/OperationsPanel";
@@ -174,7 +175,7 @@ function ConnectedTimeline() {
     ),
     [zoom],
   );
-  const summary = useMemo(() => <KpiStrip />, []);
+  const summary = useMemo(() => <SourceSummary />, []);
   return (
     <>
       {/* Details show in SelectionPopover.
@@ -191,7 +192,7 @@ function ConnectedTimeline() {
           occupancies={occupancies}
           pinnedRows={lane.rows}
           pinnedLabel={pinnedLabel}
-          previewDrop={previewDrop}
+          previewDrop={ACTIVE_DATASET.capabilities.editStands ? previewDrop : undefined}
           dragSnapMs={DRAG_SNAP_MS}
           underlay={underlay}
           overlay={overlay}
@@ -328,7 +329,7 @@ export default function App() {
               <AppNavbar
                 askActionsEnd={<AlertsMenu />}
                 // Skye catching the day's disruption (see docs/disruption-demo.md).
-                askNotices={page === "planner" ? <DisruptionNotice /> : undefined}
+                askNotices={page === "planner" && ACTIVE_DATASET.capabilities.fixtureAnalyses ? <DisruptionNotice /> : undefined}
               />
 
             </CoralShellColumn>

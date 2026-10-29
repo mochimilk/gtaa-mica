@@ -46,6 +46,11 @@ const asText = (value: unknown): string | null =>
 function boardVocabulary(request: InterpretationRequest) {
   const { snapshot } = request;
   return {
+    source: {
+      label: ACTIVE_DATASET.label, airportId: ACTIVE_DATASET.airportId,
+      readOnly: !ACTIVE_DATASET.capabilities.editStands, fixtureAnalyses: ACTIVE_DATASET.capabilities.fixtureAnalyses,
+      summary: ACTIVE_DATASET.summary,
+    },
     summary: describeBoardForInterpreter(snapshot),
     // "id — human label", so the model can match spoken flight numbers, plus
     // how long the flight's stay holds its stand, so questions like "which
@@ -79,7 +84,9 @@ function boardVocabulary(request: InterpretationRequest) {
     callingGuests: [...snapshot.callingGuests],
     // Where a stay may be moved, and which stands take narrowbodies only.
     allowedStands: ACTIVE_DATASET.stands.map(
-      (stand) => `${stand.code} — ${stand.area}, ${stand.size === "narrow" ? "narrowbody only" : "any aircraft"}`,
+      (stand) => `${stand.code} — ${stand.area}, ${!ACTIVE_DATASET.capabilities.editStands
+        ? "read-only; compatibility is not evaluated here"
+        : stand.size === "narrow" ? "narrowbody only" : "any aircraft"}`,
     ),
     allowedFilterValues: {
       carrier: [...FILTER_OPTIONS.carrier],

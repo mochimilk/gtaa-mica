@@ -14,9 +14,8 @@ and international traffic.
 The next airport is an end-to-end portability exercise, not evidence that
 every production planning problem is already modeled.
 Keep airport configuration, raw demand, plans and evaluation profiles separate.
-Steps 1-4 below are supported by this headless foundation. Steps 5-6 describe
-the later viewer and analysis integration; their prototype tooling remains on
-`feature/solver`.
+Steps 1-4 provide headless validation. Steps 5-6 register compact read-only
+schedules; additional analysis tooling remains on `feature/solver`.
 
 1. Author a manifest and referenced infrastructure with a consistent airport ID,
    timezone, stand/gate identities, physical permissions, airline/sector groups
@@ -31,18 +30,19 @@ the later viewer and analysis integration; their prototype tooling remains on
    projection currently requires complete pairs.
 4. Run baseline/tow assignments and independently validate the complete plans.
    Do not assume Contoso's coverage, tow counts or available capacity will recur.
-5. Prepare source-matched snapshots, capacity probes, atlas, accommodation and
-   tow-window evidence. Author probes and late requests using airlines,
-   aircraft and sectors the new airport actually permits.
-6. Register the new source and prepared artifact imports in the demo selector,
+5. Prepare source-matched compact snapshots using the
+   [schedule-only command](local-assignment.md#select-or-prepare-an-airport-schedule).
+   Capacity probes, atlas, accommodation and tow-window evidence require
+   separate airport-specific inputs and remain unavailable in this viewer.
+6. Register the new source and prepared artifact imports in the source registry,
    then validate chart rows, flight links, filters, unassigned demand,
-   comparisons, overlays and session restore/reload.
+   read-only boundaries and confirmed reloads.
 
 The reusable generation and assignment functions accept an airport object
 rather than selecting rules from an airport name. Command defaults target
 Contoso; supply explicit GTAA manifest, scenario and tow-profile paths for GTAA.
-Main's existing application UI, source fixture and agent interactions are
-unchanged. A manifest does not register a selectable application dataset, and
+The original application fixture retains its editing behavior. A manifest
+does not register a selectable application dataset, and
 application branding does not determine the solver's airport identity.
 
 Portability tests cover a different airport identity, timezone and travel
@@ -327,6 +327,7 @@ requires stdout without npm's banner. Extract `raw_demand` from the standalone
 package to use it with the existing raw-demand commands.
 
 The generator does not alter the Gantt, existing fixture or airport rules.
-Selectable solver datasets and overlays are a separate integration with
-main's UI; command-line review files are not imported automatically.
+Selectable solver datasets use explicitly prepared compact snapshots;
+command-line review files are not imported automatically. Analysis overlays
+remain a separate integration.
 Historical delay distributions and day-of actuals are not generated here.

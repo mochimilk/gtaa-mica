@@ -30,6 +30,7 @@ import {
 import { OPS_FLIGHTS_BY_ID, formatDuration } from "./operationsData";
 import { stayLabel, type OutputDecision } from "./outputs";
 import type { ReviewChange } from "./skyeReview";
+import { requireFixtureAnalyses } from "./activeDataset";
 
 /** The disruption: which stay runs late, by how much, and why. */
 export const DISRUPTION = {
@@ -95,6 +96,7 @@ export function subscribeDisruption(listener: () => void): () => void {
  * whether it landed now.
  */
 export function landDisruption(now = Date.now()): boolean {
+  requireFixtureAnalyses();
   if (state.landedAt !== null) return false;
   if (!setRunningLate(DISRUPTION.stayId, DISRUPTION.delayIn, DISRUPTION.delayOut)) return false;
   set({ landedAt: now, notice: "shown", baseline: boardKpis(standState()), approved: null });
@@ -226,6 +228,7 @@ const overlaps = (a: Occupancy, b: Occupancy) => a.start < b.end && b.start < a.
  * stand. A greedy pass under the sample rules, not an allocator.
  */
 export function planDisruption(stayId: string = DISRUPTION.stayId): DisruptionPlan {
+  requireFixtureAnalyses();
   if (!occupancyById(stayId)) return { stayId, moves: [], stuck: [], considered: [] };
   return planKnockOn(
     stayId,
@@ -240,6 +243,7 @@ export function planDisruption(stayId: string = DISRUPTION.stayId): DisruptionPl
  * stay is on `board`.
  */
 export function planKnockOn(stayId: string, board: Occupancy[]): DisruptionPlan {
+  requireFixtureAnalyses();
   const rowOf = new Map(DEMO_DATA.rows.map((row, index) => [row.id, index]));
   const moves: AreaMove[] = [];
   const stuck: string[] = [];

@@ -147,13 +147,13 @@ export function FlightCard({ titleId, title }: { titleId: string; title: string 
               />
             </Tooltip>
           ) : (
-            <Tooltip content="Unassign stand" relationship="label">
+            <Tooltip content={ACTIVE_DATASET.capabilities.editStands ? "Unassign stand" : "Read-only schedule"} relationship="label">
               <Button
                 appearance="subtle"
                 icon={<CalendarCancel20Regular />}
-                disabledFocusable={!unassignable}
+                disabledFocusable={!unassignable || !ACTIVE_DATASET.capabilities.editStands}
                 data-ops-unassign=""
-                onClick={() => unassignable && unassignStands([unassignable.id])}
+                onClick={() => ACTIVE_DATASET.capabilities.editStands && unassignable && unassignStands([unassignable.id])}
               />
             </Tooltip>
           )}

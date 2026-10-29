@@ -1,6 +1,7 @@
 // Compatibility entry point; all board records belong to the active dataset.
-import { ACTIVE_DATASET } from "../operations/activeDataset";
+import { ACTIVE_DATASET, sealActiveDataset } from "../operations/activeDataset";
 
+sealActiveDataset();
 export const DEMO_DATA = ACTIVE_DATASET.timeline;
 
 // DEMO_DATA is the board's shared, mutable state (stand changes rewrite it in

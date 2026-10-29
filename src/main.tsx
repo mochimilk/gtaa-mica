@@ -2,7 +2,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import { CoralProvider, type CoralConfig } from "@coral-ai/react";
 import "@coral-ai/markdown/styles";
-import App from "./App";
+import { initializeActiveDataset } from "./operations/activeDataset";
+import { loadSourceDataset, readSourceSelection, sourceSelectionUrl } from "./data-sources/registry";
 import coralConfig from "../coral.config.json";
 import "./components/cursor/cursor.css";
 import "./components/grain/grain.css";
@@ -30,11 +31,35 @@ function BootSplashDismiss() {
   return null;
 }
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <CoralProvider config={coralConfig as CoralConfig} glow={false}>
-      <App />
-      <BootSplashDismiss />
-    </CoralProvider>
-  </React.StrictMode>,
-);
+const root = ReactDOM.createRoot(document.getElementById("root")!);
+
+async function bootstrap() {
+  try {
+    const dataset = await loadSourceDataset(readSourceSelection(window.location.search));
+    initializeActiveDataset(dataset);
+    const { default: App } = await import("./App");
+    root.render(
+      <React.StrictMode>
+        <CoralProvider config={coralConfig as CoralConfig} glow={false}>
+          <App />
+          <BootSplashDismiss />
+        </CoralProvider>
+      </React.StrictMode>,
+    );
+  } catch (error) {
+    console.error("Schedule startup failed.", error);
+    root.render(
+      <main role="alert">
+        <h1>Unable to load the selected schedule</h1>
+        <p>{error instanceof Error ? error.message : String(error)}</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
+        <button onClick={() => window.location.assign(sourceSelectionUrl(new URL(window.location.href), { source: "fixture", plan: "baseline" }))}>
+          Load original fixture
+        </button>
+        <BootSplashDismiss />
+      </main>,
+    );
+  }
+}
+
+void bootstrap();

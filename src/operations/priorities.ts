@@ -25,6 +25,7 @@ import {
 import type { OpsAlert } from "./boardAlerts";
 import { planDisruption, planKnockOn } from "./disruption";
 import { OPS_FLIGHTS_BY_ID } from "./operationsData";
+import { requireFixtureAnalyses } from "./activeDataset";
 
 export type AlertFix =
   /** Move a stay (named by one of its flights) to another stand, keeping its times. */
@@ -107,6 +108,7 @@ const overlapsOn = (stay: Occupancy, standId: string, board: readonly Occupancy[
  * the board changes here.
  */
 export function planFixAll(alerts: readonly OpsAlert[], scope: "all" | "conflicts"): FixAllPlan {
+  requireFixtureAnalyses();
   const board: Occupancy[] = DEMO_DATA.occupancies.map((o) => ({ ...o }));
   const byId = new Map(board.map((o) => [o.id, o]));
   const moved = new Map<string, AreaMove>();
@@ -213,6 +215,7 @@ export function movesLateStay(moves: readonly { occupancyId: string }[]): boolea
 
 /** The change that clears `alert`, or null when there is none (or it is only a notice). */
 export function fixFor(alert: OpsAlert): AlertFix | null {
+  requireFixtureAnalyses();
   if (alert.kind === "conflict") return conflictFix(alert);
   if (alert.kind !== "no_stand") return null;
   const flight = OPS_FLIGHTS_BY_ID.get(alert.flightId);

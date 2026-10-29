@@ -32,7 +32,7 @@ export interface DatasetStand {
   code: string;
   area: string;
   /** The demo editor's sample size rule, not operational compatibility. */
-  size: StandSize;
+  size?: StandSize;
 }
 
 export interface OperationsDatasetInput {
@@ -47,9 +47,12 @@ export interface OperationsDatasetInput {
   readonly timeline: DemoTimelineData;
   readonly flights: OpsFlight[];
   readonly noStandStays: Occupancy[];
+  readonly capabilities?: { readonly editStands: boolean; readonly fixtureAnalyses: boolean };
+  readonly summary?: string;
 }
 
 export interface OperationsDataset extends OperationsDatasetInput {
+  readonly capabilities: { readonly editStands: boolean; readonly fixtureAnalyses: boolean };
   readonly flightsById: ReadonlyMap<string, OpsFlight>;
   readonly arrivals: OpsFlight[];
   readonly departures: OpsFlight[];
@@ -131,6 +134,7 @@ export function createOperationsDataset(input: OperationsDatasetInput): Operatio
     a.estimate - b.estimate || a.flight.localeCompare(b.flight);
   return {
     ...owned,
+    capabilities: owned.capabilities ?? { editStands: false, fixtureAnalyses: false },
     flightsById,
     arrivals: flights.filter((flight) => flight.direction === "arrival").sort(byEstimate),
     departures: flights.filter((flight) => flight.direction === "departure").sort(byEstimate),

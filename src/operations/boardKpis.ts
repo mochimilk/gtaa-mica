@@ -14,7 +14,7 @@
 import type { Millis, Occupancy } from "../stand-timeline";
 import { DEMO_DATA, DEMO_DOMAIN } from "../stand-timeline-demo/demoData";
 import { GHOST_SIDES, ghostClashes, ghostKey, ghostSpan } from "../stand-timeline-demo/delays";
-import { ACTIVE_DATASET } from "./activeDataset";
+import { ACTIVE_DATASET, requireFixtureAnalyses } from "./activeDataset";
 import {
   flightsAtStay,
   occupancyById,
@@ -138,6 +138,7 @@ const stayAt = (id: string) => occupancyById(id) ?? offBoardStay(id);
 
 /** The board's figures with every stay where `state` has it, and its closure. */
 export function boardKpis({ stays, closure }: StandState): BoardKpis {
+  requireFixtureAnalyses();
   const onStands: Occupancy[] = [];
   const waiting: KpiSpan[] = [];
   let noStand = 0;

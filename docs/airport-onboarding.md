@@ -10,7 +10,7 @@ Keep airport facts, synthetic demand assumptions and generated assignments
 separate. Use [GTAA](gtaa-airport.md) for source-backed infrastructure and exact
 aircraft variants. Use [Contoso](scenario-generation.md) for compact examples
 and stress cases. The current integration provides headless generation and
-assignment; viewer registration remains a follow-on milestone.
+assignment and registered read-only schedules for GTAA and Contoso.
 
 | Milestone | Required outcome | What it does not establish |
 |-----------|------------------|----------------------------|
@@ -263,16 +263,22 @@ GTAA-specific and rebuilds aircraft records, potentially losing manually
 authored seats and external codes. Back up or reconcile metadata before any
 source regeneration.
 
-## Future viewer integration
+## Register a read-only schedule source
 
-The prototype viewer and its preparation commands remain on `feature/solver`;
-they are not part of this headless foundation. First verify both generated
-plans, then integrate a compact source-identified projection with main's
-existing components and a shared dataset boundary.
+Verify both generated plans, then run the compact schedule preparation command
+with explicit manifest, profile, case, tow-profile and output paths, as shown
+in the [schedule integration guide](local-assignment.md#select-or-prepare-an-airport-schedule).
+Add a lazy snapshot import using `preparedSource` in the
+[source registry](../src/data-sources/registry.ts). Airport metadata must match
+the registry ID. The current prepared-source helper registers full-day cases.
+Adding a source does not require airport branches in chart or agent code.
 
 The chart, lists, filters and agent context must refer to the same active
 dataset. Check airport and case identity together, preserve exact stand and
 aircraft IDs, and test switching, reload restoration and unassigned flights.
+Source changes require confirmation and a full reload, so pending agent work
+and session-scoped stores cannot cross airports. Keep new solver sources
+read-only until their editing and validation contracts are implemented.
 Keep buffers, waiting, capacity/atlas, accommodation, decision review and tow
 windows unavailable until airport-specific profiles and evidence exist.
 Never reuse Contoso assumptions to fill gaps. Evidence for an approved plan

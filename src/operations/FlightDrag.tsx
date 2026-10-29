@@ -16,6 +16,7 @@ import { BAR_INSET, stayEnds } from "../stand-timeline-demo/theme";
 import { planAssign } from "./allocation";
 import { useOpsBoard } from "./OperationsContext";
 import type { OpsFlight } from "./operationsData";
+import { ACTIVE_DATASET } from "./activeDataset";
 
 /** How far a press on a row must travel before it becomes a drag, px. */
 const DRAG_THRESHOLD = 5;
@@ -101,6 +102,7 @@ export function beginFlightDrag(
   flight: OpsFlight,
   onDrop: (stayId: string, standId: string) => void,
 ): void {
+  if (!ACTIVE_DATASET.capabilities.editStands) return;
   const stay = flight.unplacedStay;
   if (!stay || flight.standId || event.button !== 0) return;
   if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
