@@ -283,6 +283,9 @@ Keep buffers, waiting, capacity/atlas, accommodation, decision review and tow
 windows unavailable until airport-specific profiles and evidence exist.
 Never reuse Contoso assumptions to fill gaps. Evidence for an approved plan
 must not be presented as current after that plan changes.
+The [isolated overlay registration guide](local-assignment.md#register-isolated-timeline-features)
+describes the UI extension points. The first migrated overlays use Contoso's
+buffer and synthetic waiting profiles; GTAA has no evaluation profiles yet.
 
 ## Use the AI onboarding prompt
 

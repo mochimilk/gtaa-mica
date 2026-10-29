@@ -1,0 +1,28 @@
+.timeline-overlays--buffers rect {
+  fill: var(--colorStatusWarningBackground1);
+  stroke: var(--colorStatusWarningForeground1);
+}
+
+.timeline-overlays--gate-wait rect {
+  fill: var(--colorBrandBackground2);
+  stroke: var(--colorBrandStroke1);
+}
+
+.fui-DialogSurface.timeline-overlay-dialog {
+  width: min(960px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+}
+
+.timeline-overlay-evidence {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.timeline-overlay-evidence th,
+.timeline-overlay-evidence td {
+  padding: 8px;
+  text-align: left;
+  border-bottom: 1px solid var(--colorNeutralStroke2);
+}

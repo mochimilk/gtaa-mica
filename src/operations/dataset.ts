@@ -1,6 +1,7 @@
 import type { Millis, Occupancy } from "../stand-timeline";
 import type { DemoTimelineData } from "../stand-timeline-demo/adapter";
 import type { StandSize } from "../stand-timeline-demo/syntheticFixture";
+import { validateOverlayData, type OverlayData } from "../overlays/profiles";
 
 export type FlightDirection = "arrival" | "departure";
 
@@ -49,6 +50,7 @@ export interface OperationsDatasetInput {
   readonly noStandStays: Occupancy[];
   readonly capabilities?: { readonly editStands: boolean; readonly fixtureAnalyses: boolean };
   readonly summary?: string;
+  readonly overlays?: OverlayData;
 }
 
 export interface OperationsDataset extends OperationsDatasetInput {
@@ -72,6 +74,10 @@ export function createOperationsDataset(input: OperationsDatasetInput): Operatio
   }
 
   const owned = structuredClone(input);
+  if (owned.overlays) {
+    if (owned.capabilities?.editStands) throw new Error("Prepared overlay profiles require a read-only schedule.");
+    validateOverlayData(owned.overlays, owned);
+  }
   const { timeline, flights, noStandStays } = owned;
   const unique = <T extends { id: string }>(records: readonly T[], kind: string): Map<string, T> => {
     const map = new Map<string, T>();

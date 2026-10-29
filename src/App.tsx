@@ -52,6 +52,7 @@ import { SkyeGlowDefs } from "./components/skye-glow";
 import { LumaSkyeBackground } from "./components/luma-skye/LumaSkyeBackground";
 import { useDrawings } from "./studio/drawings";
 import { StudioPage } from "./studio/StudioPage";
+import { TimelineOverlayProvider, OverlayToolbar, OverlayLayers, OverlayReviews } from "./overlays/TimelineOverlays";
 
 // Each page's left panel: its stable ID, shared with its toggle in the nav
 // rail, and its name in the toggle's label.
@@ -194,9 +195,9 @@ function ConnectedTimeline() {
           pinnedLabel={pinnedLabel}
           previewDrop={ACTIVE_DATASET.capabilities.editStands ? previewDrop : undefined}
           dragSnapMs={DRAG_SNAP_MS}
-          underlay={underlay}
-          overlay={overlay}
-          toolbar={toolbar}
+          underlay={<>{underlay}<OverlayLayers position="underlay" isMatch={matcher.active ? matcher.occupancy : undefined} /></>}
+          overlay={<>{overlay}<OverlayLayers position="overlay" isMatch={matcher.active ? matcher.occupancy : undefined} /></>}
+          toolbar={<>{toolbar}<OverlayToolbar /></>}
           summary={summary}
           zoom={zoom}
           flightStyle={flightStyle}
@@ -204,6 +205,7 @@ function ConnectedTimeline() {
         />
       </div>
       <SelectionPopover />
+      <OverlayReviews />
       {/* Asks before the user's swaps, beside the two stays. */}
       <SwapConfirm />
       {/* The flight being dragged from the list, beside the pointer. */}
@@ -269,6 +271,7 @@ export default function App() {
     // OperationsProvider first: the voice session reaches the app through the
     // same selection, views, filters and acknowledgements the UI uses.
     <OperationsProvider>
+      <TimelineOverlayProvider dataset={ACTIVE_DATASET}>
       <LiveCallProvider>
         <LumaSkyeBackground />
         <div className={styles.window}>
@@ -342,6 +345,7 @@ export default function App() {
         {/* The gradient that outlines Skye's selections on the chart. */}
         <SkyeGlowDefs />
       </LiveCallProvider>
+      </TimelineOverlayProvider>
     </OperationsProvider>
   );
 }

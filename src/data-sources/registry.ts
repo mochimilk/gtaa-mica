@@ -1,4 +1,4 @@
-import type { OperationsDataset } from "../operations/dataset";
+import { createOperationsDataset, type OperationsDataset } from "../operations/dataset";
 import { createFixtureDataset } from "../stand-timeline-demo/fixtureDataset";
 import { adaptPreparedSchedule } from "./preparedAdapter";
 import type { PlanVariant } from "./preparedTypes";
@@ -15,16 +15,31 @@ export interface ScheduleSource {
   readonly load: (plan: PlanVariant) => Promise<OperationsDataset>;
 }
 
-function preparedSource(id: string, label: string, load: () => Promise<{ default: unknown }>): ScheduleSource {
+function preparedSource(
+  id: string, label: string, load: () => Promise<{ default: unknown }>,
+  loadOverlays?: () => Promise<Readonly<Record<string, unknown>>>,
+): ScheduleSource {
   return {
     id, label, plans: ["baseline", "tow-options"],
-    load: async plan => adaptPreparedSchedule((await load()).default, { airportId: id, caseId: "full-day" }, plan),
+    load: async plan => {
+      const [snapshot, profiles] = await Promise.all([load(), loadOverlays?.()]);
+      const dataset = adaptPreparedSchedule(snapshot.default, { airportId: id, caseId: "full-day" }, plan);
+      return profiles ? createOperationsDataset({
+        ...dataset, overlays: { airportId: id, datasetId: dataset.id, profiles },
+      }) : dataset;
+    },
   };
 }
 
 export const SCHEDULE_SOURCES: readonly ScheduleSource[] = [
   { id: "fixture", label: "Original fixture", plans: ["baseline"], load: async () => createFixtureDataset() },
-  preparedSource("contoso", "Contoso", () => import("./prepared/contoso/full-day.json", { with: { type: "json" } })),
+  preparedSource("contoso", "Contoso", () => import("./prepared/contoso/full-day.json", { with: { type: "json" } }), async () => {
+    const [buffers, waiting] = await Promise.all([
+      import("../../data/airports/contoso/evaluation/buffer-profile.json", { with: { type: "json" } }),
+      import("../../data/airports/contoso/evaluation/gate-wait-profile.json", { with: { type: "json" } }),
+    ]);
+    return { buffers: buffers.default, "gate-wait": waiting.default };
+  }),
   preparedSource("gtaa", "GTAA - Toronto Pearson", () => import("./prepared/gtaa/full-day.json", { with: { type: "json" } })),
 ];
 

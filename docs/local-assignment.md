@@ -294,6 +294,62 @@ complete assignments, tow chains, same-stand overlap and displayed counts.
 Neither solver status nor independent stand-rule validation is operational
 certification. No capacity, accommodation or tow-window evidence is inferred.
 
+## Register isolated timeline features
+
+The [overlay package](../src/overlays) owns feature availability, selection,
+controls, chart annotations and evidence reviews. Keep calculations and
+feature state out of [App](../src/App.tsx). Its integration is limited to
+`TimelineOverlayProvider`, `OverlayToolbar`, `OverlayLayers` in the chart's
+underlay and overlay slots, and `OverlayReviews`. Reattach those composition
+points after a host UI merge instead of copying feature-specific UI logic.
+Use the same isolated composition pattern for later prototype analyses.
+
+The first migration phase includes scheduled buffers and synthetic gate
+waiting for both Contoso plans. GTAA and the original fixture have no registered
+profiles, so their toolbar is hidden. Availability comes from the active
+dataset, not an airport-name condition or a global list of enabled features.
+Overlays start off; toggles work independently. Inspect opens a feature's
+review and options without enabling its annotations. Hide all clears toggles,
+while options remain in the current session. A source, plan or profile change
+resets feature selection and options together.
+
+To add another feature:
+
+1. Define its browser-safe data parser in
+   [profiles](../src/overlays/profiles.ts) and register the parser by feature ID.
+   Validate airport, dataset, profile and metric/model versions before rendering.
+   Keep this boundary free of React and active-dataset module initialization.
+2. Load source-owned profiles or evidence through the optional lazy loader in
+   [the source registry](../src/data-sources/registry.ts). Bind the bundle to
+   the exact dataset ID. Missing data means unavailable; malformed or mismatched
+   data is an error. Never fill gaps using another airport's assumptions.
+3. Add metadata to
+   [the overlay registry](../src/overlays/registry.ts): ID, label and description.
+   Duplicate IDs and data without a matching registration fail explicitly.
+4. Implement a feature-local provider when options or shared state are needed,
+   optional `Underlay` and `Overlay` presentations, and a required `Review`.
+   Register them in
+   [TimelineOverlays](../src/overlays/TimelineOverlays.tsx).
+   No host changes are needed. Keep plot alignment, clipping, filter dimming,
+   pinned rows and pointer-event behavior consistent with the existing layers.
+5. Add pure calculation and availability regressions, then exercise the toolbar,
+   options and chart in the browser. Confirm absence on unsupported sources
+   and reset behavior across source/plan changes.
+
+Buffer highlights are strictly shorter than the selected threshold, not equal
+to it. Waiting uses an explicitly synthetic source assumption:
+`probability * max(0, conditional release delay - scheduled buffer)`.
+Unassigned, context and unassessed arrivals are separate populations.
+No applicable handovers is not evidence of zero risk or zero delay.
+Overlapping occupancies invalidate both analyses. Neither overlay changes
+assignments, defines stand-safety rules or supplies operational certification.
+
+Capacity/atlas, accommodation, decision review and tow windows remain later
+phases. Their prepared evidence must match airport, case, variant and request
+fingerprint before registration. Regenerate evidence for the current plan;
+do not attach stale prototype results or claim they remain current after edits.
+Editable datasets cannot carry these prepared overlay profiles.
+
 ## Validate the imported foundation
 
 Use the existing Node dependencies and a .NET 10 SDK:
