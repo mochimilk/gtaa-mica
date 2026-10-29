@@ -1,3 +1,6 @@
+import type { OperationsDatasetInput } from "../operations/dataset";
+import { validateCapacityDataset } from "./capacity";
+
 export interface BufferProfile {
   schema_version: "1.0.0";
   id: string;
@@ -84,20 +87,21 @@ export function parseGateWaitProfile(value: unknown): GateWaitProfile {
   };
 }
 
-export const OVERLAY_PROFILE_PARSERS: Readonly<Record<string, (value: unknown) => { id: string }>> = {
+export const OVERLAY_PROFILE_PARSERS: Readonly<Record<string, (value: unknown, source: OperationsDatasetInput) => { id: string }>> = {
   buffers: parseBufferProfile,
   "gate-wait": parseGateWaitProfile,
+  capacity: validateCapacityDataset,
 };
 
 /** Runs during source bootstrap, before any UI or session stores initialize. */
-export function validateOverlayData(data: OverlayData, source: { airportId: string; id: string }): void {
+export function validateOverlayData(data: OverlayData, source: OperationsDatasetInput): void {
   if (!record(data) || data.airportId !== source.airportId || data.datasetId !== source.id || !record(data.profiles)) {
     throw new Error("Overlay data does not match the selected airport and dataset.");
   }
   for (const [id, value] of Object.entries(data.profiles)) {
     const parser = Object.hasOwn(OVERLAY_PROFILE_PARSERS, id) ? OVERLAY_PROFILE_PARSERS[id] : undefined;
     if (!parser) throw new Error(`Unregistered overlay data: ${id}`);
-    const profile = parser(value);
+    const profile = parser(value, source);
     if (!profile.id.startsWith(`${source.airportId}:`)) throw new Error(`Overlay profile ${profile.id} belongs to another airport.`);
   }
 }

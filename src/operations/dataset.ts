@@ -2,6 +2,7 @@ import type { Millis, Occupancy } from "../stand-timeline";
 import type { DemoTimelineData } from "../stand-timeline-demo/adapter";
 import type { StandSize } from "../stand-timeline-demo/syntheticFixture";
 import { validateOverlayData, type OverlayData } from "../overlays/profiles";
+import type { PlanVariant } from "../data-sources/preparedTypes";
 
 export type FlightDirection = "arrival" | "departure";
 
@@ -51,6 +52,12 @@ export interface OperationsDatasetInput {
   readonly capabilities?: { readonly editStands: boolean; readonly fixtureAnalyses: boolean };
   readonly summary?: string;
   readonly overlays?: OverlayData;
+  readonly preparedPlan?: {
+    readonly caseId: string;
+    readonly demandId: string;
+    readonly variant: PlanVariant;
+    readonly requestFingerprint: string;
+  };
 }
 
 export interface OperationsDataset extends OperationsDatasetInput {
@@ -74,6 +81,12 @@ export function createOperationsDataset(input: OperationsDatasetInput): Operatio
   }
 
   const owned = structuredClone(input);
+  const prepared = owned.preparedPlan;
+  if (prepared && (owned.capabilities?.editStands || !prepared.caseId.trim() || !prepared.demandId.trim() ||
+      !["baseline", "tow-options"].includes(prepared.variant) || owned.id !== `${prepared.demandId}/${prepared.variant}` ||
+      !/^[0-9a-f]{64}$/.test(prepared.requestFingerprint))) {
+    throw new Error("Prepared plan identity must be valid and belong to a read-only schedule.");
+  }
   if (owned.overlays) {
     if (owned.capabilities?.editStands) throw new Error("Prepared overlay profiles require a read-only schedule.");
     validateOverlayData(owned.overlays, owned);

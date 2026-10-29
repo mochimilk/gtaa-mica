@@ -16,7 +16,7 @@ const contoso = await loadSourceDataset({ source: "contoso", plan: "baseline" })
 test("overlays register from source data, without Contoso defaults leaking to other sources", async () => {
   for (const plan of ["baseline", "tow-options"] as const) {
     const source = await loadSourceDataset({ source: "contoso", plan });
-    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait"]);
+    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait", "capacity"]);
     assert.equal(source.overlays?.datasetId, source.id);
     assert.deepEqual(availableOverlays(await loadSourceDataset({ source: "gtaa", plan })), []);
   }
@@ -31,14 +31,14 @@ test("overlay input validation rejects wrong airports, plans, unsupported data a
   assert.throws(() => validateOverlayData({ ...envelope, profiles: { buffers: { ...buffers, id: "gtaa:buffers" } } }, contoso), /another airport/);
   assert.throws(() => validateOverlayData({ ...envelope, profiles: { buffers: undefined } }, contoso), /profile/);
   assert.throws(() => createOperationsDataset({ ...contoso, capabilities: { editStands: true, fixtureAnalyses: true } }), /read-only/);
-  assert.throws(() => createOperationsDataset({ ...contoso, id: "other-source" }), /does not match/);
+  assert.throws(() => createOperationsDataset({ ...contoso, id: "other-source" }), /does not match|Prepared plan identity/);
   assert.throws(() => availableOverlays(contoso, []), /no toolbar registration/);
 });
 
 test("duplicate registrations and attempts to enable unavailable overlays explicitly fail", () => {
   const registered = availableOverlays(contoso);
   assert.throws(() => availableOverlays(contoso, [...registered, registered[0]]), /Duplicate/);
-  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "capacity" }), /unavailable/);
+  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "tow-windows" }), /unavailable/);
 });
 
 test("overlay toggle, inspection and reset remain independent and prune unavailable features", () => {

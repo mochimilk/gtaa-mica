@@ -168,6 +168,7 @@ export function adaptPreparedSchedule(
     stands: snapshot.rows.map(row => ({ code: row.id, area: row.group ?? "" })),
     aircraftMakers: {}, aircraftSizes: {},
     capabilities: { editStands: false, fixtureAnalyses: false },
+    preparedPlan: { caseId: snapshot.case_id, demandId: snapshot.demand_id, variant, requestFingerprint: plan.request_fingerprint },
     summary: `${plan.covered_flight_count}/${snapshot.flights.length} flight legs assigned; ${plan.generated_movement_count} generated tows; ${plan.solver_status}. Scheduled UTC, including context legs. Read-only synthetic plan, not operational certification.`,
   });
 }

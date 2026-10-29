@@ -304,8 +304,8 @@ underlay and overlay slots, and `OverlayReviews`. Reattach those composition
 points after a host UI merge instead of copying feature-specific UI logic.
 Use the same isolated composition pattern for later prototype analyses.
 
-The first migration phase includes scheduled buffers and synthetic gate
-waiting for both Contoso plans. GTAA and the original fixture have no registered
+The migrated features include scheduled buffers, synthetic gate waiting and
+single-turn capacity for both Contoso plans. GTAA and the original fixture have no registered
 profiles, so their toolbar is hidden. Availability comes from the active
 dataset, not an airport-name condition or a global list of enabled features.
 Overlays start off; toggles work independently. Inspect opens a feature's
@@ -344,11 +344,52 @@ No applicable handovers is not evidence of zero risk or zero delay.
 Overlapping occupancies invalidate both analyses. Neither overlay changes
 assignments, defines stand-safety rules or supplies operational certification.
 
-Capacity/atlas, accommodation, decision review and tow windows remain later
+Atlas frequency modes, accommodation, decision review and tow windows remain later
 phases. Their prepared evidence must match airport, case, variant and request
 fingerprint before registration. Regenerate evidence for the current plan;
 do not attach stale prototype results or claim they remain current after edits.
 Editable datasets cannot carry these prepared overlay profiles.
+
+### Prepare and inspect single-turn capacity
+
+The [capacity feature](../src/overlays/CapacityFeature.tsx) registers its provider,
+bands and review inside the overlay package. It requires no additional host
+composition. Select **Inspect Single-turn capacity** in the overlay menu to
+choose an aircraft/operator/sector probe, duration and UTC search window.
+Changing probes restores that probe's source-defined duration.
+
+Bands show inclusive feasible arrival-start ranges for one additional turn,
+not the entire empty occupancy interval. An exact-duration fit is a point.
+The review compares the same query against baseline and tow-options plans,
+but the chart draws only the selected source variant. Blocking assignment
+IDs, rule reasons, rule paths and static exclusions remain visible in the
+evidence tables. Invalid queries show an error and suppress bands; zero valid
+ranges is not a finding of zero airport capacity. Existing unassigned demand
+is not filled and no stand edits or movements are proposed.
+
+Generate evidence against the current frozen schedule with explicit inputs:
+
+```powershell
+node scripts\prepare-capacity.mjs --airport data\airports\contoso\airport.json --profile data\airports\contoso\demand\full-day-profile.json --case full-day --snapshot src\data-sources\prepared\contoso\full-day.json --capacity-profile data\airports\contoso\evaluation\capacity-profile.json --output src\data-sources\prepared\contoso\full-day.capacity.json
+```
+
+`npm run prepare:capacity -- <explicit arguments>` invokes the same command.
+It does not rerun the solver. It evaluates fixed assignments against the airport
+compatibility rules and writes the sidecar plus its browser-safe standalone
+schema validator. Inputs are required; there is no implicit airport fallback.
+
+Regenerate capacity after regenerating the schedule. At startup, validation
+checks airport, case, demand, horizon, SHA-256 of the entire frozen snapshot
+and both plan request fingerprints. It also checks complete stand assessment,
+assignment references and the exact complement between blocking intervals and
+free windows. Prepared dataset identity and the selected request are checked
+again at the dataset boundary. Missing or stale registered evidence is an
+explicit startup error, not a hidden fallback to another plan.
+Browser fingerprint verification requires HTTPS or localhost.
+
+Run `npm run test:capacity` for preparation/rule replay regressions and
+`npm test` for source-binding and UI-query calculation regressions.
+The atlas's synthetic multi-day frequencies are not part of this increment.
 
 ## Validate the imported foundation
 

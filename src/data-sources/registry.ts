@@ -2,6 +2,7 @@ import { createOperationsDataset, type OperationsDataset } from "../operations/d
 import { createFixtureDataset } from "../stand-timeline-demo/fixtureDataset";
 import { adaptPreparedSchedule } from "./preparedAdapter";
 import type { PlanVariant } from "./preparedTypes";
+import { validateCapacitySnapshot } from "../overlays/capacity";
 
 export interface SourceSelection {
   source: string;
@@ -17,13 +18,14 @@ export interface ScheduleSource {
 
 function preparedSource(
   id: string, label: string, load: () => Promise<{ default: unknown }>,
-  loadOverlays?: () => Promise<Readonly<Record<string, unknown>>>,
+  loadOverlays?: (snapshot: unknown) => Promise<Readonly<Record<string, unknown>>>,
 ): ScheduleSource {
   return {
     id, label, plans: ["baseline", "tow-options"],
     load: async plan => {
-      const [snapshot, profiles] = await Promise.all([load(), loadOverlays?.()]);
+      const snapshot = await load();
       const dataset = adaptPreparedSchedule(snapshot.default, { airportId: id, caseId: "full-day" }, plan);
+      const profiles = await loadOverlays?.(snapshot.default);
       return profiles ? createOperationsDataset({
         ...dataset, overlays: { airportId: id, datasetId: dataset.id, profiles },
       }) : dataset;
@@ -33,12 +35,13 @@ function preparedSource(
 
 export const SCHEDULE_SOURCES: readonly ScheduleSource[] = [
   { id: "fixture", label: "Original fixture", plans: ["baseline"], load: async () => createFixtureDataset() },
-  preparedSource("contoso", "Contoso", () => import("./prepared/contoso/full-day.json", { with: { type: "json" } }), async () => {
-    const [buffers, waiting] = await Promise.all([
+  preparedSource("contoso", "Contoso", () => import("./prepared/contoso/full-day.json", { with: { type: "json" } }), async snapshot => {
+    const [buffers, waiting, capacity] = await Promise.all([
       import("../../data/airports/contoso/evaluation/buffer-profile.json", { with: { type: "json" } }),
       import("../../data/airports/contoso/evaluation/gate-wait-profile.json", { with: { type: "json" } }),
+      import("./prepared/contoso/full-day.capacity.json", { with: { type: "json" } }),
     ]);
-    return { buffers: buffers.default, "gate-wait": waiting.default };
+    return { buffers: buffers.default, "gate-wait": waiting.default, capacity: await validateCapacitySnapshot(capacity.default, snapshot) };
   }),
   preparedSource("gtaa", "GTAA - Toronto Pearson", () => import("./prepared/gtaa/full-day.json", { with: { type: "json" } })),
 ];

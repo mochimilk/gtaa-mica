@@ -10,6 +10,7 @@ import {
   type OverlayId, type OverlayRegistration, type OverlaySelection,
 } from "./registry";
 import { BufferLayer, BufferProvider, BufferReview, WaitingLayer, WaitingProvider, WaitingReview } from "./StandOverlayFeatures";
+import { CapacityLayer, CapacityProvider, CapacityReview } from "./CapacityFeature";
 import "./overlays.css";
 
 type FeatureProps = { dataset: OperationsDataset; isMatch?: (stayId: string) => boolean };
@@ -24,6 +25,7 @@ export interface OverlayPresentation {
 const PRESENTATIONS = {
   buffers: { Provider: BufferProvider, Underlay: BufferLayer, Review: BufferReview },
   "gate-wait": { Provider: WaitingProvider, Underlay: WaitingLayer, Review: WaitingReview },
+  capacity: { Provider: CapacityProvider, Underlay: CapacityLayer, Review: CapacityReview },
 } satisfies Record<OverlayId, OverlayPresentation>;
 const presentations = new Map<string, OverlayPresentation>(Object.entries(PRESENTATIONS));
 

@@ -284,8 +284,10 @@ windows unavailable until airport-specific profiles and evidence exist.
 Never reuse Contoso assumptions to fill gaps. Evidence for an approved plan
 must not be presented as current after that plan changes.
 The [isolated overlay registration guide](local-assignment.md#register-isolated-timeline-features)
-describes the UI extension points. The first migrated overlays use Contoso's
-buffer and synthetic waiting profiles; GTAA has no evaluation profiles yet.
+describes the UI extension points. Migrated overlays use Contoso's buffer,
+synthetic waiting and single-turn capacity profiles. Capacity requires a
+fresh sidecar matched to the schedule and both plan request fingerprints;
+regenerate it when the schedule changes. GTAA has no evaluation profiles yet.
 
 ## Use the AI onboarding prompt
 

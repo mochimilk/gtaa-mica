@@ -19,6 +19,8 @@
     "test:airport": "node --test scripts/airport-model.test.mjs scripts/gtaa-airport.test.mjs scripts/gtaa-asm.test.mjs scripts/gtaa-asm-aircraft.test.mjs",
     "prepare:gtaa-asm": "node scripts/prepare-gtaa-asm.mjs",
     "prepare:schedule": "npm run build:solver && node scripts/prepare-schedule.mjs",
+    "prepare:capacity": "node scripts/prepare-capacity.mjs",
+    "test:capacity": "node --test scripts/capacity-probe.test.mjs",
     "validate:catalogs": "node scripts/validate-catalogs.mjs",
     "test:catalogs": "node --test scripts/airport-catalogs.test.mjs",
     "validate:demand": "node scripts/validate-demand.mjs",
