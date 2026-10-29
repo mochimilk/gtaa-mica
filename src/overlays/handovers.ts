@@ -58,6 +58,7 @@ export function gateWaiting(dataset: {
       assumption.expected_release_delay_minutes_given_delay < 0 || assumption.expected_release_delay_minutes_given_delay > 240) {
     throw new Error("Invalid synthetic waiting assumption.");
   }
+
   const buffers = standHandovers(dataset.timeline.occupancies, dataset.domain);
   const arrivals = dataset.arrivals.filter(flight => flight.occupancyId &&
     flight.estimate >= dataset.domain[0] && flight.estimate < dataset.domain[1]);
@@ -80,5 +81,16 @@ export function gateWaiting(dataset: {
       (flight.estimate < dataset.domain[0] || flight.estimate >= dataset.domain[1])).length,
     totalMinutes: contributions.length && buffers.availability !== "invalid"
       ? contributions.reduce((sum, item) => sum + item.minutes, 0) : null,
+  };
+}
+
+export function commonWaiting(before: ReturnType<typeof gateWaiting> | null, after: ReturnType<typeof gateWaiting> | null) {
+  const beforeById = new Map(before?.contributions.map(item => [item.arrival.id, item.minutes]));
+  const afterById = new Map(after?.contributions.map(item => [item.arrival.id, item.minutes]));
+  const ids = [...beforeById.keys()].filter(id => afterById.has(id));
+  return {
+    commonArrivals: ids.length,
+    beforeCommonMinutes: ids.length ? ids.reduce((sum, id) => sum + beforeById.get(id)!, 0) : null,
+    afterCommonMinutes: ids.length ? ids.reduce((sum, id) => sum + afterById.get(id)!, 0) : null,
   };
 }

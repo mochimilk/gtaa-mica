@@ -4,7 +4,7 @@ import { adaptPreparedSchedule } from "../data-sources/preparedAdapter";
 import type { PlanVariant, PreparedScenario } from "../data-sources/preparedTypes";
 import type { OperationsDatasetInput, OpsFlight } from "../operations/dataset";
 import { fingerprintJson, type CapacityProbe, type PreparedCapacity } from "./capacity";
-import { gateWaiting, standHandovers } from "./handovers";
+import { commonWaiting, gateWaiting, standHandovers } from "./handovers";
 import type { BufferProfile, ReleaseAssumption } from "./profiles";
 
 export interface AccommodationOption {
@@ -230,14 +230,10 @@ export function accommodationImpact(source: OperationsDatasetInput, evidence: Pr
   const beforeWaiting = assumption ? gateWaiting(reference, assumption) : null;
   const afterWaiting = assumption ? gateWaiting(preview, assumption) : null;
   if (beforeWaiting?.availability === "invalid" || afterWaiting?.availability === "invalid") throw new Error("Invalid accommodation waiting comparison.");
-  const beforeById = new Map(beforeWaiting?.contributions.map(item => [item.arrival.id, item.minutes]));
   const afterById = new Map(afterWaiting?.contributions.map(item => [item.arrival.id, item.minutes]));
-  const commonIds = [...beforeById.keys()].filter(id => afterById.has(id));
   return {
     preview, beforeBuffers: summarize(before), afterBuffers: summarize(after), beforeWaiting, afterWaiting,
-    commonArrivals: commonIds.length,
-    beforeCommonMinutes: commonIds.length ? commonIds.reduce((sum, id) => sum + beforeById.get(id)!, 0) : null,
-    afterCommonMinutes: commonIds.length ? commonIds.reduce((sum, id) => sum + afterById.get(id)!, 0) : null,
+    ...commonWaiting(beforeWaiting, afterWaiting),
     incomingMinutes: afterById.get(evidence.request.flights[0].id) ?? null,
   };
 }

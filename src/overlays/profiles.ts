@@ -3,6 +3,7 @@ import { validateCapacityDataset } from "./capacity";
 import { validateTowWindowsDataset } from "./towWindows";
 import { validateAccommodationDataset } from "./accommodation";
 import { validateAtlasDataset } from "./atlas";
+import { validatePlanComparisonDataset } from "../data-sources/planComparison";
 
 export interface BufferProfile {
   schema_version: "1.0.0";
@@ -127,6 +128,13 @@ export const OVERLAY_PROFILE_PARSERS: Readonly<Record<string, (value: unknown, s
   "decision-review": validateDecisionReviewProfile,
 };
 
+const COMPANION_PARSERS: Readonly<Record<string, (
+  value: unknown, source: OperationsDatasetInput, profiles: Readonly<Record<string, unknown>>,
+) => { id: string }>> = {
+  "capacity-atlas": validateAtlasDataset,
+  "plan-comparison": validatePlanComparisonDataset,
+};
+
 /** Runs during source bootstrap, before any UI or session stores initialize. */
 export function validateOverlayData(data: OverlayData, source: OperationsDatasetInput): void {
   if (!record(data) || data.airportId !== source.airportId || data.datasetId !== source.id || !record(data.profiles)) {
@@ -141,9 +149,10 @@ export function validateOverlayData(data: OverlayData, source: OperationsDataset
   if (data.companions !== undefined) {
     if (!record(data.companions)) throw new Error("Invalid overlay companion data.");
     for (const [id, value] of Object.entries(data.companions)) {
-      if (id !== "capacity-atlas") throw new Error(`Unregistered overlay companion: ${id}`);
-      const companion = validateAtlasDataset(value, source, data.profiles);
-      if (!companion.id.startsWith(`${source.airportId}:`)) throw new Error("Atlas profile belongs to another airport.");
+      const parser = Object.hasOwn(COMPANION_PARSERS, id) ? COMPANION_PARSERS[id] : undefined;
+      if (!parser) throw new Error(`Unregistered overlay companion: ${id}`);
+      const companion = parser(value, source, data.profiles);
+      if (!companion.id.startsWith(`${source.airportId}:`)) throw new Error("Overlay companion belongs to another airport.");
     }
   }
 }

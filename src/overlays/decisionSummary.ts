@@ -1,6 +1,7 @@
 import type { OperationsDataset, OpsFlight } from "../operations/dataset";
 import type { Occupancy } from "../stand-timeline";
-import { parseBufferProfile, parseDecisionReviewProfile, parseGateWaitProfile, validateOverlayData } from "./profiles";
+import { parseBufferProfile, parseDecisionReviewProfile, parseGateWaitProfile, validateOverlayData,
+  type BufferProfile, type ReleaseAssumption } from "./profiles";
 import { parseCapacitySnapshot, queryCapacity } from "./capacity";
 import { evaluateTowWindows, parseTowWindows, TOW_STATUSES } from "./towWindows";
 import { accommodationImpact, accommodationOptionLabel, parseAccommodation, validateAccommodationCapacity } from "./accommodation";
@@ -35,6 +36,20 @@ export interface DecisionChange {
   flights: { id: string; label: string; direction: OpsFlight["direction"]; routeEnd: string; estimate: number }[];
 }
 
+export function decisionPlanMeasures(dataset: OperationsDataset, buffers: BufferProfile | null, assumption: ReleaseAssumption | null) {
+  const gaps = standHandovers(dataset.timeline.occupancies, dataset.domain);
+  if (gaps.availability === "invalid") throw new Error("Decision review cannot assess overlapping reference occupancy.");
+  const waiting = assumption ? gateWaiting(dataset, assumption) : null;
+  return {
+    coverage: coverage(dataset.flights, dataset.timeline.occupancies, dataset.timeline.visits.map(visit => visit.id), dataset.domain),
+    buffers: buffers ? {
+      handovers: gaps.handovers.length, tight: gaps.handovers.filter(item => item.minutes < buffers.threshold_minutes).length,
+      minimum: gaps.handovers.length ? Math.min(...gaps.handovers.map(item => item.minutes)) : null,
+    } : null,
+    waiting: waitingMeasures(waiting),
+  };
+}
+
 /** Combines validated reference evidence; never creates or activates a replacement dataset. */
 export function buildDecisionSummary(dataset: OperationsDataset, options: {
   assumptionId?: string; accommodationOptionId?: string | null;
@@ -60,13 +75,8 @@ export function buildDecisionSummary(dataset: OperationsDataset, options: {
     throw new Error("Unknown or unavailable decision-review waiting assumption.");
   }
   if (options.accommodationOptionId != null && !accommodation) throw new Error("Accommodation evidence is unavailable for this decision preview.");
-  const gaps = standHandovers(dataset.timeline.occupancies, dataset.domain);
-  if (gaps.availability === "invalid") throw new Error("Decision review cannot assess overlapping reference occupancy.");
   const visitIds = dataset.timeline.visits.map(visit => visit.id);
-  const referenceCoverage = coverage(dataset.flights, dataset.timeline.occupancies, visitIds, dataset.domain);
-  const beforeWaiting = assumption ? gateWaiting({
-    domain: dataset.domain, timeline: dataset.timeline, arrivals: dataset.flights.filter(flight => flight.direction === "arrival"),
-  }, assumption) : null;
+  const referenceMeasures = decisionPlanMeasures(dataset, buffers, assumption);
   const accommodationPlan = accommodation?.variants[plan.variant] ?? null;
   const impact = accommodation && options.accommodationOptionId != null
     ? accommodationImpact(dataset, accommodation, options.accommodationOptionId, buffers, assumption) : null;
@@ -130,12 +140,7 @@ export function buildDecisionSummary(dataset: OperationsDataset, options: {
     },
     profiles: { buffers, waiting }, assumption,
     reference: {
-      coverage: referenceCoverage,
-      buffers: buffers ? {
-        handovers: gaps.handovers.length, tight: gaps.handovers.filter(item => item.minutes < buffers.threshold_minutes).length,
-        minimum: gaps.handovers.length ? Math.min(...gaps.handovers.map(item => item.minutes)) : null,
-      } : null,
-      waiting: waitingMeasures(beforeWaiting),
+      ...referenceMeasures,
       capacity: capacity ? capacity.profile.probes.map(probe => {
         const result = queryCapacity(capacity, plan.variant, probe.id, probe.default_duration_minutes, dataset.domain[0], dataset.domain[1]);
         return {

@@ -555,6 +555,8 @@ These comparisons do not certify financial, passenger or operational outcomes.
 Open Overlays, then Inspect Decision summary. It brings assignment coverage,
 scheduled buffers, synthetic waiting, single-turn capacity and one-way tow
 opportunities into one review for the selected reference plan.
+When the source supplies both fixed plans, it also compares baseline and
+tow options without switching the active board.
 The [pure summary](../src/overlays/decisionSummary.ts) reuses the validated
 source profiles and calculations; it does not generate another solver result
 or require a duplicate summary sidecar.
@@ -590,6 +592,55 @@ allocations, flight times and existing unassigned demand unchanged. Closing
 the review or navigating to Studio preserves session state; a source, plan
 or profile change resets it. There is no acceptance action, retiming,
 financial ranking or overall resilience score.
+
+### Compare baseline and tow options without applying either plan
+
+The [plan comparison](../src/overlays/PlanComparisonReview.tsx) appears inside
+Decision summary. The selected source plan is the active reference; the
+other variant is comparison-only. No second toolbar toggle, plan activation
+or acceptance action is added. Switching the source plan reverses the
+comparison direction after the normal reload.
+
+The table compares assigned/unassigned visits and flight legs, context
+flight legs, and generated tow movements. It identifies retained visits,
+newly assigned existing demand, lost assignments and changed retained
+visits. Changed-assignment details show every stand interval, tow endpoint
+and exact source UTC flight time. Cosmetic stay IDs and request hashes do
+not count as assignment changes. Both plans share one source flight
+schedule, so no additional demand or retiming is introduced.
+
+Buffers use the same source threshold in both plans. Synthetic waiting
+uses the summary's shared assumption, also used by accommodation review.
+Only arrivals assessed in both plans contribute to the waiting comparison;
+empty populations and absent profiles remain unassessed, not zero.
+Missing or gained assignments therefore cannot create a misleading waiting
+improvement by changing the assessed population.
+
+Sources opt in with `overlays.companions["plan-comparison"]`, alongside the
+existing decision-review profile. The
+[source helper](../src/data-sources/planComparison.ts) prepares this
+versioned in-memory envelope from the already-loaded schedule, with its
+SHA-256 fingerprint and both complete variants. No extra generated sidecar
+or source-specific UI branch is needed. Both variants pass the shared
+prepared adapter; validation checks the active board's exact records,
+airport, case, demand, horizon, selected request and all available
+analysis snapshot/request bindings. Use `preparePlanComparison(snapshot)`
+during asynchronous source bootstrap rather than constructing an unchecked
+envelope. A source without this companion keeps its existing summary and
+explicitly reports plan comparison as unassessed.
+
+The current Contoso full-day variants have identical assignments:
+149 assigned visits, 11 unassigned visits, 298 assigned flight legs and
+zero generated tow movements each. The review reports no assignment
+differences rather than manufacturing a benefit from enabling tow options.
+Tests also exercise gained/lost assignments, multiple tow legs, reverse
+comparisons, context flights, shared assumptions and malformed evidence.
+
+Reference capacity, Atlas and tow-window controls remain independent.
+Accommodation remains a separate hypothetical preview; selecting it does
+not replace either fixed plan in this comparison. Stand-rule validation
+does not establish operational readiness, available crews, tug routes,
+passenger handling or a preferred plan.
 
 ## Validate the imported foundation
 

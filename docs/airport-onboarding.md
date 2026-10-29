@@ -304,6 +304,13 @@ through a source-owned registration profile. It combines only available,
 validated analyses for the current reference; missing measures stay
 unavailable. Accommodation consequences remain a separate hypothetical view,
 not a replacement dataset or newly validated capacity/tow plan.
+Sources with both variants can also opt into the
+[read-only baseline-versus-tow comparison](local-assignment.md#compare-baseline-and-tow-options-without-applying-either-plan)
+by preparing a `plan-comparison` companion from that same loaded schedule.
+It reuses the decision-review profile and shared source assumptions.
+Both variants must validate; snapshot and request identities must agree
+with the active reference and available analyses. Missing comparison
+evidence stays unassessed. Neither plan is activated by inspecting it.
 Capacity, tow windows and accommodation require fresh sidecars matched to the exact schedule
 and both plan request fingerprints. Their airport and demand provenance must
 agree. Regenerate them when the schedule, airport rules or demand changes.

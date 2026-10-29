@@ -5,6 +5,7 @@ import { useAccommodationReviewState } from "./AccommodationFeature";
 import { AccommodationMeasures } from "./AccommodationMeasures";
 import { buildDecisionSummary } from "./decisionSummary";
 import { parseGateWaitProfile } from "./profiles";
+import { PlanComparisonReview } from "./PlanComparisonReview";
 
 type DatasetProps = { dataset: OperationsDataset };
 const DecisionContext = createContext<{
@@ -38,6 +39,7 @@ export function DecisionSummaryReview({ dataset }: DatasetProps) {
     <p>Selected reference: {summary.source.variant === "baseline" ? "Baseline" : "Tow options"}.
       {" "}UTC horizon: {summary.source.horizon.map(utc).join(" to ")}.
       The chart and flight lists always retain this reference. This is not a solver run, plan ranking or approval.</p>
+    <PlanComparisonReview dataset={dataset} assumptionId={assumptionId} />
     <h3>Reference coverage</h3>
     <table className="timeline-overlay-evidence" data-decision-coverage="">
       <caption>All source visits and flight legs, including context outside the horizon</caption>
@@ -60,7 +62,8 @@ export function DecisionSummaryReview({ dataset }: DatasetProps) {
     {summary.assumption && <p>Illustrative model: {summary.assumption.release_delay_probability} release-delay probability,
       {" "}{summary.assumption.expected_release_delay_minutes_given_delay} minutes conditional delay.
       {accommodation && " This choice is shared with Late-request accommodation."}
-      {" "}Chart-overlay options remain independent. These are synthetic estimates, not actual delay or a forecast.</p>}
+      {" "}The same assumption is used in the prepared-plan comparison. Chart-overlay options remain independent.
+      These are synthetic estimates, not actual delay or a forecast.</p>}
     <table className="timeline-overlay-evidence" data-decision-measures="">
       <caption>Source-defined metrics; missing profiles and missing predecessors are not zero delay</caption>
       <thead><tr><th>Measure</th><th>Reference</th></tr></thead>

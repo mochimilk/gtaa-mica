@@ -7,6 +7,7 @@ import { validateTowWindowsSnapshot } from "../overlays/towWindows";
 import { validateAccommodationCapacity, validateAccommodationSnapshot } from "../overlays/accommodation";
 import { validateAtlasCapacity } from "../overlays/atlas";
 import type { OverlayData } from "../overlays/profiles";
+import { preparePlanComparison } from "./planComparison";
 
 export interface SourceSelection {
   source: string;
@@ -59,12 +60,13 @@ export const SCHEDULE_SOURCES: readonly ScheduleSource[] = [
     }
     validateAccommodationCapacity(accommodationEvidence, capacityEvidence);
     const atlasEvidence = await validateAtlasCapacity(atlas.default, capacityEvidence);
+    const comparison = await preparePlanComparison(snapshot);
     return {
       profiles: {
         buffers: buffers.default, "gate-wait": waiting.default, capacity: capacityEvidence, "tow-windows": towEvidence,
         accommodation: accommodationEvidence, "decision-review": decisionReview.default,
       },
-      companions: { "capacity-atlas": atlasEvidence },
+      companions: { "capacity-atlas": atlasEvidence, "plan-comparison": comparison },
     };
   }),
   preparedSource("gtaa", "GTAA - Toronto Pearson", () => import("./prepared/gtaa/full-day.json", { with: { type: "json" } })),
