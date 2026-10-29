@@ -23,7 +23,7 @@ import {
 import { barEndDepth, barPath, type BarEnds, type Millis, type Occupancy } from "../stand-timeline";
 import { AIRPORT_NAMES } from "../stand-timeline-demo/airports";
 import { DEMO_DATA, formatUtc, formatUtcFull, formatUtcWithDay } from "../stand-timeline-demo/demoData";
-import { AIRCRAFT_MAKER } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET } from "./activeDataset";
 import { BAR_RADIUS, END_SHAPE } from "../stand-timeline-demo/theme";
 import {
   aircraftSize,
@@ -331,7 +331,7 @@ function StayFacts({
           <Missing label="Not assigned" />
         </CardFact>
       )}
-      <CardFact align="center" caption={(type && AIRCRAFT_MAKER[type]) || "Aircraft"}>
+      <CardFact align="center" caption={(type && ACTIVE_DATASET.aircraftMakers[type]) || "Aircraft"}>
         {type ? <span className="ops-card-type">{type}</span> : <Missing label="Not recorded" />}
         {size && (
           <Tag className="ops-card-size" size="extra-small" appearance="filled" shape="rounded">

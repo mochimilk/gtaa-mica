@@ -1,7 +1,7 @@
 ---
 title: Local stand assignment with CP-SAT
 description: Run the airport baseline and admitted tow alternatives locally with atomic visits, authored stand constraints and independent validation.
-ms.date: 2026-10-21
+ms.date: 2026-10-29
 ---
 
 ## Local execution
@@ -231,6 +231,30 @@ Source selection, compact viewer projections and analysis overlays remain a
 separate integration. The scenario runner resolves boundary state for its
 complete scheduled feed; generic initial-state overlays, single-leg tow
 scheduling and explicit gate/towing resources remain separate modeling steps.
+
+## Shared application dataset boundary
+
+[The active dataset](../src/operations/activeDataset.ts) owns the board for one
+page session. [The dataset factory](../src/operations/dataset.ts) accepts
+source identity, reference date, timeline domain, stand and aircraft metadata,
+chart records, flight records and unplaced stays. It copies those inputs,
+checks identifiers and cross-references, and creates flight indexes whose
+entries refer to the same mutable flight objects as the lists and editor.
+Creating another dataset does not register visits or change the active board.
+
+[The fixture builder](../src/stand-timeline-demo/fixtureDataset.ts) contains
+the original sample projection, including its five waiting flights. Existing
+chart and operations imports remain compatibility entry points into this
+single dataset. Allocation, KPIs, agent stand validation, chart dates and Studio
+aircraft metadata now read that dataset rather than importing fixture values.
+The original records, sample editing rules and UTC presentation are unchanged.
+
+This boundary does not yet enable source switching. The allocation baseline,
+filters, pending agent work, selections and review state are session-scoped.
+Do not replace the active dataset in place or pass a different dataset only to
+the chart. A future selection flow must initialize or reset all those consumers
+together and explicitly gate editing and analyses for a prepared solver plan.
+The sample narrow/wide size rules are not GTAA ASM compatibility rules.
 
 ## Validate the imported foundation
 

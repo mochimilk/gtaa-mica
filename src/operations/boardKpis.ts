@@ -14,7 +14,7 @@
 import type { Millis, Occupancy } from "../stand-timeline";
 import { DEMO_DATA, DEMO_DOMAIN } from "../stand-timeline-demo/demoData";
 import { GHOST_SIDES, ghostClashes, ghostKey, ghostSpan } from "../stand-timeline-demo/delays";
-import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET } from "./activeDataset";
 import {
   flightsAtStay,
   occupancyById,
@@ -172,7 +172,7 @@ export function boardKpis({ stays, closure }: StandState): BoardKpis {
   let busy = 0;
   let windows = 0;
   let free = 0;
-  for (const { code } of SYNTHETIC_STANDS) {
+  for (const { code } of ACTIVE_DATASET.stands) {
     const closed = closure && standArea(code) === closure.area ? merge([[closure.from, closure.to]]) : [];
     const openSpans = subtract([[from, to]], closed);
     const busySpans = subtract(

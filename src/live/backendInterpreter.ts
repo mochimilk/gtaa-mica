@@ -14,7 +14,7 @@ import { validateAppAction, type AppActionName } from "./appActions.ts";
 import { FILTER_OPTIONS, VIEWS } from "../operations/opsFilters.ts";
 import { OPS_FLIGHTS, standMinutes } from "../operations/operationsData.ts";
 import { formatUtc } from "../stand-timeline-demo/demoData.ts";
-import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture.ts";
+import { ACTIVE_DATASET } from "../operations/activeDataset.ts";
 import { PEOPLE } from "./callGuests.ts";
 import { liveApiBase } from "./liveBackend.ts";
 import { describeAlertCounts, flightLabel } from "./opsHost.ts";
@@ -78,7 +78,7 @@ function boardVocabulary(request: InterpretationRequest) {
     callGuests: [...snapshot.callGuests],
     callingGuests: [...snapshot.callingGuests],
     // Where a stay may be moved, and which stands take narrowbodies only.
-    allowedStands: SYNTHETIC_STANDS.map(
+    allowedStands: ACTIVE_DATASET.stands.map(
       (stand) => `${stand.code} — ${stand.area}, ${stand.size === "narrow" ? "narrowbody only" : "any aircraft"}`,
     ),
     allowedFilterValues: {

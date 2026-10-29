@@ -9,7 +9,7 @@
 // A suggestion for a person to accept, not an allocator.
 import { DEMO_DATA } from "../stand-timeline-demo/demoData";
 import { ghostClashes, ghostKey } from "../stand-timeline-demo/delays";
-import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET } from "./activeDataset";
 import type { Occupancy } from "../stand-timeline";
 import {
   closedDuring,
@@ -55,7 +55,7 @@ function conflictFix(alert: OpsAlert): AlertFix | null {
     const flight = flightsAtStay(stayId)[0];
     if (!stay || !flight) return null;
     const area = standArea(stay.rowId);
-    const nearestFirst = [...SYNTHETIC_STANDS].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
+    const nearestFirst = [...ACTIVE_DATASET.stands].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
     for (const stand of nearestFirst) {
       if (stand.code === stay.rowId || planDrop(stayId, stand.code).kind !== "move") continue;
       const after = clashesWithMove(stayId, stand.code);
@@ -134,7 +134,7 @@ export function planFixAll(alerts: readonly OpsAlert[], scope: "all" | "conflict
       const stay = byId.get(stayId);
       if (!stay) return false;
       const area = standArea(stay.rowId);
-      const nearestFirst = [...SYNTHETIC_STANDS].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
+      const nearestFirst = [...ACTIVE_DATASET.stands].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
       for (const stand of nearestFirst) {
         if (
           stand.code === stay.rowId ||

@@ -16,7 +16,7 @@ import { Menu, MenuItem, MenuList, MenuPopover, MenuTrigger } from "../component
 import { NorvaraLogo } from "../components/navbar/NorvaraLogo";
 import { PanelHeader } from "../components/panel-header";
 import { DEMO_DATA } from "../stand-timeline-demo/demoData";
-import { AIRCRAFT_MAKER } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET } from "../operations/activeDataset";
 import {
   BLANK,
   discardDraft,
@@ -50,13 +50,13 @@ for (const turn of DEMO_DATA.turnsById.values()) {
 }
 const aircraftOf = (type: string): Aircraft => ({
   type,
-  maker: AIRCRAFT_MAKER[type],
-  name: AIRCRAFT_MAKER[type] ? `${AIRCRAFT_MAKER[type]} ${type}` : type,
+  maker: ACTIVE_DATASET.aircraftMakers[type],
+  name: ACTIVE_DATASET.aircraftMakers[type] ? `${ACTIVE_DATASET.aircraftMakers[type]} ${type}` : type,
   count: counts.get(type) ?? 0,
 });
 const byName = (a: Aircraft, b: Aircraft) => a.name.localeCompare(b.name);
 /** Every type on the board, or with a maker on record. */
-const ALL_AIRCRAFT = [...new Set([...counts.keys(), ...Object.keys(AIRCRAFT_MAKER)])].map(aircraftOf).sort(byName);
+const ALL_AIRCRAFT = [...new Set([...counts.keys(), ...Object.keys(ACTIVE_DATASET.aircraftMakers)])].map(aircraftOf).sort(byName);
 const onBoard = (a: Aircraft) => `${a.count} on the board`;
 
 /** How many strokes undo goes back. */

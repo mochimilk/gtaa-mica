@@ -15,7 +15,7 @@ import type { Occupancy } from "../stand-timeline";
 import { DEMO_DATA, formatUtc } from "../stand-timeline-demo/demoData";
 import { formatDelay, ghostClashes, ghostKey, GHOST_SIDES, type GhostClashes } from "../stand-timeline-demo/delays";
 import { AIRPORT_NAMES } from "../stand-timeline-demo/airports";
-import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET } from "./activeDataset";
 import { boardKpis, type BoardKpis, type GateHold } from "./boardKpis";
 import {
   closedDuring,
@@ -250,7 +250,7 @@ export function planKnockOn(stayId: string, board: Occupancy[]): DisruptionPlan 
     if (!stay) continue;
     const area = standArea(stay.rowId);
     const row = rowOf.get(stay.rowId) ?? 0;
-    const nearest = [...SYNTHETIC_STANDS].sort(
+    const nearest = [...ACTIVE_DATASET.stands].sort(
       (a, b) =>
         Number(a.area !== area) - Number(b.area !== area) ||
         Math.abs((rowOf.get(a.code) ?? 0) - row) - Math.abs((rowOf.get(b.code) ?? 0) - row) ||

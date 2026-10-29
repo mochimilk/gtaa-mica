@@ -46,7 +46,7 @@ import {
 import type { Millis } from "../stand-timeline/index.ts";
 import { utcAt } from "../stand-timeline-demo/adapter.ts";
 import { DEMO_DATA, DEMO_DOMAIN, formatUtc } from "../stand-timeline-demo/demoData.ts";
-import { SYNTHETIC_DATE, SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture.ts";
+import { ACTIVE_DATASET } from "../operations/activeDataset.ts";
 import {
   DISRUPTION,
   explainPlan,
@@ -358,7 +358,7 @@ export function validateAppAction(name: unknown, args: Record<string, unknown> =
       if (!flight.ok) return flight;
       const standId = asString(safeArgs.standId);
       const stand = standId
-        ? SYNTHETIC_STANDS.find((entry) => entry.code.toLowerCase() === standId.toLowerCase())
+        ? ACTIVE_DATASET.stands.find((entry) => entry.code.toLowerCase() === standId.toLowerCase())
         : undefined;
       if (!stand) return reject("unknown_stand", `${standId ?? "That"} is not a stand on the chart.`);
       return { ok: true, action: { name: "move_stay", flightId: flight.flightId, standId: stand.code } };
@@ -400,7 +400,7 @@ export function validateAppAction(name: unknown, args: Record<string, unknown> =
       if (safeArgs.standId != null) {
         const named = asString(safeArgs.standId);
         const stand = named
-          ? SYNTHETIC_STANDS.find((entry) => entry.code.toLowerCase() === named.toLowerCase())
+          ? ACTIVE_DATASET.stands.find((entry) => entry.code.toLowerCase() === named.toLowerCase())
           : undefined;
         if (!stand) return reject("unknown_stand", `${named ?? "That"} is not a stand on the chart.`);
         standId = stand.code;
@@ -510,7 +510,7 @@ function matchArea(name: string): string | undefined {
 function clockTime(value: unknown): Millis | null {
   const match = typeof value === "string" ? /^(\d{1,2}):(\d{2})$/.exec(value.trim()) : null;
   if (!match || Number(match[1]) > 23 || Number(match[2]) > 59) return null;
-  return utcAt(SYNTHETIC_DATE, `${match[1].padStart(2, "0")}:${match[2]}`);
+  return utcAt(ACTIVE_DATASET.date, `${match[1].padStart(2, "0")}:${match[2]}`);
 }
 
 /** A flight id from the fixture whose flight has a stay on the chart, and where that stay is. */

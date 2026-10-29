@@ -23,7 +23,8 @@
 // lane above the stands (see ./noStandLane).
 import type { Millis, Occupancy } from "../stand-timeline";
 import { DEMO_DATA, formatUtc, formatUtcWithDay } from "../stand-timeline-demo/demoData";
-import { AIRCRAFT_SIZE, SYNTHETIC_STANDS, type StandSize } from "../stand-timeline-demo/syntheticFixture";
+import type { StandSize } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET } from "./activeDataset";
 import { formatDuration, NO_STAND_STAYS, OPS_FLIGHTS, type OpsFlight } from "./operationsData";
 
 /** What dropping a stay on a stand would do. */
@@ -46,8 +47,8 @@ export type SwapCheck = { ok: true } | { ok: false; reason: string };
 const STAYS = new Map([...DEMO_DATA.occupancies, ...NO_STAND_STAYS].map((o) => [o.id, o]));
 /** Stays with no stand, so off the chart; every other stay is on DEMO_DATA.occupancies. */
 const OFF_BOARD = new Set(NO_STAND_STAYS.map((o) => o.id));
-const STAND_SIZE = new Map(SYNTHETIC_STANDS.map((stand) => [stand.code, stand.size]));
-const STAND_AREA = new Map(SYNTHETIC_STANDS.map((stand) => [stand.code, stand.area]));
+const STAND_SIZE = new Map(ACTIVE_DATASET.stands.map((stand) => [stand.code, stand.size]));
+const STAND_AREA = new Map(ACTIVE_DATASET.stands.map((stand) => [stand.code, stand.area]));
 const ORIGINAL = new Map(
   [...DEMO_DATA.occupancies, ...NO_STAND_STAYS].map((o) => [o.id, { rowId: o.rowId, start: o.start, end: o.end }]),
 );
@@ -64,7 +65,7 @@ export const isStand = (standId: string) => STAND_SIZE.has(standId);
 /** The area a stand belongs to, e.g. "Pier B". */
 export const standArea = (standId: string) => STAND_AREA.get(standId);
 /** Every stand area, in chart order. */
-export const STAND_AREAS: readonly string[] = [...new Set(SYNTHETIC_STANDS.map((stand) => stand.area))];
+export const STAND_AREAS: readonly string[] = [...new Set(ACTIVE_DATASET.stands.map((stand) => stand.area))];
 
 /* ------------------------------------------------------------------ state */
 
@@ -306,7 +307,7 @@ const recordedType = (occupancy: Occupancy) =>
  */
 export function aircraftSize(occupancy: Occupancy): StandSize {
   const type = recordedType(occupancy);
-  return (type && AIRCRAFT_SIZE[type]) || (type ? "narrow" : "wide");
+  return (type && ACTIVE_DATASET.aircraftSizes[type]) || (type ? "narrow" : "wide");
 }
 
 const aircraftType = (occupancy: Occupancy) => recordedType(occupancy) ?? "aircraft";
@@ -471,7 +472,7 @@ export function planAreaClosure(area: string, from: Millis, to: Millis): AreaPla
     const row = rowOf.get(standId) ?? 0;
     return row < first ? first - row : row > last ? row - last : 0;
   };
-  const candidates = SYNTHETIC_STANDS.filter((stand) => stand.area !== area)
+  const candidates = ACTIVE_DATASET.stands.filter((stand) => stand.area !== area)
     .map((stand) => stand.code)
     .sort((a, b) => distance(a) - distance(b) || (rowOf.get(a) ?? 0) - (rowOf.get(b) ?? 0));
   // Hardest to place first: widebodies (fewer stands take them), then the
@@ -570,7 +571,7 @@ export function planAssign(
   /** Stays planned onto stands by other changes not made yet, which count against those stands too. */
   alsoPlanned: readonly Occupancy[] = [],
 ): AssignPlan {
-  const narrowFirst = [...SYNTHETIC_STANDS].sort(
+  const narrowFirst = [...ACTIVE_DATASET.stands].sort(
     (a, b) => Number(a.size !== "narrow") - Number(b.size !== "narrow"),
   );
   const hardestFirst = [...stayIds].sort((a, b) => {
@@ -742,7 +743,7 @@ export function suggestBest(occupancyId?: string): Suggestion | null {
     }
   };
   for (const a of subjects) {
-    for (const stand of SYNTHETIC_STANDS) {
+    for (const stand of ACTIVE_DATASET.stands) {
       const plan = planDrop(a.id, stand.code);
       if (plan.kind === "move") consider(plan, new Map([[a.id, stand.code]]), [a.rowId, stand.code]);
     }

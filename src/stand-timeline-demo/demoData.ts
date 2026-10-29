@@ -1,14 +1,7 @@
-// Shared synthetic dataset for the chart demo and the operations panel.
-// Built once from the synthetic fixture; nothing here is real operations data.
-import { adaptSyntheticDay, utcAt } from "./adapter";
-import {
-  SYNTHETIC_DATE,
-  SYNTHETIC_STANDS,
-  SYNTHETIC_TURNS,
-  SYNTHETIC_WINDOW,
-} from "./syntheticFixture";
+// Compatibility entry point; all board records belong to the active dataset.
+import { ACTIVE_DATASET } from "../operations/activeDataset";
 
-export const DEMO_DATA = adaptSyntheticDay(SYNTHETIC_DATE, SYNTHETIC_STANDS, SYNTHETIC_TURNS);
+export const DEMO_DATA = ACTIVE_DATASET.timeline;
 
 // DEMO_DATA is the board's shared, mutable state (stand changes rewrite it in
 // place). A hot update would hand some importers a fresh copy while others
@@ -16,10 +9,7 @@ export const DEMO_DATA = adaptSyntheticDay(SYNTHETIC_DATE, SYNTHETIC_STANDS, SYN
 // different boards, so a change here reloads the page instead.
 if (import.meta.hot) import.meta.hot.accept(() => location.reload());
 
-export const DEMO_DOMAIN = [
-  utcAt(SYNTHETIC_DATE, SYNTHETIC_WINDOW.from),
-  utcAt(SYNTHETIC_DATE, SYNTHETIC_WINDOW.to),
-] as const;
+export const DEMO_DOMAIN = ACTIVE_DATASET.domain;
 
 const utcTime = new Intl.DateTimeFormat("en-GB", {
   timeZone: "UTC",
@@ -31,9 +21,9 @@ const utcTime = new Intl.DateTimeFormat("en-GB", {
 /** HH:MM in UTC, the demo's only display zone. */
 export const formatUtc = (t: number) => utcTime.format(t);
 
-const DAY_START = utcAt(SYNTHETIC_DATE, "00:00");
+const DAY_START = Date.parse(`${ACTIVE_DATASET.date}T00:00:00Z`);
 
-/** Whole UTC days between `t` and SYNTHETIC_DATE (0 on the demo date, −1 the day before). */
+/** Whole UTC days from the active dataset's reference date. */
 export const dayOffset = (t: number) => Math.floor((t - DAY_START) / 86_400_000);
 
 /** Compact day marker, "" on the demo date, otherwise e.g. "−1d" / "+1d". */

@@ -26,7 +26,7 @@ import { currentAlerts } from "../operations/boardAlerts.ts";
 import { disruptionState } from "../operations/disruption.ts";
 import { OPS_FLIGHTS, OPS_FLIGHTS_BY_ID, standMinutes, type OpsFlight } from "../operations/operationsData.ts";
 import { FILTER_OPTIONS, UNASSIGNED_AREA, VIEWS, type FilterDim, type ViewKey } from "../operations/opsFilters.ts";
-import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture.ts";
+import { ACTIVE_DATASET } from "../operations/activeDataset.ts";
 import { validateAppAction, type AppAction } from "./appActions.ts";
 import { PEOPLE } from "./callGuests.ts";
 import type { OpsSnapshot } from "./opsHost.ts";
@@ -139,7 +139,7 @@ const listPeople = () => (PEOPLE.length <= 1 ? (PEOPLE[0] ?? "") : `${PEOPLE.sli
 
 /** Stands named in the utterance, matched as whole words ("to c25"). */
 function mentionedStands(normalized: string): string[] {
-  return SYNTHETIC_STANDS.map((stand) => stand.code).filter((code) =>
+  return ACTIVE_DATASET.stands.map((stand) => stand.code).filter((code) =>
     new RegExp(`\\b${code.toLowerCase()}\\b`).test(normalized),
   );
 }
