@@ -18,3 +18,47 @@ desktop-out/
 .env
 .env.*
 !.env.example
+
+## Reusable planning components ##
+
+# .NET build output
+components/**/[Bb]in/
+components/**/[Oo]bj/
+components/**/[Oo]ut/
+components/**/[Dd]ebug/
+components/**/[Rr]elease/
+components/**/artifacts/
+
+# JavaScript dependencies and generated output
+components/**/node_modules/
+components/**/dist/
+components/**/.vite/
+components/**/*.tsbuildinfo
+
+# Test and coverage output
+components/**/TestResults/
+components/**/coverage/
+components/**/*.coverage
+components/**/*.coveragexml
+components/**/*.trx
+components/**/cobertura.xml
+
+# Package archives produced by npm pack
+components/**/*.tgz
+
+# Local logs
+components/**/*.log
+components/**/npm-debug.log*
+components/**/yarn-debug.log*
+components/**/yarn-error.log*
+components/**/pnpm-debug.log*
+
+# Local configuration and secrets
+components/**/.env
+components/**/.env.*
+!components/**/.env.example
+components/**/appsettings.*.local.json
+components/**/appsettings.Local.json
+
+# Local reference documents and sample data
+data/samples/*
