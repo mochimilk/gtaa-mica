@@ -2,6 +2,7 @@ import type { OperationsDatasetInput } from "../operations/dataset";
 import { validateCapacityDataset } from "./capacity";
 import { validateTowWindowsDataset } from "./towWindows";
 import { validateAccommodationDataset } from "./accommodation";
+import { validateAtlasDataset } from "./atlas";
 
 export interface BufferProfile {
   schema_version: "1.0.0";
@@ -34,6 +35,14 @@ export interface OverlayData {
   airportId: string;
   datasetId: string;
   profiles: Readonly<Record<string, unknown>>;
+  companions?: Readonly<Record<string, unknown>>;
+}
+
+export interface DecisionReviewProfile {
+  schema_version: "1.0.0";
+  id: string;
+  metric_id: "airport-decision-review";
+  metric_version: "1.0.0";
 }
 
 const record = (value: unknown): value is Record<string, unknown> =>
@@ -89,12 +98,33 @@ export function parseGateWaitProfile(value: unknown): GateWaitProfile {
   };
 }
 
+export function parseDecisionReviewProfile(value: unknown): DecisionReviewProfile {
+  if (!record(value) || !onlyKeys(value, ["$schema", "schema_version", "id", "metric_id", "metric_version"]) ||
+      value.schema_version !== "1.0.0" || !text(value.id) || /\s/.test(value.id) ||
+      value.metric_id !== "airport-decision-review" || value.metric_version !== "1.0.0" ||
+      ("$schema" in value && typeof value.$schema !== "string")) {
+    throw new Error("Invalid or unsupported decision-review profile.");
+  }
+  return { schema_version: value.schema_version, id: value.id, metric_id: value.metric_id, metric_version: value.metric_version };
+}
+
+function validateDecisionReviewProfile(value: unknown, source: OperationsDatasetInput): DecisionReviewProfile {
+  const profile = parseDecisionReviewProfile(value), plan = source.preparedPlan;
+  if (!plan || source.capabilities?.editStands !== false ||
+      !["baseline", "tow-options"].includes(plan.variant) || !plan.caseId.trim() || !plan.demandId.trim() ||
+      !/^[0-9a-f]{64}$/.test(plan.requestFingerprint) || source.id !== `${plan.demandId}/${plan.variant}`) {
+    throw new Error("Decision review requires an exact read-only prepared dataset/plan.");
+  }
+  return profile;
+}
+
 export const OVERLAY_PROFILE_PARSERS: Readonly<Record<string, (value: unknown, source: OperationsDatasetInput) => { id: string }>> = {
   buffers: parseBufferProfile,
   "gate-wait": parseGateWaitProfile,
   capacity: validateCapacityDataset,
   "tow-windows": validateTowWindowsDataset,
   accommodation: validateAccommodationDataset,
+  "decision-review": validateDecisionReviewProfile,
 };
 
 /** Runs during source bootstrap, before any UI or session stores initialize. */
@@ -107,5 +137,13 @@ export function validateOverlayData(data: OverlayData, source: OperationsDataset
     if (!parser) throw new Error(`Unregistered overlay data: ${id}`);
     const profile = parser(value, source);
     if (!profile.id.startsWith(`${source.airportId}:`)) throw new Error(`Overlay profile ${profile.id} belongs to another airport.`);
+  }
+  if (data.companions !== undefined) {
+    if (!record(data.companions)) throw new Error("Invalid overlay companion data.");
+    for (const [id, value] of Object.entries(data.companions)) {
+      if (id !== "capacity-atlas") throw new Error(`Unregistered overlay companion: ${id}`);
+      const companion = validateAtlasDataset(value, source, data.profiles);
+      if (!companion.id.startsWith(`${source.airportId}:`)) throw new Error("Atlas profile belongs to another airport.");
+    }
   }
 }

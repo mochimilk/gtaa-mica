@@ -3,6 +3,7 @@ import { Button, Field, Select } from "@fluentui/react-components";
 import type { OperationsDataset } from "../operations/dataset";
 import { parseBufferProfile, parseGateWaitProfile } from "./profiles";
 import { accommodationImpact, accommodationOptionLabel, parseAccommodation } from "./accommodation";
+import { AccommodationMeasures } from "./AccommodationMeasures";
 
 type DatasetProps = { dataset: OperationsDataset };
 function useAccommodationState(dataset: OperationsDataset) {
@@ -32,6 +33,9 @@ function useAccommodationState(dataset: OperationsDataset) {
   };
 }
 const AccommodationContext = createContext<ReturnType<typeof useAccommodationState> | null>(null);
+export function useAccommodationReviewState() {
+  return useContext(AccommodationContext);
+}
 export function AccommodationProvider({ dataset, children }: PropsWithChildren<DatasetProps>) {
   const state = useAccommodationState(dataset);
   return <AccommodationContext.Provider value={state}>{children}</AccommodationContext.Provider>;
@@ -55,7 +59,6 @@ export function AccommodationReview({ dataset }: DatasetProps) {
     if (!visit) throw new Error("Unknown accommodation affected visit.");
     return visit.label;
   };
-  const number = (value: number | null | undefined) => value === null || value === undefined ? "Not assessed" : Number(value.toFixed(2)).toString();
   const assigned = new Set(dataset.timeline.occupancies.map(stay => stay.visitId)).size;
   const assignedLegs = dataset.flights.filter(flight => !!flight.occupancyId).length;
   return <>
@@ -128,19 +131,7 @@ export function AccommodationReview({ dataset }: DatasetProps) {
       </p>) : <p>Direct placement; no existing assignment changes.</p>}
       <p>Two incoming legs are represented only in this hypothetical comparison. The chart and flight lists still show
         the unchanged reference; {dataset.noStandStays.length} existing unassigned visits remain unassigned.</p>
-      <table className="timeline-overlay-evidence">
-        <caption>Reference versus independent preview; scheduled gaps and illustrative waiting, not operational performance</caption>
-        <thead><tr><th>Measure</th><th>Reference</th><th>Preview</th></tr></thead>
-        <tbody>
-          <tr><th>Scheduled stand handovers</th><td>{impact.beforeBuffers.handovers}</td><td>{impact.afterBuffers.handovers}</td></tr>
-          <tr><th>Tight handovers</th><td>{number(impact.beforeBuffers.tight)}</td><td>{number(impact.afterBuffers.tight)}</td></tr>
-          <tr><th>Minimum scheduled buffer (minutes)</th><td>{number(impact.beforeBuffers.minimum)}</td><td>{number(impact.afterBuffers.minimum)}</td></tr>
-          <tr><th>Assessed assigned arrivals</th><td>{number(impact.beforeWaiting?.assessed)}</td><td>{number(impact.afterWaiting?.assessed)}</td></tr>
-          <tr><th>Unassessed assigned arrivals</th><td>{number(impact.beforeWaiting?.unassessed)}</td><td>{number(impact.afterWaiting?.unassessed)}</td></tr>
-          <tr><th>Waiting for common existing arrivals (minutes)</th><td>{number(impact.beforeCommonMinutes)}</td><td>{number(impact.afterCommonMinutes)}</td></tr>
-          <tr><th>Incoming illustrative waiting (minutes)</th><td>Not in reference</td><td>{number(impact.incomingMinutes)}</td></tr>
-        </tbody>
-      </table>
+      <AccommodationMeasures {...impact} />
       <p>{impact.commonArrivals} existing arrivals are assessed in both views; the common-population waiting row compares
         only those arrivals. A missing modeled predecessor is not zero risk or zero delay.
         No capacity or tow-window evidence is reused as current evidence for a preview.</p>

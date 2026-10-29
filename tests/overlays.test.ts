@@ -16,7 +16,7 @@ const contoso = await loadSourceDataset({ source: "contoso", plan: "baseline" })
 test("overlays register from source data, without Contoso defaults leaking to other sources", async () => {
   for (const plan of ["baseline", "tow-options"] as const) {
     const source = await loadSourceDataset({ source: "contoso", plan });
-    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait", "capacity", "tow-windows", "accommodation"]);
+    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait", "capacity", "tow-windows", "accommodation", "decision-review"]);
     assert.equal(source.overlays?.datasetId, source.id);
     assert.deepEqual(availableOverlays(await loadSourceDataset({ source: "gtaa", plan })), []);
   }
@@ -38,7 +38,7 @@ test("overlay input validation rejects wrong airports, plans, unsupported data a
 test("duplicate registrations and attempts to enable unavailable overlays explicitly fail", () => {
   const registered = availableOverlays(contoso);
   assert.throws(() => availableOverlays(contoso, [...registered, registered[0]]), /Duplicate/);
-  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "decision-review" }), /unavailable/);
+  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "atlas" }), /unavailable/);
 });
 
 test("review-only features can be inspected but cannot enable nonexistent chart layers", () => {
@@ -49,6 +49,10 @@ test("review-only features can be inspected but cannot enable nonexistent chart 
   assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "accommodation" }), /review-only/);
   assert.deepEqual(changeOverlaySelection({ enabled: ["accommodation", "buffers"], review: "accommodation" }, registered, { type: "close" }),
     { enabled: ["buffers"], review: null });
+  assert.equal(registered.find(feature => feature.id === "decision-review")?.reviewOnly, true);
+  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "decision-review" }), /review-only/);
+  assert.deepEqual(changeOverlaySelection({ enabled: ["decision-review"], review: null }, registered, { type: "inspect", id: "decision-review" }),
+    { enabled: [], review: "decision-review" });
 });
 test("overlay toggle, inspection and reset remain independent and prune unavailable features", () => {
   const registered = availableOverlays(contoso);

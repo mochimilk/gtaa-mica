@@ -13,6 +13,7 @@ import { BufferLayer, BufferProvider, BufferReview, WaitingLayer, WaitingProvide
 import { CapacityLayer, CapacityProvider, CapacityReview } from "./CapacityFeature";
 import { TowWindowLayer, TowWindowProvider, TowWindowReview } from "./TowWindowFeature";
 import { AccommodationProvider, AccommodationReview } from "./AccommodationFeature";
+import { DecisionSummaryProvider, DecisionSummaryReview } from "./DecisionSummaryFeature";
 import "./overlays.css";
 
 type FeatureProps = { dataset: OperationsDataset; isMatch?: (stayId: string) => boolean };
@@ -30,6 +31,7 @@ const PRESENTATIONS = {
   capacity: { Provider: CapacityProvider, Underlay: CapacityLayer, Review: CapacityReview },
   "tow-windows": { Provider: TowWindowProvider, Overlay: TowWindowLayer, Review: TowWindowReview },
   accommodation: { Provider: AccommodationProvider, Review: AccommodationReview },
+  "decision-review": { Provider: DecisionSummaryProvider, Review: DecisionSummaryReview },
 } satisfies Record<OverlayId, OverlayPresentation>;
 const presentations = new Map<string, OverlayPresentation>(Object.entries(PRESENTATIONS));
 

@@ -287,6 +287,23 @@ The [isolated overlay registration guide](local-assignment.md#register-isolated-
 describes the UI extension points. Migrated overlays use Contoso's buffer,
 synthetic waiting, single-turn capacity, one-way tow-window evidence and
 read-only late-request accommodation.
+Contoso's capacity review also supports
+[synthetic Atlas frequency](local-assignment.md#prepare-and-inspect-synthetic-atlas-frequency)
+through optional `overlays.companions["capacity-atlas"]` evidence, not
+another toolbar registration. Prepare schedule, capacity and then Atlas
+with explicit source inputs. Atlas schema v2 binds the complete capacity
+hash and both plan requests; malformed or stale registered companions
+fail startup. Without Atlas, current capacity remains available.
+Replay dates label timing experiments on one fixed reference day, not
+historical operations or a demand forecast. Frequency colors only current
+feasible starts; retention uses planned fits as its denominator and is
+unassessed when that denominator is zero.
+Contoso also opts into a
+[read-only decision summary](local-assignment.md#inspect-the-read-only-decision-summary)
+through a source-owned registration profile. It combines only available,
+validated analyses for the current reference; missing measures stay
+unavailable. Accommodation consequences remain a separate hypothetical view,
+not a replacement dataset or newly validated capacity/tow plan.
 Capacity, tow windows and accommodation require fresh sidecars matched to the exact schedule
 and both plan request fingerprints. Their airport and demand provenance must
 agree. Regenerate them when the schedule, airport rules or demand changes.

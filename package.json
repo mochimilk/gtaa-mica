@@ -21,6 +21,8 @@
     "prepare:schedule": "npm run build:solver && node scripts/prepare-schedule.mjs",
     "prepare:capacity": "node scripts/prepare-capacity.mjs",
     "test:capacity": "node --test scripts/capacity-probe.test.mjs",
+    "prepare:atlas": "node scripts/prepare-atlas.mjs",
+    "test:atlas": "node --test scripts/capacity-atlas.test.mjs",
     "prepare:tow-windows": "node scripts/prepare-tow-windows.mjs",
     "test:tow-windows": "node --test scripts/tow-windows.test.mjs",
     "prepare:accommodation": "node scripts/prepare-accommodation.mjs",

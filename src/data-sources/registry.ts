@@ -5,6 +5,8 @@ import type { PlanVariant } from "./preparedTypes";
 import { validateCapacitySnapshot } from "../overlays/capacity";
 import { validateTowWindowsSnapshot } from "../overlays/towWindows";
 import { validateAccommodationCapacity, validateAccommodationSnapshot } from "../overlays/accommodation";
+import { validateAtlasCapacity } from "../overlays/atlas";
+import type { OverlayData } from "../overlays/profiles";
 
 export interface SourceSelection {
   source: string;
@@ -20,16 +22,16 @@ export interface ScheduleSource {
 
 function preparedSource(
   id: string, label: string, load: () => Promise<{ default: unknown }>,
-  loadOverlays?: (snapshot: unknown) => Promise<Readonly<Record<string, unknown>>>,
+  loadOverlays?: (snapshot: unknown) => Promise<Pick<OverlayData, "profiles" | "companions">>,
 ): ScheduleSource {
   return {
     id, label, plans: ["baseline", "tow-options"],
     load: async plan => {
       const snapshot = await load();
       const dataset = adaptPreparedSchedule(snapshot.default, { airportId: id, caseId: "full-day" }, plan);
-      const profiles = await loadOverlays?.(snapshot.default);
-      return profiles ? createOperationsDataset({
-        ...dataset, overlays: { airportId: id, datasetId: dataset.id, profiles },
+      const overlays = await loadOverlays?.(snapshot.default);
+      return overlays ? createOperationsDataset({
+        ...dataset, overlays: { ...overlays, airportId: id, datasetId: dataset.id },
       }) : dataset;
     },
   };
@@ -38,12 +40,14 @@ function preparedSource(
 export const SCHEDULE_SOURCES: readonly ScheduleSource[] = [
   { id: "fixture", label: "Original fixture", plans: ["baseline"], load: async () => createFixtureDataset() },
   preparedSource("contoso", "Contoso", () => import("./prepared/contoso/full-day.json", { with: { type: "json" } }), async snapshot => {
-    const [buffers, waiting, capacity, towWindows, accommodation] = await Promise.all([
+    const [buffers, waiting, capacity, towWindows, accommodation, decisionReview, atlas] = await Promise.all([
       import("../../data/airports/contoso/evaluation/buffer-profile.json", { with: { type: "json" } }),
       import("../../data/airports/contoso/evaluation/gate-wait-profile.json", { with: { type: "json" } }),
       import("./prepared/contoso/full-day.capacity.json", { with: { type: "json" } }),
       import("./prepared/contoso/full-day.tow-windows.json", { with: { type: "json" } }),
       import("./prepared/contoso/full-day.accommodation.json", { with: { type: "json" } }),
+      import("../../data/airports/contoso/evaluation/decision-review-profile.json", { with: { type: "json" } }),
+      import("./prepared/contoso/full-day.atlas.json", { with: { type: "json" } }),
     ]);
     const [capacityEvidence, towEvidence, accommodationEvidence] = await Promise.all([
       validateCapacitySnapshot(capacity.default, snapshot), validateTowWindowsSnapshot(towWindows.default, snapshot),
@@ -54,9 +58,13 @@ export const SCHEDULE_SOURCES: readonly ScheduleSource[] = [
       throw new Error("Prepared overlays have different airport or demand provenance. Regenerate their evidence together.");
     }
     validateAccommodationCapacity(accommodationEvidence, capacityEvidence);
+    const atlasEvidence = await validateAtlasCapacity(atlas.default, capacityEvidence);
     return {
-      buffers: buffers.default, "gate-wait": waiting.default, capacity: capacityEvidence, "tow-windows": towEvidence,
-      accommodation: accommodationEvidence,
+      profiles: {
+        buffers: buffers.default, "gate-wait": waiting.default, capacity: capacityEvidence, "tow-windows": towEvidence,
+        accommodation: accommodationEvidence, "decision-review": decisionReview.default,
+      },
+      companions: { "capacity-atlas": atlasEvidence },
     };
   }),
   preparedSource("gtaa", "GTAA - Toronto Pearson", () => import("./prepared/gtaa/full-day.json", { with: { type: "json" } })),

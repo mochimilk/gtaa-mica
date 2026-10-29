@@ -306,7 +306,7 @@ Use the same isolated composition pattern for later prototype analyses.
 
 The migrated features include scheduled buffers, synthetic gate waiting,
 single-turn capacity, one-way tow windows and read-only late-request
-accommodation for both Contoso plans.
+accommodation, plus a read-only decision summary for both Contoso plans.
 GTAA and the original fixture have no registered
 profiles, so their toolbar is hidden. Availability comes from the active
 dataset, not an airport-name condition or a global list of enabled features.
@@ -348,8 +348,8 @@ No applicable handovers is not evidence of zero risk or zero delay.
 Overlapping occupancies invalidate both analyses. Neither overlay changes
 assignments, defines stand-safety rules or supplies operational certification.
 
-Atlas frequency modes and decision review remain later
-phases. Their prepared evidence must match airport, case, variant and request
+Atlas frequency modes remain a later phase.
+Prepared evidence must match airport, case, variant and request
 fingerprint before registration. Regenerate evidence for the current plan;
 do not attach stale prototype results or claim they remain current after edits.
 Editable datasets cannot carry these prepared overlay profiles.
@@ -393,7 +393,63 @@ Browser fingerprint verification requires HTTPS or localhost.
 
 Run `npm run test:capacity` for preparation/rule replay regressions and
 `npm test` for source-binding and UI-query calculation regressions.
-The atlas's synthetic multi-day frequencies are not part of this increment.
+
+### Prepare and inspect synthetic Atlas frequency
+
+The [Atlas evaluator](../src/overlays/atlas.ts) and
+[Atlas review](../src/overlays/CapacityAtlasReview.tsx) extend single-turn
+capacity without another toolbar toggle or host composition change.
+Contoso supplies a `capacity-atlas` entry in `overlays.companions`, separate
+from feature registration profiles. Other sources retain current-plan
+capacity without frequency modes unless they supply matching evidence.
+Unknown or invalid companions fail validation; Atlas requires source-owned
+capacity on an exact read-only prepared plan.
+
+In **Inspect Single-turn capacity**, **Capacity view** defaults to **Current
+plan**. The other views show synthetic planned-day frequency, modeled
+end-of-day frequency or conditional retention. They split and color only
+the current plan's inclusive feasible arrival-start ranges. They do not
+display every opportunity occurring in the replays. Inspect a range and
+exact UTC arrival start to see counts and individual replay outcomes.
+Changing probe, duration or search window resets that inspection.
+Changing mode or navigating to Studio preserves it.
+
+Planned and modeled end-of-day rates divide fitting replays by all assessed
+replays. Retention divides replays fitting both phases by replays fitting
+the planned phase. Zero planned fits means **Not assessed**, not zero
+retention, and uses a dashed band. A measured zero remains visible.
+Whole occupancy must fit, including an exact final feasible start.
+Independent opportunities are not additive or jointly allocatable.
+
+Prepare the schedule first, capacity second, and Atlas third:
+
+```powershell
+node scripts\prepare-atlas.mjs --airport data\airports\contoso\airport.json --profile data\airports\contoso\demand\full-day-profile.json --case full-day --snapshot src\data-sources\prepared\contoso\full-day.json --capacity src\data-sources\prepared\contoso\full-day.capacity.json --atlas-profile data\airports\contoso\evaluation\capacity-atlas-profile.json --output src\data-sources\prepared\contoso\full-day.atlas.json
+```
+
+`npm run prepare:atlas -- <explicit arguments>` invokes the same command.
+All inputs are explicit. Preparation reproduces authoritative capacity
+before accepting its fingerprint, then replays fixed assignments without
+solving, retiming the source or assigning existing unassigned demand.
+The [version 2 schema](../data/schemas/capacity-atlas.schema.json) records
+the exact capacity hash, source/airport/demand hashes, horizon and both
+request fingerprints. Startup verifies these bindings and complete
+probe/stand assessments for every replay and phase.
+
+Contoso uses 30 deterministic timing experiments on one reference day.
+Replay dates are labels and seeds, not operational history. Planned
+uniform shift/scale transforms are followed by modeled outcome
+shift/scale transforms; absolute timestamps remain relative to the
+reference UTC horizon, not the label dates. These are not actual
+end-of-day observations, a monthly demand model, calibrated probabilities,
+weather or staffing forecasts, or proof of sustainable airport capacity.
+Profiles, seeds and parameter ranges are disclosed in the review.
+The decision summary continues to report current reference-plan evidence,
+independently of the selected frequency mode.
+
+Run `npm run test:atlas` for deterministic preparation and authoritative
+rule replays; `npm test` covers source bindings, exact-time segmentation,
+per-day membership, conditional denominators and inspection validation.
 
 ### Prepare and inspect one-way tow windows
 
@@ -493,6 +549,47 @@ with incoming waiting reported separately. Assessed and unassessed counts
 remain visible; unavailable profiles or missing predecessors are not zero
 delay. Alternatives are paginated in deterministic order, not ranked.
 These comparisons do not certify financial, passenger or operational outcomes.
+
+### Inspect the read-only decision summary
+
+Open Overlays, then Inspect Decision summary. It brings assignment coverage,
+scheduled buffers, synthetic waiting, single-turn capacity and one-way tow
+opportunities into one review for the selected reference plan.
+The [pure summary](../src/overlays/decisionSummary.ts) reuses the validated
+source profiles and calculations; it does not generate another solver result
+or require a duplicate summary sidecar.
+
+The source opts in with a
+[decision-review profile](../data/airports/contoso/evaluation/decision-review-profile.json),
+validated against the
+[registration contract](../data/schemas/decision-review-profile.schema.json)
+and the exact read-only dataset envelope. Missing companion profiles are
+shown as unavailable, not zero. Malformed, stale or mismatched evidence fails
+explicitly. Available sidecars must share snapshot, airport, demand and both
+plan request fingerprints.
+
+Coverage includes all source records, with context flight legs identified
+separately. Waiting uses an explicitly selected source assumption. Capacity
+shows each probe's default duration and separation across the full horizon;
+it does not copy query controls or chart filters. Tow status populations
+remain separate from destination choices. Neither capacity bands nor tow
+choices are additive, scheduled or jointly feasible opportunities.
+
+The [review component](../src/overlays/DecisionSummaryFeature.tsx) shares
+accommodation selection and its waiting assumption with Late-request
+accommodation. Switching between those reviews preserves the same preview.
+The scheduled-buffer and gate-wait chart controls remain independent.
+The summary offers a separate hypothetical comparison with coverage changes,
+common-existing-arrival waiting, incoming waiting, affected stands and exact
+UTC flight times. Both reviews reuse the same
+[consequence table](../src/overlays/AccommodationMeasures.tsx).
+
+Capacity and tow evidence remain reference-only and are never attached to
+the accommodation comparison. Selecting or clearing a preview leaves chart
+allocations, flight times and existing unassigned demand unchanged. Closing
+the review or navigating to Studio preserves session state; a source, plan
+or profile change resets it. There is no acceptance action, retiming,
+financial ranking or overall resilience score.
 
 ## Validate the imported foundation
 

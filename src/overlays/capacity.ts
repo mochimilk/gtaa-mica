@@ -171,14 +171,15 @@ export function queryCapacity(capacity: PreparedCapacity, variant: PlanVariant, 
   return { opportunities, eligible_stands: probe.rows.length, excluded_stands: probe.excluded_stands };
 }
 
+export function parseCapacityQueryInstant(text: string) {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{1,3})?)?$/.test(text)) return NaN;
+  const time = Date.parse(`${text}Z`);
+  return Number.isFinite(time) && new Date(time).toISOString().slice(0, 16) === text.slice(0, 16) ? time : NaN;
+}
+
 export function evaluateCapacityQuery(capacity: PreparedCapacity, probeId: string, durationText: string, startText: string, endText: string) {
   const duration = Number(durationText);
-  const localInstant = (text: string) => {
-    if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d{3})?)?$/.test(text)) return NaN;
-    const time = Date.parse(`${text}Z`);
-    return Number.isFinite(time) && new Date(time).toISOString().slice(0, 16) === text.slice(0, 16) ? time : NaN;
-  };
-  const start = localInstant(startText), end = localInstant(endText);
+  const start = parseCapacityQueryInstant(startText), end = parseCapacityQueryInstant(endText);
   const error = !Number.isInteger(duration) || duration < 1 || duration > 1440
     ? "Enter a whole-minute occupancy duration from 1 through 1440."
     : !Number.isFinite(start) || !Number.isFinite(end) || end <= start
