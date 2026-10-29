@@ -1,10 +1,17 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "urn:gtaa-mica:accommodation:1.1.0",
+  "$id": "urn:gtaa-mica:accommodation:2.0.0",
   "type": "object", "additionalProperties": false,
-  "required": ["schema_version", "id", "source", "snapshot_fingerprint", "airport_fingerprint", "demand_fingerprint", "profile", "approved_at", "received_at", "request", "variants"],
+  "required": ["schema_version", "id", "source", "airport_id", "case_id", "demand_id", "plan_window", "snapshot_fingerprint", "airport_fingerprint", "demand_fingerprint", "profile", "approved_at", "received_at", "request", "variants"],
   "properties": {
-    "schema_version": { "const": "1.1.0" }, "id": { "$ref": "#/definitions/id" }, "source": { "const": "synthetic" },
+    "schema_version": { "const": "2.0.0" }, "id": { "$ref": "#/definitions/id" }, "source": { "const": "synthetic" },
+    "airport_id": { "$ref": "#/definitions/id" },
+    "case_id": { "$ref": "#/definitions/id" },
+    "demand_id": { "$ref": "#/definitions/id" },
+    "plan_window": {
+      "type": "object", "additionalProperties": false, "required": ["start", "end"],
+      "properties": { "start": { "$ref": "#/definitions/time" }, "end": { "$ref": "#/definitions/time" } }
+    },
     "snapshot_fingerprint": { "$ref": "#/definitions/hash" },
     "airport_fingerprint": { "$ref": "#/definitions/hash" },
     "demand_fingerprint": { "$ref": "#/definitions/hash" },
@@ -33,8 +40,9 @@
     "time": { "type": "string", "format": "date-time" },
     "result": {
       "type": "object", "additionalProperties": false,
-      "required": ["status", "search", "total_options_found", "options", "excluded_stands", "blocked_stands"],
+      "required": ["request_fingerprint", "status", "search", "total_options_found", "options", "excluded_stands", "blocked_stands"],
       "properties": {
+        "request_fingerprint": { "$ref": "#/definitions/hash" },
         "status": { "enum": ["options-found", "no-acceptable-option-found"] },
         "search": { "enum": ["direct-placement", "single-whole-turn-relocation"] },
         "total_options_found": { "type": "integer", "minimum": 0 },

@@ -12,6 +12,7 @@ import {
 import { BufferLayer, BufferProvider, BufferReview, WaitingLayer, WaitingProvider, WaitingReview } from "./StandOverlayFeatures";
 import { CapacityLayer, CapacityProvider, CapacityReview } from "./CapacityFeature";
 import { TowWindowLayer, TowWindowProvider, TowWindowReview } from "./TowWindowFeature";
+import { AccommodationProvider, AccommodationReview } from "./AccommodationFeature";
 import "./overlays.css";
 
 type FeatureProps = { dataset: OperationsDataset; isMatch?: (stayId: string) => boolean };
@@ -28,6 +29,7 @@ const PRESENTATIONS = {
   "gate-wait": { Provider: WaitingProvider, Underlay: WaitingLayer, Review: WaitingReview },
   capacity: { Provider: CapacityProvider, Underlay: CapacityLayer, Review: CapacityReview },
   "tow-windows": { Provider: TowWindowProvider, Overlay: TowWindowLayer, Review: TowWindowReview },
+  accommodation: { Provider: AccommodationProvider, Review: AccommodationReview },
 } satisfies Record<OverlayId, OverlayPresentation>;
 const presentations = new Map<string, OverlayPresentation>(Object.entries(PRESENTATIONS));
 
@@ -74,6 +76,7 @@ function OverlaySession({ dataset, children }: PropsWithChildren<{ dataset: Oper
 export function OverlayToolbar() {
   const { available, selection, change } = useOverlays();
   if (!available.length) return null;
+  const overlays = available.filter(feature => !feature.reviewOnly);
   const name = selection.enabled.length ? `Overlays: ${selection.enabled.length} enabled` : "Overlays: none enabled";
   return (
     <Menu checkedValues={{ overlays: [...selection.enabled] }}>
@@ -85,13 +88,13 @@ export function OverlayToolbar() {
       </MenuTrigger>
       <MenuPopover data-ops-keep-selection="">
         <MenuList>
-          {available.map(feature => (
+          {overlays.map(feature => (
             <MenuItemCheckbox key={feature.id} name="overlays" value={feature.id}
               title={feature.description} persistOnClick onClick={() => change({ type: "toggle", id: feature.id })}>
               {feature.label}
             </MenuItemCheckbox>
           ))}
-          <MenuDivider />
+          {!!overlays.length && <MenuDivider />}
           {available.map(feature => (
             <MenuItem key={feature.id} onClick={() => change({ type: "inspect", id: feature.id })}>Inspect {feature.label}</MenuItem>
           ))}

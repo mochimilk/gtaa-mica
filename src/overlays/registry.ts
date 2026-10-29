@@ -5,6 +5,7 @@ export interface OverlayRegistration {
   readonly id: string;
   readonly label: string;
   readonly description: string;
+  readonly reviewOnly?: boolean;
 }
 
 export const OVERLAY_REGISTRATIONS = [
@@ -12,6 +13,7 @@ export const OVERLAY_REGISTRATIONS = [
   { id: "gate-wait", label: "Synthetic gate waiting", description: "Illustrative release-delay assumptions, not a forecast or actual delay." },
   { id: "capacity", label: "Single-turn capacity", description: "Feasible arrival starts for one additional turn against the fixed plan, not additive slots." },
   { id: "tow-windows", label: "One-way tow windows", description: "Destination-checked relocation start ranges, not scheduled movements or parking-and-return cycles." },
+  { id: "accommodation", label: "Late-request accommodation", reviewOnly: true, description: "Read-only previews of a synthetic request and bounded whole-turn stand reassignments; nothing is accepted or applied." },
 ] as const satisfies readonly OverlayRegistration[];
 
 export type OverlayId = typeof OVERLAY_REGISTRATIONS[number]["id"];
@@ -47,11 +49,15 @@ export function changeOverlaySelection(
   action: { type: "toggle" | "inspect"; id: string } | { type: "reset" } | { type: "close" },
 ): OverlaySelection {
   const ids = new Set(available.map(feature => feature.id));
-  const current = { enabled: state.enabled.filter(id => ids.has(id)), review: state.review && ids.has(state.review) ? state.review : null };
+  const current = {
+    enabled: state.enabled.filter(id => available.some(feature => feature.id === id && !feature.reviewOnly)),
+    review: state.review && ids.has(state.review) ? state.review : null,
+  };
   if (action.type === "reset") return EMPTY_OVERLAY_SELECTION;
   if (action.type === "close") return { ...current, review: null };
   if (!ids.has(action.id)) throw new Error(`Overlay is unavailable: ${action.id}`);
   if (action.type === "inspect") return { ...current, review: action.id };
+  if (available.find(feature => feature.id === action.id)?.reviewOnly) throw new Error(`Feature is review-only: ${action.id}`);
   return {
     ...current,
     enabled: current.enabled.includes(action.id) ? current.enabled.filter(id => id !== action.id) : [...current.enabled, action.id],

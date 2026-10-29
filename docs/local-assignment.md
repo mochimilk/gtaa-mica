@@ -305,7 +305,8 @@ points after a host UI merge instead of copying feature-specific UI logic.
 Use the same isolated composition pattern for later prototype analyses.
 
 The migrated features include scheduled buffers, synthetic gate waiting,
-single-turn capacity and one-way tow windows for both Contoso plans.
+single-turn capacity, one-way tow windows and read-only late-request
+accommodation for both Contoso plans.
 GTAA and the original fixture have no registered
 profiles, so their toolbar is hidden. Availability comes from the active
 dataset, not an airport-name condition or a global list of enabled features.
@@ -327,6 +328,8 @@ To add another feature:
 3. Add metadata to
    [the overlay registry](../src/overlays/registry.ts): ID, label and description.
    Duplicate IDs and data without a matching registration fail explicitly.
+   Set `reviewOnly` for analyses without chart layers. They offer Inspect,
+   not an enablement checkbox.
 4. Implement a feature-local provider when options or shared state are needed,
    optional `Underlay` and `Overlay` presentations, and a required `Review`.
    Register them in
@@ -345,7 +348,7 @@ No applicable handovers is not evidence of zero risk or zero delay.
 Overlapping occupancies invalidate both analyses. Neither overlay changes
 assignments, defines stand-safety rules or supplies operational certification.
 
-Atlas frequency modes, accommodation and decision review remain later
+Atlas frequency modes and decision review remain later
 phases. Their prepared evidence must match airport, case, variant and request
 fingerprint before registration. Regenerate evidence for the current plan;
 do not attach stale prototype results or claim they remain current after edits.
@@ -445,6 +448,51 @@ added flights or operational authorization. Parking-and-return cycles,
 adjustments to existing chains, tow routes, crews, tugs and shared-gate
 resources are not assessed. Ordinary turn handling rules and flight times
 are unchanged.
+
+### Prepare and inspect late-request accommodation
+
+Contoso registers accommodation as a review-only feature. Open Overlays,
+then Inspect Late-request accommodation. Choose a hypothetical alternative,
+page through the full list or clear the preview. Closing the review preserves
+its session state; a source or plan change resets it. There is no chart layer,
+acceptance action or allocation edit.
+
+Generate evidence against an already prepared schedule, without running a solver:
+
+```powershell
+node scripts\prepare-accommodation.mjs --airport data\airports\contoso\airport.json --profile data\airports\contoso\demand\full-day-profile.json --case full-day --snapshot src\data-sources\prepared\contoso\full-day.json --capacity-profile data\airports\contoso\evaluation\capacity-profile.json --accommodation-profile data\airports\contoso\evaluation\accommodation-profile.json --output src\data-sources\prepared\contoso\full-day.accommodation.json
+npm run test:accommodation
+```
+
+The [generator](../scripts/accommodation.mjs) searches direct fits first.
+Only when none exist does it search one complete existing turn reassigned
+to another compatible stand before arrival. Every independent alternative
+passes the full rule evaluator, including bidirectional adjacency. Existing
+flight times and unassigned demand are unchanged. Existing tow chains and
+boundary-context stays are protected. A whole-turn reassignment is not an
+added tow. No acceptable option within this bounded search is not proof of
+infeasibility.
+
+Evidence version 2.0.0 binds the exact snapshot, airport, scenario, demand,
+horizon, both plan request fingerprints and source-owned capacity probe.
+Regenerate prototype version 1 evidence. Startup rejects stale or mismatched
+data, inconsistent alternatives and invalid source references. The synthetic
+approval and receipt timestamps are story assumptions, not an actual audit.
+The preparation command also regenerates the standalone browser validator.
+
+The [feature](../src/overlays/AccommodationFeature.tsx) uses isolated
+[comparison previews](../src/overlays/accommodation.ts), never replacement
+operations datasets. No reference capacity or tow evidence is attached to
+them. The chart, flight lists and existing overlays continue to describe
+the unchanged reference plan.
+
+Consequence metrics use only the source's buffer threshold and selected
+synthetic waiting assumption. Tight buffers are strictly below the threshold.
+Waiting comparisons use the same existing assessed arrivals in both views,
+with incoming waiting reported separately. Assessed and unassessed counts
+remain visible; unavailable profiles or missing predecessors are not zero
+delay. Alternatives are paginated in deterministic order, not ranked.
+These comparisons do not certify financial, passenger or operational outcomes.
 
 ## Validate the imported foundation
 

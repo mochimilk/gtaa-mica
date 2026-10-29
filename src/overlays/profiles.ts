@@ -1,6 +1,7 @@
 import type { OperationsDatasetInput } from "../operations/dataset";
 import { validateCapacityDataset } from "./capacity";
 import { validateTowWindowsDataset } from "./towWindows";
+import { validateAccommodationDataset } from "./accommodation";
 
 export interface BufferProfile {
   schema_version: "1.0.0";
@@ -93,6 +94,7 @@ export const OVERLAY_PROFILE_PARSERS: Readonly<Record<string, (value: unknown, s
   "gate-wait": parseGateWaitProfile,
   capacity: validateCapacityDataset,
   "tow-windows": validateTowWindowsDataset,
+  accommodation: validateAccommodationDataset,
 };
 
 /** Runs during source bootstrap, before any UI or session stores initialize. */

@@ -16,7 +16,7 @@ const contoso = await loadSourceDataset({ source: "contoso", plan: "baseline" })
 test("overlays register from source data, without Contoso defaults leaking to other sources", async () => {
   for (const plan of ["baseline", "tow-options"] as const) {
     const source = await loadSourceDataset({ source: "contoso", plan });
-    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait", "capacity", "tow-windows"]);
+    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait", "capacity", "tow-windows", "accommodation"]);
     assert.equal(source.overlays?.datasetId, source.id);
     assert.deepEqual(availableOverlays(await loadSourceDataset({ source: "gtaa", plan })), []);
   }
@@ -38,9 +38,18 @@ test("overlay input validation rejects wrong airports, plans, unsupported data a
 test("duplicate registrations and attempts to enable unavailable overlays explicitly fail", () => {
   const registered = availableOverlays(contoso);
   assert.throws(() => availableOverlays(contoso, [...registered, registered[0]]), /Duplicate/);
-  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "accommodation" }), /unavailable/);
+  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "decision-review" }), /unavailable/);
 });
 
+test("review-only features can be inspected but cannot enable nonexistent chart layers", () => {
+  const registered = availableOverlays(contoso);
+  assert.equal(registered.find(feature => feature.id === "accommodation")?.reviewOnly, true);
+  assert.deepEqual(changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "inspect", id: "accommodation" }),
+    { enabled: [], review: "accommodation" });
+  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "accommodation" }), /review-only/);
+  assert.deepEqual(changeOverlaySelection({ enabled: ["accommodation", "buffers"], review: "accommodation" }, registered, { type: "close" }),
+    { enabled: ["buffers"], review: null });
+});
 test("overlay toggle, inspection and reset remain independent and prune unavailable features", () => {
   const registered = availableOverlays(contoso);
   let state = changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "buffers" });
