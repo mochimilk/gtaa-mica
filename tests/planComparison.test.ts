@@ -272,7 +272,7 @@ test("comparison is optional and has no separate overlay registration", async ()
   const without = createOperationsDataset({ ...source, overlays });
   assert.equal(buildPlanComparison(without), null);
   assert.deepEqual(availableOverlays(source), availableOverlays(without));
-  assert.equal(availableOverlays(source).length, 6);
+  assert.equal(availableOverlays(source).length, 4);
   for (const name of ["fixture", "gtaa"]) {
     assert.equal(buildPlanComparison(await loadSourceDataset({ source: name, plan: "baseline" })), null);
   }

@@ -251,8 +251,10 @@ The original records, sample editing rules and UTC presentation are unchanged.
 
 The allocation baseline, filters, pending agent work, selections and review
 state are session-scoped. Bootstrap loads and validates the selected dataset
-before importing App. Compatibility consumers seal that choice; replacing it
-later throws. Do not pass a different dataset only to the chart.
+before importing App. Compatibility consumers seal the source choice; general
+replacement later throws. The narrowly scoped accommodation transition below
+updates all compatibility records and allocation indexes together before
+publishing a new workspace revision. Do not replace only the chart's dataset.
 
 ## Select or prepare an airport schedule
 
@@ -335,9 +337,10 @@ underlay and overlay slots, and `OverlayReviews`. Reattach those composition
 points after a host UI merge instead of copying feature-specific UI logic.
 Use the same isolated composition pattern for later prototype analyses.
 
-The migrated features include scheduled buffers, synthetic gate waiting,
-single-turn capacity, one-way tow windows and read-only late-request
-accommodation, plus a read-only decision summary for both Contoso plans.
+The overlay features include scheduled buffers, synthetic gate waiting,
+single-turn capacity and one-way tow windows. Session-only late requests and
+the read-only reference decision summary live separately in **Requests**.
+Both workflows use source-owned profiles for the selected Contoso plan.
 GTAA and the original fixture have no registered
 profiles, so their toolbar is hidden. A labeled **Overlays** control beside
 **Scenarios** appears when the active dataset has registered features; its
@@ -540,11 +543,36 @@ are unchanged.
 
 ### Prepare and inspect late-request accommodation
 
-Contoso registers accommodation as a review-only feature. Open Overlays,
-then Inspect Late-request accommodation. Choose a hypothetical alternative,
-page through the full list or clear the preview. Closing the review preserves
-its session state; a source or plan change resets it. There is no chart layer,
-acceptance action or allocation edit.
+Open **Requests**, then **Late request**. The incoming turn card shows both
+flight numbers, origin/destination, UTC dates and times, and turn duration.
+Select an option to see the explicit sequence: reassign an existing whole
+turn if needed, then assign the new turn to the released stand. A direct fit
+requires no reassignment.
+
+The contextual chart places the affected stands together on one time scale,
+with **Reference** and **With option** rows and at least one hour before and after
+the affected turns. All supplied occupancy intersecting that window remains
+visible. The gap table gives exact neighboring turn times and scheduled gaps;
+missing neighbors are unknown, not unlimited availability. A tight gap is
+strictly below the source buffer threshold, not an operational separation rule.
+Selecting or clearing an option does not change the board. Closing the dialog
+preserves selection; source or plan changes reset it. Additional consequence
+metrics, waiting assumptions and provenance are collapsed below the decision.
+
+After reviewing an alternative and its source-owned waiting assumption, choose
+**Apply option**, acknowledge the rehearsal's limits, then confirm. The
+chart, flight lists, filters, agent context and Studio use one amended session
+workspace. The applied option and assumption remain visible in this review.
+**Replace applied option** always rebuilds from the original approved reference;
+it never accumulates incoming requests or previous reassignments.
+**Undo accommodation**, also available directly in the planner toolbar,
+reinstates the exact original dataset after confirmation.
+
+Accept, replace and restore clear selections, filters, reviews and agent outputs
+and cancel pending typed work and active calls. Appearance settings, saved
+drawings and drawing drafts are retained. Nothing is written to a backend.
+Reloading or changing airport, scenario or plan discards the session choice.
+This is a synthetic rehearsal, not operational approval.
 
 Generate evidence against an already prepared schedule, without running a solver:
 
@@ -569,11 +597,23 @@ data, inconsistent alternatives and invalid source references. The synthetic
 approval and receipt timestamps are story assumptions, not an actual audit.
 The preparation command also regenerates the standalone browser validator.
 
-The [feature](../src/overlays/AccommodationFeature.tsx) uses isolated
-[comparison previews](../src/overlays/accommodation.ts), never replacement
-operations datasets. No reference capacity or tow evidence is attached to
-them. The chart, flight lists and existing overlays continue to describe
-the unchanged reference plan.
+The [feature](../src/requests/AccommodationFeature.tsx) uses isolated
+[comparison previews](../src/overlays/accommodation.ts). Explicit acceptance
+builds a complete validated operations dataset, retaining every original visit,
+unassigned stay, flight time and tow chain and adding exactly one new service.
+The [session state](../src/overlays/accommodationSession.ts) retains the original
+reference separately. The amended dataset carries no prepared-plan
+certification, offline evidence or companions. Only the source buffer and
+waiting configurations are rebound to the amended dataset; waiting defaults
+to the explicitly accepted assumption.
+
+While accommodation is active, buffers and synthetic waiting recalculate from
+the amended occupancies and flights. Their toggles and settings remain usable
+in **Overlays**; there is no pause to release. Capacity/Atlas and tow-window
+controls are unavailable until their offline analyses are regenerated.
+**Requests** retains the original reference for option comparisons and
+**Reference analysis**, explicitly labeled as such. Undo restores the original
+overlay controls, initially disabled.
 
 Consequence metrics use only the source's buffer threshold and selected
 synthetic waiting assumption. Tight buffers are strictly below the threshold.
@@ -585,7 +625,7 @@ These comparisons do not certify financial, passenger or operational outcomes.
 
 ### Inspect the read-only decision summary
 
-Open Overlays, then Inspect Decision summary. It brings assignment coverage,
+Open **Requests**, then **Reference analysis**. It brings assignment coverage,
 scheduled buffers, synthetic waiting, single-turn capacity and one-way tow
 opportunities into one review for the selected reference plan.
 When the source supplies both fixed plans, it also compares baseline and
@@ -623,8 +663,9 @@ Capacity and tow evidence remain reference-only and are never attached to
 the accommodation comparison. Selecting or clearing a preview leaves chart
 allocations, flight times and existing unassigned demand unchanged. Closing
 the review or navigating to Studio preserves session state; a source, plan
-or profile change resets it. There is no acceptance action, retiming,
-financial ranking or overall resilience score.
+or profile change resets it. Acceptance, replacement and restore require
+confirmation in Late-request accommodation, not in this summary. Retiming,
+financial ranking and an overall resilience score remain unavailable.
 
 ### Compare baseline and tow options without applying either plan
 

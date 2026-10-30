@@ -5,6 +5,7 @@ import {
 import { LayerRegular } from "@fluentui/react-icons";
 import { Menu, MenuDivider, MenuItem, MenuItemCheckbox, MenuList, MenuPopover, MenuTrigger } from "../components/menu";
 import type { OperationsDataset } from "../operations/dataset";
+import { useAccommodationSession } from "../operations/useAccommodationSession";
 import {
   availableOverlays, changeOverlaySelection, EMPTY_OVERLAY_SELECTION,
   type OverlayId, type OverlayRegistration, type OverlaySelection,
@@ -12,8 +13,6 @@ import {
 import { BufferLayer, BufferProvider, BufferReview, WaitingLayer, WaitingProvider, WaitingReview } from "./StandOverlayFeatures";
 import { CapacityLayer, CapacityProvider, CapacityReview } from "./CapacityFeature";
 import { TowWindowLayer, TowWindowProvider, TowWindowReview } from "./TowWindowFeature";
-import { AccommodationProvider, AccommodationReview } from "./AccommodationFeature";
-import { DecisionSummaryProvider, DecisionSummaryReview } from "./DecisionSummaryFeature";
 import "./overlays.css";
 
 type FeatureProps = { dataset: OperationsDataset; isMatch?: (stayId: string) => boolean };
@@ -30,8 +29,6 @@ const PRESENTATIONS = {
   "gate-wait": { Provider: WaitingProvider, Underlay: WaitingLayer, Review: WaitingReview },
   capacity: { Provider: CapacityProvider, Underlay: CapacityLayer, Review: CapacityReview },
   "tow-windows": { Provider: TowWindowProvider, Overlay: TowWindowLayer, Review: TowWindowReview },
-  accommodation: { Provider: AccommodationProvider, Review: AccommodationReview },
-  "decision-review": { Provider: DecisionSummaryProvider, Review: DecisionSummaryReview },
 } satisfies Record<OverlayId, OverlayPresentation>;
 const presentations = new Map<string, OverlayPresentation>(Object.entries(PRESENTATIONS));
 
@@ -77,6 +74,7 @@ function OverlaySession({ dataset, children }: PropsWithChildren<{ dataset: Oper
 
 export function OverlayToolbar() {
   const { available, selection, change } = useOverlays();
+  const { accepted } = useAccommodationSession();
   if (!available.length) return null;
   const overlays = available.filter(feature => !feature.reviewOnly);
   const name = selection.enabled.length ? `Overlays: ${selection.enabled.length} enabled` : "Overlays: none enabled";
@@ -92,6 +90,7 @@ export function OverlayToolbar() {
       </MenuTrigger>
       <MenuPopover data-ops-keep-selection="">
         <MenuList>
+          {accepted && <MenuItem disabled>Capacity / Atlas / tow need fresh evidence</MenuItem>}
           {overlays.map(feature => (
             <MenuItemCheckbox key={feature.id} name="overlays" value={feature.id}
               title={feature.description} persistOnClick onClick={() => change({ type: "toggle", id: feature.id })}>
@@ -123,6 +122,7 @@ export function OverlayLayers({ position, isMatch }: {
 
 export function OverlayReviews() {
   const { dataset, available, selection, change } = useOverlays();
+  const { accepted } = useAccommodationSession();
   const feature = available.find(item => item.id === selection.review);
   if (!feature) return null;
   const Review = presentation(feature.id).Review;
@@ -133,6 +133,7 @@ export function OverlayReviews() {
           <DialogTitle>{feature.label}</DialogTitle>
           <DialogContent>
             <p>{dataset.label}. {feature.description}</p>
+            {accepted && <p role="status">Recalculated for the amended board. Synthetic waiting is illustrative, not actual delay.</p>}
             <Review dataset={dataset} />
           </DialogContent>
           <DialogActions><Button onClick={() => change({ type: "close" })}>Close</Button></DialogActions>

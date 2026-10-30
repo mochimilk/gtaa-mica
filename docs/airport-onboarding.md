@@ -291,8 +291,9 @@ Never reuse Contoso assumptions to fill gaps. Evidence for an approved plan
 must not be presented as current after that plan changes.
 The [isolated overlay registration guide](local-assignment.md#register-isolated-timeline-features)
 describes the UI extension points. Migrated overlays use Contoso's buffer,
-synthetic waiting, single-turn capacity, one-way tow-window evidence and
-read-only late-request accommodation.
+synthetic waiting, single-turn capacity and one-way tow-window evidence.
+Late-request accommodation and reference decision analysis use the separate
+**Requests** workflow, with explicit, reversible session acceptance.
 Contoso's capacity review also supports
 [synthetic Atlas frequency](local-assignment.md#prepare-and-inspect-synthetic-atlas-frequency)
 through optional `overlays.companions["capacity-atlas"]` evidence, not
@@ -308,8 +309,14 @@ Contoso also opts into a
 [read-only decision summary](local-assignment.md#inspect-the-read-only-decision-summary)
 through a source-owned registration profile. It combines only available,
 validated analyses for the current reference; missing measures stay
-unavailable. Accommodation consequences remain a separate hypothetical view,
-not a replacement dataset or newly validated capacity/tow plan.
+unavailable. Accommodation consequences remain a separate reference-based view.
+Explicit acceptance creates a protected session workspace, not a newly
+validated capacity/tow plan. Rebind only buffer and synthetic-waiting
+configurations to the amended dataset and recompute them from its actual
+records; waiting defaults to the accepted assumption. Do not copy prepared-plan
+certification, offline sidecars or companions. Capacity/Atlas/tow controls
+must remain unavailable until regenerated. Requests compares against the
+retained original reference, not stale evidence presented as current.
 Sources with both variants can also opt into the
 [read-only baseline-versus-tow comparison](local-assignment.md#compare-baseline-and-tow-options-without-applying-either-plan)
 by preparing a `plan-comparison` companion from that same loaded schedule.
@@ -325,9 +332,14 @@ describes the explicit inputs, operating-policy requirements and exclusions.
 Tow windows do not apply movements or assess parking-and-return cycles.
 The [accommodation preparation guide](local-assignment.md#prepare-and-inspect-late-request-accommodation)
 describes the source-owned request profile and capacity probe. Accommodation
-offers independent comparison previews only: a direct fit or one complete
+offers independently selectable options: a direct fit or one complete
 turn reassigned without retiming, dropped demand or additional tows.
-It has no acceptance action and never replaces the active reference dataset.
+Show prominent incoming and moved-turn UTC timing, explicit assignment steps,
+shared-scale before/after stand context and exact neighboring gaps. Keep
+technical evidence secondary to the decision.
+Confirmed acceptance updates the chart, lists, agent and Studio together.
+Replacement always derives from the retained reference; restore reinstates it
+exactly. These session choices never persist or change the registered source.
 GTAA has no evaluation profiles yet.
 
 ## Use the AI onboarding prompt

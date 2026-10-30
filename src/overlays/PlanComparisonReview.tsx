@@ -3,12 +3,14 @@ import type { OperationsDataset } from "../operations/dataset";
 import { AccommodationMeasures } from "./AccommodationMeasures";
 import { buildPlanComparison } from "./planComparison";
 
-export function PlanComparisonReview({ dataset, assumptionId }: { dataset: OperationsDataset; assumptionId?: string }) {
+export function PlanComparisonReview({ dataset, assumptionId, referenceActive = true }: {
+  dataset: OperationsDataset; assumptionId?: string; referenceActive?: boolean;
+}) {
   const comparison = useMemo(() => buildPlanComparison(dataset, assumptionId), [dataset, assumptionId]);
   if (!comparison) return <p>Plan comparison is not assessed: this source has no matching prepared-plan companion.</p>;
   const { reference, alternative } = comparison;
   const label = (variant: typeof reference.variant) => variant === "baseline" ? "Baseline" : "Tow options";
-  const beforeLabel = `${label(reference.variant)} (active reference)`, afterLabel = `${label(alternative.variant)} (comparison only)`;
+  const beforeLabel = `${label(reference.variant)} (${referenceActive ? "active" : "approved"} reference)`, afterLabel = `${label(alternative.variant)} (comparison only)`;
   const rows: [string, number, number][] = [
     ["Source visits", reference.coverage.visits, alternative.coverage.visits],
     ["Assigned visits", reference.coverage.assignedVisits, alternative.coverage.assignedVisits],
@@ -22,9 +24,11 @@ export function PlanComparisonReview({ dataset, assumptionId }: { dataset: Opera
   const changes = comparison.changes;
   return <section data-plan-comparison="" aria-label="Read-only baseline-versus-tow comparison">
     <h3>Baseline versus tow options</h3>
-    <p>{beforeLabel} remains in the chart and flight lists. {afterLabel} is inspected here only.
-      Both are fixed prepared plans for the same demand and UTC horizon. Nothing is selected for application,
-      solved again, accepted or applied. An accommodation preview below is independent of this comparison.</p>
+    <p>{referenceActive ? `${beforeLabel} remains in the chart and flight lists.`
+      : "The chart and lists show the session accommodation; both plans here are retained comparisons only."}
+      {" "}{afterLabel} is inspected here only.
+      Both are fixed prepared plans for the same demand and UTC horizon. This comparison does not apply or solve a plan.
+      Accommodation decisions are independent of this comparison.</p>
     <table className="timeline-overlay-evidence" data-plan-comparison-coverage="">
       <caption>Same source demand; coverage and generated movements are not capacity guarantees</caption>
       <thead><tr><th>Measure</th><th>{beforeLabel}</th><th>{afterLabel}</th></tr></thead>
@@ -71,7 +75,7 @@ export function PlanComparisonReview({ dataset, assumptionId }: { dataset: Opera
         release-delay probability {comparison.assumption.release_delay_probability};
         conditional delay {comparison.assumption.expected_release_delay_minutes_given_delay} minutes.</p>}
       <p>Tow counts are generated movements, not proof of crew, tug, route or shared-gate feasibility.
-        Capacity, Atlas and tow-window opportunities elsewhere remain tied to the active reference.
+        Capacity, Atlas and tow-window opportunities remain tied to the approved reference, not a session accommodation.
         No plan ranking, financial benefit or operational approval is inferred.</p>
     </details>
   </section>;

@@ -1,0 +1,60 @@
+.fui-DialogSurface.request-dialog {
+  width: min(1120px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+}
+
+.request-review h3 { margin: 18px 0 10px; }
+.request-note { color: var(--colorNeutralForeground2); font-size: 12px; }
+.request-turn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--colorNeutralStroke1);
+  border-radius: 14px;
+  background: var(--colorNeutralBackground2);
+}
+.request-turn-end, .request-turn-middle { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.request-turn-end > strong { font-size: 19px; }
+.request-turn-end time { font-size: 25px; font-weight: 600; line-height: 1.2; white-space: nowrap; }
+.request-turn-end--departure { text-align: end; }
+.request-turn-middle { justify-content: center; align-items: center; font-size: 12px; }
+.request-turn-middle > strong { font-size: 17px; }
+.request-turn small { color: var(--colorNeutralForeground2); font-size: 11px; }
+.request-turn time small { font-size: 11px; font-weight: normal; }
+.request-applied { border-left: 3px solid var(--colorBrandStroke1); padding: 12px; background: var(--colorNeutralBackground2); }
+.request-applied button { margin-left: 12px; }
+.request-applied p { margin-bottom: 0; }
+.request-actions { padding-left: 24px; }
+.request-actions > li { padding-left: 4px; margin: 12px 0; }
+.request-actions > li > strong { font-size: 15px; }
+.request-actions p { margin: 6px 0 12px; }
+.request-option-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 20px 0; }
+.request-option-actions > span { flex: 1 1 200px; color: var(--colorNeutralForeground2); }
+.request-details { margin: 16px 0; }
+.request-details > summary { cursor: pointer; font-weight: 600; }
+.request-legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 10px 0; font-size: 12px; }
+.request-legend > span { border-bottom: 3px solid var(--colorNeutralStroke1); }
+.request-legend .request-legend--incoming { border-color: var(--colorPaletteGreenForeground2); }
+.request-legend .request-legend--reassigned { border-color: var(--colorBrandStroke1); }
+.request-legend .request-legend--released { border-color: var(--colorStatusWarningForeground1); border-bottom-style: dashed; }
+.request-context { border: 1px solid var(--colorNeutralStroke2); border-radius: 8px; }
+.request-context .st-bar-rect { fill: var(--colorNeutralBackground3); stroke: var(--colorNeutralStroke1); }
+.request-context .request-bar--incoming .st-bar-rect { fill: var(--colorPaletteGreenBackground2); stroke: var(--colorPaletteGreenForeground2); }
+.request-context .request-bar--reassigned .st-bar-rect { fill: var(--colorBrandBackground2); stroke: var(--colorBrandStroke1); }
+.request-context .request-bar--released .st-bar-rect { fill: var(--colorNeutralBackground1); stroke: var(--colorStatusWarningForeground1); stroke-dasharray: 4 3; }
+.request-context-label, .request-context-time { fill: var(--colorNeutralForeground1); font-size: 11px; pointer-events: none; }
+.request-context-time { fill: var(--colorNeutralForeground2); }
+.request-gaps small { display: block; font-weight: normal; margin-top: 6px; color: var(--colorNeutralForeground2); }
+.request-gap--tight { color: var(--colorStatusWarningForeground1); }
+.request-gaps caption { text-align: left; font-size: 12px; }
+@media (max-width: 500px) {
+  .request-turn { padding: 12px; gap: 8px; }
+  .request-turn-end > strong { font-size: 16px; }
+  .request-turn-end time { font-size: 21px; }
+  .request-turn-end time small { display: block; }
+  .request-turn-middle > strong { font-size: 14px; }
+  .request-gaps { font-size: 11px; }
+  .request-gaps th, .request-gaps td { padding: 6px 3px; }
+}

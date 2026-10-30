@@ -2,7 +2,11 @@
 import { ACTIVE_DATASET, sealActiveDataset } from "../operations/activeDataset";
 
 sealActiveDataset();
-export const DEMO_DATA = ACTIVE_DATASET.timeline;
+export let DEMO_DATA = ACTIVE_DATASET.timeline;
+
+export function refreshDemoData(): void {
+  DEMO_DATA = ACTIVE_DATASET.timeline;
+}
 
 // DEMO_DATA is the board's shared, mutable state (stand changes rewrite it in
 // place). A hot update would hand some importers a fresh copy while others

@@ -153,6 +153,22 @@ function changed(): void {
   for (const listener of listeners) listener();
 }
 
+export function refreshAccommodationAllocation(): void {
+  if (ACTIVE_DATASET.capabilities.editStands) throw new Error("Accommodation cannot replace an editable allocation.");
+  STAYS.clear();
+  OFF_BOARD.clear();
+  ORIGINAL.clear();
+  for (const stay of [...DEMO_DATA.occupancies, ...NO_STAND_STAYS]) {
+    STAYS.set(stay.id, stay);
+    ORIGINAL.set(stay.id, { rowId: stay.rowId, start: stay.start, end: stay.end });
+  }
+  for (const stay of NO_STAND_STAYS) OFF_BOARD.add(stay.id);
+  ORIGINAL_ON_BOARD.splice(0, ORIGINAL_ON_BOARD.length, ...DEMO_DATA.occupancies);
+  closure = null;
+  planRevision += 1;
+  changed();
+}
+
 /** Whether any stay is off its fixture stand or times, or an area is closed. */
 export const hasStandChanges = () =>
   closure !== null ||

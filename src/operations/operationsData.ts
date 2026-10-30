@@ -6,11 +6,19 @@ import type { OpsFlight } from "./dataset";
 export type { FlightDirection, OpsFlight, UnplacedStay } from "./dataset";
 
 sealActiveDataset();
-export const NO_STAND_STAYS = ACTIVE_DATASET.noStandStays;
-export const OPS_FLIGHTS = ACTIVE_DATASET.flights;
-export const OPS_FLIGHTS_BY_ID = ACTIVE_DATASET.flightsById;
-export const ARRIVALS = ACTIVE_DATASET.arrivals;
-export const DEPARTURES = ACTIVE_DATASET.departures;
+export let NO_STAND_STAYS = ACTIVE_DATASET.noStandStays;
+export let OPS_FLIGHTS = ACTIVE_DATASET.flights;
+export let OPS_FLIGHTS_BY_ID = ACTIVE_DATASET.flightsById;
+export let ARRIVALS = ACTIVE_DATASET.arrivals;
+export let DEPARTURES = ACTIVE_DATASET.departures;
+
+export function refreshOperationsData(): void {
+  NO_STAND_STAYS = ACTIVE_DATASET.noStandStays;
+  OPS_FLIGHTS = ACTIVE_DATASET.flights;
+  OPS_FLIGHTS_BY_ID = ACTIVE_DATASET.flightsById;
+  ARRIVALS = ACTIVE_DATASET.arrivals;
+  DEPARTURES = ACTIVE_DATASET.departures;
+}
 
 if (import.meta.hot) import.meta.hot.accept(() => location.reload());
 

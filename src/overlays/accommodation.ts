@@ -2,10 +2,10 @@ import validate from "./accommodation-validator.mjs";
 import { validate as validateSchedule } from "../data-sources/prepared-validator.mjs";
 import { adaptPreparedSchedule } from "../data-sources/preparedAdapter";
 import type { PlanVariant, PreparedScenario } from "../data-sources/preparedTypes";
-import type { OperationsDatasetInput, OpsFlight } from "../operations/dataset";
+import { createOperationsDataset, type OperationsDataset, type OperationsDatasetInput, type OpsFlight } from "../operations/dataset";
 import { fingerprintJson, type CapacityProbe, type PreparedCapacity } from "./capacity";
 import { commonWaiting, gateWaiting, standHandovers } from "./handovers";
-import type { BufferProfile, ReleaseAssumption } from "./profiles";
+import { parseGateWaitProfile, type BufferProfile, type ReleaseAssumption } from "./profiles";
 
 export interface AccommodationOption {
   id: string;
@@ -213,6 +213,33 @@ export function previewAccommodation(source: OperationsDatasetInput, evidence: P
   const option = evidence.variants[source.preparedPlan!.variant].options.find(option => option.id === optionId);
   if (!option) throw new Error(`Unknown accommodation option: ${optionId}`);
   return buildPreview(source, evidence, option);
+}
+
+export function accommodateDataset(reference: OperationsDataset, evidence: PreparedAccommodation, optionId: string, assumptionId?: string): OperationsDataset {
+  const preview = previewAccommodation(reference, evidence, optionId);
+  const timeline = structuredClone(reference.timeline);
+  timeline.occupancies = preview.timeline.occupancies;
+  timeline.endpoints = preview.timeline.endpoints;
+  const { request } = evidence;
+  timeline.visits.push({ id: request.visit.turnId, label: `${request.visit.arrFlight}/${request.visit.depFlight}` });
+  timeline.turnsById.set(request.visit.turnId, { ...structuredClone(request.visit), stays: [] });
+  timeline.stayPosition.set(request.stay_id, { index: 0, count: 1 });
+  const assignedLegs = preview.flights.filter(flight => flight.occupancyId).length;
+  const id = `${reference.id}/accommodation/${optionId}`;
+  const profiles: Record<string, unknown> = {};
+  if (reference.overlays?.profiles.buffers) profiles.buffers = reference.overlays.profiles.buffers;
+  if (reference.overlays?.profiles["gate-wait"]) {
+    const waiting = parseGateWaitProfile(reference.overlays.profiles["gate-wait"]);
+    if (assumptionId && !waiting.assumptions.some(item => item.id === assumptionId)) throw new Error("Unknown request waiting assumption.");
+    profiles["gate-wait"] = { ...waiting, default_assumption_id: assumptionId ?? waiting.default_assumption_id };
+  }
+  return createOperationsDataset({
+    ...reference, id,
+    label: `${reference.label} - Session accommodation`,
+    timeline, flights: preview.flights, preparedPlan: undefined,
+    overlays: Object.keys(profiles).length ? { airportId: reference.airportId, datasetId: id, profiles } : undefined,
+    summary: `${assignedLegs}/${preview.flights.length} flight legs assigned; one additional service; ${reference.noStandStays.length} original unassigned visits retained. No added tows or retiming. Session-only accommodation, not a new solver plan or operational approval.`,
+  });
 }
 
 export function accommodationImpact(source: OperationsDatasetInput, evidence: PreparedAccommodation, optionId: string,

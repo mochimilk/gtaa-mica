@@ -188,7 +188,7 @@ test("companions are optional, source-bound, non-toolbar evidence; current summa
     const without = createOperationsDataset({ ...dataset, overlays });
     assert.deepEqual(buildDecisionSummary(without), summary);
     assert.equal(availableOverlays(dataset).length, availableOverlays(without).length);
-    assert.equal(availableOverlays(dataset).length, 6);
+    assert.equal(availableOverlays(dataset).length, 4);
     assert.throws(() => createOperationsDataset({ ...dataset, overlays: {
       ...overlays, companions: { unknown: atlas },
     } }), /Unregistered/);

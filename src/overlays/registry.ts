@@ -1,5 +1,6 @@
 import type { OperationsDataset } from "../operations/dataset";
 import { validateOverlayData } from "./profiles";
+import { REQUEST_PROFILE_IDS } from "../requests/registry";
 
 export interface OverlayRegistration {
   readonly id: string;
@@ -13,8 +14,6 @@ export const OVERLAY_REGISTRATIONS = [
   { id: "gate-wait", label: "Synthetic gate waiting", description: "Illustrative release-delay assumptions, not a forecast or actual delay." },
   { id: "capacity", label: "Single-turn capacity", description: "Feasible arrival starts for one additional turn against the fixed plan, not additive slots." },
   { id: "tow-windows", label: "One-way tow windows", description: "Destination-checked relocation start ranges, not scheduled movements or parking-and-return cycles." },
-  { id: "accommodation", label: "Late-request accommodation", reviewOnly: true, description: "Read-only previews of a synthetic request and bounded whole-turn stand reassignments; nothing is accepted or applied." },
-  { id: "decision-review", label: "Decision summary", reviewOnly: true, description: "Reference-plan measures and independent accommodation consequences, not a ranking or operational approval." },
 ] as const satisfies readonly OverlayRegistration[];
 
 export type OverlayId = typeof OVERLAY_REGISTRATIONS[number]["id"];
@@ -32,7 +31,7 @@ export function availableOverlays(
   if (!data) return [];
   validateOverlayData(data, dataset);
   for (const id of Object.keys(data.profiles)) {
-    if (!ids.has(id)) throw new Error(`Overlay data has no toolbar registration: ${id}`);
+    if (!ids.has(id) && !REQUEST_PROFILE_IDS.some(profile => profile === id)) throw new Error(`Overlay data has no toolbar registration: ${id}`);
   }
   return registrations.filter(feature => Object.hasOwn(data.profiles, feature.id));
 }

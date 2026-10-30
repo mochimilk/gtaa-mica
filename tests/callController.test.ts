@@ -536,6 +536,27 @@ test("transcript turns are published per call, and a new call starts empty", asy
   assert.ok(notified > afterFirst);
 });
 
+test("hangup cancels pending typed work even without a voice call", async () => {
+  const pending: { resolve: ((value: InterpretedRequest) => void) | null } = { resolve: null };
+  let signal: AbortSignal | undefined;
+  const h = harness({ interpreter: {
+    id: "slow",
+    interpret: (_request, abortSignal) => {
+      signal = abortSignal;
+      return new Promise<InterpretedRequest>(resolve => { pending.resolve = resolve; });
+    },
+  } });
+  const typed = h.controller.runTypedRequest("show me arrivals");
+  await flush();
+  assert.equal(h.controller.getState().phase, "idle");
+  assert.equal(h.controller.getState().working, true);
+  await h.controller.hangup();
+  assert.equal(signal?.aborted, true);
+  pending.resolve?.({ kind: "action", action: { name: "set_view", view: "arrivals" } });
+  assert.equal(await typed, null);
+  assert.deepEqual(h.host.calls, []);
+});
+
 test("Stop cancels a typed request but never voice work", async () => {
   const pending: { resolve: ((value: InterpretedRequest) => void) | null } = { resolve: null };
   const h = harness({

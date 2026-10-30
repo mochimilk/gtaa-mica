@@ -1,7 +1,8 @@
 import { createContext, useContext, useMemo, useState, type PropsWithChildren } from "react";
 import { Field, Select } from "@fluentui/react-components";
 import type { OperationsDataset } from "../operations/dataset";
-import { useAccommodationReviewState } from "./AccommodationFeature";
+import { useAccommodationSession } from "../operations/useAccommodationSession";
+import { useAccommodationReviewState } from "../requests/AccommodationFeature";
 import { AccommodationMeasures } from "./AccommodationMeasures";
 import { buildDecisionSummary } from "./decisionSummary";
 import { parseGateWaitProfile } from "./profiles";
@@ -23,6 +24,7 @@ export function DecisionSummaryProvider({ dataset, children }: PropsWithChildren
 }
 
 export function DecisionSummaryReview({ dataset }: DatasetProps) {
+  const { accepted } = useAccommodationSession();
   const state = useContext(DecisionContext), accommodation = useAccommodationReviewState();
   if (!state) throw new Error("Decision review requires its source provider.");
   if (Object.hasOwn(dataset.overlays!.profiles, "accommodation") && !accommodation) {
@@ -38,8 +40,10 @@ export function DecisionSummaryReview({ dataset }: DatasetProps) {
   return <div data-decision-summary="">
     <p>Selected reference: {summary.source.variant === "baseline" ? "Baseline" : "Tow options"}.
       {" "}UTC horizon: {summary.source.horizon.map(utc).join(" to ")}.
-      The chart and flight lists always retain this reference. This is not a solver run, plan ranking or approval.</p>
-    <PlanComparisonReview dataset={dataset} assumptionId={assumptionId} />
+      {accepted ? " The chart and lists show the session accommodation; this summary retains the approved reference."
+        : " The chart and flight lists retain this reference."}
+      {" "}This is not a solver run, plan ranking or approval.</p>
+    <PlanComparisonReview dataset={dataset} assumptionId={assumptionId} referenceActive={!accepted} />
     <h3>Reference coverage</h3>
     <table className="timeline-overlay-evidence" data-decision-coverage="">
       <caption>All source visits and flight legs, including context outside the horizon</caption>
@@ -61,7 +65,7 @@ export function DecisionSummaryReview({ dataset }: DatasetProps) {
     </Field>}
     {summary.assumption && <p>Illustrative model: {summary.assumption.release_delay_probability} release-delay probability,
       {" "}{summary.assumption.expected_release_delay_minutes_given_delay} minutes conditional delay.
-      {accommodation && " This choice is shared with Late-request accommodation."}
+      {accommodation && " This choice is shared with the late request."}
       {" "}The same assumption is used in the prepared-plan comparison. Chart-overlay options remain independent.
       These are synthetic estimates, not actual delay or a forecast.</p>}
     <table className="timeline-overlay-evidence" data-decision-measures="">
@@ -113,7 +117,7 @@ export function DecisionSummaryReview({ dataset }: DatasetProps) {
         This is new service, not existing unassigned demand.</p>
       {summary.accommodation.status === "no-acceptable-option-found"
         ? <p role="status">No acceptable direct or one-turn repair option found. This bounded search does not prove infeasibility.</p>
-        : <Field label="Accommodation preview">
+        : <Field label="Request option comparison">
           <Select data-decision-accommodation="" value={selectedId ?? ""} onChange={(_, data) => {
             if (!accommodation) throw new Error("Accommodation preview selection is unavailable.");
             accommodation.select(data.value || null);
@@ -122,7 +126,7 @@ export function DecisionSummaryReview({ dataset }: DatasetProps) {
               accommodation.setPage(Math.floor(index / accommodation.evidence.profile.max_displayed_options));
             }
           }}>
-            <option value="">No preview; unchanged reference</option>
+            <option value="">No option comparison; keep active workspace</option>
             {summary.accommodation.options.map(option => <option key={option.id} value={option.id}>{option.label}</option>)}
           </Select>
         </Field>}
@@ -133,7 +137,8 @@ export function DecisionSummaryReview({ dataset }: DatasetProps) {
         {" "}{preview.lostVisits} lost; {preview.changedVisits} existing visits reassigned;
         {" "}{preview.newlyAssignedExistingVisits} existing unassigned visits newly placed;
         {" "}{preview.unresolvedOriginalVisits} original visits remain unassigned;
-        {" "}{preview.retimedFlightIds.length} existing flight times changed. No added tows or acceptance.
+        {" "}{preview.retimedFlightIds.length} existing flight times changed. No added tows.
+        Changing this preview does not accept or replace a session choice.
         Hypothetical totals: {preview.coverage.assignedVisits} of {preview.coverage.visits} visits assigned,
         {" "}{preview.coverage.assignedFlightLegs} of {preview.coverage.flightLegs} flight legs assigned.</p>
       <AccommodationMeasures beforeBuffers={reference.buffers} afterBuffers={preview.buffers}
@@ -152,11 +157,11 @@ export function DecisionSummaryReview({ dataset }: DatasetProps) {
           </li>)}</ul>
         </section>)}
       </details>
-    </section> : <p role="status">No accommodation preview selected. The unchanged reference remains active.</p>}
+    </section> : <p role="status">No accommodation preview selected. The active workspace is unchanged.</p>}
     <h3>Human decision, not an overall score</h3>
     <p>Confirm airline and ground-handler coordination, shared gates, staffing, passenger handling and stand calendars.
       No financial benefit, universal capacity percentage or resilience score is inferred. Opportunities are independent,
-      not a jointly executable plan. Nothing is accepted, scheduled, retimed or applied here.</p>
+      not a jointly executable plan. Apply, replace or undo an option from the Late request tab.</p>
     <details className="timeline-capacity-provenance"><summary>Source and model provenance</summary>
       <p>Airport: {summary.source.airportId}; case: {summary.source.caseId}; demand: {summary.source.demandId}.
         Summary: {summary.profile.id}, v{summary.profile.metric_version}.</p>

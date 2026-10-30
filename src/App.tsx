@@ -11,7 +11,7 @@ import { NorvaraLogo } from "./components/navbar/NorvaraLogo";
 import { PanelHeader } from "./components/panel-header";
 import { LeftPanelToggle } from "./components/panel-toggle";
 import { DesktopTitleBar } from "./components/title-bar";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { MINUTE, type DropPreview } from "./stand-timeline";
 import { DEMO_DATA } from "./stand-timeline-demo/demoData";
 import { StandTimelineDemo } from "./stand-timeline-demo/StandTimelineDemo";
@@ -31,6 +31,7 @@ import { DisruptionNotice } from "./operations/DisruptionNotice";
 import { SourceSummary } from "./data-sources/SourceSummary";
 import { ScenarioToolbar } from "./data-sources/ScenarioToolbar";
 import { ACTIVE_DATASET } from "./operations/activeDataset";
+import { useAccommodationSession } from "./operations/useAccommodationSession";
 import { ClosureBand, ClosureLabel } from "./operations/ClosureBand";
 import { FlightDragChip, FlightDropGhost } from "./operations/FlightDrag";
 import { OperationsPanel } from "./operations/OperationsPanel";
@@ -54,6 +55,7 @@ import { LumaSkyeBackground } from "./components/luma-skye/LumaSkyeBackground";
 import { useDrawings } from "./studio/drawings";
 import { StudioPage } from "./studio/StudioPage";
 import { TimelineOverlayProvider, OverlayToolbar, OverlayLayers, OverlayReviews } from "./overlays/TimelineOverlays";
+import { RequestsProvider, RequestsToolbar } from "./requests/RequestsFeature";
 
 // Each page's left panel: its stable ID, shared with its toggle in the nav
 // rail, and its name in the toggle's label.
@@ -198,7 +200,7 @@ function ConnectedTimeline() {
           dragSnapMs={DRAG_SNAP_MS}
           underlay={<>{underlay}<OverlayLayers position="underlay" isMatch={matcher.active ? matcher.occupancy : undefined} /></>}
           overlay={<>{overlay}<OverlayLayers position="overlay" isMatch={matcher.active ? matcher.occupancy : undefined} /></>}
-          toolbar={<><ScenarioToolbar /><OverlayToolbar />{toolbar}</>}
+          toolbar={<><ScenarioToolbar /><RequestsToolbar /><OverlayToolbar />{toolbar}</>}
           summary={summary}
           zoom={zoom}
           flightStyle={flightStyle}
@@ -266,13 +268,18 @@ const useStyles = makeStyles({
 
 export default function App() {
   const styles = useStyles();
+  const workspace = useAccommodationSession();
+  useEffect(() => {
+    if (workspace.revision) document.querySelector<HTMLButtonElement>("[data-requests-toolbar]")?.focus({ preventScroll: true });
+  }, [workspace.revision]);
   const [page, setPage] = useState<AppPage>("planner");
   const leftPanel = LEFT_PANELS[page];
   return (
     // OperationsProvider first: the voice session reaches the app through the
     // same selection, views, filters and acknowledgements the UI uses.
-    <OperationsProvider>
-      <TimelineOverlayProvider dataset={ACTIVE_DATASET}>
+    <OperationsProvider key={workspace.revision}>
+      <RequestsProvider dataset={workspace.reference}>
+      <TimelineOverlayProvider dataset={workspace.active}>
       <LiveCallProvider>
         <LumaSkyeBackground />
         <div className={styles.window}>
@@ -347,6 +354,7 @@ export default function App() {
         <SkyeGlowDefs />
       </LiveCallProvider>
       </TimelineOverlayProvider>
+      </RequestsProvider>
     </OperationsProvider>
   );
 }

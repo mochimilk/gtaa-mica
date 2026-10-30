@@ -7,6 +7,7 @@ import { createOperationsDataset } from "../src/operations/dataset.ts";
 import { availableOverlays, changeOverlaySelection, EMPTY_OVERLAY_SELECTION } from "../src/overlays/registry.ts";
 import { parseBufferProfile, parseGateWaitProfile, validateOverlayData } from "../src/overlays/profiles.ts";
 import { gateWaiting, standHandovers } from "../src/overlays/handovers.ts";
+import { availableRequests } from "../src/requests/registry.ts";
 
 const read = (name: string) => JSON.parse(readFileSync(new URL(`../data/airports/contoso/evaluation/${name}-profile.json`, import.meta.url), "utf8"));
 const buffers = parseBufferProfile(read("buffer"));
@@ -16,9 +17,11 @@ const contoso = await loadSourceDataset({ source: "contoso", plan: "baseline" })
 test("overlays register from source data, without Contoso defaults leaking to other sources", async () => {
   for (const plan of ["baseline", "tow-options"] as const) {
     const source = await loadSourceDataset({ source: "contoso", plan });
-    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait", "capacity", "tow-windows", "accommodation", "decision-review"]);
+    assert.deepEqual(availableOverlays(source).map(item => item.id), ["buffers", "gate-wait", "capacity", "tow-windows"]);
+    assert.deepEqual(availableRequests(source), { accommodation: true, analysis: true });
     assert.equal(source.overlays?.datasetId, source.id);
     assert.deepEqual(availableOverlays(await loadSourceDataset({ source: "gtaa", plan })), []);
+    assert.deepEqual(availableRequests(await loadSourceDataset({ source: "gtaa", plan })), { accommodation: false, analysis: false });
   }
   assert.deepEqual(availableOverlays(await loadSourceDataset({ source: "fixture", plan: "baseline" })), []);
 });
@@ -42,17 +45,17 @@ test("duplicate registrations and attempts to enable unavailable overlays explic
 });
 
 test("review-only features can be inspected but cannot enable nonexistent chart layers", () => {
-  const registered = availableOverlays(contoso);
+  const registered = [...availableOverlays(contoso), {
+    id: "accommodation", label: "Test review-only extension", description: "Test registration", reviewOnly: true,
+  }];
+  assert.equal(availableOverlays(contoso).some(item => item.id === "accommodation" || item.id === "decision-review"), false);
   assert.equal(registered.find(feature => feature.id === "accommodation")?.reviewOnly, true);
   assert.deepEqual(changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "inspect", id: "accommodation" }),
     { enabled: [], review: "accommodation" });
   assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "accommodation" }), /review-only/);
   assert.deepEqual(changeOverlaySelection({ enabled: ["accommodation", "buffers"], review: "accommodation" }, registered, { type: "close" }),
     { enabled: ["buffers"], review: null });
-  assert.equal(registered.find(feature => feature.id === "decision-review")?.reviewOnly, true);
-  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, registered, { type: "toggle", id: "decision-review" }), /review-only/);
-  assert.deepEqual(changeOverlaySelection({ enabled: ["decision-review"], review: null }, registered, { type: "inspect", id: "decision-review" }),
-    { enabled: [], review: "decision-review" });
+  assert.throws(() => changeOverlaySelection(EMPTY_OVERLAY_SELECTION, availableOverlays(contoso), { type: "inspect", id: "accommodation" }), /unavailable/);
 });
 test("overlay toggle, inspection and reset remain independent and prune unavailable features", () => {
   const registered = availableOverlays(contoso);
