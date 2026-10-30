@@ -35,6 +35,19 @@
   min-height: 120px;
 }
 
+.demo-timeline .demo-toolbar {
+  height: auto;
+  min-height: 56px;
+  flex-wrap: wrap;
+  padding-block: 8px;
+}
+
+.demo-timeline .demo-toolbar-actions {
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
 /*
  * The zoom row in the header's View menu (ZoomMenuRow.tsx), laid out like the
  * menu's rows (components/menu/menu.css): 40px tall, its 16px icon 10px in,

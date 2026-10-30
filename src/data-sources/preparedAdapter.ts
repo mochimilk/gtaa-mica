@@ -163,7 +163,7 @@ export function adaptPreparedSchedule(
   };
   return createOperationsDataset({
     id: `${snapshot.demand_id}/${variant}`, airportId: snapshot.airport.id,
-    label: `${snapshot.airport.name} - Full day - ${variant === "baseline" ? "Baseline" : "Tow options"}`,
+    label: `${snapshot.airport.name} - ${snapshot.case_id.charAt(0).toUpperCase() + snapshot.case_id.slice(1).replaceAll("-", " ")} - ${variant === "baseline" ? "Baseline" : "Tow options"}`,
     date: snapshot.plan_window.start.slice(0, 10), domain, timeline, flights, noStandStays,
     stands: snapshot.rows.map(row => ({ code: row.id, area: row.group ?? "" })),
     aircraftMakers: {}, aircraftSizes: {},

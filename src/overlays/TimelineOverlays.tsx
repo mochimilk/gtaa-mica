@@ -83,9 +83,11 @@ export function OverlayToolbar() {
   return (
     <Menu checkedValues={{ overlays: [...selection.enabled] }}>
       <MenuTrigger disableButtonEnhancement>
-        <Tooltip content={name} relationship="label">
+        <Tooltip content={name} relationship="description">
           <Button data-ops-keep-selection="" data-overlay-toolbar="" aria-label={name}
-            appearance={selection.enabled.length ? "primary" : "subtle"} icon={<LayerRegular />} />
+            appearance={selection.enabled.length ? "primary" : "subtle"} icon={<LayerRegular />}>
+            {selection.enabled.length ? `Overlays (${selection.enabled.length})` : "Overlays"}
+          </Button>
         </Tooltip>
       </MenuTrigger>
       <MenuPopover data-ops-keep-selection="">

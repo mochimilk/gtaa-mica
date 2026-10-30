@@ -189,6 +189,7 @@ export function StandTimelineDemo({
         label={<DateStepper date={ACTIVE_DATASET.date} />}
         actionsStart={toolbarStart}
         actionsEnd={toolbar}
+        styles={{ root: "demo-toolbar", actionsEnd: "demo-toolbar-actions" }}
       />
 
       <StandTimeline

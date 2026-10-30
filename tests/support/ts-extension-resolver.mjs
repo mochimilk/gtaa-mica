@@ -13,10 +13,19 @@ const CANDIDATES = [".ts", ".tsx", "/index.ts", ".js"];
 
 /**
  * @param {string} specifier
- * @param {unknown} context
- * @param {(specifier: string, context: unknown) => Promise<unknown>} nextResolve
+ * @param {{ importAttributes: Record<string, string> }} context
+ * @param {(specifier: string, context: unknown) => Promise<object>} nextResolve
  */
 export async function resolve(specifier, context, nextResolve) {
+  if (specifier.endsWith(".json")) {
+    // Vite serves JSON as JavaScript; only Node needs native JSON metadata.
+    const importAttributes = { type: "json", ...context.importAttributes };
+    const resolved = await nextResolve(specifier, {
+      ...context,
+      importAttributes,
+    });
+    return { ...resolved, importAttributes };
+  }
   try {
     return await nextResolve(specifier, context);
   } catch (error) {

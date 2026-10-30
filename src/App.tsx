@@ -29,6 +29,7 @@ import {
 import { AlertsMenu } from "./operations/AlertsMenu";
 import { DisruptionNotice } from "./operations/DisruptionNotice";
 import { SourceSummary } from "./data-sources/SourceSummary";
+import { ScenarioToolbar } from "./data-sources/ScenarioToolbar";
 import { ACTIVE_DATASET } from "./operations/activeDataset";
 import { ClosureBand, ClosureLabel } from "./operations/ClosureBand";
 import { FlightDragChip, FlightDropGhost } from "./operations/FlightDrag";
@@ -197,7 +198,7 @@ function ConnectedTimeline() {
           dragSnapMs={DRAG_SNAP_MS}
           underlay={<>{underlay}<OverlayLayers position="underlay" isMatch={matcher.active ? matcher.occupancy : undefined} /></>}
           overlay={<>{overlay}<OverlayLayers position="overlay" isMatch={matcher.active ? matcher.occupancy : undefined} /></>}
-          toolbar={<>{toolbar}<OverlayToolbar /></>}
+          toolbar={<><ScenarioToolbar /><OverlayToolbar />{toolbar}</>}
           summary={summary}
           zoom={zoom}
           flightStyle={flightStyle}

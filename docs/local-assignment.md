@@ -256,13 +256,20 @@ later throws. Do not pass a different dataset only to the chart.
 
 ## Select or prepare an airport schedule
 
-Open Settings > Schedule source to choose the original editable fixture,
-Contoso or GTAA, with baseline and tow-options plans for each airport.
+Open **Scenarios** in the planner toolbar, or Settings > Schedule source.
+Choose an airport or the original editable fixture, a demand scenario, then
+Baseline or Tow options. Both entry points share the same picker and confirmation.
+Contoso offers Comfortable, Constrained and Full day; GTAA offers Full day.
+The original fixture has one editable scenario and only its baseline.
 The confirmation reloads the page, clearing stand changes, selections,
 reviews, pending agent work and active calls. Appearance settings and saved
 drawings remain. Selection is URL-backed, for example
-`?source=gtaa&plan=baseline`, so reloads, bookmarks and shared links retain it.
-Invalid sources or corrupt snapshots show a startup error with explicit retry
+`?source=contoso&scenario=constrained&plan=tow-options`, so reloads, bookmarks
+and shared links retain all three choices. Older airport links without a
+scenario still select Full day. Changing airports resets to that source's
+default scenario and Baseline; changing scenarios retains the selected plan.
+Draft changes and cancellation do not change the active board.
+Invalid sources, scenarios, plans or corrupt snapshots show a startup error with explicit retry
 and original-fixture recovery, never a silent airport fallback.
 
 [The source registry](../src/data-sources/registry.ts) is the extension point.
@@ -271,6 +278,16 @@ context flights outside the displayed window. Wholly unassigned paired visits
 appear in the No stand lane with both original flights. Current full-day
 snapshots contain 160 visits and 320 legs each: GTAA assigns all legs; Contoso
 assigns 298 and leaves 11 paired visits visible without stands.
+
+| Contoso scenario | Baseline assigned visits | Tow options assigned visits | Added tow movements |
+|------------------|--------------------------|-----------------------------|---------------------|
+| Comfortable      | 36 / 36                  | 36 / 36                     | 0                   |
+| Constrained      | 40 / 41                  | 41 / 41                     | 2                   |
+| Full day         | 149 / 160                | 149 / 160                   | 0                   |
+
+Each Contoso scenario includes matching buffers, synthetic waiting, capacity,
+Atlas, tow-window, accommodation and fixed-plan comparison evidence.
+GTAA remains schedule-only; it does not inherit Contoso analysis assumptions.
 
 Prepared sources disable dragging, stand mutations and agent proposals at both
 UI and core boundaries. Their summary reports coverage, tow count and solver
@@ -284,11 +301,25 @@ Build the native CLI once, then regenerate each compact snapshot explicitly:
 npm run build:solver
 node scripts\prepare-schedule.mjs --airport data\airports\gtaa\airport.json --profile data\airports\gtaa\demand\scenario-profile.json --case full-day --tow-profile data\airports\gtaa\demand\tow-profile.json --output src\data-sources\prepared\gtaa\full-day.json
 node scripts\prepare-schedule.mjs --airport data\airports\contoso\airport.json --profile data\airports\contoso\demand\full-day-profile.json --case full-day --tow-profile data\airports\contoso\demand\tow-profile.json --output src\data-sources\prepared\contoso\full-day.json
+node scripts\prepare-schedule.mjs --airport data\airports\contoso\airport.json --profile data\airports\contoso\demand\scenario-profile.json --case comfortable --tow-profile data\airports\contoso\demand\tow-profile.json --output src\data-sources\prepared\contoso\comfortable.json
+node scripts\prepare-schedule.mjs --airport data\airports\contoso\airport.json --profile data\airports\contoso\demand\scenario-profile.json --case constrained --tow-profile data\airports\contoso\demand\tow-profile.json --output src\data-sources\prepared\contoso\constrained.json
 ```
+
+For Comfortable and Constrained, regenerate the evidence with the capacity,
+Atlas, tow-window and accommodation commands below, substituting
+`scenario-profile.json` for `full-day-profile.json` and the selected case for
+`full-day` in `--case`, snapshot and output paths. Generate the schedule first,
+capacity second and Atlas after capacity; tow-window and accommodation evidence
+also require the matching schedule. Existing evaluation profiles support all
+three cases. Never rename or reuse Full day evidence for another scenario.
 
 Alternatively, `npm run prepare:schedule -- <explicit arguments>` builds first.
 The preparation command overwrites its output and generates the browser-safe
 standalone schema validator; AJV compilation stays in Node, not the browser.
+Keep lazy JSON imports free of native JSON import attributes: Vite's development
+server transforms JSON into JavaScript modules. The Node test resolver supplies
+native JSON metadata separately. Verify schedule startup in development as well
+as the production preview.
 Runtime validation also checks source/case identity, flight endpoints,
 complete assignments, tow chains, same-stand overlap and displayed counts.
 Neither solver status nor independent stand-rule validation is operational
@@ -308,7 +339,9 @@ The migrated features include scheduled buffers, synthetic gate waiting,
 single-turn capacity, one-way tow windows and read-only late-request
 accommodation, plus a read-only decision summary for both Contoso plans.
 GTAA and the original fixture have no registered
-profiles, so their toolbar is hidden. Availability comes from the active
+profiles, so their toolbar is hidden. A labeled **Overlays** control beside
+**Scenarios** appears when the active dataset has registered features; its
+enabled count updates as chart layers are toggled. Availability comes from the active
 dataset, not an airport-name condition or a global list of enabled features.
 Overlays start off; toggles work independently. Inspect opens a feature's
 review and options without enabling its annotations. Hide all clears toggles,
@@ -633,6 +666,9 @@ The current Contoso full-day variants have identical assignments:
 149 assigned visits, 11 unassigned visits, 298 assigned flight legs and
 zero generated tow movements each. The review reports no assignment
 differences rather than manufacturing a benefit from enabling tow options.
+Comfortable also has no assignment differences. Constrained demonstrates
+the coverage gain from 40 to 41 visits and its two complete tow movements,
+including the reverse comparison when Tow options is the active plan.
 Tests also exercise gained/lost assignments, multiple tow legs, reverse
 comparisons, context flights, shared assumptions and malformed evidence.
 

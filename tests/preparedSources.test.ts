@@ -9,6 +9,14 @@ function snapshot(airport = "gtaa"): PreparedScenario {
   return JSON.parse(readFileSync(new URL(`../src/data-sources/prepared/${airport}/full-day.json`, import.meta.url), "utf8"));
 }
 
+test("test resolver supports Vite-style JSON imports without overriding explicit import metadata", async () => {
+  const { default: source } = await import("../src/data-sources/prepared/contoso/full-day.json");
+  assert.equal(source.airport.id, "contoso");
+  assert.equal(source.case_id, "full-day");
+  await assert.rejects(import("../src/data-sources/prepared/contoso/full-day.json", { with: { type: "javascript" } }),
+    { code: "ERR_IMPORT_ATTRIBUTE_UNSUPPORTED" });
+});
+
 for (const airport of ["gtaa", "contoso"]) {
   for (const variant of ["baseline", "tow-options"] satisfies PlanVariant[]) {
     test(`${airport}/${variant} preserves exact source identifiers, coverage and waiting visits`, () => {
@@ -46,8 +54,8 @@ for (const airport of ["gtaa", "contoso"]) {
 }
 
 test("registry validates URL selections and preserves unrelated parameters and fragments", async () => {
-  assert.deepEqual(readSourceSelection(""), { source: "fixture", plan: "baseline" });
-  assert.deepEqual(readSourceSelection("?source=gtaa&plan=tow-options"), { source: "gtaa", plan: "tow-options" });
+  assert.deepEqual(readSourceSelection(""), { source: "fixture", scenario: "original", plan: "baseline" });
+  assert.deepEqual(readSourceSelection("?source=gtaa&plan=tow-options"), { source: "gtaa", scenario: "full-day", plan: "tow-options" });
   assert.throws(() => readSourceSelection("?source=missing"), /Unknown/);
   assert.throws(() => readSourceSelection("?source=fixture&plan=tow-options"), /Unknown/);
   const url = new URL(sourceSelectionUrl(new URL("http://localhost/?theme=dark#studio"), { source: "contoso", plan: "baseline" }));

@@ -268,16 +268,22 @@ source regeneration.
 Verify both generated plans, then run the compact schedule preparation command
 with explicit manifest, profile, case, tow-profile and output paths, as shown
 in the [schedule integration guide](local-assignment.md#select-or-prepare-an-airport-schedule).
-Add a lazy snapshot import using `preparedSource` in the
+Add a source definition with `defaultScenario` and source-owned `scenarios` in the
 [source registry](../src/data-sources/registry.ts). Airport metadata must match
-the registry ID. The current prepared-source helper registers full-day cases.
-Adding a source does not require airport branches in chart or agent code.
+the registry ID. Each scenario declares its ID, label, description, supported
+plans and lazy loader. The `preparedScenario` helper binds a schedule-only
+snapshot to its airport and case; Contoso's loader additionally validates
+matching analysis evidence. Only register scenarios with prepared artifacts.
+The shared toolbar and Settings picker discover these declarations without
+airport branches in chart or agent code.
 
 The chart, lists, filters and agent context must refer to the same active
 dataset. Check airport and case identity together, preserve exact stand and
 aircraft IDs, and test switching, reload restoration and unassigned flights.
-Source changes require confirmation and a full reload, so pending agent work
-and session-scoped stores cannot cross airports. Keep new solver sources
+Airport, scenario and plan changes require confirmation and a full reload, so
+pending agent work and session-scoped stores cannot cross datasets. The URL
+stores all three choices; omitted scenarios use the source's declared default
+for compatibility with older links. Keep new solver sources
 read-only until their editing and validation contracts are implemented.
 Keep buffers, waiting, capacity/atlas, accommodation, decision review and tow
 windows unavailable until airport-specific profiles and evidence exist.
