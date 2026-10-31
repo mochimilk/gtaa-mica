@@ -27,14 +27,15 @@ test("people are found by full or first name, in any case", () => {
   assert.equal(findPerson("John"), undefined);
 });
 
-test("adding someone calls them, and they join once they answer; Skye says it is the call window only", () => {
+test("adding someone calls them, and they join once they answer; Skye just says she's calling", () => {
   const host = createFakeHost();
   const add = validateAppAction("add_to_call", { person: "marcus" });
   assert.ok(add.ok);
   const result = applyAppAction(add.action, host);
   assert.ok(result.ok);
   assert.deepEqual(host.calls, ["addToCall:Marcus Chen"]);
-  assert.match(result.spoken, /^Calling Marcus Chen now\. .*nothing actually reaches them/);
+  // No aside about the call window being a placeholder: it gets in the demo's way.
+  assert.equal(result.spoken, "Calling Marcus Chen now.");
 
   // Ringing: being called, not on yet.
   assert.deepEqual(callingNames(), ["Marcus Chen"]);
@@ -78,7 +79,7 @@ test("taking someone off while they ring stops calling them, and they never join
 test("someone not on the people list is not added, and Skye says who can be", () => {
   const result = validateAppAction("add_to_call", { person: "John Smith" });
   assert.ok(!result.ok);
-  assert.match(result.ok ? "" : result.message, /I can add Priya Raman, Marcus Chen, Aisha Okafor and Travis Hughes/);
+  assert.match(result.ok ? "" : result.message, /I can add Priya Raman, Marcus Chen, Aisha Okafor, Travis Hughes, Dana Kowalski, Mateo Silva, Hannah Lee, Kofi Mensah, Ines Duarte and Sofia Reyes\./);
   assert.equal(validateAppAction("remove_from_call", { person: "Aisha" }).ok, false);
 });
 

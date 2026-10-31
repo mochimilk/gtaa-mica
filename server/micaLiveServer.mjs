@@ -204,12 +204,14 @@ export function createMicaLiveServer({ env = process.env, fetchImpl = fetch } = 
     try {
       const result =
         url.pathname === SESSION_ROUTE
-          ? // Only the SDP offer is accepted from the renderer. Session
-            // instructions are app-authored on this side, so caller text can
-            // never become model instructions.
+          ? // Only the SDP offer, and which of the app's personas it is for,
+            // are accepted from the renderer. Session instructions are
+            // app-authored on this side, so caller text can never become
+            // model instructions.
             await createLiveSession({
               env,
               sdp: /** @type {any} */ (body.value)?.sdp,
+              persona: /** @type {any} */ (body.value)?.persona,
               fetchImpl,
               signal: aborted.signal,
             })

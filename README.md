@@ -84,7 +84,15 @@ On Windows and Linux the page draws the title bar (`src/components/title-bar`):
 File, Edit, View and Window at its start, the native window controls over its
 end, in the page's colour. Its menus are the only preload API
 (`electron/preload.cjs`), checked in `electron/titleBar.mjs`; macOS keeps its
-own title bar and menu bar. Packaged content has a CSP; inline
+own title bar and menu bar. On Windows 11 (22H2 and later) the window's base
+layer is Mica, Microsoft's material for long-lived app windows
+(`electron/backdrop.mjs`): the desktop wallpaper, tinted by the system theme,
+shows behind the title bar, nav rail and app bar, and the content sits on it as
+a translucent layer. The preload marks `<html data-backdrop="mica">` and the
+page paints only a tint over it (black at 50% in the dark theme, white at 50%
+in the light) and a band at 80% up the bottom third, `colorNeutralBackground5`
+into `colorNeutralBackground4` into transparent, behind Skye's glow (`LumaSkyeBackground`); Windows falls back to a solid colour
+while the window is inactive or transparency effects are off. Packaged content has a CSP; inline
 styles remain allowed for Fluent/Griffel. Development uses Vite's usual HMR
 scripts. A future native capability should expose a narrow validated preload
 API rather than adding Node access to React.

@@ -6,9 +6,11 @@ import { afterEach, beforeEach, mock, test } from "node:test";
 import { DelegationExecutor } from "../src/live/executor.ts";
 import {
   ANSWER_MS,
+  callGuests,
   endGuestCall,
   EXPERTISE_LABELS,
   inviteToCall,
+  leaveCall,
   PEOPLE,
   personWith,
   TEAM,
@@ -24,6 +26,7 @@ import {
   setClosure,
 } from "../src/operations/allocation.ts";
 import {
+  approveSignoff,
   approveSkyeChanges,
   askForSignoffs,
   callForSignoffs,
@@ -31,6 +34,8 @@ import {
   beginSkyeChange,
   needsBaggage,
   readyForUser,
+  setAnswerAloud,
+  SIGNOFF_ALOUD_MS,
   SIGNOFF_MS,
   undoSkyeChanges,
 } from "../src/operations/skyeReview.ts";
@@ -90,8 +95,13 @@ test("a change on the same pier waits for the user alone, and approving keeps it
 
 test("a change to another pier waits for Travis, once the user sends it to him; they approve only after he has", () => {
   const said = asSkye(() => applyPlan({ kind: "move", occupancyId: "T01-1", standId: "C25" }));
-  assert.equal(said?.say, "It's waiting for approval: Travis Hughes for baggage operations first, then you.");
-  assert.deepEqual(said?.offer, { ask: "Want me to give Travis a call?", action: { name: "add_to_call", person: "Travis Hughes" } });
+  // Approval is asked of baggage in the terminal the bags now land in, on its channel, until someone picks up.
+  assert.equal(said?.say, "Baggage operations in Terminal B approves first, then you.");
+  // Said straight after, so the team she has just named is "them".
+  assert.deepEqual(said?.offer, {
+    ask: "Want me to call them?",
+    action: { name: "add_to_call", person: "Travis Hughes" },
+  });
   assert.deepEqual(skyeReview()?.signoffs, [{ name: "Travis Hughes", expertise: "baggage", state: "needed" }]);
   assert.equal(approveSkyeChanges(), false);
   // Nobody is asked until the user sends it (Review with baggage).
@@ -121,11 +131,42 @@ test("Travis on the call already looks at it at once; one being called looks onc
 
   inviteToCall("Travis Hughes");
   const ringing = asSkye(() => applyPlan({ kind: "move", occupancyId: "T01-1", standId: "C25" }));
-  assert.match(ringing?.say ?? "", /I'm calling Travis already\.$/);
+  assert.match(ringing?.say ?? "", /I'm calling baggage operations in Terminal B already\.$/);
   assert.equal(ringing?.offer, undefined);
   assert.equal(skyeReview()?.signoffs[0]?.state, "needed");
   mock.timers.tick(ANSWER_MS);
   assert.equal(skyeReview()?.signoffs[0]?.state, "asked");
+});
+
+test("Travis answering aloud approves as he says so, with a backstop; leaving himself, the call goes on", () => {
+  const voiced: string[] = [];
+  setAnswerAloud((name) => (voiced.push(name), true));
+  try {
+    inviteToCall("Travis Hughes");
+    mock.timers.tick(ANSWER_MS);
+    asSkye(() => applyPlan({ kind: "move", occupancyId: "T01-1", standId: "C25" }));
+    assert.deepEqual(voiced, ["Travis Hughes"]);
+    assert.deepEqual(skyeReview()?.signoffs, [{ name: "Travis Hughes", expertise: "baggage", state: "asked", aloud: true }]);
+    // Not after the usual few seconds: he approves as he says so.
+    mock.timers.tick(SIGNOFF_MS);
+    assert.equal(skyeReview()?.signoffs[0]?.state, "asked");
+    approveSignoff("Travis Hughes");
+    assert.equal(skyeReview()?.signoffs[0]?.state, "approved");
+    // He hangs up himself, and the call goes on for the user.
+    leaveCall("Travis Hughes");
+    assert.deepEqual(callGuests(), { names: [], calling: [], since: callGuests()?.since });
+    undoSkyeChanges();
+
+    // Never saying so, he approves all the same, in the end.
+    asSkye(() => applyPlan({ kind: "move", occupancyId: "T01-1", standId: "C25" }));
+    askForSignoffs();
+    mock.timers.tick(SIGNOFF_ALOUD_MS - 1);
+    assert.equal(skyeReview()?.signoffs[0]?.state, "asked");
+    mock.timers.tick(1);
+    assert.equal(skyeReview()?.signoffs[0]?.state, "approved");
+  } finally {
+    setAnswerAloud(null);
+  }
 });
 
 test("Review with baggage calls in whoever still has to see it, once", () => {
@@ -198,7 +239,7 @@ test("Skye's reply says her change is waiting, and what her cursor changed befor
   const reply = await executor.handleTypedRequest("move XA101 to C25");
   assert.match(
     reply ?? "",
-    /^Moved XA101\/102 from A1 to C25\. .* It's waiting for approval: Travis Hughes for baggage operations first, then you\. Want me to give Travis a call\?$/,
+    /^Moved XA101\/102 from A1 to C25\. .* Baggage operations in Terminal B approves first, then you\. Want me to call them\?$/,
   );
   assert.equal(skyeReview()?.changes.length, 1);
 

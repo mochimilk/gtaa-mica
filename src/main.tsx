@@ -3,6 +3,8 @@ import * as ReactDOM from "react-dom/client";
 import { CoralProvider, type CoralConfig } from "@coral-ai/react";
 import "@coral-ai/markdown/styles";
 import App from "./App";
+import { DefaultContextMenu } from "./components/context-menu";
+import { hasDesktopBackdrop } from "./components/title-bar";
 import coralConfig from "../coral.config.json";
 import "./components/cursor/cursor.css";
 import "./components/grain/grain.css";
@@ -32,8 +34,15 @@ function BootSplashDismiss() {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <CoralProvider config={coralConfig as CoralConfig} glow={false}>
+    {/* On Mica, the window paints the body (hasDesktopBackdrop) in place of Coral. */}
+    <CoralProvider
+      config={coralConfig as CoralConfig}
+      glow={false}
+      bodyBackground={hasDesktopBackdrop() ? "transparent" : undefined}
+    >
       <App />
+      {/* Right-click's Cut, Copy and Paste, wherever the app has no menu of its own; never the browser's. */}
+      <DefaultContextMenu />
       <BootSplashDismiss />
     </CoralProvider>
   </React.StrictMode>,

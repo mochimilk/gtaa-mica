@@ -30,6 +30,18 @@ export type LiveOrbProps = {
   glow?: boolean;
   /** Audio to react to, e.g. the caller's microphone: speech speeds the orb up and swells its glow. */
   voice?: MediaStream | null;
+  /** Multiplies its state's speed: below 1 it moves more calmly. */
+  speed?: number;
+  /** How much faster than its speed the orb runs at full voice: 1.5 (the default) is 2.5× as fast. */
+  voiceSpeedup?: number;
+  /**
+   * The voice level (0 to 1) that counts as full voice, for the speed and
+   * the glow. 1 by default; lower, any speech drives it fully, so it reads as
+   * talking or not rather than following each word's loudness.
+   */
+  voiceFull?: number;
+  /** Whether the voice swells the glow too (the default), or only speeds the orb up. */
+  voiceGlow?: boolean;
   /** Stops the renderer (e.g. while hidden); the placeholder shows in its place. */
   paused?: boolean;
   /**
@@ -50,7 +62,7 @@ export type LiveOrbProps = {
 /** How far the canvas extends past `size`, matching the overhang of the orb image in Figma. */
 const CANVAS_OVERSCAN = 1.25;
 
-/** At full voice the orb runs this much faster than its state's speed. */
+/** By default, at full voice the orb runs this much faster than its speed (see `voiceSpeedup`). */
 const VOICE_SPEEDUP = 1.5;
 /** Glow strength at rest and the extra a full voice adds; see `glowVoice`. */
 const GLOW_OPACITY = 0.4;
@@ -208,6 +220,10 @@ export function LiveOrb({
   palette,
   glow = false,
   voice,
+  speed = 1,
+  voiceSpeedup = VOICE_SPEEDUP,
+  voiceFull = 1,
+  voiceGlow = true,
   paused = false,
   placeholder = "skeleton",
   still,
@@ -231,10 +247,12 @@ export function LiveOrb({
 
   // The renderer pulls the target every frame, so preset and state changes
   // apply (and state changes animate) without restarting it.
+  const resolved = resolveOrbStateParams(configuration, state);
   const params: OrbParams = {
-    ...resolveOrbStateParams(configuration, state),
+    ...resolved,
     ...palette?.shared,
     ...palette?.states?.[state],
+    speed: resolved.speed * speed,
   };
   const targetRef = React.useRef<OrbRenderTarget | null>(null);
   targetRef.current = {
@@ -243,6 +261,11 @@ export function LiveOrb({
     activationDuration: defaultOrbActivationDuration,
     transitionDuration: defaultOrbTransitionDuration,
   };
+  // Read each frame, by the renderer and the glow, as the target is.
+  const voiceRef = React.useRef({ speedup: voiceSpeedup, full: voiceFull, glow: voiceGlow });
+  voiceRef.current = { speedup: voiceSpeedup, full: voiceFull, glow: voiceGlow };
+  /** How much of full voice a level is, 0 to 1. */
+  const voiceAmount = (level: number) => Math.min(1, level / voiceRef.current.full);
 
   // Can run live at all (WebGPU works, motion allowed); `live` = running now.
   const canRunLive = !reducedMotion && status !== "failed";
@@ -253,8 +276,9 @@ export function LiveOrb({
   const voiceLevel = useVoiceLevel(reducedMotion || paused || atRest ? null : voice, (level) => {
     const element = glowVoiceRef.current;
     if (!element) return;
-    element.style.opacity = level ? String(GLOW_OPACITY + GLOW_VOICE_OPACITY * level) : "";
-    element.style.transform = level ? `scale(${1 + GLOW_VOICE_SCALE * level})` : "";
+    const amount = voiceRef.current.glow ? voiceAmount(level) : 0;
+    element.style.opacity = amount ? String(GLOW_OPACITY + GLOW_VOICE_OPACITY * amount) : "";
+    element.style.transform = amount ? `scale(${1 + GLOW_VOICE_SCALE * amount})` : "";
   });
 
   // A restarted renderer must fade in again once its first frame lands.
@@ -272,7 +296,7 @@ export function LiveOrb({
       // motion phase, so the change never jumps the animation.
       getTarget: () => {
         const target = targetRef.current!;
-        const speedup = 1 + VOICE_SPEEDUP * voiceLevel.current;
+        const speedup = 1 + voiceRef.current.speedup * voiceAmount(voiceLevel.current);
         if (speedup === 1) return target;
         return { ...target, params: { ...target.params, speed: target.params.speed * speedup } };
       },

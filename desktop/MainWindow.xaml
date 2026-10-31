@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    The window: the React app in WebView2, edge to edge, on Mica. The page draws
+    the title bar (src/components/title-bar/DesktopTitleBar.tsx); Windows draws
+    its caption buttons over the bar's end, and MainWindow.xaml.cs opens the
+    window menus and keeps the rest of the bar dragging the window.
+-->
+<Window
+    x:Class="GtaaMica.MainWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Title="GTAA Mica"
+    mc:Ignorable="d">
+    <Grid x:Name="Root">
+        <WebView2 x:Name="Web" />
+    </Grid>
+</Window>

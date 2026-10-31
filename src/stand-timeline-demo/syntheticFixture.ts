@@ -196,13 +196,23 @@ const HAND_WRITTEN_TURNS: SyntheticTurn[] = [
   turn("T12", "XC", ["334", "335"], ["LHR", "ORD"], "C-SYCC", "A321", [stay("A4", "15:20", "17:45")]),
   turn("T13", "XD", ["454", "455"], ["YUL", "YVR"], "C-SYDC", "A339", [stay("B10", "05:50", "09:10")]),
   turn("T14", "XB", ["216", "217"], ["BOS", "BOS"], "C-SYBD", "B738", [stay("B10", "11:00", "12:05")]),
+  // Pier B's busy afternoon, so the disruption's moves spread out over the
+  // stands: each of B11's bank finds the next stand along taken, and the last
+  // has none on Pier B at all. All after 13:00, clear of the Pier B closure
+  // demo's window (docs/multi-agent-demo.md).
+  turn("T28", "XD", ["458", "459"], ["YUL", "YUL"], "C-SYDH", "A339", [stay("B10", "13:55", "15:20")]),
+  turn("T31", "XB", ["234", "235"], ["JFK", "BOS"], "C-SYBJ", "B738", [stay("B14", "14:45", "16:00")]),
+  turn("T32", "XB", ["236", "237"], ["BOS", "JFK"], "C-SYBK", "B38M", [stay("B15", "13:40", "15:20")]),
+  turn("T29", "XC", ["346", "347"], ["ORD", "YUL"], "C-SYCH", "B788", [stay("B16", "13:20", "15:30")]),
   // B11's midday bank, the disruption demo's (src/operations/disruption.ts):
-  // XD472/473 on time, then two arrivals close behind it. When XD472 runs
-  // late, its turn runs into both, and the knock-on holds T16 and T15 too.
+  // XD472/473 on time, then a bank of quick turns close behind it. When
+  // XD472 runs late, its turn runs into four of them, and the knock-on holds
+  // T15 too.
   turn("T24", "XD", ["472", "473"], ["LHR", "LHR"], "C-SYDG", "B789", [stay("B11", "08:40", "11:40")]),
   turn("T25", "XC", ["344", "345"], ["ORD", "ORD"], "C-SYCG", "B788", [stay("B11", "11:50", "12:55")]),
-  turn("T26", "XB", ["232", "233"], ["BOS", "BOS"], "C-SYBH", "B738", [stay("B11", "13:05", "13:55")]),
-  turn("T16", "XC", ["336", "337"], ["ORD", "LHR"], "C-SYCD", "E195", [stay("B11", "14:00", "15:30")]),
+  turn("T26", "XB", ["232", "233"], ["BOS", "BOS"], "C-SYBH", "B738", [stay("B11", "13:05", "13:45")]),
+  turn("T27", "XA", ["117", "118"], ["SEA", "SEA"], "C-SYAI", "A320", [stay("B11", "13:55", "14:35")]),
+  turn("T16", "XC", ["336", "337"], ["ORD", "LHR"], "C-SYCD", "E195", [stay("B11", "14:45", "15:30")]),
   turn("T15", "XA", ["109", "110"], ["LAX", "LAX"], "C-SYAE", "A319", [stay("B11", "15:45", "16:50")]),
   turn("T17", "XB", ["218", "219"], ["JFK", "BOS"], "C-SYBE", "B38M", [stay("B12", "06:00", "06:55")]),
   turn("T18", "XD", ["456", "457"], ["YVR", "YUL"], "C-SYDD", "B789", [stay("B12", "10:20", "16:30")]),

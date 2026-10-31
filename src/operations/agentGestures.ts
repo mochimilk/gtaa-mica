@@ -19,6 +19,12 @@
 //
 // Closing a stand area is the one action Skye carries out with several
 // cursors at once (see closeArea below and docs/multi-agent-demo.md).
+//
+// The board stays mounted while the user is on another page
+// (../live/outOfSight), so Skye's work on it carries on there, out of sight,
+// clicked through and dragged as it would be on screen, and her cursors there
+// go out of sight with it (playAgentGesture). What would show over that page,
+// the toolbar's menus, she leaves to the apply.
 import {
   agentCursor,
   agentHelpers,
@@ -46,10 +52,12 @@ import {
   type AreaMove,
   type StandAssign,
 } from "./allocation";
+import { pageShift, pageShown, skyeWorksOn } from "../live/outOfSight";
 import { boardKpis } from "./boardKpis";
 import { lateTag } from "./disruption";
 import { FIRST_LANE_ROW, isLaneRow } from "./noStandLane";
 import { formatDuration, OPS_FLIGHTS_BY_ID, type OpsFlight } from "./operationsData";
+import { describeBoardAction } from "./outputs";
 import { skyeTakesHold } from "./skyeReview";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -247,7 +255,10 @@ type DragStayOptions = {
  * waiting flight's in the lane, going down onto a stand, or a stay going up
  * into the lane; the lane is always in view, so nothing waits for it to show.
  * The Outputs panel lists the stay as being worked on from the moment the
- * cursor sets off for it, until it lands.
+ * cursor sets off for it, until it lands. Should the board go out of sight or
+ * come back meanwhile, it moves under the cursor (../live/outOfSight), so the cursor
+ * lets go, as a cancelled drag, and nothing lands where it was not meant to;
+ * once the board holds still in its new place, it takes hold again.
  */
 async function dragStay(
   occupancyId: string,
@@ -256,33 +267,41 @@ async function dragStay(
   { cursor = agentCursor, shiftMs = 0, scroll = true }: DragStayOptions = {},
 ): Promise<void> {
   const bar = barOf(occupancyId);
-  let grabX: number | null = null;
   skyeTakesHold(occupancyId, isLaneRow(rowId) ? "" : rowId, shiftMs);
-  await cursor.drag(
-    () => shown(bar),
-    () => {
-      const y = rowCentre(rowId);
-      const perMs = pixelsPerMs();
-      return y === null || grabX === null || perMs === null ? null : { x: grabX + shiftMs * perMs, y };
-    },
-    {
-      signal,
-      aim: (rect) => {
-        const point = aimAtBar(rect);
-        grabX = point.x;
-        return point;
+  for (;;) {
+    const shifted = pageShift("planner");
+    let grabX: number | null = null;
+    await cursor.drag(
+      () => shown(bar),
+      () => {
+        const y = rowCentre(rowId);
+        const perMs = pixelsPerMs();
+        return y === null || grabX === null || perMs === null ? null : { x: grabX + shiftMs * perMs, y };
       },
-      visibleBox:
-        scroll && !isLaneRow(rowId)
-          ? () => {
-              const scroller = shown(".st-scroller");
-              return scroller ? chartVisibleBox(scroller) : null;
-            }
-          : undefined,
-      scrollBox: rowsBoxOf(bar),
-      reveal: scroll,
-    },
-  );
+      {
+        signal: AbortSignal.any([signal, shifted]),
+        aim: (rect) => {
+          const point = aimAtBar(rect);
+          grabX = point.x;
+          return point;
+        },
+        visibleBox:
+          scroll && !isLaneRow(rowId)
+            ? () => {
+                const scroller = shown(".st-scroller");
+                return scroller ? chartVisibleBox(scroller) : null;
+              }
+            : undefined,
+        scrollBox: rowsBoxOf(bar),
+        reveal: scroll,
+      },
+    );
+    if (signal.aborted || !shifted.aborted) return;
+    await heldStill(() => {
+      const plot = shown(".st-plot")?.getBoundingClientRect();
+      return plot ? `${plot.left},${plot.top}` : "";
+    }, signal);
+  }
 }
 
 /** A move onto free time: one drag, when the rules allow it. */
@@ -404,31 +423,17 @@ function inReach(move: AreaMove): boolean {
 /** How long the chart must hold still after scrolling to count as settled, ms. */
 const SCROLL_STILL_MS = 120;
 
-/** Smooth-scrolls the chart so `point` (on screen now) is centred in the work area, and waits for it to settle. */
-async function centreChartOn(point: { x: number; y: number }, signal: AbortSignal): Promise<void> {
-  const scroller = shown(".st-scroller");
-  const box = workBox();
-  if (!(scroller instanceof HTMLElement) || !box) return;
-  const left = scroller.scrollLeft + point.x - (box.left + box.width / 2);
-  const top = scroller.scrollTop + point.y - (box.top + box.height / 2);
-  if (Math.abs(left - scroller.scrollLeft) < 8 && Math.abs(top - scroller.scrollTop) < 8) return;
-  // Settled once the scroll ends (scrollend), or after 1.2s where it does not
-  // say; then, in case it said so early, once it has held still for a few
-  // frames (two looks a frame apart can both fall between the frames of a
-  // busy page). A cursor that aimed while the chart still glided would take
-  // hold of where a bar was, not where it is, and a helper judging what is in
-  // reach would drag to where its row was.
-  let ended = false;
-  const end = () => (ended = true);
-  scroller.addEventListener("scrollend", end, { once: true });
-  scroller.scrollTo({ left, top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-  await waitFor(() => ended || null, signal, 1_200);
-  scroller.removeEventListener("scrollend", end);
-  let at = `${scroller.scrollLeft},${scroller.scrollTop}`;
+/**
+ * Waits until `where` (where something is now, as a string) has held still
+ * for SCROLL_STILL_MS, or 1.2s at most: two looks a frame apart can both fall
+ * between the frames of a busy page, so a few frames' worth.
+ */
+async function heldStill(where: () => string, signal: AbortSignal): Promise<void> {
+  let at = where();
   let since = performance.now();
   await waitFor(
     () => {
-      const now = `${scroller.scrollLeft},${scroller.scrollTop}`;
+      const now = where();
       if (now !== at) {
         at = now;
         since = performance.now();
@@ -438,6 +443,28 @@ async function centreChartOn(point: { x: number; y: number }, signal: AbortSigna
     signal,
     1_200,
   );
+}
+
+/** Smooth-scrolls the chart so `point` (on screen now) is centred in the work area, and waits for it to settle. */
+async function centreChartOn(point: { x: number; y: number }, signal: AbortSignal): Promise<void> {
+  const scroller = shown(".st-scroller");
+  const box = workBox();
+  if (!(scroller instanceof HTMLElement) || !box) return;
+  const left = scroller.scrollLeft + point.x - (box.left + box.width / 2);
+  const top = scroller.scrollTop + point.y - (box.top + box.height / 2);
+  if (Math.abs(left - scroller.scrollLeft) < 8 && Math.abs(top - scroller.scrollTop) < 8) return;
+  // Settled once the scroll ends (scrollend), or after 1.2s where it does not
+  // say; then, in case it said so early, once it has held still. A cursor
+  // that aimed while the chart still glided would take hold of where a bar
+  // was, not where it is, and a helper judging what is in reach would drag to
+  // where its row was.
+  let ended = false;
+  const end = () => (ended = true);
+  scroller.addEventListener("scrollend", end, { once: true });
+  scroller.scrollTo({ left, top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  await waitFor(() => ended || null, signal, 1_200);
+  scroller.removeEventListener("scrollend", end);
+  await heldStill(() => `${scroller.scrollLeft},${scroller.scrollTop}`, signal);
 }
 
 /**
@@ -675,15 +702,17 @@ async function closeArea(action: Extract<AppAction, { name: "close_area" }>, sig
 }
 
 /**
- * Whether the user has something of their own open that Skye's clicks on the
- * toolbar would get in the way of: a menu they opened (data-opened-by, see
- * ViewsFiltersToolbar) or their selection details. Skye then makes the
- * change without clicking through it; the apply does it.
+ * Whether Skye makes a change on the toolbar without clicking through it,
+ * leaving it to the apply: while the user has something of their own open
+ * that her clicks would get in the way of, a menu they opened
+ * (data-opened-by, see ViewsFiltersToolbar) or their selection details; or
+ * while the board is out of sight (../live/outOfSight), where its menus would
+ * open over the page the user is on.
  */
-const userHasOpen = () => !!document.querySelector('[data-opened-by="user"], .ops-popover');
+const skipToolbar = () => !pageShown("planner") || !!document.querySelector('[data-opened-by="user"], .ops-popover');
 
 async function setView(view: string, signal: AbortSignal): Promise<void> {
-  if (userHasOpen()) return;
+  if (skipToolbar()) return;
   const item = `[data-ops-view="${CSS.escape(view)}"]`;
   if (!(await openMenu("views", item, signal))) return;
   // A radio item closes the menu as it is picked.
@@ -692,7 +721,7 @@ async function setView(view: string, signal: AbortSignal): Promise<void> {
 
 /** Ticks and unticks one filter group's items until they match `values`, then closes the menu. */
 async function setFilter(dimension: string, values: readonly string[], signal: AbortSignal): Promise<void> {
-  if (userHasOpen()) return;
+  if (skipToolbar()) return;
   const items = `[data-ops-filter-dim="${CSS.escape(dimension)}"]`;
   if (!(await openMenu("filters", items, signal))) return;
   const wanted = new Set(values);
@@ -709,7 +738,7 @@ async function setFilter(dimension: string, values: readonly string[], signal: A
 }
 
 async function resetFilters(signal: AbortSignal): Promise<void> {
-  if (userHasOpen()) return;
+  if (skipToolbar()) return;
   const item = "[data-ops-filter-reset]";
   if (!(await openMenu("filters", item, signal))) return;
   const reset = shown(item);
@@ -856,13 +885,15 @@ async function fixAll(action: Extract<AppAction, { name: "fix_all" }>, signal: A
 
 /**
  * The helpers at work on `moves` and `assigns` (see fixAll), with `tag` on
- * Skye's orb counting them off.
+ * Skye's orb counting them off. `size` helpers, or about one per two jobs
+ * (crewSize).
  */
 async function crewWork(
   moves: readonly AreaMove[],
   assigns: readonly StandAssign[],
   signal: AbortSignal,
   tag: (done: number, total: number) => string,
+  size?: number,
 ): Promise<void> {
   const total = moves.length + assigns.length;
   if (total === 0) return;
@@ -883,7 +914,7 @@ async function crewWork(
   await agentCursor.moveTo(screenCentre, { signal });
   if (signal.aborted) return;
 
-  const crew = agentHelpers.slice(0, crewSize(total));
+  const crew = agentHelpers.slice(0, size ?? crewSize(total));
   const tethers = showTethers(
     agentCursor,
     crew.map(({ controller }) => controller),
@@ -1053,7 +1084,8 @@ function disruptionChecks(action: Extract<AppAction, { name: "resolve_disruption
  * why each will not do, and which will), and over the stays around them,
  * while her ring fills with what has been checked. They stop on what would
  * wait, a beat, so it is clear what the problem is; then the helpers move
- * what the late stay runs into, as fixAll does, and merge back into her.
+ * what the late stay runs into, one each and all at once, as fixAll does,
+ * and merge back into her.
  */
 async function resolveDisruption(action: Extract<AppAction, { name: "resolve_disruption" }>, signal: AbortSignal): Promise<void> {
   const late = occupancyById(action.stayId);
@@ -1135,7 +1167,8 @@ async function resolveDisruption(action: Extract<AppAction, { name: "resolve_dis
     }
   }
   if (signal.aborted) return;
-  await crewWork(pending, [], signal, (done, total) => `Clearing ${name}'s knock-on · ${done}/${total} moved`);
+  // One helper to each stay it runs into, all moving at once.
+  await crewWork(pending, [], signal, (done, total) => `Clearing ${name}'s knock-on · ${done}/${total} moved`, pending.length);
 }
 
 /**
@@ -1159,24 +1192,17 @@ async function showCallWindow(ready: () => Element | null, signal: AbortSignal):
 }
 
 /**
- * Calling someone in, as a person does: on a call, from the call window's
- * Add people menu (the window shown first if it is closed); off one, from the
- * People list, with the call button on their row.
+ * Calling someone in, as a person does: off a call, from the People list,
+ * with the call button on their row. On one, the call window has no Add
+ * people, so there is nothing to click: the window is shown (if it is
+ * closed), where their tile rings once they are called.
  */
 async function addToCall(person: string, signal: AbortSignal): Promise<void> {
-  const add = () => shown("[data-call-add]");
-  await showCallWindow(add, signal);
-  if (add()) {
-    await click(add, signal, { last: false });
-    const item = `[data-call-invite="${CSS.escape(person)}"]`;
-    if (await waitFor(() => shown(item), signal)) {
-      await wait(MENU_SETTLE_MS);
-      await click(() => shown(item), signal, { aim: aimAtMenuItem });
-    }
+  const people = () => shown("[data-call-people]");
+  if (!people()) {
+    await showCallWindow(() => shown('[role="dialog"][aria-label="Call"]'), signal);
     return;
   }
-  const people = () => shown("[data-call-people]");
-  if (!people()) return;
   await click(people, signal, { last: false });
   const call = `[data-call-person="${CSS.escape(person)}"]`;
   if (await waitFor(() => shown(call), signal)) {
@@ -1185,18 +1211,45 @@ async function addToCall(person: string, signal: AbortSignal): Promise<void> {
   }
 }
 
-/** Taking someone off the call: the remove button on their tile in the call window. */
+/**
+ * Taking someone off the call: the remove button on their tile in the call
+ * window, expanded first (data-call-expand) when it is shrunk to avatars.
+ */
 async function removeFromCall(person: string, signal: AbortSignal): Promise<void> {
   const remove = () => shown(`[data-call-remove="${CSS.escape(person)}"]`);
-  await showCallWindow(remove, signal);
+  const expand = () => shown("[data-call-expand]");
+  await showCallWindow(() => remove() ?? expand(), signal);
+  if (!remove() && expand()) {
+    await click(expand, signal, { last: false });
+    await waitFor(remove, signal, 800);
+  }
   if (remove()) await click(remove, signal);
 }
 
+/* ------------------------------------------------ working out of sight */
+
+/** What Skye does off the board: calling people in and taking them off the call, in the call window on every page. */
+const OFF_BOARD = new Set<AppAction["name"]>(["add_to_call", "remove_from_call"]);
+
 /**
  * Carries `action` out with Skye's cursor, resolving once its clicks are
- * done. Reads have nothing to click and resolve at once.
+ * done. Reads have nothing to click and resolve at once. Her cursor counts
+ * as at work on the board meanwhile (../live/outOfSight), so it goes out of
+ * sight with the board and her work goes on there; finished out of sight,
+ * her cursor goes back into her orb at once, unseen, rather than turning up
+ * over the page the user is on.
  */
 export async function playAgentGesture(action: AppAction, signal: AbortSignal): Promise<void> {
+  const done = skyeWorksOn(OFF_BOARD.has(action.name) ? null : "planner", describeBoardAction(action));
+  try {
+    await playOnScreen(action, signal);
+  } finally {
+    // Unless a newer request has taken over from this one.
+    if (done() && agentCursor.out && !pageShown("planner")) void agentCursor.recall();
+  }
+}
+
+async function playOnScreen(action: AppAction, signal: AbortSignal): Promise<void> {
   // A finished multi-cursor task's tally does not follow Skye into the next one.
   if (action.name !== "close_area") agentCursor.setTask(null);
   switch (action.name) {

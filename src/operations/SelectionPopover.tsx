@@ -63,15 +63,14 @@ const SCROLL_REGION = ".st-scroller, .ops-group-scroll";
  * The part of a scroll region where content is actually visible: for the
  * chart, where the rows `el` is among show (the body's between its rulers and
  * below the No stand lane, or the lane's own strip; see rowsViewport); for a
- * list, its client box (excluding scrollbars) below its sticky table header.
+ * list, its client box (excluding scrollbars; its column headings sit above it).
  */
 function visibleContentBox(region: Element, el?: Element) {
   if (region.matches(".st-scroller")) return rowsViewport(region, el ? sectionOf(el) : "body");
   const r = region.getBoundingClientRect();
   const top = r.top + region.clientTop;
   const left = r.left + region.clientLeft;
-  const head = region.querySelector("thead")?.getBoundingClientRect();
-  return { top: Math.max(top, head?.bottom ?? top), left, bottom: top + region.clientHeight, right: left + region.clientWidth };
+  return { top, left, bottom: top + region.clientHeight, right: left + region.clientWidth };
 }
 
 /**

@@ -54,6 +54,8 @@ export type ControllerDeps = {
   /** The caller's microphone while a call holds it, for a level meter; null once released. */
   onLocalStream?: (stream: MediaStream | null) => void;
   onLog?: (entry: ExecutorLogEntry) => void;
+  /** How loud Skye's voice is as it plays (0–1, see VoiceMeter), to tell when she has finished saying something. */
+  outputLevel?: () => number;
   settleMs?: number;
   contextSyncMs?: number;
 };
@@ -61,16 +63,64 @@ export type ControllerDeps = {
 /** Quiet gap after which the agent is treated as no longer speaking. */
 export const SPEECH_IDLE_MS = 1_200;
 
+/** How long what Skye raises herself (`offer`) waits for her to finish what she is saying, ms. */
+export const OFFER_QUIET_WITHIN_MS = 10_000;
+
+/** How long, once asked, Skye has to be heard raising it, ms; past that the offer resolves unheard. */
+export const OFFER_HEARD_WITHIN_MS = 8_000;
+
+/** How long what Skye says (`speak`) can go on once she is heard, ms; past that it is taken as said. */
+export const SPOKEN_WITHIN_MS = 60_000;
+
 /**
- * Sent as instructions once the session is up, so Skye speaks first, the way
- * a coworker picks up a call. App-authored; never built from caller text.
+ * What she says is said once no words of it have come for SAID_IDLE_MS and
+ * her voice has been quiet for SAID_QUIET_MS: longer than she pauses between
+ * sentences, which SPEECH_IDLE_MS is not. Her voice is quiet below
+ * QUIET_LEVEL (0–1, as VoiceMeter reads it). Checked every SAID_POLL_MS.
+ */
+export const SAID_IDLE_MS = 1_500;
+export const SAID_QUIET_MS = 900;
+export const QUIET_LEVEL = 0.3;
+export const SAID_POLL_MS = 100;
+
+/**
+ * Once her words come to NEAR_END of what she was given to say (by length;
+ * she says it in her own words), she is done sooner: no words for
+ * NEAR_END_IDLE_MS and her voice quiet for NEAR_END_QUIET_MS, so whoever
+ * answers her does not leave a long gap.
+ */
+export const NEAR_END = 0.85;
+export const NEAR_END_IDLE_MS = 800;
+export const NEAR_END_QUIET_MS = 400;
+
+/**
+ * Once what she has said is known to have come to its end (speak's `ended`),
+ * she is done as soon as her words have stopped for ENDED_IDLE_MS and her
+ * voice for ENDED_QUIET_MS. Her words run ahead of her voice, so going by them
+ * alone, whoever answers her could start while she is still heard.
+ */
+export const ENDED_IDLE_MS = 300;
+export const ENDED_QUIET_MS = 300;
+
+/**
+ * Before she is given something new to say, her words have stopped
+ * (SPEECH_IDLE_MS) and her voice has been quiet this long, ms: steered while
+ * she is still heard, she can be cut off mid-sentence.
+ */
+export const QUIET_GAP_MS = 300;
+
+/**
+ * Sent as commentary once the session is up, so Skye speaks first, the way a
+ * coworker picks up a call, as GPT-Live's guide has a session greet; the
+ * session also starts with a greeting of its own in its input
+ * (server/live-session.mjs). App-authored; never built from caller text.
  */
 export const GREETING_INSTRUCTIONS =
   "A coworker just called you and you picked up. Speak first, in English, with a short, natural, casual " +
   "greeting in your own words, the way you would answer a colleague on the stand-allocation desk; vary it " +
   "from call to call. Do not introduce yourself or explain what you can do. Then stop and listen.";
 
-/** Put before what Skye is to say herself (see `say`). App-authored; what follows is too. */
+/** Put before what Skye is to say herself (see `say`), as commentary. App-authored; what follows is too. */
 export const SAY_INSTRUCTIONS =
   "Say this to the caller now, briefly and in your own words, without adding anything that is not in it: ";
 
@@ -115,6 +165,12 @@ export class LiveCallController {
   #generation = 0;
   #eventSeq = 0;
   #cancelSpeechTimer: (() => void) | null = null;
+  /** Waiting for Skye's voice (see #nextSpeech): each called with true when she is next heard, false when the call ends. */
+  #speechWaiters = new Set<(heard: boolean) => void>();
+  /** What Skye hears, held off by the app (holdInput), apart from the user's own mute. */
+  #held = false;
+  /** Told each of Skye's words as it arrives (see speak). */
+  #wordListeners = new Set<(delta: string) => void>();
 
   constructor(deps: ControllerDeps) {
     this.#deps = deps;
@@ -199,6 +255,8 @@ export class LiveCallController {
         this.#transcript.append("agent", event.delta, event.startMs, event.endMs);
         this.#notifyTranscript();
         this.#markSpeaking();
+        for (const listener of [...this.#wordListeners]) listener(event.delta);
+        for (const heard of [...this.#speechWaiters]) heard(true);
         break;
       case "session.delegation.created":
         this.#executor.handleDelegation(event);
@@ -280,6 +338,7 @@ export class LiveCallController {
     this.#transcript.clear();
     this.#notifyTranscript();
     this.#executor.reset();
+    this.#held = false;
     // A mute chosen before the call is placed survives into it.
     this.#patch({ ...IDLE_STATE, muted: this.#state.muted, phase: "starting" });
 
@@ -318,8 +377,7 @@ export class LiveCallController {
       // Initial board context, as quiet facts.
       this.#executor.syncNow();
       // Then Skye answers with a hello rather than waiting for the caller.
-      this.#eventSeq += 1;
-      transport.send(injectionEvent("instructions", `mica_inj_${this.#eventSeq}`, null, GREETING_INSTRUCTIONS));
+      this.#prompt(GREETING_INSTRUCTIONS);
     } catch (error) {
       if (generation !== this.#generation) return;
       const failure =
@@ -361,6 +419,19 @@ export class LiveCallController {
   }
 
   /**
+   * Holds what Skye hears off, without muting the user: while a teammate
+   * answers her aloud (./teammateVoice), so she does not take his words,
+   * from the speakers, for the caller's. She hears silence meanwhile, not a
+   * muted session (LiveTransport.hold). Released, the user's own mute is
+   * what applies. Only for the call it is held on.
+   */
+  holdInput(held: boolean): void {
+    if (this.#held === held) return;
+    this.#held = held;
+    this.#transport?.hold(held);
+  }
+
+  /**
    * A request typed in the chat, run by the same executor as voice requests,
    * with or without a call. Resolves with the reply, or null if a newer
    * request replaced it.
@@ -385,22 +456,140 @@ export class LiveCallController {
    * a reply to a request the app made for the user (the disruption's Run).
    */
   say(text: string): boolean {
-    if (this.#state.phase !== "connected" || !this.#transport) return false;
-    this.#eventSeq += 1;
-    this.#transport.send(
-      injectionEvent("instructions", `mica_inj_${this.#eventSeq}`, null, `${SAY_INSTRUCTIONS}${text}`),
-    );
-    return true;
+    return this.#prompt(`${SAY_INSTRUCTIONS}${text}`);
+  }
+
+  /**
+   * As `say`, once Skye has finished what she is saying (as `offer` waits),
+   * resolving once she has said it: true when she was heard and has since
+   * finished (SAID_IDLE_MS, SAID_QUIET_MS; sooner near its end, NEAR_END,
+   * and sooner still once `ended` says what she has said has come to its
+   * end, ENDED_IDLE_MS), false when she was not heard (no call, the call
+   * ended, or nothing within OFFER_HEARD_WITHIN_MS). For what has to follow
+   * her words, as a teammate's answer follows her brief. `onWords` hears
+   * what she has said of it so far, as her words arrive.
+   */
+  async speak(text: string, onWords?: (said: string) => void, ended?: (said: string) => boolean): Promise<boolean> {
+    if (this.#state.phase !== "connected") return false;
+    await this.#whenQuiet(OFFER_QUIET_WITHIN_MS);
+    let said = "";
+    const hear = (delta: string) => {
+      said += delta;
+      onWords?.(said);
+    };
+    this.#wordListeners.add(hear);
+    try {
+      if (!this.say(text) || !(await this.#nextSpeech(OFFER_HEARD_WITHIN_MS))) return false;
+      await this.#whenSaid(
+        SPOKEN_WITHIN_MS,
+        () => said.length >= NEAR_END * text.length,
+        () => ended?.(said) ?? false,
+      );
+      return this.#state.phase === "connected";
+    } finally {
+      this.#wordListeners.delete(hear);
+    }
+  }
+
+  /**
+   * Resolves once Skye has finished what she is saying: no words for
+   * SAID_IDLE_MS and her voice quiet for SAID_QUIET_MS, or, once `nearEnd`
+   * says she is near its end, NEAR_END_IDLE_MS and NEAR_END_QUIET_MS, or,
+   * once `ended` says she has come to it, ENDED_IDLE_MS and ENDED_QUIET_MS;
+   * or once the call is not up, or after `timeoutMs` regardless.
+   */
+  #whenSaid(timeoutMs: number, nearEnd: () => boolean = () => false, ended: () => boolean = () => false): Promise<void> {
+    return new Promise((resolve) => {
+      let waited = 0;
+      let sinceWords = 0;
+      let sinceLoud = 0;
+      const heard = () => {
+        sinceWords = 0;
+      };
+      this.#wordListeners.add(heard);
+      const poll = () => {
+        waited += SAID_POLL_MS;
+        sinceWords += SAID_POLL_MS;
+        sinceLoud = (this.#deps.outputLevel?.() ?? 0) >= QUIET_LEVEL ? 0 : sinceLoud + SAID_POLL_MS;
+        const said =
+          (sinceWords >= SAID_IDLE_MS && sinceLoud >= SAID_QUIET_MS) ||
+          (nearEnd() && sinceWords >= NEAR_END_IDLE_MS && sinceLoud >= NEAR_END_QUIET_MS) ||
+          (ended() && sinceWords >= ENDED_IDLE_MS && sinceLoud >= ENDED_QUIET_MS);
+        if (said || waited >= timeoutMs || this.#state.phase !== "connected") {
+          this.#wordListeners.delete(heard);
+          resolve();
+        } else this.#schedule(poll, SAID_POLL_MS);
+      };
+      this.#schedule(poll, SAID_POLL_MS);
+    });
   }
 
   /**
    * Skye brings something up herself, offering to do `proposal` (the
-   * disruption notice): said on a call, and kept as her offer either way, so
-   * a yes, said or typed, carries it out.
+   * disruption notice): kept as her offer, `said` being what the user is
+   * told, so a yes, said or typed, carries it out; and raised on a call,
+   * once she has finished what she is saying. With `cue`, she is steered to
+   * put it in her own words (see headsUpCue) rather than asked to say `said`.
+   *
+   * Resolves true as she is heard raising it, so what goes with it on screen
+   * can show as she speaks; false when she is not (no call, the call ended,
+   * or nothing heard within OFFER_HEARD_WITHIN_MS).
    */
-  offer(text: string, proposal: AppAction): void {
-    this.#executor.offer(text, proposal);
-    this.say(text);
+  offer(said: string, proposal: AppAction, cue?: string): Promise<boolean> {
+    this.#executor.offer(said, proposal);
+    const raise = () => {
+      if (!(cue ? this.#prompt(cue) : this.say(said))) return Promise.resolve(false);
+      return this.#nextSpeech(OFFER_HEARD_WITHIN_MS);
+    };
+    if (this.#state.phase !== "connected") return Promise.resolve(false);
+    // Not over herself: steered mid-sentence, her next words could still be the last one's.
+    return this.#whenQuiet(OFFER_QUIET_WITHIN_MS).then(raise);
+  }
+
+  /** Resolves true when Skye is next heard, false after `timeoutMs` or when the call ends. */
+  #nextSpeech(timeoutMs: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      const settle = (heard: boolean) => {
+        this.#speechWaiters.delete(settle);
+        cancel();
+        resolve(heard);
+      };
+      this.#speechWaiters.add(settle);
+      const cancel = this.#schedule(() => settle(false), timeoutMs);
+    });
+  }
+
+  /**
+   * Resolves once Skye is not speaking, by her words (agentSpeaking) and by
+   * her voice, quiet for QUIET_GAP_MS, as her words run ahead of it; or once
+   * the call is not up, or after `timeoutMs` regardless.
+   */
+  #whenQuiet(timeoutMs: number): Promise<void> {
+    return new Promise((resolve) => {
+      let waited = 0;
+      let sinceLoud = 0;
+      const poll = () => {
+        waited += SAID_POLL_MS;
+        sinceLoud = (this.#deps.outputLevel?.() ?? 0) >= QUIET_LEVEL ? 0 : sinceLoud + SAID_POLL_MS;
+        const quiet = !this.#state.agentSpeaking && sinceLoud >= QUIET_GAP_MS;
+        if (quiet || waited >= timeoutMs || this.#state.phase !== "connected") resolve();
+        else this.#schedule(poll, SAID_POLL_MS);
+      };
+      this.#schedule(poll, SAID_POLL_MS);
+    });
+  }
+
+  /**
+   * Has Skye say something now: app-authored, never caller text, sent as
+   * commentary, the channel GPT-Live says aloud in its own words. Not as
+   * instructions: those stay with the session for the rest of the call, and
+   * can cut her off mid-sentence. Only while connected.
+   */
+  #prompt(content: string): boolean {
+    if (this.#state.phase !== "connected" || !this.#transport) return false;
+    this.#eventSeq += 1;
+    this.#transport.send(injectionEvent("commentary", `mica_inj_${this.#eventSeq}`, null, content));
+    return true;
   }
 
   /** The user changed the board by hand. */
@@ -412,6 +601,8 @@ export class LiveCallController {
   async #release(): Promise<void> {
     this.#cancelSpeechTimer?.();
     this.#cancelSpeechTimer = null;
+    this.#held = false;
+    for (const heard of [...this.#speechWaiters]) heard(false);
     const transport = this.#transport;
     this.#transport = null;
     // Abort before dropping the controller, or a connect still waiting on the

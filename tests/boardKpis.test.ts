@@ -50,21 +50,22 @@ test("gate hold: a late departure holds the next arrival, and the knock-on holds
   assert.ok(setRunningLate("T24-1", 110, 110));
   const kpis = boardKpis(standState());
   // XC344/345 is due at 11:50 and gets on at 13:30; off at 14:35, so XB232/233
-  // (due 13:05) waits until then, and so on down B11.
+  // (due 13:05) waits until then, and so on down B11's bank.
   assert.deepEqual(
     kpis.holds.map((hold) => [hold.label, hold.standId, hold.due, hold.minutes]),
     [
       ["XC344/345", "B11", at("11:50"), 100],
       ["XB232/233", "B11", at("13:05"), 90],
-      ["XC336/337", "B11", at("14:00"), 85],
-      ["XA109/110", "B11", at("15:45"), 70],
+      ["XA117/118", "B11", at("13:55"), 80],
+      ["XC336/337", "B11", at("14:45"), 70],
+      ["XA109/110", "B11", at("15:45"), 55],
     ],
   );
-  assert.equal(kpis.gateHoldMinutes, 345);
+  assert.equal(kpis.gateHoldMinutes, 395);
   // Only the first runs into its ghost; the rest are the knock-on.
   assert.deepEqual(kpis.conflicts.map((c) => [c.label, c.standId, c.start]), [["XD472/473", "B11", at("11:40")]]);
   // News, not a change: the plan takes it in.
-  assert.equal(planKpis().gateHoldMinutes, 345);
+  assert.equal(planKpis().gateHoldMinutes, 395);
 });
 
 test("free stand time is the stretches of an hour or more on open stands", () => {
@@ -104,7 +105,7 @@ test("the figures follow the board, while the plan's stay as they were", () => {
   assert.ok(applyPlan(planDrop("T25-1", "A3")));
   const one = boardKpis(standState());
   assert.equal(one.conflicts.length, 1);
-  assert.deepEqual(one.holds.map((hold) => hold.label), ["XB232/233", "XC336/337", "XA109/110"]);
+  assert.deepEqual(one.holds.map((hold) => hold.label), ["XB232/233", "XA117/118", "XC336/337"]);
   // XB232/233 off too: nobody waits.
   assert.ok(applyPlan(planDrop("T26-1", "B10")));
   assert.equal(boardKpis(standState()).conflicts.length, 0);
@@ -117,6 +118,6 @@ test("the figures follow the board, while the plan's stay as they were", () => {
 
   // The plan's own figures stay as they were.
   assert.equal(planKpis().conflicts.length, 1);
-  assert.equal(planKpis().gateHoldMinutes, 345);
+  assert.equal(planKpis().gateHoldMinutes, 395);
   assert.equal(planKpis().noStand, 5);
 });

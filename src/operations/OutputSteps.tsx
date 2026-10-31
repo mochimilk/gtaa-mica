@@ -9,6 +9,7 @@ import { useSyncExternalStore, type ReactNode } from "react";
 import { Panel } from "@coral-ai/react";
 import { Avatar, Badge, Body1, makeStyles, mergeClasses, tokens, Tooltip } from "@fluentui/react-components";
 import { ArrowUndo20Regular } from "@fluentui/react-icons";
+import { photoOf } from "../components/people/photos";
 import { StepStatusIcon, type TaskStepStatus } from "../components/step-status-icon";
 import { describeRequest, outputs, subscribeOutputs, type OutputRequest, type OutputStatus, type OutputStep } from "./outputs";
 
@@ -25,7 +26,7 @@ const STATUS_LABEL: Record<OutputStatus, string> = {
   "pending-approval": "waiting for a teammate's approval",
   waiting: "waiting for your approval",
   done: "done",
-  undone: "undone",
+  undone: "cancelled",
 };
 
 /**
@@ -100,8 +101,10 @@ const useStyles = makeStyles({
     textOverflow: "ellipsis",
     color: tokens.colorNeutralForeground3,
   },
+  // A piece cancelled (undone), struck through.
   undone: {
     color: tokens.colorNeutralForeground3,
+    textDecorationLine: "line-through",
   },
   // A request waiting for approval says so in Fluent's warning colour.
   waiting: {
@@ -148,7 +151,7 @@ export function OutputSteps({
         const text = (
           <>
             <Body1 className={mergeClasses(styles.title, step.status === "undone" && styles.undone)}>{step.title}</Body1>
-            <Body1 className={styles.detail}>{step.detail}</Body1>
+            <Body1 className={mergeClasses(styles.detail, step.status === "undone" && styles.undone)}>{step.detail}</Body1>
             <span className={styles.status}>, {STATUS_LABEL[step.status]}</span>
           </>
         );
@@ -217,7 +220,7 @@ function trailingOf(step: OutputStep, className: string): ReactNode {
   if (step.approvedBy) {
     return (
       <Tooltip content={`Approved by ${step.approvedBy}`} relationship="label">
-        <Avatar size={16} name={step.approvedBy} color="colorful" className={className} />
+        <Avatar size={24} name={step.approvedBy} image={photoOf(step.approvedBy)} color="colorful" className={className} />
       </Tooltip>
     );
   }

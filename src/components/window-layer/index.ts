@@ -4,9 +4,14 @@
 // them. Over her cursors stand the Outputs peek and Ask Skye's open windows
 // (the chat, the alerts): WINDOW_Z. Fluent's portals opened from inside them
 // (a tooltip, a menu) mount over them in turn, in windowPortalNode
-// (PortalMountNodeProvider), at WINDOW_PORTAL_Z.
+// (PortalMountNodeProvider), at WINDOW_PORTAL_Z. Settings stands over all of
+// it, Skye included, at SETTINGS_Z, with what opens from it over that, at
+// SETTINGS_PORTAL_Z; only the film grain (grain.css) and the boot splash
+// (index.html) are higher.
 export const WINDOW_Z = 2147483001;
 export const WINDOW_PORTAL_Z = 2147483002;
+export const SETTINGS_Z = 2147483003;
+export const SETTINGS_PORTAL_Z = 2147483004;
 
 /**
  * A layer at the top of the page at `z`, made once: fixed, and no height of
@@ -29,3 +34,7 @@ function layer(name: string, z: number): () => HTMLElement {
 export const windowNode = layer("window-layer", WINDOW_Z);
 /** Where Fluent's portals opened from those windows mount, over them. */
 export const windowPortalNode = layer("window-portals", WINDOW_PORTAL_Z);
+/** Where Settings mounts (through a Fluent Portal, so it keeps the theme), over everything else in the app. */
+export const settingsNode = layer("settings-layer", SETTINGS_Z);
+/** Where Fluent's portals opened from Settings mount, over it. */
+export const settingsPortalNode = layer("settings-portals", SETTINGS_PORTAL_Z);

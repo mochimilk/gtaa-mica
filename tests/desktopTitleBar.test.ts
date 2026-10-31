@@ -36,3 +36,8 @@ test("the window controls take the page's colours in either theme", () => {
   assert.deepEqual(titleBarOverlayColors(false), { color: "#ebebeb", symbolColor: "#242424" });
   assert.deepEqual(titleBarOverlayColors(true), { color: "#000000", symbolColor: "#ffffff" });
 });
+
+test("on Mica the window controls are clear, keeping the page colour for their hover shade", () => {
+  assert.deepEqual(titleBarOverlayColors(false, "mica"), { color: "rgba(235, 235, 235, 0)", symbolColor: "#242424" });
+  assert.deepEqual(titleBarOverlayColors(true, "mica"), { color: "rgba(0, 0, 0, 0)", symbolColor: "#ffffff" });
+});

@@ -2,17 +2,20 @@
 // the board as a person would (her cursor drags the stays), and it then waits
 // here, on the board, for whoever has to approve it: the teammate for each
 // area it touches (baggage, for now; see needsBaggage), then the user, who
-// runs the stands. Approving keeps it; undoing puts the stays Skye changed
+// runs the stands. Approving keeps it; cancelling puts the stays Skye changed
 // back where they were. Changes Skye makes while one is waiting join it, and
-// are approved or undone together. Every piece Skye changes is listed, under
+// are approved or cancelled together. Every piece Skye changes is listed, under
 // the request she changed it for and with where it stands, in the Outputs
 // panel and its peek (outputs.ts), with the decision at their foot
-// (OutputsApproval).
+// (OutputsApproval), and on the call's shared screen (../approvals/ApprovalsCall),
+// which opens as a teammate is brought in (teammatesBroughtIn).
 //
 // A teammate looks at it once they are on the call: already on it when Skye
 // makes the change, or called in (Skye offers to; Review with baggage does).
 // A placeholder: nothing reaches anyone. Each approves on their own after a
-// few seconds (SIGNOFF_MS), as people called in answer.
+// few seconds (SIGNOFF_MS), as people called in answer; one with a voice of
+// their own (../live/teammateVoice) answers Skye aloud and approves as they
+// say so (setAnswerAloud, approveSignoff).
 import {
   callingNames,
   EXPERTISE_LABELS,
@@ -58,9 +61,13 @@ import {
 } from "./outputs";
 import { boardKpis } from "./boardKpis";
 import { formatDuration } from "./operationsData";
+import { terminalOf } from "./terminals";
 
 /** How long a teammate takes to approve, ms: long enough for Skye to brief them first (DisruptionNotice). */
 export const SIGNOFF_MS = 10_000;
+
+/** How long a teammate answering aloud has to approve, ms, should they never say so: a backstop. */
+export const SIGNOFF_ALOUD_MS = 60_000;
 
 /** One stay Skye changed: where it was before she did, and where she left it. */
 export type ReviewChange = {
@@ -73,9 +80,17 @@ export type ReviewChange = {
 
 /**
  * A teammate who has to approve before the user can: `needed` until the user
- * sends it to them (askForSignoffs), `asked` while they look, then `approved`.
+ * sends it to them (askForSignoffs), `asked` while they look, then `approved`,
+ * `at` when (Date.now()). `aloud` when, asked, they answer Skye aloud on the
+ * call (setAnswerAloud), approving as they say so.
  */
-export type Signoff = { name: string; expertise: Expertise; state: "needed" | "asked" | "approved" };
+export type Signoff = {
+  name: string;
+  expertise: Expertise;
+  state: "needed" | "asked" | "approved";
+  at?: number;
+  aloud?: true;
+};
 
 export type SkyeReview = {
   changes: readonly ReviewChange[];
@@ -153,26 +168,53 @@ function clearTimers(): void {
   timers.clear();
 }
 
-/** Moves a teammate's sign-off on. */
-function setSignoff(name: string, state: Signoff["state"]): void {
+/** Moves a teammate's sign-off on; one approving notes when, and one asked whether they answer aloud. */
+function setSignoff(name: string, state: Signoff["state"], aloud = false): void {
   if (!review) return;
-  set({ ...review, signoffs: review.signoffs.map((entry) => (entry.name === name ? { ...entry, state } : entry)) });
+  const next = (entry: Signoff): Signoff => {
+    if (state === "approved") return { ...entry, state, at: Date.now() };
+    // How they answered the last time they were asked is no guide to the next.
+    const { aloud: _, ...rest } = entry;
+    return state === "asked" && aloud ? { ...rest, state, aloud: true } : { ...rest, state };
+  };
+  set({ ...review, signoffs: review.signoffs.map((entry) => (entry.name === name ? next(entry) : entry)) });
+}
+
+/**
+ * Whether a teammate answers Skye aloud as they are asked, set by the call
+ * (../live/LiveCallProvider): asked, it starts their voice, and says whether
+ * it could. Null when nobody can.
+ */
+let answersAloud: ((name: string) => boolean) | null = null;
+export function setAnswerAloud(decide: ((name: string) => boolean) | null): void {
+  answersAloud = decide;
+}
+
+/** A teammate approves, while they are asked: as they say so (aloud), or after SIGNOFF_MS. */
+export function approveSignoff(name: string): void {
+  if (review?.signoffs.some((entry) => entry.name === name && entry.state === "asked")) setSignoff(name, "approved");
 }
 
 /**
  * Sends what is waiting to the teammates who have to approve it first (only
- * those named, when `names` is given); each approves after SIGNOFF_MS.
- * Returns whether anyone was asked.
+ * those named, when `names` is given); each approves after SIGNOFF_MS, or,
+ * answering aloud (setAnswerAloud), as they say so, SIGNOFF_ALOUD_MS being
+ * a backstop. Returns whether anyone was asked.
  */
 export function askForSignoffs(names?: readonly string[]): boolean {
   const asking =
     review?.signoffs.filter((entry) => entry.state === "needed" && (!names || names.includes(entry.name))) ?? [];
   for (const { name } of asking) {
-    setSignoff(name, "asked");
-    const timer = setTimeout(() => {
-      timers.delete(timer);
-      setSignoff(name, "approved");
-    }, SIGNOFF_MS);
+    // Decided first, so whoever hears they are asked hears how they answer.
+    const aloud = answersAloud?.(name) ?? false;
+    setSignoff(name, "asked", aloud);
+    const timer = setTimeout(
+      () => {
+        timers.delete(timer);
+        approveSignoff(name);
+      },
+      aloud ? SIGNOFF_ALOUD_MS : SIGNOFF_MS,
+    );
     timers.add(timer);
   }
   return asking.length > 0;
@@ -193,6 +235,15 @@ export function callForSignoffs(): boolean {
   for (const { name } of calling) inviteToCall(name);
   return calling.length > 0;
 }
+
+/**
+ * Whether a teammate has been brought in on what is waiting: being called for
+ * it (`calling`, everyone being called), looking at it, or done. Review with
+ * baggage does it, and so does a yes to Skye's offer to call them, or their
+ * being on the call already when Skye is done. The call opens on the Chat page then.
+ */
+export const teammatesBroughtIn = (current: SkyeReview | null, calling: readonly string[] = callingNames()): boolean =>
+  !!current?.signoffs.some((entry) => entry.state !== "needed" || calling.includes(entry.name));
 
 /**
  * Puts what `held` changed up for approval, asking again from the start:
@@ -231,24 +282,40 @@ const listWords = (words: readonly string[]) =>
   words.length <= 1 ? (words[0] ?? "") : `${words.slice(0, -1).join(", ")} and ${words.at(-1)}`;
 
 /**
- * What Skye says of the wait, after saying what she did: who has to approve
- * first, where they are, and, for one not on the call, an offer to call them.
+ * The terminal Skye's changes land in, whose channel approves them
+ * (../chat/chatThreads): where the first change that moves bags takes them,
+ * else where it took them from; undefined when none does.
+ */
+export function reviewTerminal(changes: readonly ReviewChange[]): string | undefined {
+  const change = changes.find((entry) => entry.baggage);
+  return change ? (terminalOf(change.to.rowId) ?? terminalOf(change.from.rowId)) : undefined;
+}
+
+/**
+ * What Skye says of the wait, after saying what she did, in as few words as
+ * it takes: who has to approve first, where they are, and, for one not on
+ * the call, an offer to call them. Approval is asked of an area's team in the
+ * changes' terminal, called on its channel: she names the team until someone
+ * picks up, and then them.
  */
 function waitFor(current: SkyeReview): ChangeWait {
   const first = current.signoffs.filter((entry) => entry.state !== "approved");
   if (first.length === 0) return { say: "It's waiting for your approval." };
-  const who = first.map((entry) => `${entry.name} for ${EXPERTISE_LABELS[entry.expertise].toLowerCase()}`);
-  const parts = [`It's waiting for approval: ${listWords(who)} first, then you.`];
+  const terminal = reviewTerminal(current.changes);
+  const team = (entry: Signoff) => `${EXPERTISE_LABELS[entry.expertise].toLowerCase()}${terminal ? ` in ${terminal}` : ""}`;
+  const teams = listWords(first.map(team));
+  const parts = [`${teams.charAt(0).toUpperCase()}${teams.slice(1)} ${first.length === 1 ? "approves" : "approve"} first, then you.`];
   const firstName = (name: string) => name.split(" ")[0];
   const asked = first.filter((entry) => entry.state === "asked").map((entry) => firstName(entry.name));
   if (asked.length > 0) parts.push(`${listWords(asked)} ${asked.length === 1 ? "is" : "are"} on the call, so I've sent it over.`);
   const ringing = first.filter((entry) => entry.state === "needed" && callingNames().includes(entry.name));
-  if (ringing.length > 0) parts.push(`I'm calling ${listWords(ringing.map((entry) => firstName(entry.name)))} already.`);
+  if (ringing.length > 0) parts.push(`I'm calling ${listWords(ringing.map(team))} already.`);
   const away = first.find((entry) => entry.state === "needed" && !callingNames().includes(entry.name));
   if (!away) return { say: parts.join(" ") };
+  // The offer always follows what she says, so a team she has just named is "them".
   return {
     say: parts.join(" "),
-    offer: { ask: `Want me to give ${firstName(away.name)} a call?`, action: { name: "add_to_call", person: away.name } },
+    offer: { ask: `Want me to call ${first.length === 1 ? "them" : team(away)}?`, action: { name: "add_to_call", person: away.name } },
   };
 }
 
@@ -260,7 +327,7 @@ const CLOSURE = "closure";
 /**
  * A run of changes to the board the Outputs panel lists together, under who
  * made them: a request Skye works on, or something the user does in one go (a
- * drag, a swap, an undo, a reset). Each piece is listed once, from where it
+ * drag, a swap, a reset). Each piece is listed once, from where it
  * was when the run started (see follow).
  */
 type Trail = {
@@ -300,6 +367,8 @@ let board = standState();
 let skyeTrail: Trail | null = null;
 /** What the user is doing in one go (asUser): what changes on the board meanwhile is theirs, together. */
 let userTrail: Trail | null = null;
+/** While Skye's changes are cancelled on their own: shown on her requests (struck through), not listed as the user's. */
+let cancelling = false;
 
 const stepOf = (current: Trail, piece: string) => {
   const id = current.steps.get(piece) ?? `${current.requestId}:${piece}`;
@@ -331,6 +400,7 @@ function follow(current: Trail, before: StandState, now: StandState): void {
       stayId,
       title: stayLabel(stayId),
       detail: describeMove(from, place),
+      move: { from, to: place },
       status: current.landed(from, place),
       needs: current.needs(from, place),
     });
@@ -372,8 +442,9 @@ function closeTrail(current: Trail): void {
 const stopFollowing = subscribeAllocation(() => {
   const before = board;
   board = standState();
-  // The plan moving on (a stay running late) is news, not anyone's change.
-  if (planUpdating()) return;
+  // The plan moving on (a stay running late) is news, not anyone's change; nor
+  // is Skye's being cancelled, which her requests show.
+  if (planUpdating() || cancelling) return;
   const current = userTrail ?? skyeTrail;
   if (current) {
     follow(current, before, board);
@@ -390,7 +461,7 @@ if (import.meta.hot) import.meta.hot.dispose(stopFollowing);
 
 /**
  * Lists what `work` changes on the board as one thing the user did, `title`:
- * undoing Skye's changes, resetting the stands. Inside another, it joins it.
+ * resetting the stands. Inside another, it joins it.
  */
 export function asUser<T>(title: string, work: () => T): T {
   if (userTrail) return work();
@@ -421,6 +492,7 @@ export function skyeTakesHold(stayId: string, toStand: string, shiftMs = 0): voi
     stayId,
     title: stayLabel(stayId),
     detail: describeMove(from, to),
+    move: { from, to },
     status: "working",
     needs: current.needs(from, to),
   });
@@ -506,10 +578,22 @@ export function subscribeApprovals(listener: (decision: OutputDecision) => void)
 
 /**
  * What approving decides, for the log: who approved (the teammates, then the
- * user), and the board's headline figures as they were before Skye's changes
- * and as they are now, each with whether that is better.
+ * user), when each teammate did, and the board's headline figures (figuresOf).
  */
 function decide(current: SkyeReview, waiting: Held): OutputDecision {
+  return {
+    at: Date.now(),
+    by: [...current.signoffs.map((entry) => entry.name), "You"],
+    signoffs: current.signoffs.map((entry) => ({ name: entry.name, at: entry.at ?? Date.now() })),
+    figures: figuresOf(waiting),
+  };
+}
+
+/**
+ * The board's headline figures as they were before what is waiting and as
+ * they are now, each with whether that is better.
+ */
+function figuresOf(waiting: Held): DecisionFigure[] {
   const now = standState();
   const stays = new Map(now.stays);
   for (const [id, was] of waiting.before) stays.set(id, was);
@@ -531,21 +615,28 @@ function decide(current: SkyeReview, waiting: Held): OutputDecision {
       figure("Conflicts", before.conflicts.length, after.conflicts.length, String, true),
     figure("Stand use", percent(before.standUse), percent(after.standUse), (value) => `${value}%`, null),
   ];
-  return {
-    at: Date.now(),
-    by: [...current.signoffs.map((entry) => entry.name), "You"],
-    figures: figures.filter((entry): entry is DecisionFigure => !!entry),
-  };
+  return figures.filter((entry): entry is DecisionFigure => !!entry);
 }
 
 /**
- * Undoes what is waiting: each stay Skye changed goes back where it was, and
+ * Cancels what is waiting: each stay Skye changed goes back where it was, and
  * so does a closure she changed. One someone has changed again since is left
- * as they left it.
+ * as they left it. Her pieces are marked undone, which is all the Outputs
+ * panel shows of it; inside something else the user does (resetting the
+ * stands), what it puts back is listed with that.
  */
 export function undoSkyeChanges(): void {
   if (!held) return;
-  asUser("Undid Skye's changes", undoHeld);
+  if (userTrail) {
+    undoHeld();
+    return;
+  }
+  cancelling = true;
+  try {
+    undoHeld();
+  } finally {
+    cancelling = false;
+  }
 }
 
 function undoHeld(): void {

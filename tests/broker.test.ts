@@ -151,6 +151,32 @@ test("only the SDP is taken from the caller", async () => {
   );
 });
 
+test("Travis's session is asked for by name alone; his instructions and voice stay on the server", async () => {
+  let sent: Record<string, unknown> = {};
+  await withBroker(
+    {
+      fetchImpl: (async (_url: string, init: RequestInit) => {
+        sent = JSON.parse(String(init.body));
+        return new Response(JSON.stringify({ session: { id: "live_t" }, transport: { sdp: FAKE_ANSWER_SDP } }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        });
+      }) as unknown as typeof fetch,
+    },
+    async (base) => {
+      const response = await post(base, "/api/live/session", { sdp: FAKE_OFFER_SDP, persona: "travis" });
+      assert.equal(response.status, 200);
+      assert.equal(((await response.json()) as { voice: string }).voice, "ripple");
+      const session = sent.session as { instructions: string; audio: { output: { voice: string } } };
+      assert.match(session.instructions, /^You are Travis Hughes/);
+      assert.equal(session.audio.output.voice, "ripple");
+
+      const refused = await post(base, "/api/live/session", { sdp: FAKE_OFFER_SDP, persona: "someone-else" });
+      assert.equal(refused.status, 400);
+    },
+  );
+});
+
 test("an interpretation is proxied with the revision echoed", async () => {
   await withBroker(
     {

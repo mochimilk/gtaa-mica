@@ -76,7 +76,8 @@ div.fui-MenuPopover:has(.fui-MenuItem ~ .fui-MenuItem) {
   line-height: 16px;
 }
 
-.fui-MenuPopover .fui-MenuItem:hover,
+/* Hovered by a person's pointer or one of Skye's (data-agent-hover, see agent-cursor/cursorMotion). */
+.fui-MenuPopover .fui-MenuItem:is(:hover, [data-agent-hover]),
 .fui-MenuPopover .fui-MenuItem:hover:active,
 .fui-MenuPopover .fui-MenuItem[data-fui-focus-visible] {
   background-color: var(--mica-menu-highlight);
@@ -129,15 +130,15 @@ div.fui-MenuPopover:has(.fui-MenuItem ~ .fui-MenuItem) {
   height: 16px;
 }
 
-.fui-MenuPopover .fui-MenuItem:hover .fui-MenuItem__icon {
+.fui-MenuPopover .fui-MenuItem:is(:hover, [data-agent-hover]) .fui-MenuItem__icon {
   color: inherit;
 }
 
-.fui-MenuPopover .fui-MenuItem:hover .fui-Icon-filled {
+.fui-MenuPopover .fui-MenuItem:is(:hover, [data-agent-hover]) .fui-Icon-filled {
   display: none;
 }
 
-.fui-MenuPopover .fui-MenuItem:hover .fui-Icon-regular {
+.fui-MenuPopover .fui-MenuItem:is(:hover, [data-agent-hover]) .fui-Icon-regular {
   display: inline;
 }
 

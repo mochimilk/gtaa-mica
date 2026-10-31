@@ -14,6 +14,10 @@ const staging = await mkdtemp(path.join(os.tmpdir(), 'gtaa-mica-package-'));
 try {
   await cp(path.join(root, 'dist'), path.join(staging, 'dist'), { recursive: true });
   await cp(path.join(root, 'electron'), path.join(staging, 'electron'), { recursive: true });
+  // The broker's session and interpreter code, which the app runs on a key from Settings → API (electron/appVoice.mjs).
+  for (const file of ['live-session.mjs', 'interpret.mjs']) {
+    await cp(path.join(root, 'server', file), path.join(staging, 'server', file));
+  }
   await writeFile(path.join(staging, 'package.json'), JSON.stringify({
     name: manifest.name, productName: 'GTAA Mica', version: manifest.version,
     type: 'module', main: 'electron/main.mjs',

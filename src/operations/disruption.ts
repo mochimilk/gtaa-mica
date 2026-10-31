@@ -1,7 +1,9 @@
 // Scenario 1, disruption resolution (see docs/disruption-demo.md): a late
 // arrival, caught as the news comes in. XD472/473, a B789 on B11, is found
-// running 1h 50m late. Its turn then runs into the two arrivals behind it on
-// B11, and the knock-on would hold four aircraft off their stand. Skye says
+// running 1h 50m late, and its crew, who take it back out, need their rest
+// first, so it leaves 3h 10m late. Its turn then runs into the four arrivals
+// behind it on B11, and the knock-on would hold five aircraft off their
+// stand. Skye says
 // so (DisruptionNotice, above Ask Skye), and on Run weighs it across the plan
 // and moves what the late aircraft runs into (resolve_disruption), keeping the
 // late aircraft where it is.
@@ -39,22 +41,22 @@ export const DISRUPTION = {
   flightId: "T24-ARR",
   /** Minutes late onto its stand. */
   delayIn: 110,
-  /** Minutes late off it: the turn keeps its length, so the whole delay carries through. */
-  delayOut: 110,
+  /** Minutes late off it: the delay carries through, and the crew's rest before taking it back out adds more. */
+  delayOut: 190,
   /** Why, as the airline's update puts it. */
-  cause: "Held at origin for a late inbound crew",
+  cause: "Held at origin for a late inbound crew, who need their rest before taking it back out",
 } as const;
 
 /* ------------------------------------------------------------------ state */
 
 export type NoticeState =
-  /** Nothing has happened yet. */
+  /** Skye has said nothing yet: the news has not arrived, or it is on the board and she has yet to spot it. */
   | "none"
   /** Skye is telling the user, above Ask Skye. */
   | "shown"
   /** The user put it away without acting. */
   | "dismissed"
-  /** The user pressed Run: Skye is on it. */
+  /** The user pressed Plan (or asked Skye): Skye is on it. */
   | "running"
   /** Her plan is approved: the notice shows what it did against the baseline, and that it is logged. */
   | "approved"
@@ -90,14 +92,24 @@ export function subscribeDisruption(listener: () => void): () => void {
 }
 
 /**
- * The news arrives: the flight is running late from now on (setRunningLate),
- * its conflicts show on the board, and the notice shows. Once only; returns
- * whether it landed now.
+ * The news arrives: the flight is running late from now on (setRunningLate)
+ * and its conflicts show on the board. Skye tells the user a moment later
+ * (announceDisruption). Once only; returns whether it landed now.
  */
 export function landDisruption(now = Date.now()): boolean {
   if (state.landedAt !== null) return false;
   if (!setRunningLate(DISRUPTION.stayId, DISRUPTION.delayIn, DISRUPTION.delayOut)) return false;
-  set({ landedAt: now, notice: "shown", baseline: boardKpis(standState()), approved: null });
+  set({ landedAt: now, notice: "none", baseline: boardKpis(standState()), approved: null });
+  return true;
+}
+
+/**
+ * Skye has spotted the news on the board: the notice shows. Only once it has
+ * landed, and only if nobody has acted on it yet; returns whether it showed.
+ */
+export function announceDisruption(): boolean {
+  if (state.landedAt === null || state.notice !== "none") return false;
+  set({ ...state, notice: "shown" });
   return true;
 }
 
@@ -124,9 +136,13 @@ export function dismissDisruptionNotice(): void {
   if (state.notice === "shown") set({ ...state, notice: "dismissed" });
 }
 
-/** The user pressed Run: the notice goes, and Skye takes it from there. */
+/**
+ * The user pressed Plan, or asked Skye, maybe before she spoke up: the notice
+ * goes (or never shows), and Skye takes it from there.
+ */
 export function markDisruptionRunning(): void {
-  if (state.notice === "shown" || state.notice === "dismissed") set({ ...state, notice: "running" });
+  const before = state.notice === "none" && state.landedAt !== null;
+  if (before || state.notice === "shown" || state.notice === "dismissed") set({ ...state, notice: "running" });
 }
 
 /* ---------------------------------------------------------------- reading */
@@ -159,16 +175,19 @@ const listWords = (words: readonly string[]) =>
 
 const plural = (count: number, one: string, many = `${one}s`) => `${count} ${count === 1 ? one : many}`;
 
-/** What the notice says: the news, why, what it runs into, and what is needed. */
+/** What the notice says: the news, why, and what it runs into. */
 export type DisruptionNotice = {
   title: string;
+  /** The news in a line, on the notice's pill: "XD472 from LHR 1h 50m late". */
+  summary: string;
   /** Why it is late, and when it is due now. */
   context: string;
   /** What it runs into, and the knock-on. */
   conflict: string;
-  /** What has to happen, by when. */
-  action: string;
 };
+
+/** "held at origin…": a cause, as it reads mid-sentence. */
+const midSentence = (text: string) => text.charAt(0).toLowerCase() + text.slice(1);
 
 /**
  * The notice's words, from the board as it is: null while the news has not
@@ -185,18 +204,15 @@ export function disruptionNotice(): DisruptionNotice | null {
   const into = runsInto(stay.id);
   const holds = standHolds();
   const waits = holds.reduce((sum, hold) => sum + hold.minutes, 0);
-  const first = into[0];
   return {
     title: `${name} from ${AIRPORT_NAMES[flight.routeEnd] ?? flight.routeEnd} is ${formatDelay(late)} late`,
-    context: `${DISRUPTION.cause}. Now due on ${stay.rowId} at ${formatUtc(stay.start)}, was ${formatUtc(stay.start - late)}.`,
+    summary: `${name} from ${flight.routeEnd} ${formatDelay(late)} late`,
+    context: `${name} was ${midSentence(DISRUPTION.cause)}. Now due on ${stay.rowId} at ${formatUtc(stay.start)}, was ${formatUtc(stay.start - late)}.`,
     conflict:
       into.length > 0
         ? `Its turn now runs to ${formatUtc(leaves)}, into ${listWords(into.map((other) => `${stayName(other)} (${formatUtc(other.start)})`))}.` +
           (waits > 0 ? ` The knock-on holds ${plural(holds.length, "arrival")} for ${formatDuration(waits)} in all.` : "")
         : `Its turn now runs to ${formatUtc(leaves)}, clear of anything else on ${stay.rowId}.`,
-    action: first
-      ? `Re-plan ${stay.rowId} before ${stayName(first).split("/")[0]} is due at ${formatUtc(first.start)}.`
-      : "Nothing to re-plan: the stand is clear behind it.",
   };
 }
 
@@ -370,25 +386,54 @@ export function rememberPlan(plan: DisruptionPlan): void {
   for (const move of plan.moves) if (!movedFrom.has(move.occupancyId)) movedFrom.set(move.occupancyId, move.fromStand);
 }
 
-/** What Skye says as the news arrives: the notice, said, and her offer to work it. */
-export function headsUp(): string | null {
-  const words = disruptionNotice();
-  return words ? `Heads-up: ${words.title}. ${words.conflict} Want me to work it?` : null;
+/** "XD472 from London Heathrow is running late and causing conflicts on the board": the flight, where from, what it is doing. */
+function lateFlightLine(): string | null {
+  const flight = OPS_FLIGHTS_BY_ID.get(DISRUPTION.flightId);
+  if (!flight || !disruptionNotice()) return null;
+  const from = AIRPORT_NAMES[flight.routeEnd] ?? flight.routeEnd;
+  return `${flight.flight} from ${from} is running late and causing conflicts on the board`;
 }
 
-/** What Skye says once her plan is approved: what it did against the baseline, and that it is logged. */
+/**
+ * Skye's heads-up as the news arrives, in a line: the flight, where it is
+ * from and what it is doing, and her offer to look at it, nothing more, as
+ * the notice has the details. Written in the chat off a call, and kept as
+ * her offer.
+ */
+export function headsUp(): string | null {
+  const line = lateFlightLine();
+  return line ? `Heads-up: ${line}. Want to take a look?` : null;
+}
+
+/**
+ * How Skye brings the news up on a call: steering, not a script, so she puts
+ * it in her own words, as she does her hello. A quick heads-up in the
+ * notice's order (the flight, where it is from, what it is doing) and an
+ * offer, leaving times and figures to the notice; she is told the news
+ * itself, so she can answer if asked more.
+ */
+export function headsUpCue(): string | null {
+  const words = disruptionNotice();
+  const line = lateFlightLine();
+  return words && line
+    ? `News just in: ${words.title}, and it now runs into other flights on the stand plan. ` +
+        "Give the caller a quick heads-up in your own words, one short casual sentence, in this order: the flight number, " +
+        `where it's from, then what it's doing, along the lines of "${line}". ` +
+        "Skip times and figures, as they're on screen. Ask if they want to take a look, then stop."
+    : null;
+}
+
+/**
+ * What Skye says once her plan is approved: that it is logged, and what it
+ * did against the baseline, in a line; the moves themselves are on the board.
+ */
 export function settledLine(): string | null {
   const approved = state.approved;
   if (!approved) return null;
   const { gateHold, conflicts } = approved.impact;
-  const moved = [...movedFrom].flatMap(([id]) => {
-    const stay = occupancyById(id);
-    return stay ? [`${stayName(stay)} on ${stay.rowId}`] : [];
-  });
   return (
     `That's approved and logged. Gate hold is down from ${formatHold(gateHold.before)} to ${formatHold(gateHold.after)}` +
-    `${conflicts.after === 0 ? ", with no conflicts left" : ""}.` +
-    (moved.length > 0 ? ` ${listWords(moved)}, and ${lateNames().stay} keeps ${lateStay()?.rowId ?? "its stand"}.` : "")
+    `${conflicts.after === 0 ? ", with no conflicts left" : ""}.`
   );
 }
 
@@ -397,29 +442,150 @@ export function settledLine(): string | null {
  * ../operations/skyeReview), once they pick up: the news, when it is the
  * disruption's; each change in their area and what it means for them; what
  * else moved that does not touch them; and the ask. For baggage, the changes
- * that move a flight's bags.
+ * that move a flight's bags. She greets whoever is on the call (`onCall`, the
+ * teammate among them): them by name, two by both names, more all at once,
+ * and with others there she says which part is the teammate's. She asks for
+ * the user, so the re-plan is "ours", not hers.
  */
-export function teammateBrief(name: string, changes: readonly ReviewChange[]): string {
+export const teammateBrief = (name: string, changes: readonly ReviewChange[], onCall: readonly string[] = [name]): string =>
+  teammateBriefScript(name, changes, onCall).text;
+
+/**
+ * What Skye points at on the call's shared approval as her brief comes to it
+ * (../approvals/walkThrough): the changes as a whole (`look`), a change in
+ * the teammate's area (`card`), one of its stands (`stand`), what it does to
+ * the bags (`bags`), the changes that move none (`others`), or the decision
+ * (`ask`).
+ */
+export type BriefPoint =
+  | { kind: "look" | "ask" }
+  | { kind: "card" | "bags"; stayId: string }
+  | { kind: "stand"; stayId: string; end: "from" | "to" }
+  | { kind: "others"; stayIds: readonly string[] };
+
+/**
+ * A point in Skye's brief, `at` characters into its words, and `words`, any
+ * of which, said, is where she comes to it (she puts the brief in her own
+ * words, so `at` only says roughly where); none for where she starts.
+ */
+export type BriefBeat = BriefPoint & { at: number; words?: readonly string[] };
+
+/** Words Skye comes to what a change does to the bags with, or, on the same pier, to its new times. */
+const BAGS_WORDS = ["bags", "bag", "baggage", "carousel", "carousels"];
+const TIMES_WORDS = ["now", "times", "bags"];
+/** And the changes that move none, and her ask. */
+const OTHERS_WORDS = ["other"];
+const ASK_WORDS = ["approve", "approval", "sign", "okay", "ok", "good"];
+
+/** Skye's brief (teammateBrief), with where in it she comes to each thing on the shared approval. */
+export type BriefScript = { text: string; beats: readonly BriefBeat[] };
+
+/** teammateBrief, with its beats: where each change, stand and what it does to the bags come up. */
+export function teammateBriefScript(
+  name: string,
+  changes: readonly ReviewChange[],
+  onCall: readonly string[] = [name],
+): BriefScript {
   const theirs = changes.filter((change) => change.baggage);
-  const parts = [`${name.split(" ")[0]}, it's Skye.`];
+  const firstName = (who: string) => who.split(" ")[0];
+  const company = onCall.some((who) => who !== name);
+  let text = "";
+  const beats: BriefBeat[] = [];
+  const say = (words: string) => void (text += words);
+  const point = (where: BriefPoint, words?: readonly string[]) => void beats.push({ ...where, at: text.length, words });
+
+  point({ kind: "look" });
+  say(
+    onCall.length <= 1
+      ? `Hey ${firstName(name)}.`
+      : onCall.length === 2
+        ? `Hi ${listWords(onCall.map(firstName))}.`
+        : "Hi everyone.",
+  );
   const stay = lateStay();
   if (state.landedAt !== null && stay) {
-    parts.push(`${lateNames().flight} is ${formatDelay(DEMO_DATA.delays.get(stay.id)?.in ?? 0)} late on ${stay.rowId}, so I've re-planned the arrivals behind it.`);
+    say(` ${lateNames().flight} is ${formatDelay(DEMO_DATA.delays.get(stay.id)?.in ?? 0)} late on ${stay.rowId}, so we've re-planned the arrivals behind it.`);
   }
   const area = (standId: string) => (standId ? (standArea(standId) ?? standId) : "no stand");
-  const lines = theirs.map((change) => {
-    const [from, to] = [area(change.from.rowId), area(change.to.rowId)];
-    const where = change.from.rowId && change.to.rowId ? `from ${change.from.rowId} to ${change.to.rowId}` : `to ${change.to.rowId || "no stand"}`;
-    return from === to
-      ? `${stayLabel(change.stayId)} moves ${where}, now ${formatUtc(change.to.start)}–${formatUtc(change.to.end)}`
-      : `${stayLabel(change.stayId)} moves ${where}, ${formatUtc(change.to.start)}–${formatUtc(change.to.end)}, so its bags go to ${to} instead of ${from}`;
-  });
-  if (lines.length > 0) parts.push(`For you: ${listWords(lines)}.`);
-  const others = changes.length - theirs.length;
-  if (others > 0) parts.push(`${others === 1 ? "The other move stays" : `The other ${others} moves stay`} on the same pier, so nothing changes for bags there.`);
-  parts.push("Can you approve?");
-  return parts.join(" ");
+  if (theirs.length > 0) {
+    say(` ${company ? `${firstName(name)}, for you` : "For you"}: `);
+    theirs.forEach((change, index) => {
+      // Each its own sentence, as each says a good deal: "a. b. And c."
+      if (index > 0) say(index === theirs.length - 1 ? ". And " : ". ");
+      const { stayId } = change;
+      const [from, to] = [area(change.from.rowId), area(change.to.rowId)];
+      const label = stayLabel(stayId);
+      // Its arrival's flight, however she says the rest ("XA101 slash 102").
+      point({ kind: "card", stayId }, [label.split("/")[0]]);
+      say(`${label} moves `);
+      if (change.from.rowId && change.to.rowId) {
+        point({ kind: "stand", stayId, end: "from" }, [change.from.rowId]);
+        say(`from ${change.from.rowId} `);
+      }
+      point({ kind: "stand", stayId, end: "to" }, change.to.rowId ? [change.to.rowId] : ["stand"]);
+      say(`to ${change.to.rowId || "no stand"}`);
+      const times = `${formatUtc(change.to.start)}–${formatUtc(change.to.end)}`;
+      if (from === to) {
+        say(", ");
+        point({ kind: "bags", stayId }, TIMES_WORDS);
+        say(`now ${times}`);
+      } else {
+        say(`, ${times}, `);
+        point({ kind: "bags", stayId }, BAGS_WORDS);
+        say(`so its bags go to ${to} instead of ${from}`);
+      }
+    });
+    say(".");
+  }
+  const others = changes.filter((change) => !change.baggage);
+  if (others.length > 0) {
+    say(" ");
+    point({ kind: "others", stayIds: others.map((change) => change.stayId) }, OTHERS_WORDS);
+    say(`${others.length === 1 ? "The other move stays" : `The other ${others.length} moves stay`} on the same pier, so nothing changes for bags there.`);
+  }
+  say(" ");
+  point({ kind: "ask" }, ASK_WORDS);
+  say("Can you approve?");
+  return { text, beats };
 }
+
+/**
+ * What a teammate who answers Skye aloud (../live/teammateVoice) is cued to
+ * say back to her brief (teammateBrief), straight on, as a colleague answers:
+ * it works for the carousels, he approves, then a plain thanks, and to let
+ * them know if they need anything else. App-authored.
+ */
+export const teammateCue = (): string =>
+  "Skye just asked you to approve. Answer her now, out loud, in your own words, friendly and at an ordinary " +
+  "pace, with no long pauses: the carousels can take it; it's approved for baggage; then a " +
+  'plain "Thanks.", naming nobody, and "Let me know if you need anything else."';
+
+/**
+ * What Skye asked him to approve, for him to know without saying it (it goes
+ * as quiet facts with his cue); null when none of it is his.
+ */
+export function teammateContext(changes: readonly ReviewChange[]): string | null {
+  const area = (standId: string) => (standId ? (standArea(standId) ?? standId) : "no stand");
+  const moves = changes
+    .filter((change) => change.baggage)
+    .map((change) => {
+      const [from, to] = [area(change.from.rowId), area(change.to.rowId)];
+      return from === to
+        ? `${stayLabel(change.stayId)} on new times`
+        : `${stayLabel(change.stayId)}'s bags going to ${to} instead of ${from}`;
+    });
+  return moves.length > 0 ? `What Skye asked you to approve: ${listWords(moves)}.` : null;
+}
+
+/** Where a teammate answering aloud comes to the end of what teammateCue asks of him. */
+export const teammateCueEnded = (said: string): boolean => /\banything else\b/i.test(said);
+
+/**
+ * What Skye says once a teammate has approved aloud, as he hangs up: thanks,
+ * and, when it is the user's to approve now (`yours`), that it's over to them.
+ */
+export const handOffLine = (name: string, yours: boolean): string =>
+  `Thanks, ${name.split(" ")[0]}!${yours ? " That's approved for baggage, so it's over to you." : ""}`;
 
 /** "XD472/473 · 1h 50m late": the late stay, on Skye's tag as she looks at it. */
 export function lateTag(): string {

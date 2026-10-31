@@ -7,8 +7,17 @@ export { GREETING_INSTRUCTIONS, LiveCallController, SPEECH_IDLE_MS } from "./cal
 export type { CallPhase, ControllerDeps, LiveCallState } from "./callController.ts";
 export { LiveTransport } from "./liveTransport.ts";
 export type { TransportDeps, TransportHandlers } from "./liveTransport.ts";
-export { LiveCallError, fetchLiveHealth, liveApiBase, requestLiveSession } from "./liveBackend.ts";
+export { LiveCallError, fetchLiveHealth, liveApiBase, liveFetch, requestLiveSession } from "./liveBackend.ts";
 export type { LiveHealth, LiveSessionGrant } from "./liveBackend.ts";
+export {
+  desktopVoice,
+  forgetVoiceKey,
+  setVoiceKey,
+  subscribeVoiceKey,
+  voiceKey,
+  voiceKeyRevision,
+} from "./desktopVoice.ts";
+export type { VoiceKey, VoiceProvider } from "./desktopVoice.ts";
 export { DelegationExecutor } from "./executor.ts";
 export type { ExecutorLogEntry, ExecutorOptions } from "./executor.ts";
 export { TranscriptLog } from "./transcript.ts";

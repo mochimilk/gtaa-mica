@@ -1,9 +1,9 @@
 // The Outputs panel's list of every change to the board, under who made it:
 // Skye's requests, each with every piece she changed for it, turn by turn,
-// and what the user did, each drag, swap, undo or reset on its own. Skye's
+// and what the user did, each drag, swap or reset on its own. Skye's
 // piece is worked on from when her cursor sets off for it, waits for
 // approval once it lands (first from baggage, when it moves bags, then from
-// the user), then is approved or undone with the rest of hers. What ends up
+// the user), then is approved or cancelled with the rest of hers. What ends up
 // where it was comes off the list, and an action that does not change the
 // board is never on it.
 import assert from "node:assert/strict";
@@ -14,7 +14,7 @@ import { DelegationExecutor } from "../src/live/executor.ts";
 import { phraseInterpreter } from "../src/live/requestInterpreter.ts";
 import { TranscriptLog } from "../src/live/transcript.ts";
 import { applyPlan, occupancyById, resetStands, setClosure } from "../src/operations/allocation.ts";
-import { clearOutputs, outputs } from "../src/operations/outputs.ts";
+import { clearOutputs, describeRequest, outputs } from "../src/operations/outputs.ts";
 import {
   approveSkyeChanges,
   askForSignoffs,
@@ -90,7 +90,7 @@ test("a piece that moves bags keeps its dots while Skye works, waits on baggage 
   assert.deepEqual(statuses(), ["done"]);
 });
 
-test("one request lists every piece it changed, newest first, and they are undone together", () => {
+test("one request lists every piece it changed, newest first, and they are cancelled together", () => {
   const was = standOf("T02-1");
   const finish = beginSkyeChange(fixConflicts);
   move("T01-1", "A4");
@@ -105,19 +105,14 @@ test("one request lists every piece it changed, newest first, and they are undon
   // The one to another pier waits on baggage; the one on the same pier, on the user alone.
   assert.deepEqual(statuses(), ["pending-approval", "waiting"]);
   undoSkyeChanges();
-  // Undoing is the user's, listed above Skye's: her pieces undone, and the two put back.
-  const [undo, hers] = outputs();
-  assert.equal(undo.actor, "user");
-  assert.equal(undo.title, "Undid Skye's changes");
+  // Cancelling is shown on Skye's request, her pieces undone, and not listed as the user's; the two are put back.
   assert.deepEqual(
-    undo.steps.map((step) => [step.title, step.status]).sort(),
-    [["XA101/102", "done"], ["XA103/104", "done"]],
+    outputs().map((request) => [request.actor, request.title]),
+    [["skye", "Fix all conflicts"]],
   );
-  assert.equal(hers.actor, "skye");
-  assert.deepEqual(
-    hers.steps.map((step) => step.status),
-    ["undone", "undone"],
-  );
+  assert.deepEqual(statuses(), ["undone", "undone"]);
+  assert.deepEqual(describeRequest(outputs()[0]), { status: "Cancelled by you", count: "2 changes", waiting: false, cancelled: true });
+  assert.deepEqual([standOf("T01-1"), standOf("T02-1")], ["A1", was]);
 });
 
 test("what the user does is listed as theirs, one thing at a time: a drag, then a swap", () => {

@@ -4,7 +4,9 @@
 // it posts its SDP offer to Mica's own broker, which calls GPT-Live with the
 // server-side project key and returns the answer. There is nothing here to
 // persist, and nothing to put in a VITE_* variable except the broker's own
-// public URL.
+// public URL. In the desktop app, a key from Settings → API goes to the main
+// process instead, which answers the same routes with it (liveFetch).
+import { desktopVoice, type DesktopVoiceRoute } from "./desktopVoice.ts";
 
 export type LiveSessionGrant = {
   sessionId: string;
@@ -48,11 +50,64 @@ export function liveApiBase(): string {
   return typeof configured === "string" ? configured.replace(/\/$/, "") : "";
 }
 
+/** The broker's routes, by path, as the desktop app answers them. */
+const DESKTOP_ROUTES: Record<string, DesktopVoiceRoute> = {
+  "/api/live/session": "session",
+  "/api/live/interpret": "interpret",
+  "/api/live/health": "health",
+};
+
+const jsonResponse = (status: number, body: unknown) =>
+  new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+
+/**
+ * Whether there is a broker to go to: the dev server's proxy, or the one a
+ * packaged build was built with.
+ */
+function hasBroker(): boolean {
+  return liveApiBase() !== "" || (import.meta.env as { DEV?: boolean } | undefined)?.DEV === true;
+}
+
+/**
+ * `fetch` for Mica's voice routes. In the desktop app, a window given a key in
+ * Settings → API has the main process answer them with it
+ * (electron/appVoice.mjs), so the key never rides on a request from here;
+ * without one they go to the broker, as in a browser. A packaged build with no
+ * broker answers that it needs a key.
+ */
+export const liveFetch: typeof fetch = async (input, init) => {
+  const voice = desktopVoice();
+  const route = voice && typeof input === "string" ? DESKTOP_ROUTES[new URL(input, "mica://app/").pathname] : undefined;
+  if (!voice || !route) return fetch(input, init);
+
+  const signal = init?.signal ?? undefined;
+  signal?.throwIfAborted();
+  const id = crypto.randomUUID();
+  const abort = () => voice.abort(id);
+  signal?.addEventListener("abort", abort, { once: true });
+  let answer: Awaited<ReturnType<typeof voice.request>>;
+  try {
+    answer = await voice.request(id, route, typeof init?.body === "string" ? init.body : undefined);
+  } finally {
+    signal?.removeEventListener("abort", abort);
+  }
+  signal?.throwIfAborted();
+
+  if (answer) return jsonResponse(answer.status, answer.body);
+  if (hasBroker()) return fetch(input, init);
+  return jsonResponse(503, {
+    error: { code: "missing_api_key", message: "Skye needs an OpenAI API key: add yours in Settings → API." },
+  });
+};
+
 type RequestOptions = {
   baseUrl?: string;
   fetchImpl?: typeof fetch;
   signal?: AbortSignal;
 };
+
+/** Whose session: Skye's, or Travis's, answering her on an approval call (./teammateVoice). */
+export type LivePersona = "skye" | "travis";
 
 /** Reads `{ error: { code, message } }` without trusting its shape. */
 async function readError(response: Response, fallbackCode: string): Promise<LiveCallError> {
@@ -69,28 +124,31 @@ async function readError(response: Response, fallbackCode: string): Promise<Live
 }
 
 /**
- * Exchanges an SDP offer for a GPT-Live session.
+ * Exchanges an SDP offer for a GPT-Live session: Skye's, unless `persona`
+ * says whose; the broker holds each one's instructions and voice.
  *
  * @throws LiveCallError with `missing_api_key` when the broker has no key
  *   configured, which is the expected state in a fresh checkout.
  */
 export async function requestLiveSession(
   sdp: string,
-  { baseUrl = liveApiBase(), fetchImpl = fetch, signal }: RequestOptions = {},
+  { baseUrl = liveApiBase(), fetchImpl = liveFetch, signal, persona }: RequestOptions & { persona?: LivePersona } = {},
 ): Promise<LiveSessionGrant> {
   let response: Response;
   try {
     response = await fetchImpl(`${baseUrl}/api/live/session`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sdp }),
+      body: JSON.stringify(persona ? { sdp, persona } : { sdp }),
       signal,
     });
   } catch (error) {
     if (signal?.aborted) throw new LiveCallError("cancelled", "The call was cancelled.");
     throw new LiveCallError(
       "backend_unreachable",
-      "Mica's voice backend is not running. Start it with `npm run dev:voice`.",
+      desktopVoice()
+        ? "Skye needs an OpenAI API key: add yours in Settings → API, or start Mica's voice backend with `npm run dev:voice`."
+        : "Mica's voice backend is not running. Start it with `npm run dev:voice`.",
     );
   }
 
@@ -114,7 +172,7 @@ export async function requestLiveSession(
  */
 export async function fetchLiveHealth({
   baseUrl = liveApiBase(),
-  fetchImpl = fetch,
+  fetchImpl = liveFetch,
   signal,
 }: RequestOptions = {}): Promise<LiveHealth | null> {
   try {

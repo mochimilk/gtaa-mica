@@ -1,0 +1,67 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    GTAA Mica for Windows: a WinUI 3 window, on Mica, that hosts the React app
+    (../src) in WebView2. Unpackaged and self-contained, so it installs per user
+    with Velopack (no admin, no certificate) and updates from the repo's GitHub
+    releases (Updates/Updater.cs). See README.md.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+    <RootNamespace>GtaaMica</RootNamespace>
+    <AssemblyName>GtaaMica</AssemblyName>
+    <Product>GTAA Mica</Product>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\AppIcon.ico</ApplicationIcon>
+    <Platforms>x64;ARM64</Platforms>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-$([System.Runtime.InteropServices.RuntimeInformation]::ProcessArchitecture.ToString().ToLowerInvariant())</RuntimeIdentifier>
+    <UseWinUI>true</UseWinUI>
+    <WinUISDKReferences>false</WinUISDKReferences>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <!-- Unpackaged and self-contained: Velopack installs it, nothing else is needed. -->
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <SelfContained>true</SelfContained>
+    <!-- Program.cs has the Main: Velopack has to run before anything else. -->
+    <DefineConstants>$(DefineConstants);DISABLE_XAML_GENERATED_MAIN</DefineConstants>
+
+    <!-- The release version, from the vX.Y.Z tag (see .github/workflows/release.yml). -->
+    <Version Condition="'$(Version)' == ''">0.0.0</Version>
+    <!--
+      The GitHub App people sign in with to read the private repo's releases
+      (GitHub/GitHubSignIn.cs). Its client ID is public; no secret ships.
+    -->
+    <GitHubClientId Condition="'$(GitHubClientId)' == ''"></GitHubClientId>
+    <GitHubRepository Condition="'$(GitHubRepository)' == ''">mochimilk/gtaa-mica</GitHubRepository>
+
+    <!-- WinRT and WebView2 interop don't survive trimming. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <PublishReadyToRun Condition="'$(Configuration)' != 'Debug'">true</PublishReadyToRun>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="GitHubClientId" Value="$(GitHubClientId)" />
+    <AssemblyMetadata Include="GitHubRepository" Value="$(GitHubRepository)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\AppIcon.ico" CopyToOutputDirectory="PreserveNewest" />
+    <!-- The page's bridge to this app, injected before the page's own scripts. -->
+    <EmbeddedResource Include="Bridge\HostBridge.js" LogicalName="HostBridge.js" />
+    <!-- The React app, built by `npm run build` at the repo's root, served from web\. -->
+    <Content Include="..\dist\**\*" LinkBase="web" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.4" />
+    <PackageReference Include="Velopack" Version="1.2.161" />
+  </ItemGroup>
+</Project>

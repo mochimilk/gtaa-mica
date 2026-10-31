@@ -1,6 +1,6 @@
 // What the Outputs panel lists: every change to the board, newest first, each
 // under who made it: a request Skye worked on, or something the user did in
-// one go (a drag, a swap, an undo, a reset); and under each, every piece it
+// one go (a drag, a swap, a reset); and under each, every piece it
 // changed, turn by turn, newest first, as a chess game's moves are listed
 // under the game. Recorded as the board changes (skyeReview).
 // A piece is `working` while Skye has hold of it, then waits for approval
@@ -8,7 +8,8 @@
 // lands, or, when its change needs a teammate (baggage, for one that moves
 // bags), it stays `working` until Skye is done, waits on them
 // (`pending-approval`) once they are asked, then on the user; until it is
-// approved or undone. A piece
+// approved or cancelled (`undone`, struck through, the request it is for
+// saying so rather than the user's cancelling being listed). A piece
 // that ends up where it was is taken off, and so is a request that changed
 // nothing. While the list is empty, the panel's toggle in the board's header
 // is greyed out and the panel stays closed (OutputsPanel); while Skye works
@@ -39,6 +40,8 @@ export type OutputStep = {
   status: OutputStatus;
   /** The teammate who has to approve it before the user (baggage, for one that moves bags). */
   needs?: { name: string; expertise: Expertise };
+  /** Where the stay was before the change and where it is after, for a stay's. */
+  move?: { from: StayPlace; to: StayPlace };
   /** That teammate, once they have. */
   approvedBy?: string;
 };
@@ -62,8 +65,17 @@ export type OutputRequest = {
 /** One of the board's figures before Skye's changes and after: "Gate hold", "5h 45m", "none". */
 export type DecisionFigure = { label: string; before: string; after: string; better: boolean | null };
 
-/** The log of an approval: when (Date.now()), who approved, in order (the user last), and the figures. */
-export type OutputDecision = { at: number; by: readonly string[]; figures: readonly DecisionFigure[] };
+/**
+ * The log of an approval: when (Date.now()), who approved, in order (the user
+ * last), each teammate who approved before the user with when they did, and
+ * the figures.
+ */
+export type OutputDecision = {
+  at: number;
+  by: readonly string[];
+  signoffs: readonly { name: string; at: number }[];
+  figures: readonly DecisionFigure[];
+};
 
 let requests: readonly OutputRequest[] = [];
 const listeners = new Set<() => void>();
@@ -259,14 +271,15 @@ export function describeUserChange(
 
 /**
  * Where a request stands, for its header: "Working" and "3 changes", or
- * "Waiting for approval" (`waiting`, for the user to see) and "7 changes".
+ * "Waiting for approval" (`waiting`, for the user to see) and "7 changes", or
+ * "Cancelled by you" (`cancelled`, its pieces struck through) and "2 changes".
  */
-export function describeRequest(request: OutputRequest): { status?: string; count?: string; waiting: boolean } {
+export function describeRequest(request: OutputRequest): { status?: string; count?: string; waiting: boolean; cancelled?: boolean } {
   const count = `${request.steps.length} change${request.steps.length === 1 ? "" : "s"}`;
   if (request.working) return request.steps.length > 0 ? { status: "Working", count, waiting: false } : { status: "Working…", waiting: false };
   const statuses = new Set(request.steps.map((step) => step.status));
   if (statuses.has("pending-approval") || statuses.has("waiting")) return { status: "Waiting for approval", count, waiting: true };
-  if (statuses.size === 1 && statuses.has("undone")) return { status: "Undone", count, waiting: false };
+  if (statuses.size === 1 && statuses.has("undone")) return { status: "Cancelled by you", count, waiting: false, cancelled: true };
   if (statuses.size === 1 && statuses.has("done")) return { status: "Done", count, waiting: false };
   return { count, waiting: false };
 }

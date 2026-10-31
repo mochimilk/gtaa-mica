@@ -3,6 +3,7 @@ import { eventBus } from "@coral-ai/react";
 import { makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
 import { useLiveCall } from "../../live";
 import { holdAwake, useReduceEffects } from "../effects";
+import { hasDesktopBackdrop } from "../title-bar";
 import { VoiceSkye } from "./VoiceSkye";
 import { skyeState } from "./state";
 
@@ -17,6 +18,16 @@ const useStyles = makeStyles({
     pointerEvents: "none",
     backgroundColor: tokens.colorNeutralBackground5,
   },
+  // On Mica the window paints the page (hasDesktopBackdrop), tinted below.
+  // A band rises from the bottom at 80%, colorNeutralBackground5 into
+  // colorNeutralBackground4, gone a third of the way up, so Skye's glow along
+  // the bottom reads clearly over the wallpaper.
+  backdrop: {
+    backgroundImage: `linear-gradient(to top, color-mix(in srgb, ${tokens.colorNeutralBackground5} 80%, transparent), color-mix(in srgb, ${tokens.colorNeutralBackground4} 80%, transparent) 16.667%, transparent 33.333%)`,
+  },
+  // Mica's tint: black at half in the dark theme, white at half in the light.
+  backdropDark: { backgroundColor: "rgb(0 0 0 / 0.5)" },
+  backdropLight: { backgroundColor: "rgb(255 255 255 / 0.5)" },
   skye: { position: "absolute", inset: 0 },
   // Keep the resting tint visible on the light canvas, too.
   light: { opacity: 0.65 },
@@ -45,8 +56,17 @@ export function LumaSkyeBackground() {
   const busy = state !== "idle" && state !== "unavailable";
   useEffect(() => (busy ? holdAwake() : undefined), [busy]);
   const reduceEffects = useReduceEffects();
+  const backdrop = hasDesktopBackdrop();
   return (
-    <div className={styles.root} data-luma-background aria-hidden="true">
+    <div
+      className={mergeClasses(
+        styles.root,
+        backdrop && styles.backdrop,
+        backdrop && (colorMode === "light" ? styles.backdropLight : styles.backdropDark),
+      )}
+      data-luma-background
+      aria-hidden="true"
+    >
       <div className={mergeClasses(styles.skye, colorMode === "light" && styles.light)}>
         <VoiceSkye state={state} level={level} still={reduceEffects} />
       </div>

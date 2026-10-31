@@ -2,7 +2,19 @@
 // playback activity from backend task state.
 import assert from "node:assert/strict";
 import test from "node:test";
-import { GREETING_INSTRUCTIONS, LiveCallController, SPEECH_IDLE_MS, type LiveCallState } from "../src/live/callController.ts";
+import {
+  ENDED_IDLE_MS,
+  ENDED_QUIET_MS,
+  GREETING_INSTRUCTIONS,
+  LiveCallController,
+  NEAR_END_IDLE_MS,
+  OFFER_HEARD_WITHIN_MS,
+  QUIET_GAP_MS,
+  SAID_POLL_MS,
+  SAY_INSTRUCTIONS,
+  SPEECH_IDLE_MS,
+  type LiveCallState,
+} from "../src/live/callController.ts";
 import { callFailureText } from "../src/live/callFailure.ts";
 import { LiveCallError } from "../src/live/liveBackend.ts";
 import type { LiveIncomingEvent, LiveOutgoingEvent } from "../src/live/liveEvents.ts";
@@ -15,6 +27,8 @@ type FakeTransport = {
   sent: LiveOutgoingEvent[];
   calls: string[];
   muted: boolean;
+  /** The app's hold on the microphone (holdInput), apart from the session's mute. */
+  held: boolean;
   /** Settles the pending connect. */
   resolveConnect: (sessionId?: string) => void;
   rejectConnect: (error: unknown) => void;
@@ -33,7 +47,7 @@ type Harness = {
   localStreams: (MediaStream | null)[];
 };
 
-function harness(options: { interpreter?: RequestInterpreter } = {}): Harness {
+function harness(options: { interpreter?: RequestInterpreter; level?: () => number } = {}): Harness {
   const scheduler = createScheduler();
   const host = createFakeHost();
   const states: LiveCallState[] = [];
@@ -49,6 +63,7 @@ function harness(options: { interpreter?: RequestInterpreter } = {}): Harness {
     settleMs: 400,
     onRemoteStream: (stream) => streams.push(stream),
     onLocalStream: (stream) => localStreams.push(stream),
+    outputLevel: options.level,
     createTransport: (handlers) => {
       let resolve: ((value: { sessionId: string }) => void) | null = null;
       let reject: ((error: unknown) => void) | null = null;
@@ -59,6 +74,7 @@ function harness(options: { interpreter?: RequestInterpreter } = {}): Harness {
         sent: [],
         calls: [],
         muted: false,
+        held: false,
         resolveConnect(sessionId = "live_1") {
           resolve?.({ sessionId });
         },
@@ -85,6 +101,9 @@ function harness(options: { interpreter?: RequestInterpreter } = {}): Harness {
             fake.muted = muted;
             fake.calls.push(`setMuted:${muted}`);
             return Promise.resolve();
+          },
+          hold(held: boolean) {
+            fake.held = held;
           },
           close() {
             fake.calls.push("close");
@@ -122,6 +141,23 @@ async function connect(h: Harness): Promise<void> {
   await starting;
 }
 
+/** Lets `ms` pass, as Skye's voice is checked: a step at a time. */
+async function pass(h: Harness, ms: number): Promise<void> {
+  for (let elapsed = 0; elapsed < ms; elapsed += SAID_POLL_MS) {
+    h.scheduler.advance(SAID_POLL_MS);
+    await flush(1);
+  }
+  await flush();
+}
+
+/** What Skye was given to say, as commentary: her greeting, then what she says herself. */
+const prompts = (h: Harness) =>
+  h.latest.sent.filter((event) => event.type === "session.commentary.append").map((event) => event.content);
+
+/** Her words arriving, as she says something. */
+const agentSays = (h: Harness, delta: string) =>
+  h.latest.handlers.onEvent({ type: "session.output_transcript.delta", role: "agent", delta, startMs: 0, endMs: 100 });
+
 test("a call reports starting, connecting and connected in order", async () => {
   const h = harness();
   await connect(h);
@@ -143,17 +179,141 @@ test("a call reports starting, connecting and connected in order", async () => {
   assert.equal(thinking[0].delegation_id, null);
 });
 
-test("once connected, the agent is told to greet the caller first, once", async () => {
+test("once connected, the agent is told to greet the caller first, once, as commentary", async () => {
   const h = harness();
   await connect(h);
 
-  const instructions = h.latest.sent.filter((event) => event.type === "session.instructions.append");
-  assert.equal(instructions.length, 1);
-  assert.equal(instructions[0].delegation_id, null);
-  assert.equal(instructions[0].content, GREETING_INSTRUCTIONS);
+  const greeting = h.latest.sent.filter((event) => event.type === "session.commentary.append");
+  assert.equal(greeting.length, 1);
+  assert.equal(greeting[0].delegation_id, null);
+  assert.equal(greeting[0].content, GREETING_INSTRUCTIONS);
+  // Never as instructions, which stay with the session and can cut her off.
+  assert.equal(h.latest.sent.some((event) => event.type === "session.instructions.append"), false);
   // After the board context, so the agent already has it when it speaks.
   const types = h.latest.sent.map((event) => event.type);
-  assert.ok(types.indexOf("session.thinking.append") < types.indexOf("session.instructions.append"));
+  assert.ok(types.indexOf("session.thinking.append") < types.indexOf("session.commentary.append"));
+});
+
+test("what Skye raises herself is steered by its cue as given, or said as written without one, as commentary", async () => {
+  const h = harness();
+  const proposal = { name: "brief" } as const;
+  // Off a call nothing is sent, but the offer is kept.
+  h.controller.offer("Heads-up: it's late.", proposal, "Tell them briefly, in your own words.");
+  await connect(h);
+  assert.deepEqual(prompts(h), [GREETING_INSTRUCTIONS]);
+
+  void h.controller.offer("Heads-up: it's late.", proposal, "Tell them briefly, in your own words.");
+  await pass(h, QUIET_GAP_MS);
+  assert.equal(prompts(h).at(-1), "Tell them briefly, in your own words.");
+  void h.controller.offer("Heads-up: it's late.", proposal);
+  await pass(h, QUIET_GAP_MS);
+  assert.equal(prompts(h).at(-1), `${SAY_INSTRUCTIONS}Heads-up: it's late.`);
+  assert.equal(h.latest.sent.some((event) => event.type === "session.instructions.append"), false);
+});
+
+test("what Skye raises herself waits until she is done speaking, and resolves as she is heard raising it", async () => {
+  const h = harness();
+  const proposal = { name: "brief" } as const;
+  assert.equal(await h.controller.offer("Heads-up: it's late.", proposal), false);
+  await connect(h);
+
+  // Mid-greeting: the cue waits for her to finish.
+  agentSays(h, "Hey, what's up");
+  let heard: boolean | undefined;
+  void h.controller.offer("Heads-up: it's late.", proposal, "Tell them.").then((result) => (heard = result));
+  await pass(h, SPEECH_IDLE_MS - SAID_POLL_MS);
+  assert.equal(prompts(h).at(-1), GREETING_INSTRUCTIONS);
+  await pass(h, SAID_POLL_MS);
+  assert.equal(prompts(h).at(-1), "Tell them.");
+  assert.equal(heard, undefined);
+  agentSays(h, "Quick heads-up");
+  await flush();
+  assert.equal(heard, true);
+
+  // Not heard in time, or the call ends first: unheard.
+  await pass(h, SPEECH_IDLE_MS);
+  const timedOut = h.controller.offer("Heads-up: it's late.", proposal);
+  await pass(h, QUIET_GAP_MS);
+  h.scheduler.advance(OFFER_HEARD_WITHIN_MS);
+  assert.equal(await timedOut, false);
+  const hungUp = h.controller.offer("Heads-up: it's late.", proposal);
+  await h.controller.hangup();
+  await pass(h, SAID_POLL_MS);
+  assert.equal(await hungUp, false);
+});
+
+test("her words run ahead of her voice: what she raises waits until she can't be heard", async () => {
+  let level = 0;
+  const h = harness({ level: () => level });
+  await connect(h);
+
+  agentSays(h, "Hey, what's up");
+  level = 0.8;
+  void h.controller.offer("Heads-up: it's late.", { name: "brief" }, "Tell them.");
+  // Her words have stopped, but she is still heard.
+  await pass(h, SPEECH_IDLE_MS + QUIET_GAP_MS);
+  assert.equal(prompts(h).at(-1), GREETING_INSTRUCTIONS);
+  level = 0;
+  await pass(h, QUIET_GAP_MS);
+  assert.equal(prompts(h).at(-1), "Tell them.");
+});
+
+test("what Skye speaks resolves once she has said it; what she hears can be held off without muting the user", async () => {
+  const h = harness();
+  assert.equal(await h.controller.speak("Travis, it's Skye."), false);
+  await connect(h);
+
+  let said: boolean | undefined;
+  const heard: string[] = [];
+  void h.controller.speak("Travis, it's Skye. Can you approve?", (words) => heard.push(words)).then((result) => (said = result));
+  await pass(h, QUIET_GAP_MS);
+  assert.equal(prompts(h).at(-1), `${SAY_INSTRUCTIONS}Travis, it's Skye. Can you approve?`);
+  agentSays(h, "Travis, it's Skye.");
+  await flush();
+  // A pause between sentences is not the end of it.
+  await pass(h, SPEECH_IDLE_MS);
+  assert.equal(said, undefined);
+  agentSays(h, " Can you approve?");
+  await flush();
+  assert.deepEqual(heard, ["Travis, it's Skye.", "Travis, it's Skye. Can you approve?"]);
+  // At the end of what she was given to say, she is done sooner.
+  await pass(h, NEAR_END_IDLE_MS);
+  assert.equal(said, true);
+
+  // Held, the session hears silence, not a mute: the user is not muted, nor
+  // is the session told to be, and the user's own mute stays theirs.
+  h.controller.holdInput(true);
+  assert.equal(h.latest.held, true);
+  assert.equal(h.latest.muted, false);
+  assert.equal(h.controller.getState().muted, false);
+  await h.controller.setMuted(false);
+  assert.equal(h.latest.held, true);
+  h.controller.holdInput(false);
+  assert.equal(h.latest.held, false);
+  await h.controller.setMuted(true);
+  h.controller.holdInput(true);
+  h.controller.holdInput(false);
+  assert.equal(h.latest.muted, true);
+  assert.equal(h.latest.held, false);
+});
+
+test("at the end of what she says, she is done once her voice stops too, so whoever answers her doesn't talk over her", async () => {
+  let level = 0;
+  const h = harness({ level: () => level });
+  await connect(h);
+
+  let said: boolean | undefined;
+  const asked = (words: string) => /approve/.test(words);
+  void h.controller.speak("Hey Travis. Can you approve?", undefined, asked).then((result) => (said = result));
+  await pass(h, QUIET_GAP_MS);
+  agentSays(h, "Hey Travis. Can you approve?");
+  // All her words are in, and she has come to her ask, but her voice still plays.
+  level = 0.8;
+  await pass(h, ENDED_IDLE_MS * 3);
+  assert.equal(said, undefined);
+  level = 0;
+  await pass(h, ENDED_QUIET_MS);
+  assert.equal(said, true);
 });
 
 test("an unconfigured backend surfaces its reason and leaves no call running", async () => {

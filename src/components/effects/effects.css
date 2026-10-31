@@ -30,3 +30,13 @@
 :root[data-effects="reduced"] .mica-settings nav + div {
   background-color: var(--colorNeutralBackground2);
 }
+
+/* Skye's notification (SkyeNotification) takes Settings' glass, so solid in the same way. */
+:root[data-effects="reduced"] .skye-notif {
+  background-color: var(--colorNeutralBackground1);
+}
+
+/* So does the chat's box to write in, over its posts (chat.css). */
+:root[data-effects="reduced"] .chat-compose > :last-child > div {
+  background-color: var(--colorNeutralBackground1);
+}

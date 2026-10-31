@@ -56,9 +56,15 @@ input[type="radio"]:not(:disabled),
   cursor: var(--cursor-pointer);
 }
 
-:is(button, select, input):disabled,
-[aria-disabled="true"] {
-  cursor: var(--cursor-not-allowed);
+/*
+ * Disabled controls keep the arrow, not the no-entry cursor: their tooltip or
+ * label says why. Specific enough (each :is() counts as its most specific
+ * form) to outrank the not-allowed Fluent sets on them, which it sets for
+ * hover and press too (a class with :hover:active).
+ */
+html :is(button, select, input):is(:disabled, :disabled:hover:active),
+html :is([aria-disabled="true"], [aria-disabled="true"]:hover:active) {
+  cursor: var(--cursor-default);
 }
 
 /* Editable text keeps an I-beam, which it would otherwise lose to the inherited arrow. */

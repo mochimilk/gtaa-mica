@@ -1,9 +1,11 @@
-// The decision on Skye's changes waiting to be approved (skyeReview), at the
-// foot of the Outputs panel and of its peek: the primary button, full width,
-// over Undo, which puts them back and clears every selection. Approving clears
+// The decision on Skye's changes waiting to be approved (skyeReview), under
+// the request waiting in the Outputs panel and at the foot of its peek: the
+// primary button, full width, over Cancel, which puts them back and clears
+// every selection. Approving clears
 // what Skye has selected. When the
 // changes move bags, the primary button first calls in baggage (Review with
-// baggage), waits while they ring or look, and approves once they have.
+// baggage, which opens the call on the Chat page: see useOpenApprovals),
+// waits while they ring or look, and approves once they have.
 // Nothing shows while Skye is still at work, nor once nothing waits.
 import { useSyncExternalStore } from "react";
 import { Button, makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
@@ -64,7 +66,7 @@ export function OutputsApproval({ className }: { className?: string }) {
         {primary.label}
       </Button>
       <Button appearance="transparent" className={styles.button} onClick={undoSkyeChanges}>
-        Undo
+        Cancel
       </Button>
       <p className="ops-visually-hidden" aria-live="polite">
         {waiting

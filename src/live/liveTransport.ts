@@ -83,6 +83,8 @@ export class LiveTransport {
    * must apply to the track before it is ever added to the connection.
    */
   #muted = false;
+  /** The app's own hold on the microphone (see hold), apart from the caller's mute. */
+  #held = false;
   /** Set once close() ran, so a late connection drop is not reported as a loss. */
   #closing = false;
 
@@ -291,8 +293,19 @@ export class LiveTransport {
 
   #applyMuteToTracks(): void {
     for (const track of this.#microphone?.getAudioTracks() ?? []) {
-      track.enabled = !this.#muted;
+      track.enabled = !this.#muted && !this.#held;
     }
+  }
+
+  /**
+   * Holds the microphone off without telling the session: the track sends
+   * silence, so the session still hears input running, as GPT-Live's guide
+   * asks, but nothing from the room. For the app's own hold
+   * (LiveCallController.holdInput); the caller's mute is setMuted.
+   */
+  hold(held: boolean): void {
+    this.#held = held;
+    this.#applyMuteToTracks();
   }
 
   /** The mute state the caller last asked for. */

@@ -17,16 +17,6 @@
   font-size: var(--fontSizeBase200);
   line-height: var(--lineHeightBase200);
   color: var(--colorNeutralForeground1);
-  /*
-   * The surface the panel sits on: the Content card (colorNeutralBackground4
-   * at half opacity, see App.tsx) over the page (colorNeutralBackground5, see
-   * LumaSkyeBackground). Layered backgrounds composite to the same colour,
-   * opaque, so the sticky table headers and scroll fades match the panel while
-   * hiding rows beneath.
-   */
-  --ops-content-tint: color-mix(in srgb, var(--colorNeutralBackground4) 50%, transparent);
-  --ops-surface: linear-gradient(var(--ops-content-tint), var(--ops-content-tint)),
-    var(--colorNeutralBackground5);
 }
 
 .ops-groups {
@@ -130,59 +120,59 @@
   margin-bottom: var(--spacingVerticalXS);
 }
 
-/* Each open group scrolls on its own. */
-.ops-group-scroll {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 0 var(--spacingHorizontalXXS);
-  /* Rows reached by keyboard stay clear of the sticky table header. */
-  scroll-padding-top: 28px;
-}
-
 /*
- * OverflowScroll wrapper: joins the flex height chain between NavGroup's
- * item container and .ops-group-scroll, and positions the fade overlays.
- * Fades paint the panel's surface (--ops-surface, as the sticky table header
- * does), masked to a gradient; override --ofs-fade-surface if it changes.
+ * A flight list's grid (FlightList) joins the flex height chain between
+ * NavGroup's item container and its OverflowScroll.
  */
-.ofs {
-  --ofs-fade-surface: var(--ops-surface, var(--colorNeutralBackground5));
-  position: relative;
+.ops-list {
   display: flex;
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
 }
 
-.ofs-fade {
-  position: absolute;
-  left: 0;
-  z-index: 2;
-  height: 16px;
-  pointer-events: none;
-  background: var(--ofs-fade-surface);
-  opacity: 0;
-  transition: opacity 120ms ease;
+/*
+ * Each open group's rows scroll on their own, under fixed column headings
+ * with the same side padding, so their columns line up.
+ */
+.ops-group-scroll,
+.ops-list .ofs-head {
+  padding: 0 var(--spacingHorizontalXXS);
 }
 
-.ofs-fade--on {
-  opacity: 1;
+.ops-group-scroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 }
 
-.ofs-fade--top {
-  mask-image: linear-gradient(to bottom, #000, transparent);
+/*
+ * OverflowScroll wrapper: joins the flex height chain down to its scroller.
+ * Its edge fades are a mask it sets on the scroller (OverflowScroll.tsx), so
+ * they show whatever is behind the panel.
+ */
+.ofs {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
-.ofs-fade--bottom {
-  mask-image: linear-gradient(to top, #000, transparent);
+/*
+ * OverflowScroll's header, above the scroller. It follows the scroller's
+ * horizontal scroll (set from script), and both reserve the same scrollbar
+ * gutter, so the header is exactly as wide as the content below it whether
+ * or not that overflows.
+ */
+.ofs-head {
+  flex: none;
+  overflow: hidden;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ofs-fade {
-    transition: none;
-  }
+.ofs-head,
+.ofs-head + * {
+  scrollbar-gutter: stable;
 }
 
 /*
@@ -258,8 +248,9 @@ div.ops-menu-popover > .ops-menu-list {
 /* ------------------------------------------------------------- flight lists */
 
 /*
- * Fluent Table with one <colgroup>: fixed layout, and identical padding,
- * font and alignment on header and body cells so columns line up exactly.
+ * Two Fluent Tables, headings and rows, with the same <colgroup> and width:
+ * fixed layout, and identical padding, font and alignment on header and body
+ * cells so columns line up exactly.
  * `.ops-list .ops-…` selectors outrank Fluent's single-class Griffel styles.
  */
 .ops-list .ops-table {
@@ -267,8 +258,8 @@ div.ops-menu-popover > .ops-menu-list {
   /*
    * Four equal data columns + one compact icon column, using the cells'
    * actual padding (.ops-cell: 0 var(--spacingHorizontalS)).
-   * - Data column minimum: widest data cell, "HH:MM −1d" or the small
-   *   "Unassigned" badge (about 64px at this font size, so 5.5em), plus padding.
+   * - Data column minimum: widest data cell, "HH:MM −1d" (5.5em at this
+   *   font size), plus padding.
    * - Icon column: the 16px icon plus padding (FlightList COLUMNS uses it).
    * Wider panels share the extra width equally among the data columns; only a
    * narrower one scrolls horizontally rather than clipping.
@@ -292,22 +283,17 @@ div.ops-menu-popover > .ops-menu-list {
   text-overflow: ellipsis;
 }
 
+/*
+ * Column headings: clear, over the panel. They sit above the scroll region
+ * (OverflowScroll's header), so no row ever passes beneath them.
+ */
 .ops-list .ops-head-row .ops-cell {
-  /* Header stays visible while the group scrolls, on the panel's own surface. */
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: var(--ops-surface);
-  /* backdrop-filter: blur(12px); */
   color: var(--colorNeutralForeground3);
   font-size: var(--fontSizeBase100);
   font-weight: var(--fontWeightSemibold);
 }
 
-/*
- * Fluent's header button inherits only the cell's background-color, not the
- * surface's overlay layer, so it would paint darker; let the cell show.
- */
+/* Fluent's header button paints its own background; keep it clear like the cell. */
 .ops-list .ops-head-row .fui-TableHeaderCell__button {
   background: transparent;
 }
@@ -329,7 +315,7 @@ div.ops-menu-popover > .ops-menu-list {
 /*
  * Body rows 32px (header rows keep Fluent's extra-small 24px). Overrides
  * Fluent's extra-small TableCell `height: 24px`; 16px content (line height,
- * small Badge, icon) is vertically centred by the cells' vertical-align.
+ * icon) is vertically centred by the cells' vertical-align.
  */
 .ops-list .ops-row > .ops-cell {
   height: 32px;
@@ -349,12 +335,13 @@ div.ops-menu-popover > .ops-menu-list {
 }
 
 .ops-list .ops-row,
-.ops-list .ops-row:hover,
+.ops-list .ops-row:is(:hover, [data-agent-hover]),
 .ops-list .ops-row:active {
   background: transparent;
 }
 
-.ops-list .ops-row:hover > .ops-cell {
+/* Hovered by a person's pointer or one of Skye's (data-agent-hover, see agent-cursor/cursorMotion). */
+.ops-list .ops-row:is(:hover, [data-agent-hover]) > .ops-cell {
   background: var(--colorSubtleBackgroundHover);
 }
 
@@ -420,12 +407,11 @@ div.ops-menu-popover > .ops-menu-list {
 /*
  * At rest a row's text sits at 80%, so the lists stay quiet beside
  * the chart; hovered, selected (by the user or by Skye) or keyboard-focused,
- * it is full again. Status marks (the Unassigned badge, the warning icon)
- * keep their colour throughout. Rows paint no background at rest, so the
+ * it is full again. The warning icon keeps its colour throughout. Rows paint no background at rest, so the
  * cells' opacity only touches their text.
  */
 .ops-list
-  .ops-row:not(:hover, :focus-visible, [aria-selected="true"], [data-skye-selected])
+  .ops-row:not(:hover, [data-agent-hover], :focus-visible, [aria-selected="true"], [data-skye-selected])
   :is(.ops-flight, .ops-muted, .ops-time, .ops-stand, .ops-issue--info) {
   opacity: 0.8;
 }
@@ -480,7 +466,7 @@ div.ops-menu-popover > .ops-menu-list {
   background: var(--colorSubtleBackgroundSelected);
 }
 
-.ops-alert:hover {
+.ops-alert:is(:hover, [data-agent-hover]) {
   background: var(--colorSubtleBackgroundHover);
 }
 
@@ -570,7 +556,7 @@ div.ops-menu-popover > .ops-menu-list {
 }
 
 /* Hovering the menu button, or its menu being open, still lights the row. */
-.ops-alert-item:is(:hover, [data-menu-open]) > .ops-alert:not(:disabled, [data-mentioned]) {
+.ops-alert-item:is(:hover, [data-agent-hover], [data-menu-open]) > .ops-alert:not(:disabled, [data-mentioned]) {
   background: var(--ops-alert-hover);
 }
 
@@ -609,7 +595,7 @@ div.ops-menu-popover > .ops-menu-list {
   opacity: 0;
 }
 
-.ops-alert-item:is(:hover, [data-menu-open]) .ops-alert-more,
+.ops-alert-item:is(:hover, [data-agent-hover], [data-menu-open]) .ops-alert-more,
 .ops-alert-item .ops-alert-more:focus-visible {
   opacity: 1;
 }
@@ -1079,15 +1065,16 @@ html.ops-flight-drag--blocked * {
 /*
  * The board's KPIs (KpiStrip.tsx), a bar under its chart (the demo page's
  * summary): no surface of its own and no glass, just Stroke 2 hairlines, its
- * top one over the chart's bottom edge, so the two share a line. Four equal
- * columns, then the 40px expand/collapse toggle, each column divided from
- * the last, full height.
+ * top one over the chart's bottom edge, so the two share a line. Five equal
+ * columns, each divided from the last, full height. It expands and shrinks
+ * from its context menu; focused from the keyboard, it has its focus ring
+ * inside its hairlines.
  */
 .ops-kpis {
   position: relative;
   flex: none;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr)) 40px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   margin-top: -1px;
   border: 1px solid var(--colorNeutralStroke2);
   font-family: var(--fontFamilyBase);
@@ -1096,21 +1083,27 @@ html.ops-flight-drag--blocked * {
   color: var(--colorNeutralForeground1);
 }
 
+.ops-kpis:focus-visible {
+  outline: var(--strokeWidthThick) solid var(--colorStrokeFocus2);
+  outline-offset: calc(-1 * var(--strokeWidthThick));
+}
+
 .ops-kpis > * + * {
   border-left: 1px solid var(--colorNeutralStroke2);
 }
 
 /*
  * A column, collapsed: 40px, its label (Caption 1, in the disabled ink) and
- * 16px on, its figure (Caption 1 Strong, in the tertiary ink), so the bar
- * stays quiet under the board. The label gives way first. Each column is a
- * container, so its small chart gives way as it narrows.
+ * 6px on, its figure (Caption 1 Strong, in the tertiary ink), so the bar
+ * stays quiet under the board, then its delta pushed to the column's end.
+ * The label gives way first. Each column is a container, so its small chart
+ * gives way as it narrows.
  */
 .ops-kpi {
   container: ops-kpi / inline-size;
   display: flex;
   align-items: center;
-  gap: var(--spacingHorizontalL);
+  gap: var(--spacingHorizontalSNudge);
   min-width: 0;
   height: 40px;
   padding: 0 var(--spacingHorizontalL);
@@ -1137,7 +1130,7 @@ html.ops-flight-drag--blocked * {
 /*
  * Expanded, the column is laid out as a card: its label (in the secondary
  * ink) and, in the top-right corner, its delta; then 24px below, the figure,
- * large and in the primary ink, a small chart beside it. The top row is the
+ * in Subtitle 2 and the primary ink, a small chart beside it. The top row is the
  * delta's height whether there is one or not, so every column's figure sits
  * at the same height.
  */
@@ -1158,63 +1151,26 @@ html.ops-flight-drag--blocked * {
 .ops-kpis[data-expanded] .ops-kpi-label {
   color: var(--colorNeutralForeground2);
 }
-
-/* Proportional figures: a big standalone number reads tighter without tabular-nums. */
+/* Subtitle 2, in proportional figures: a standalone number reads tighter without tabular-nums. */
 .ops-kpis[data-expanded] .ops-kpi-value {
   color: var(--colorNeutralForeground1);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: var(--fontSizeBase600);
-  line-height: 28px;
-  letter-spacing: -0.01em;
-}
-
-/*
- * The toggle is the whole last column, the full height of the bar, its
- * chevron centred in it, in the primary ink. Hovered and pressed, it takes
- * Fluent's subtle backgrounds; focused from the keyboard, its focus ring
- * inside the column.
- */
-.ops-kpis-toggle {
-  display: grid;
-  place-items: center;
-  min-width: 0;
-  margin: 0;
-  padding: 0;
-  border: none;
-  border-left: 1px solid var(--colorNeutralStroke2);
-  background: transparent;
-  color: var(--colorNeutralForeground1);
-  cursor: pointer;
-}
-
-.ops-kpis-toggle:hover {
-  background: var(--colorSubtleBackgroundHover);
-}
-
-.ops-kpis-toggle:hover:active {
-  background: var(--colorSubtleBackgroundPressed);
-}
-
-.ops-kpis-toggle:focus-visible {
-  outline: var(--strokeWidthThick) solid var(--colorStrokeFocus2);
-  outline-offset: calc(-1 * var(--strokeWidthThick));
-}
-
-.ops-kpis-toggle svg {
-  display: block;
-  width: 20px;
-  height: 20px;
+  font-size: var(--fontSizeBase400);
+  line-height: var(--lineHeightBase400);
 }
 
 /*
  * The delta, a small pill tinted in its own colour: green when better than
- * the plan, red when worse, neutral otherwise.
+ * the plan, red when worse, neutral otherwise. Its auto start margin takes
+ * the free space, so it sits at the column's end in the collapsed row and at
+ * its area's end in the expanded card.
  */
 .ops-kpi-delta {
   grid-area: delta;
-  justify-self: end;
+  flex: none;
+  margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -1230,6 +1186,137 @@ html.ops-flight-drag--blocked * {
   flex: none;
   width: 12px;
   height: 12px;
+}
+
+/*
+ * A figure or delta rolling to its new value (KpiStrip.tsx, Roll), clipped
+ * to its line and still ellipsized in a narrow column. Each digit that
+ * changes is a reel, a line tall, of the digits it turns through, which
+ * slides from its first to its last (its inline transform, which it rests
+ * on); every other character just shows. Text with no digits stacks the old
+ * and the new in one cell instead, the old sliding out as the new slides in,
+ * upward when the figure grows and downward when it falls. Under reduced
+ * motion neither is drawn and the new text just shows.
+ */
+.ops-roll {
+  display: inline-grid;
+  grid-template-columns: minmax(0, 1fr);
+  max-width: 100%;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.ops-roll > * {
+  grid-area: 1 / 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ops-roll-place {
+  display: inline-block;
+  height: 1lh;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.ops-roll-reel {
+  display: block;
+}
+
+.ops-roll-reel > * {
+  display: block;
+  height: 1lh;
+  text-align: center;
+}
+
+.ops-roll-from {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Its duration, longer the more digits it turns through, is set inline. */
+  .ops-roll-reel {
+    animation: ops-roll-reel var(--curveDecelerateMid) backwards;
+  }
+
+  .ops-roll-from {
+    display: block;
+  }
+
+  .ops-roll-from,
+  .ops-roll-to {
+    animation-duration: var(--durationSlow);
+    animation-timing-function: var(--curveDecelerateMid);
+    animation-fill-mode: both;
+  }
+
+  .ops-roll-to.ops-roll--up {
+    animation-name: ops-roll-in-up;
+  }
+
+  .ops-roll-from.ops-roll--up {
+    animation-name: ops-roll-out-up;
+  }
+
+  .ops-roll-to.ops-roll--down {
+    animation-name: ops-roll-in-down;
+  }
+
+  .ops-roll-from.ops-roll--down {
+    animation-name: ops-roll-out-down;
+  }
+}
+
+@keyframes ops-roll-reel {
+  from {
+    transform: translateY(var(--roll-from));
+  }
+}
+
+@keyframes ops-roll-in-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes ops-roll-out-up {
+  from {
+    transform: none;
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes ops-roll-in-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes ops-roll-out-down {
+  from {
+    transform: none;
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 }
 
 .ops-kpi-delta--good {

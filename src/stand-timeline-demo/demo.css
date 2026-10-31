@@ -119,9 +119,11 @@
  * page, so what the host shows beside the chart (its `summary`, say) can mark
  * a status in its bars' colour. CoralProvider currently follows the system
  * color scheme, so the dark set uses the same prefers-color-scheme switch.
+ * A BoardSnippet takes the same palette, as it draws the board's bars.
  */
-.demo-timeline {
-  --flight-healthy: #6a89dc;         /* base, deepened from the dark-mode pastel for ≥ 3:1 on white */
+.demo-timeline,
+.board-snippet {
+  --flight-healthy: #6a89dc;        /* base, deepened from the dark-mode pastel for ≥ 3:1 on white */
   --flight-glass-from: rgb(255 255 255 / 30%);
   --flight-glass-to: rgb(255 255 255 / 22%);
   --flight-glass-edge: var(--colorNeutralStroke1);
@@ -146,7 +148,8 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  .demo-timeline {
+  .demo-timeline,
+  .board-snippet {
     /* Brighter, so the colours read off dark surfaces; the red's pill takes dark text. */
     --flight-healthy: #93adf4;        /* base */
     --flight-glass-from: rgb(255 255 255 / 10%);
@@ -166,11 +169,11 @@
  * thin outline on the chart's separate outline rect, so fills and label
  * contrast never change. Selected/linked/focus outlines keep precedence.
  */
-.demo-chart .st-bar:hover .st-bar-rect {
+.demo-chart .st-bar:is(:hover, [data-agent-hover]) .st-bar-rect {
   filter: none;
 }
 
-.demo-chart .st-bar:not(.st-bar--selected):not(.st-bar--linked):not(:focus-visible):hover
+.demo-chart .st-bar:not(.st-bar--selected):not(.st-bar--linked):not(:focus-visible):is(:hover, [data-agent-hover])
   .st-bar-outline {
   stroke: var(--flight-outline);
   stroke-width: var(--st-stroke);
@@ -247,3 +250,18 @@
  * every label and its matching endpoint icon at its pair's contrast above.
  */
 .demo-chart .st-bar-label--secondary { opacity: 1; }
+
+/*
+ * BoardSnippet: the board's chart, framed by its host (e.g. a notification's
+ * rounded preview box), so it has no border of its own, and only as tall as
+ * its rows. Only to look at: nothing in it takes the pointer.
+ */
+.board-snippet {
+  pointer-events: none;
+  user-select: none;
+}
+
+.board-snippet .demo-chart {
+  min-height: 0;
+  border: 0;
+}

@@ -70,9 +70,13 @@ export function createDragStore(): DragStore {
   };
 }
 
-/** The bar under the pointer and the one with keyboard focus, by occupancy id. */
+/**
+ * The bars under a pointer, by pointer id (a person's mouse, or each of
+ * several on-screen cursors driving the chart at once), and the one with
+ * keyboard focus, by occupancy id.
+ */
 export interface BarHover {
-  hoveredId: string | null;
+  hovered: ReadonlyMap<number, string>;
   focusedId: string | null;
 }
 
@@ -82,20 +86,40 @@ export interface BarHover {
  */
 export interface HoverStore {
   get(): BarHover;
-  set(change: Partial<BarHover>): void;
+  /** Whether any pointer is over bar `id`. */
+  isHovered(id: string): boolean;
+  /** Pointer `pointerId` comes onto bar `id`. */
+  enter(pointerId: number, id: string): void;
+  /** Pointer `pointerId` leaves bar `id`, if it is the one it is on. */
+  leave(pointerId: number, id: string): void;
+  setFocused(id: string | null): void;
   subscribe(listener: () => void): () => void;
 }
 
 export function createHoverStore(): HoverStore {
-  let hover: BarHover = { hoveredId: null, focusedId: null };
+  let hover: BarHover = { hovered: new Map(), focusedId: null };
   const listeners = new Set<() => void>();
+  const set = (next: BarHover) => {
+    hover = next;
+    for (const listener of listeners) listener();
+  };
+  const withPointer = (pointerId: number, id: string | null) => {
+    const hovered = new Map(hover.hovered);
+    if (id === null) hovered.delete(pointerId);
+    else hovered.set(pointerId, id);
+    set({ ...hover, hovered });
+  };
   return {
     get: () => hover,
-    set(change) {
-      const next = { ...hover, ...change };
-      if (next.hoveredId === hover.hoveredId && next.focusedId === hover.focusedId) return;
-      hover = next;
-      for (const listener of listeners) listener();
+    isHovered: (id) => [...hover.hovered.values()].includes(id),
+    enter(pointerId, id) {
+      if (hover.hovered.get(pointerId) !== id) withPointer(pointerId, id);
+    },
+    leave(pointerId, id) {
+      if (hover.hovered.get(pointerId) === id) withPointer(pointerId, null);
+    },
+    setFocused(id) {
+      if (hover.focusedId !== id) set({ ...hover, focusedId: id });
     },
     subscribe(listener) {
       listeners.add(listener);

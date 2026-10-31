@@ -24,11 +24,12 @@ import {
 } from "@fluentui/react-icons";
 import { useLiveCall } from "../../live";
 import { useRingback } from "../agent-call";
+import { photoOf } from "../people/photos";
 import {
   EXPERTISE_LABELS,
-  PEOPLE,
   TEAM,
   callGuests,
+  endGuestCall,
   inviteToCall,
   removeFromCall,
   subscribeCallGuests,
@@ -145,21 +146,45 @@ function earliest(a: number | null, b: number | null): number | null {
 export type PeopleCallButtonProps = {
   /** The agent the live call is with, e.g. "Skye". */
   agentName: string;
+  /** The page on screen shows the call itself (the Chat page, the call's chat open): its window stays hidden meanwhile. */
+  callOnPage?: boolean;
+  /** The call is a channel's: its people show only once they pick up, as on the page. */
+  callToChannel?: boolean;
+  /** The user is sharing on the call (Skye, on their behalf): their tile says so. */
+  sharing?: boolean;
+  /** The call window's Open: the call in its chat, on the Chat page. */
+  onOpenCall?: () => void;
+  /** The call window's Share and Stop sharing, when there is something to share. */
+  onShareChange?: (share: boolean) => void;
 };
 
 
 /**
  * The People button. Off a call it lists teammates to call. Calling someone
- * in pops the call out into a window the user can drag around the board
- * (CallPopout); calling Skye does not. On a call this button shows or hides
- * that window, which goes when the call ends.
+ * in pops the call out, shrunk, into a window the user can drag around the
+ * board (CallPopout); calling Skye does not. On a call this button shows or
+ * hides that window, which goes when the call ends, or when the people
+ * called in leave it to the user and Skye. Its red Leave ends the call with
+ * the people called in, or, with nobody but Skye on it, disconnects her.
+ * While the page shows the call (`callOnPage`), the window waits hidden;
+ * leaving it (another chat, another page) with people on the call, the call
+ * comes along in the window.
  */
-export function PeopleCallButton({ agentName }: PeopleCallButtonProps) {
+export function PeopleCallButton({
+  agentName,
+  callOnPage = false,
+  callToChannel = false,
+  sharing = false,
+  onOpenCall,
+  onShareChange,
+}: PeopleCallButtonProps) {
   const styles = useStyles();
   const live = useLiveCall();
   const [listOpen, setListOpen] = React.useState(false);
   // `focus`: the user opened it, so it takes focus; a call starting leaves focus where it is.
   const [popout, setPopout] = React.useState({ open: false, focus: false });
+  // Its window shrunk to everyone's avatars, from its title bar; it stays so while hidden.
+  const [compact, setCompact] = React.useState(true);
   // Shared, so Skye can call people in too.
   const guests = React.useSyncExternalStore(subscribeCallGuests, callGuests);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
@@ -169,24 +194,58 @@ export function PeopleCallButton({ agentName }: PeopleCallButtonProps) {
   // It rings while anyone is being called in, whether the user or Skye called them.
   useRingback((guests?.calling.length ?? 0) > 0);
 
-  // Skye leaving leaves the people called in on the call: Disconnect at the
-  // bar's end takes either side off, or both (DisconnectButton).
+  // Skye leaving leaves the people called in on the call, and their leaving
+  // leaves Skye: Disconnect at the bar's end takes her off (DisconnectButton),
+  // the window's red Leave them.
 
-  // People being called in pops the window out. Calling Skye leaves it shut,
-  // for this button to show. The call ending puts it away.
+  // Skye is the user's own agent, so a call with nobody else on it keeps its
+  // window shut, for this button to show. People being called in pops it out,
+  // shrunk to everyone's avatars; with them gone, Skye staying on, it goes
+  // away again, as the call ending puts it away.
   const peopleOn = guests !== null;
   const wasPeopleOn = React.useRef(peopleOn);
   React.useEffect(() => {
     if (wasPeopleOn.current === peopleOn) return;
     wasPeopleOn.current = peopleOn;
-    if (peopleOn) setPopout((current) => (current.open ? current : { open: true, focus: false }));
+    if (peopleOn) {
+      setPopout((current) => (current.open ? current : { open: true, focus: false }));
+      setCompact(true);
+    } else {
+      setPopout((current) => (current.open ? { open: false, focus: false } : current));
+    }
   }, [peopleOn]);
+  // Leaving the call's chat brings the window out, wherever the user goes
+  // next, while people are on it.
+  const wasOnPage = React.useRef(callOnPage);
+  React.useEffect(() => {
+    if (wasOnPage.current && !callOnPage && peopleOn) setPopout((current) => (current.open ? current : { open: true, focus: false }));
+    wasOnPage.current = callOnPage;
+  }, [callOnPage, peopleOn]);
   React.useEffect(() => {
     if (!onCall) setPopout((current) => (current.open ? { open: false, focus: false } : current));
   }, [onCall]);
 
+  // Leave in the window, or Remove on the last person in it, puts the window
+  // away: with nobody but Skye left, or the call over. Focus comes back here
+  // once it has gone, to this button or, the call over, the one in its place.
+  const windowOpen = onCall && popout.open && !callOnPage;
+  const returnFocus = React.useRef(false);
+  React.useEffect(() => {
+    if (windowOpen || !returnFocus.current) return;
+    returnFocus.current = false;
+    buttonRef.current?.focus();
+  }, [windowOpen]);
+  const leave = () => {
+    returnFocus.current = true;
+    if (guests !== null) endGuestCall();
+    else live.hangup();
+  };
+  const remove = (name: string) => {
+    if (guests && guests.names.length + guests.calling.length === 1) returnFocus.current = true;
+    removeFromCall(name);
+  };
+
   const invite = inviteToCall;
-  const remove = removeFromCall;
 
   // The list makes way for the call window, which takes focus from it.
   const callFromList = (name: string) => {
@@ -204,13 +263,14 @@ export function PeopleCallButton({ agentName }: PeopleCallButtonProps) {
   return (
     <>
       {onCall ? (
-        <Tooltip content="Call" relationship="label">
+        <Tooltip content={callOnPage ? "Call, on this page" : "Call"} relationship="label">
           <ToggleButton
             ref={buttonRef}
             {...KEEP_SELECTION_ATTR}
             appearance="subtle"
             data-call-toggle=""
-            checked={popout.open}
+            checked={popout.open && !callOnPage}
+            disabledFocusable={callOnPage}
             icon={<PeopleCallIcon />}
             onClick={() => setPopout({ open: !popout.open, focus: !popout.open })}
           />
@@ -226,7 +286,7 @@ export function PeopleCallButton({ agentName }: PeopleCallButtonProps) {
             <ul className={styles.list}>
               {TEAM.map(({ name, expertise }) => (
                 <li key={name} className={styles.person}>
-                  <Avatar size={28} name={name} color="colorful" />
+                  <Avatar size={28} name={name} image={photoOf(name)} color="colorful" />
                   <span className={styles.who}>
                     <span className={styles.name}>{name}</span>
                     <span className={styles.expertise}>{EXPERTISE_LABELS[expertise]}</span>
@@ -255,15 +315,20 @@ export function PeopleCallButton({ agentName }: PeopleCallButtonProps) {
         </Popover>
       )}
       <CallPopout
-        open={onCall && popout.open}
+        open={windowOpen}
         autoFocus={popout.focus}
+        compact={compact}
+        onCompactChange={setCompact}
         agentName={agentName}
         startedAt={startedAt}
         guests={guests?.names ?? []}
-        calling={guests?.calling ?? []}
-        invitable={PEOPLE.filter((name) => !guests?.names.includes(name) && !guests?.calling.includes(name))}
-        onInvite={invite}
+        calling={callToChannel ? [] : (guests?.calling ?? [])}
+        sharing={sharing}
+        onShareChange={onShareChange}
+        onOpen={onOpenCall}
         onRemove={remove}
+        onLeave={leave}
+        leaveLabel={guests !== null ? "Leave" : `Disconnect ${agentName}`}
         onClose={closePopout}
       />
     </>

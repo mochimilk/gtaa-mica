@@ -668,11 +668,12 @@ const OccupancyBar = memo(function OccupancyBar({
       aria-label={label}
       data-occupancy-id={id}
       onPointerDown={(e: ReactPointerEvent<SVGGElement>) => begin(e, id, { section, index: bar.rowIndex })}
-      // Shared with layers drawn apart from the bars (BarLabels marks their labels).
-      onPointerEnter={() => hover.set({ hoveredId: id })}
-      onPointerLeave={() => hover.get().hoveredId === id && hover.set({ hoveredId: null })}
-      onFocus={(e) => e.currentTarget.matches(":focus-visible") && hover.set({ focusedId: id })}
-      onBlur={() => hover.get().focusedId === id && hover.set({ focusedId: null })}
+      // Shared with layers drawn apart from the bars (BarLabels marks their
+      // labels), for each pointer over the board.
+      onPointerEnter={(e) => hover.enter(e.pointerId, id)}
+      onPointerLeave={(e) => hover.leave(e.pointerId, id)}
+      onFocus={(e) => e.currentTarget.matches(":focus-visible") && hover.setFocused(id)}
+      onBlur={() => hover.get().focusedId === id && hover.setFocused(null)}
       onClick={(e: MouseEvent) => {
         e.stopPropagation();
         select(e.shiftKey || e.metaKey || e.ctrlKey);
@@ -1149,7 +1150,7 @@ const BarLabel = memo(function BarLabel({
   padding = 5,
 }: BarLabelsProps & { bar: BarDatum; hover: HoverStore }) {
   const id = bar.occupancy.id;
-  const hovered = useSyncExternalStore(hover.subscribe, () => hover.get().hoveredId === id);
+  const hovered = useSyncExternalStore(hover.subscribe, () => hover.isHovered(id));
   const focused = useSyncExternalStore(hover.subscribe, () => hover.get().focusedId === id);
 
   let barSlots = slots?.(bar);

@@ -76,8 +76,10 @@ const useStyles = makeStyles({
   },
 });
 
-export type CallPopoutProps = CallPanelProps & {
+export type CallPopoutProps = Omit<CallPanelProps, "onMinimize"> & {
   open: boolean;
+  /** Escape, from anywhere in the window. */
+  onClose: () => void;
   /** Moves focus into the window as it opens, as when the user opened it. */
   autoFocus?: boolean;
 };
@@ -86,9 +88,10 @@ export type CallPopoutProps = CallPanelProps & {
  * The call in a floating window over the board, dragged around by its
  * toolbar and snapped, when let go, to the nearest of four corners. Mount it
  * for as long as calls can happen and toggle `open`: the window keeps its
- * corner while hidden. Escape or the close button close it (`onClose`).
+ * corner while hidden. Shrinking it (`compact`) is the caller's to keep.
+ * Escape closes it (`onClose`).
  */
-export function CallPopout({ open, autoFocus, onClose, onRemove, ...panelProps }: CallPopoutProps) {
+export function CallPopout({ open, autoFocus, onClose, onRemove, onLeave, ...panelProps }: CallPopoutProps) {
   const styles = useStyles();
   const rootRef = React.useRef<HTMLDivElement | null>(null);
   const [corner, setCorner] = React.useState<Corner>("bottom-right");
@@ -126,8 +129,8 @@ export function CallPopout({ open, autoFocus, onClose, onRemove, ...panelProps }
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     const root = rootRef.current;
     const target = event.target as Element;
-    // Only presses on the toolbar itself: its buttons stay buttons, and the
-    // Add people menu, though portaled, bubbles here through React.
+    // Only presses on the toolbar itself: its buttons stay buttons, and their
+    // tooltips, though portaled, bubble here through React.
     if (event.button !== 0 || !root || !event.currentTarget.contains(target) || target.closest("button")) return;
     const rect = root.getBoundingClientRect();
     drag.current = { pointerId: event.pointerId, offset: { x: event.clientX - rect.left, y: event.clientY - rect.top } };
@@ -180,12 +183,18 @@ export function CallPopout({ open, autoFocus, onClose, onRemove, ...panelProps }
       >
         <CallPanel
           {...panelProps}
-          onClose={onClose}
           // The pressed button goes away with its tile; keep focus in the window.
           onRemove={(name) => {
             rootRef.current?.focus();
             onRemove(name);
           }}
+          // Until the window goes, focus stays in it; the People button takes it back then.
+          onLeave={() => {
+            rootRef.current?.focus();
+            onLeave();
+          }}
+          // Minimize puts it away, as Escape does; the People button brings it back.
+          onMinimize={onClose}
           toolbarProps={{
             className: styles.handle,
             onPointerDown,

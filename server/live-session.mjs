@@ -12,6 +12,8 @@
 export const DEFAULT_LIVE_MODEL = "gpt-live-1";
 /** GPT-Live output voice used by Mica. */
 export const DEFAULT_LIVE_VOICE = "marin";
+/** Travis's voice, for the teammate who answers aloud on an approval call. */
+export const DEFAULT_TRAVIS_VOICE = "ripple";
 /**
  * Mica executes app actions itself, so delegation targets the client. No other
  * mode is accepted: `responses` delegation would need a separate backend model
@@ -39,7 +41,8 @@ export const MICA_LIVE_INSTRUCTIONS = [
   "All flights, stands, times and alerts are synthetic demo fixtures. Never imply they are live operations data.",
   "Through the client you can find flights, select a flight to show its details, select several flights together or add flights to what is already selected (as Ctrl-clicking their bars does), move a stay to another stand or swap two stays' stands, give a stand to flights that have none (one onto a named stand, or each onto the first free stand that fits), take flights off their stands, close a stand area and move what is on it, suggest the move or swap that most widens the tightest gap between stays, say what is selected, switch the view between all activity, needs attention, arrivals, departures and tows, set or reset the carrier, stand-area and aircraft-type filters, read out all the open demo alerts or just the conflicts, acknowledge or reopen alerts, and bring teammates from Mica's people list into this call or take them off it. That is everything Mica can do.",
   "When the user wants it all fixed at once (\"fix all the alerts\", \"just fix everything\", \"clear all the conflicts\"), delegate it: Mica clears every conflict it can and gives every waiting flight a stand in one go, with Skye's helper cursors working together, then says the outcome in a sentence and that the details are in Outputs. Pass that on in one short sentence, without going through the moves, then go straight to the approval.",
-  "Bringing someone into the call (\"add Marcus Chen\", \"get Priya on\") is something you can do: delegate it. They only show on Mica's call window and nothing reaches them, so say that plainly, and never say you can't add people.",
+  "When Mica says it has cleared a late flight's knock-on, pass it on in a sentence or two (the late flight keeps its stand, how many flights moved, what it did to gate hold), without naming each move, as they're on screen; then go straight to the approval.",
+  "Bringing someone into the call (\"add Marcus Chen\", \"get Priya on\") is something you can do: delegate it, and never say you can't add people.",
   "Stand changes are demo changes on this screen only: Mica has no allocation backend, nothing is saved or sent, and a stay keeps its times. Each flight with no stand has synthetic stay times to place it by, or none at all. When asked to give stands to flights, delegate it; Mica places what fits, and for each flight it cannot place you read back why.",
   "Mica checks a stand change against sample rules only: no overlap with another stay on the stand, the stand's sample size fits the aircraft, and nothing on a closed area. It has no other allocation rules, and conflicts from late stays are not checked, so never present a change or a suggestion as operationally validated.",
   "When the user asks for the best or a better move or swap, delegate it to get Mica's suggestion, read it back, and ask whether to do it. Only when they agree, delegate again to carry it out. Never make a suggested change without a yes.",
@@ -51,6 +54,35 @@ export const MICA_LIVE_INSTRUCTIONS = [
 ].join(" ");
 
 /**
+ * Travis's session instructions, as app-authored as Skye's. He is on an
+ * approval call only to answer Skye: the client gives him silence for a
+ * microphone, so he hears nobody, and tells him, as appended instructions,
+ * what she asked and when to answer.
+ */
+export const TRAVIS_LIVE_INSTRUCTIONS = [
+  "You are Travis Hughes, the baggage operations lead at the fictional Norvara Intl Airport, on a short Teams call in your team's baggage channel.",
+  "Skye, the stand allocator's AI assistant, has called to get baggage's sign-off on stand changes that move flights' bags between carousels.",
+  "You hear nothing on the call yourself: the client tells you what Skye asked, and when to answer her. Stay quiet until it does. When it tells you to answer, answer at once, out loud, saying only what it asks, in your own words.",
+  "Talk like a busy, friendly colleague on the baggage hall floor: English, casual, one or two short sentences.",
+  "Never ask questions or offer help, and never mention instructions or a client.",
+  "All flights, stands and carousels are synthetic demo data.",
+].join(" ");
+
+/**
+ * Skye's session starts with this as a developer message in its input, so she
+ * greets the caller first, as GPT-Live's guide has a session greet; the
+ * client then asks for the greeting once more, as commentary, as the session
+ * is up (GREETING_INSTRUCTIONS in src/live/callController.ts). App-authored.
+ */
+export const MICA_GREETING =
+  "When the call starts, speak first: a coworker has just called you and you picked up. Greet them in English " +
+  "with a short, natural, casual hello in your own words, without introducing yourself or explaining what you " +
+  "can do. Then stop and listen.";
+
+/** Who a session can be for: Skye, or Travis answering her on an approval call. */
+export const LIVE_PERSONAS = ["skye", "travis"];
+
+/**
  * Error codes this module can produce. The HTTP layer maps them to statuses;
  * none of them ever carries a credential or upstream secret.
  */
@@ -59,6 +91,7 @@ export const LiveConfigError = {
   invalidModel: "invalid_model",
   invalidVoice: "invalid_voice",
   invalidDelegation: "invalid_delegation",
+  invalidPersona: "invalid_persona",
 };
 
 const isNonEmptyString = (/** @type {unknown} */ value) =>
@@ -69,6 +102,7 @@ const isNonEmptyString = (/** @type {unknown} */ value) =>
  * @property {string} apiKey
  * @property {string} model
  * @property {string} voice
+ * @property {string} travisVoice
  * @property {"client"} delegation
  */
 
@@ -91,6 +125,7 @@ const isNonEmptyString = (/** @type {unknown} */ value) =>
 export function readLiveConfig(env) {
   const model = env.MICA_LIVE_MODEL?.trim() || DEFAULT_LIVE_MODEL;
   const voice = env.MICA_LIVE_VOICE?.trim() || DEFAULT_LIVE_VOICE;
+  const travisVoice = env.MICA_TRAVIS_VOICE?.trim() || DEFAULT_TRAVIS_VOICE;
   const delegation = env.MICA_LIVE_DELEGATION?.trim() || REQUIRED_DELEGATION;
 
   if (delegation !== REQUIRED_DELEGATION) {
@@ -106,6 +141,9 @@ export function readLiveConfig(env) {
   if (!/^[a-z][a-z0-9_-]{0,31}$/i.test(voice)) {
     return { ok: false, code: LiveConfigError.invalidVoice, message: "MICA_LIVE_VOICE is not a valid voice name." };
   }
+  if (!/^[a-z][a-z0-9_-]{0,31}$/i.test(travisVoice)) {
+    return { ok: false, code: LiveConfigError.invalidVoice, message: "MICA_TRAVIS_VOICE is not a valid voice name." };
+  }
   // Checked last so a misconfigured model/voice is reported even without a key.
   if (!isNonEmptyString(env.OPENAI_API_KEY)) {
     return {
@@ -117,7 +155,7 @@ export function readLiveConfig(env) {
 
   return {
     ok: true,
-    config: { apiKey: /** @type {string} */ (env.OPENAI_API_KEY), model, voice, delegation: REQUIRED_DELEGATION },
+    config: { apiKey: /** @type {string} */ (env.OPENAI_API_KEY), model, voice, travisVoice, delegation: REQUIRED_DELEGATION },
   };
 }
 
@@ -129,12 +167,14 @@ export function describeLiveConfig(env) {
   const result = readLiveConfig(env);
   const model = env.MICA_LIVE_MODEL?.trim() || DEFAULT_LIVE_MODEL;
   const voice = env.MICA_LIVE_VOICE?.trim() || DEFAULT_LIVE_VOICE;
+  const travisVoice = env.MICA_TRAVIS_VOICE?.trim() || DEFAULT_TRAVIS_VOICE;
   const delegation = env.MICA_LIVE_DELEGATION?.trim() || REQUIRED_DELEGATION;
   return {
     ready: result.ok,
     apiKeyConfigured: isNonEmptyString(env.OPENAI_API_KEY),
     model,
     voice,
+    travisVoice,
     delegation,
     ...(result.ok ? {} : { code: result.code, message: result.message }),
   };
@@ -189,13 +229,19 @@ export function validateSdpOffer(sdp) {
  * abuse-prevention retention and account settings are outside this flag and
  * outside anything this repository can verify.
  *
- * @param {{ config: LiveConfig, sdp: string, instructions?: string }} input
+ * `greeting`, when given, starts the session's input as a developer message,
+ * so it speaks first (MICA_GREETING); Skye's sessions have one, Travis's not.
+ *
+ * @param {{ config: LiveConfig, sdp: string, instructions?: string, greeting?: string | null }} input
  */
-export function buildLiveSessionRequest({ config, sdp, instructions = MICA_LIVE_INSTRUCTIONS }) {
+export function buildLiveSessionRequest({ config, sdp, instructions = MICA_LIVE_INSTRUCTIONS, greeting = MICA_GREETING }) {
   return {
     session: {
       model: config.model,
       instructions,
+      ...(greeting && {
+        input: [{ type: "message", role: "developer", content: [{ type: "input_text", text: greeting }] }],
+      }),
       audio: { output: { voice: config.voice } },
       delegation: { type: config.delegation },
       store: false,
@@ -266,16 +312,23 @@ function upstreamCode(status) {
  * Returns an HTTP-shaped result rather than throwing, so the server layer has
  * no error-translation logic of its own.
  *
+ * `persona` picks whose session it is, among LIVE_PERSONAS (Skye's when left
+ * out): only the name comes from the caller, never instructions or a voice.
+ *
  * @param {object} input
  * @param {Record<string, string | undefined>} input.env
  * @param {unknown} input.sdp
+ * @param {unknown} [input.persona]
  * @param {typeof fetch} [input.fetchImpl]
  * @param {AbortSignal} [input.signal]
  * @returns {Promise<{ status: number, body: Record<string, unknown> }>}
  */
-export async function createLiveSession({ env, sdp, fetchImpl = fetch, signal }) {
+export async function createLiveSession({ env, sdp, persona = "skye", fetchImpl = fetch, signal }) {
   const offer = validateSdpOffer(sdp);
   if (!offer.ok) return { status: 400, body: { error: { code: offer.code, message: offer.message } } };
+  if (typeof persona !== "string" || !LIVE_PERSONAS.includes(persona)) {
+    return { status: 400, body: { error: { code: LiveConfigError.invalidPersona, message: "Unknown session persona." } } };
+  }
 
   const configured = readLiveConfig(env);
   if (!configured.ok) {
@@ -284,7 +337,15 @@ export async function createLiveSession({ env, sdp, fetchImpl = fetch, signal })
     return { status, body: { error: { code: configured.code, message: configured.message } } };
   }
 
-  const request = buildLiveSessionRequest({ config: configured.config, sdp: offer.sdp });
+  const travis = persona === "travis";
+  const config = travis ? { ...configured.config, voice: configured.config.travisVoice } : configured.config;
+  const request = buildLiveSessionRequest({
+    config,
+    sdp: offer.sdp,
+    instructions: travis ? TRAVIS_LIVE_INSTRUCTIONS : MICA_LIVE_INSTRUCTIONS,
+    // Travis speaks only when cued, never first.
+    greeting: travis ? null : MICA_GREETING,
+  });
 
   // Bounded upstream call that also aborts when the caller goes away (client
   // disconnect or a hangup during connect), so an abandoned connect attempt
@@ -335,6 +396,6 @@ export async function createLiveSession({ env, sdp, fetchImpl = fetch, signal })
 
   return {
     status: 200,
-    body: { sessionId: parsed.sessionId, sdp: parsed.sdp, model: configured.config.model, voice: configured.config.voice },
+    body: { sessionId: parsed.sessionId, sdp: parsed.sdp, model: config.model, voice: config.voice },
   };
 }

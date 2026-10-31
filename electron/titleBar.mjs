@@ -28,11 +28,17 @@ export const WINDOW_MENUS = [
 /**
  * The window controls' colours: the page's, colorNeutralBackground5 behind
  * colorNeutralForeground1, as the boot splash (index.html) and the bar use
- * them. The page's theme follows the system's, so these follow nativeTheme.
+ * them; on a system backdrop (backdrop.mjs), clear, as the bar is. The page's
+ * theme follows the system's, so these follow nativeTheme.
  * @param {boolean} dark
+ * @param {string} [backdrop]
  */
-export function titleBarOverlayColors(dark) {
-  return dark ? { color: "#000000", symbolColor: "#ffffff" } : { color: "#ebebeb", symbolColor: "#242424" };
+export function titleBarOverlayColors(dark, backdrop) {
+  const symbolColor = dark ? "#ffffff" : "#242424";
+  // Clear, the page colour at no alpha: Electron shades the hovered and pressed
+  // controls toward its colour's contrast, so it must stay the page's.
+  if (backdrop) return { color: dark ? "rgba(0, 0, 0, 0)" : "rgba(235, 235, 235, 0)", symbolColor };
+  return { color: dark ? "#000000" : "#ebebeb", symbolColor };
 }
 
 /**

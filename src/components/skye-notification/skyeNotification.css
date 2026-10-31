@@ -1,0 +1,365 @@
+/*
+ * Skye's notification (SkyeNotification.tsx), in Fluent's tokens so it follows
+ * the app's light or dark theme: a 500px pill (its bar), which opens upward
+ * into its details (its drawer). Its tone colours only the icon's circle.
+ * Its glass is Settings' (Coral's Overlay card): see-through, blurring the
+ * board behind it; solid with effects reduced (effects.css).
+ *
+ * Motion:
+ *   arriving: it widens out of a short pill from its centre as it rises,
+ *     then its icon pops in and rings twice, its words slide in from the
+ *     left and its buttons from the right;
+ *   opening: the drawer's row grows from nothing, its content held to the
+ *     bar so it stays put while the card's top sweeps up over it, each
+ *     piece fading up in turn from the bar; closing, the content fades
+ *     first, then the row closes;
+ *   leaving: it sinks and fades (LEAVE_MS in the component waits for it).
+ */
+.skye-notif {
+  --skye-notif-radius: 32px;
+  --skye-notif-tone-bg: var(--colorStatusDangerBackground1);
+  --skye-notif-tone-fg: var(--colorStatusDangerForeground3);
+  /* Quick to start, long to settle; and one that overshoots a touch, for the icon. */
+  --skye-notif-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --skye-notif-ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(500px, calc(100vw - 32px));
+  box-sizing: border-box;
+  /* 6px clear of the stack's gap, so it floats a little higher over the bar. */
+  margin-bottom: 6px;
+  overflow: hidden;
+  border: 1px solid var(--colorNeutralStroke1Selected);
+  border-radius: var(--skye-notif-radius);
+  background-color: var(--colorNeutralBackgroundAlpha);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  box-shadow: var(--shadow16);
+  color: var(--colorNeutralForeground1);
+  font-family: var(--fontFamilyBase);
+  font-size: var(--fontSizeBase300);
+  line-height: var(--lineHeightBase300);
+  font-weight: var(--fontWeightRegular);
+  transform-origin: 50% 100%;
+  animation: skye-notif-in 620ms var(--skye-notif-ease-out) backwards;
+}
+
+.skye-notif *,
+.skye-notif *::before,
+.skye-notif *::after {
+  box-sizing: border-box;
+}
+
+.skye-notif[data-tone='warning'] {
+  --skye-notif-tone-bg: var(--colorStatusWarningBackground1);
+  --skye-notif-tone-fg: var(--colorStatusWarningForeground3);
+}
+
+.skye-notif[data-tone='success'] {
+  --skye-notif-tone-bg: var(--colorStatusSuccessBackground1);
+  --skye-notif-tone-fg: var(--colorStatusSuccessForeground3);
+}
+
+.skye-notif[data-tone='info'] {
+  --skye-notif-tone-bg: var(--colorBrandBackground2);
+  --skye-notif-tone-fg: var(--colorBrandForeground2);
+}
+
+/*
+ * Out of a short pill at its centre: the clip ends past the shadow, so it
+ * is gone (backwards fill, not both) without the shadow showing up late.
+ */
+@keyframes skye-notif-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+    clip-path: inset(0 36% round var(--skye-notif-radius));
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(-48px round var(--skye-notif-radius));
+  }
+}
+
+.skye-notif[data-leaving] {
+  pointer-events: none;
+  animation: skye-notif-out 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
+}
+
+@keyframes skye-notif-out {
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.96);
+  }
+}
+
+.skye-notif__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ------------------------------------------------------------------ bar */
+
+.skye-notif__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 62px;
+  flex: none;
+  padding: 12px 16px 12px 12px;
+  border-top: 1px solid transparent;
+  transition:
+    border-color var(--durationNormal) var(--curveEasyEase),
+    background-color var(--durationFaster) var(--curveEasyEase);
+}
+
+.skye-notif[data-open] .skye-notif__bar {
+  border-top-color: var(--colorNeutralStroke3);
+}
+
+/* Pointing at the toggle lifts the bar a shade (the whole pill, closed), still see-through. */
+.skye-notif__bar:has(.skye-notif__toggle:hover) {
+  background-color: color-mix(in srgb, var(--colorNeutralForeground1) 6%, transparent);
+}
+
+.skye-notif__toggle {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--borderRadiusCircular);
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: var(--cursor-pointer, pointer);
+}
+
+.skye-notif__toggle:focus-visible {
+  outline: 2px solid var(--colorStrokeFocus2);
+  outline-offset: 2px;
+}
+
+.skye-notif__icon {
+  position: relative;
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--borderRadiusCircular);
+  background: var(--skye-notif-tone-bg);
+  color: var(--skye-notif-tone-fg);
+  font-size: 20px;
+  animation: skye-notif-pop 560ms var(--skye-notif-ease-pop) 160ms backwards;
+}
+
+/* Rings out twice in its tone, once it has popped in. */
+.skye-notif__icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: skye-notif-ring 1400ms var(--skye-notif-ease-out) 620ms 2;
+}
+
+@keyframes skye-notif-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4) rotate(-14deg);
+  }
+}
+
+@keyframes skye-notif-ring {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--skye-notif-tone-fg) 55%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+
+.skye-notif__heading {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  animation: skye-notif-slide 520ms var(--skye-notif-ease-out) 220ms backwards;
+}
+
+@keyframes skye-notif-slide {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+.skye-notif__title {
+  padding-bottom: 2px;
+  font-size: var(--fontSizeBase300);
+  line-height: var(--lineHeightBase300);
+  font-weight: var(--fontWeightSemibold);
+  color: var(--colorNeutralForeground1);
+  overflow-wrap: anywhere;
+}
+
+.skye-notif__summary {
+  padding-bottom: 2px;
+  overflow: hidden;
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  color: var(--colorNeutralForeground2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skye-notif__actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  animation: skye-notif-slide-in 520ms var(--skye-notif-ease-out) 300ms backwards;
+}
+
+@keyframes skye-notif-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+}
+
+/* Fluent's medium button keeps a 96px minimum; here it hugs its label. */
+.skye-notif__action.fui-Button {
+  min-width: 0;
+}
+
+/* --------------------------------------------------------------- drawer */
+
+/*
+ * The row's 0fr ↔ 1fr opens it to its content's height. Closing waits for
+ * the content to fade first; opening starts at once.
+ */
+.skye-notif__drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 300ms cubic-bezier(0.4, 0, 0.2, 1) 80ms;
+}
+
+.skye-notif[data-open] .skye-notif__drawer {
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 520ms var(--skye-notif-ease-out);
+}
+
+/* Held to the bar (flex-end), so the content stays put as the top sweeps up over it. */
+.skye-notif__drawer-inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.skye-notif__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 24px 12px 12px;
+}
+
+.skye-notif__body > p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.skye-notif__preview {
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--colorNeutralBackground3);
+}
+
+.skye-notif__disclaimer {
+  margin: 0;
+  padding: 12px 16px 24px 12px;
+  overflow: hidden;
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  color: var(--colorNeutralForeground2);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Each piece fades up from the bar in turn, nearest the bar first. */
+.skye-notif__body > *,
+.skye-notif__disclaimer {
+  --skye-notif-delay: 0ms;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 120ms var(--curveEasyEase),
+    transform 160ms var(--curveEasyEase);
+}
+
+.skye-notif[data-open] :is(.skye-notif__body > *, .skye-notif__disclaimer) {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 360ms var(--curveEasyEase) var(--skye-notif-delay),
+    transform 560ms var(--skye-notif-ease-out) var(--skye-notif-delay);
+}
+
+.skye-notif__disclaimer {
+  --skye-notif-delay: 40ms;
+}
+
+.skye-notif__body > :nth-last-child(1) {
+  --skye-notif-delay: 90ms;
+}
+
+.skye-notif__body > :nth-last-child(2) {
+  --skye-notif-delay: 140ms;
+}
+
+.skye-notif__body > :nth-last-child(n + 3) {
+  --skye-notif-delay: 190ms;
+}
+
+/* The preview settles in from a touch smaller, as the card opens round it. */
+.skye-notif__body > .skye-notif__preview {
+  transform: translateY(10px) scale(0.97);
+  transform-origin: 50% 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skye-notif,
+  .skye-notif[data-leaving],
+  .skye-notif__icon,
+  .skye-notif__icon::after,
+  .skye-notif__heading,
+  .skye-notif__actions {
+    animation: none;
+  }
+
+  .skye-notif__drawer,
+  .skye-notif[data-open] .skye-notif__drawer,
+  .skye-notif__body > *,
+  .skye-notif__disclaimer,
+  .skye-notif[data-open] :is(.skye-notif__body > *, .skye-notif__disclaimer) {
+    transition: none;
+  }
+}

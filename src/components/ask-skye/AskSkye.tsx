@@ -10,16 +10,24 @@ import {
   Speaker220Regular,
 } from "@fluentui/react-icons";
 import { createMicaAgentHandler } from "../agent-chat/micaAgentHandler";
-import { useConnectChime } from "../agent-call";
-import { callFailureText, fetchLiveHealth, isRinging, useLiveCall, useLiveTranscript } from "../../live";
+import { useConnectChime, useSpeaking } from "../agent-call";
+import {
+  callFailureText,
+  fetchLiveHealth,
+  isRinging,
+  subscribeVoiceKey,
+  useLiveCall,
+  useLiveTranscript,
+  voiceKeyRevision,
+} from "../../live";
 import { KEEP_SELECTION_ATTR } from "../../operations/ViewsFiltersToolbar";
+import { SkyeNotification } from "../skye-notification";
 import { windowPortalNode } from "../window-layer";
 import { AskButton } from "./AskButton";
 import { AskFloatSlot } from "./AskFloatingWindow";
 import { closeAskPanels, useAnyAskPanelOpen, useAskPanel } from "./askPanels";
 import { AskInput, type AskServiceStatus } from "./AskInput";
 import { mergeSkyeNotes, skyeNotes, subscribeSkyeNotes } from "./skyeNotes";
-import { useAudioLevels } from "./useAudioLevels";
 import { mergeVoiceTurns, VOICE_MESSAGE_TYPE } from "./voiceMessages";
 import "./askSkye.css";
 
@@ -66,15 +74,55 @@ const MESSAGE_COMPONENTS = { [VOICE_MESSAGE_TYPE]: SpokenReply };
 // The chat toggle's icon: regular at rest, filled on hover and while the chat is open.
 const ChatToggleIcon = bundleIcon(KeyboardFilled, KeyboardRegular);
 
+/** How long after the connect chime starts the pill widens, ms. */
+const WIDEN_AFTER_CHIME_MS = 500;
+/** How long the pill takes to widen or narrow: askSkye.css's --durationSlower. */
+const CALL_WIDTH_MS = 400;
+
+/**
+ * The pill's width for the call: "wide" from WIDEN_AFTER_CHIME_MS after the
+ * connect chime starts until the call ends, then "narrowing" while it closes
+ * back in round the orb, as gently as it opened (a chat closing narrows it
+ * at the chat's own pace), then "narrow". The chime is the trigger: call the
+ * returned function as it starts playing.
+ */
+type CallWidth = "narrow" | "wide" | "narrowing";
+
+function useWidenAfterChime(onCall: boolean): [CallWidth, () => void] {
+  const [width, setWidth] = React.useState<CallWidth>("narrow");
+  const timer = React.useRef<number | undefined>(undefined);
+  const onCallRef = React.useRef(onCall);
+  onCallRef.current = onCall;
+
+  const onChimePlaying = React.useCallback(() => {
+    window.clearTimeout(timer.current);
+    timer.current = window.setTimeout(() => {
+      // The call may have failed or ended while the chime played.
+      if (onCallRef.current) setWidth("wide");
+    }, WIDEN_AFTER_CHIME_MS);
+  }, []);
+
+  React.useEffect(() => {
+    if (onCall) return;
+    window.clearTimeout(timer.current);
+    setWidth((current) => (current === "wide" ? "narrowing" : "narrow"));
+    timer.current = window.setTimeout(() => setWidth("narrow"), CALL_WIDTH_MS);
+  }, [onCall]);
+  React.useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  return [width, onChimePlaying];
+}
+
 /**
  * Readiness of Mica's model service, from the broker's health route: red when
  * the broker is down or the interpreter or GPT-Live is not configured, neutral
  * when configured, green once a call has really connected on this page. It is
- * checked again whenever a call fails.
+ * checked again whenever a call fails, and when Settings → API's key changes.
  */
 function useServiceStatus(phase: string): AskServiceStatus | undefined {
   const [health, setHealth] = React.useState<AskServiceStatus | undefined>(undefined);
   const [verified, setVerified] = React.useState(false);
+  const keyRevision = React.useSyncExternalStore(subscribeVoiceKey, voiceKeyRevision);
 
   React.useEffect(() => {
     if (phase === "connected") setVerified(true);
@@ -89,7 +137,7 @@ function useServiceStatus(phase: string): AskServiceStatus | undefined {
       setHealth(result?.ready && interpreter?.ready === true ? "configured" : "disconnected");
     });
     return () => aborter.abort();
-  }, [phase]);
+  }, [phase, keyRevision]);
 
   if (health === "disconnected") return "disconnected";
   return verified ? "verified" : health;
@@ -102,7 +150,9 @@ function AskSurface({ agentName, actionsEnd, notices, speakNext }: AskSkyeProps 
   const notes = React.useSyncExternalStore(subscribeSkyeNotes, skyeNotes);
   const status = useServiceStatus(live.state.phase);
   // A chime as the call starts connecting; the ring is for calling people in.
-  useConnectChime(isRinging(live.state));
+  // The pill widens a beat after the chime starts, and closes back in as the call ends.
+  const [callWidth, onChimePlaying] = useWidenAfterChime(live.active);
+  useConnectChime(isRinging(live.state), onChimePlaying);
   // The chat, or a window floating above the bar: only one is open at a time.
   const [open, setOpen] = useAskPanel("chat");
   const anyOpen = useAnyAskPanelOpen();
@@ -116,9 +166,15 @@ function AskSurface({ agentName, actionsEnd, notices, speakNext }: AskSkyeProps 
 
   const { messages, setMessages, isTyping: streaming, input: draft } = chat;
   const onCall = live.active;
+  const connected = live.state.phase === "connected";
   const failed = live.state.phase === "failed";
   const started = messages.some((message) => message.role !== "system");
-  const levels = useAudioLevels(onCall ? [live.localStream, live.remoteStream] : []);
+  // Skye talking on the call, as the call window lights her tile.
+  const { voiceLevel } = live;
+  const agentSpeaking = useSpeaking(
+    React.useCallback(() => voiceLevel("agent"), [voiceLevel]),
+    connected,
+  );
 
   // What was said on a call joins the conversation. Held back while Coral is
   // writing a typed reply, which replaces the whole list when it settles;
@@ -190,6 +246,12 @@ function AskSurface({ agentName, actionsEnd, notices, speakNext }: AskSkyeProps 
   // failing, leaves it as it was. The failure's notice floats above the bar.
   const startVoice = () => live.startCall();
 
+  // The sound notice, dismissed, stays away for the rest of that call.
+  const [soundDismissed, setSoundDismissed] = React.useState(false);
+  React.useEffect(() => {
+    if (!onCall) setSoundDismissed(false);
+  }, [onCall]);
+
   // Pressing anywhere outside the chat closes it to the pill, as it does a
   // floating window; the conversation and any draft stay. Only the user's own
   // presses count: Skye's cursor clicks the board with synthetic events while
@@ -234,28 +296,37 @@ function AskSurface({ agentName, actionsEnd, notices, speakNext }: AskSkyeProps 
     return () => window.removeEventListener("keydown", onKeyDown, { capture: true });
   }, [setOpen]);
 
+  // Connection news is Skye's notification too: its line cut short, the whole
+  // of it in the details. Not hers to vouch for, so no AI disclaimer. No
+  // claim that the board is unchanged: a call can drop after an action applied.
+  const failureText = callFailureText(live.state) ?? "";
+  const soundText = `Connected, but the browser has not let ${agentName} play sound yet.`;
   const notice = failed ? (
-    <div className="mica-ask__notice" data-tone="error" role="alert">
-      {/* No claim that the board is unchanged: a call can drop after an action applied. */}
-      <p className="mica-ask__notice-text">{callFailureText(live.state)}</p>
-      <AskButton size="small" appearance="primary" onClick={startVoice}>
-        Try again
-      </AskButton>
-      <AskButton
-        size="small"
-        appearance="transparent"
-        icon={Dismiss20Regular}
-        label="Dismiss connection error"
-        onClick={live.hangup}
-      />
-    </div>
-  ) : onCall && live.audioBlocked ? (
-    <div className="mica-ask__notice" role="alert">
-      <p className="mica-ask__notice-text">Connected, but the browser has not let {agentName} play sound yet.</p>
-      <AskButton size="small" appearance="primary" icon={Speaker220Regular} onClick={live.resumeAudio}>
-        Turn on sound
-      </AskButton>
-    </div>
+    <SkyeNotification
+      key="call-failed"
+      tone="danger"
+      title="Connection error"
+      summary={failureText}
+      action={{ label: "Try again", onClick: startVoice }}
+      onDismiss={live.hangup}
+      dismissLabel="Dismiss connection error"
+      disclaimer={null}
+    >
+      <p>{failureText}</p>
+    </SkyeNotification>
+  ) : onCall && live.audioBlocked && !soundDismissed ? (
+    <SkyeNotification
+      key="audio-blocked"
+      tone="warning"
+      icon={<Speaker220Regular />}
+      title="No sound"
+      summary={soundText}
+      action={{ label: "Turn on sound", onClick: live.resumeAudio }}
+      onDismiss={() => setSoundDismissed(true)}
+      disclaimer={null}
+    >
+      <p>{soundText}</p>
+    </SkyeNotification>
   ) : null;
 
   return (
@@ -265,7 +336,7 @@ function AskSurface({ agentName, actionsEnd, notices, speakNext }: AskSkyeProps 
         <div ref={stackRef} className="mica-ask__stack">
           {/* An open AskFloatingWindow renders here, above the notice and the bar. */}
           <div ref={setFloatSlot} className="mica-ask__float-slot" />
-          {/* What Skye brings up herself, right above the bar (and above a connection notice). */}
+          {/* What Skye brings up herself, then any connection notice, right above the bar. */}
           <AskRunContext.Provider value={run}>{notices}</AskRunContext.Provider>
           {notice}
           {/* The toggles hang off the bar's ends, so the bar stays centred in the dock. */}
@@ -288,8 +359,9 @@ function AskSurface({ agentName, actionsEnd, notices, speakNext }: AskSkyeProps 
               data-open={open}
               // Open, it covers part of the board: Skye's cursors work around it (agentGestures.ts).
               data-agent-avoid={open ? "" : undefined}
+              // Wide 0.5s after the connect chime starts, until the call ends; then narrowing.
+              data-call-width={callWidth}
               data-empty={!started}
-              data-listening={onCall}
               data-streaming={streaming}
               aria-label={`Chat with ${agentName}`}
             >
@@ -326,8 +398,8 @@ function AskSurface({ agentName, actionsEnd, notices, speakNext }: AskSkyeProps 
                 voice={{
                   onCall,
                   muted: live.state.muted,
-                  levels,
-                  micStream: onCall ? live.localStream : null,
+                  agentStream: onCall ? live.remoteStream : null,
+                  agentSpeaking,
                   onStart: startVoice,
                 }}
               />

@@ -1,13 +1,15 @@
-// Compact flight table shared by ArrivalList and DepartureList. Fluent v9
-// Table primitives (native <table>) with role="grid" so rows can carry
-// aria-selected and a roving tabindex: Tab enters the grid once, arrow keys,
-// Home and End move between rows, Enter/Space selects. The row of a flight
-// with no stand (and stay times) can be dragged onto a stand on the chart
-// (see ./FlightDrag); the details popover's Assign stand does the same from
-// the keyboard.
+// Compact flight table shared by ArrivalList and DepartureList. One
+// role="grid" so rows can carry aria-selected and a roving tabindex: Tab
+// enters the grid once, arrow keys, Home and End move between rows,
+// Enter/Space selects. Its column headings and rows are two Fluent v9 Tables
+// (native <table>) on one set of columns: the headings sit above the scroll
+// region (OverflowScroll's header) so no row scrolls beneath them, and
+// explicit roles make the pair one grid. The row of a flight with no stand
+// (and stay times) can be dragged onto a stand on the chart (see
+// ./FlightDrag); the details popover's Assign stand does the same from the
+// keyboard.
 import { memo, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import {
-  Badge,
   Table,
   TableBody,
   TableCell,
@@ -22,6 +24,7 @@ import { isFlightSelected, useOpsActions, useOpsBoard, useOpsSelections } from "
 import { alertsForFlight } from "./boardAlerts";
 import { beginFlightDrag } from "./FlightDrag";
 import type { OpsFlight } from "./operationsData";
+import { OverflowScroll } from "./OverflowScroll";
 
 export interface FlightListProps {
   flights: readonly OpsFlight[];
@@ -36,8 +39,9 @@ export interface FlightListProps {
 }
 
 /**
- * Shared column definitions: one <colgroup> sizes header and body cells
- * alike (fixed table layout), so headings sit exactly over their values.
+ * Shared column definitions: the same <colgroup> sizes the heading and body
+ * tables alike (fixed layout, equal widths), so headings sit exactly over
+ * their values.
  * The four data columns have no width, so they split the width left after
  * the compact icon column equally. The table's min-width (operations.css)
  * keeps each of them wide enough for the widest data cell.
@@ -73,10 +77,9 @@ export function FlightList({
     const row = body?.querySelector<HTMLElement>("tr[aria-selected='true']");
     const scroller = body?.closest<HTMLElement>(".ops-group-scroll");
     if (!row || !scroller || scroller.offsetParent === null) return;
-    const headH = body?.closest("table")?.tHead?.offsetHeight ?? 0;
     const box = scroller.getBoundingClientRect();
     const r = row.getBoundingClientRect();
-    if (r.top < box.top + headH) scroller.scrollTop -= box.top + headH - r.top;
+    if (r.top < box.top) scroller.scrollTop -= box.top - r.top;
     else if (r.bottom > box.bottom) scroller.scrollTop += r.bottom - box.bottom;
   }, [selection]);
 
@@ -110,49 +113,61 @@ export function FlightList({
     }
   };
 
+  const columns = (
+    <colgroup>
+      {COLUMNS.map((c) => (
+        <col key={c.key} style={c.width ? { width: c.width } : undefined} />
+      ))}
+    </colgroup>
+  );
+
+  // The tables are only layout (role="presentation"); their sections, rows
+  // and cells carry the grid's roles.
+  const headings = (
+    <Table size="extra-small" role="presentation" className="ops-table">
+      {columns}
+      <TableHeader role="rowgroup">
+        <TableRow role="row" className="ops-head-row">
+          <TableHeaderCell role="columnheader" className="ops-cell">Flight</TableHeaderCell>
+          <TableHeaderCell role="columnheader" className="ops-cell">{routeHeader}</TableHeaderCell>
+          <TableHeaderCell
+            role="columnheader"
+            className="ops-cell"
+            aria-label={`${timeHeaderLabel}, UTC, synthetic`}
+          >
+            <abbr title={`${timeHeaderLabel} (UTC, synthetic)`}>{timeHeader}</abbr>
+          </TableHeaderCell>
+          <TableHeaderCell role="columnheader" className="ops-cell">Stand</TableHeaderCell>
+          <TableHeaderCell role="columnheader" className="ops-cell" aria-label="Alerts" />
+        </TableRow>
+      </TableHeader>
+    </Table>
+  );
+
   return (
-    <div className="ops-list">
-      {/* Multiselectable: several chart stays (shift-select) can mark several rows. */}
-      <Table
-        size="extra-small"
-        role="grid"
-        aria-label={label}
-        aria-multiselectable="true"
-        className="ops-table"
-      >
-        <colgroup>
-          {COLUMNS.map((c) => (
-            <col key={c.key} style={c.width ? { width: c.width } : undefined} />
-          ))}
-        </colgroup>
-        <TableHeader>
-          <TableRow className="ops-head-row">
-            <TableHeaderCell className="ops-cell">Flight</TableHeaderCell>
-            <TableHeaderCell className="ops-cell">{routeHeader}</TableHeaderCell>
-            <TableHeaderCell className="ops-cell" aria-label={`${timeHeaderLabel}, UTC, synthetic`}>
-              <abbr title={`${timeHeaderLabel} (UTC, synthetic)`}>{timeHeader}</abbr>
-            </TableHeaderCell>
-            <TableHeaderCell className="ops-cell">Stand</TableHeaderCell>
-            <TableHeaderCell className="ops-cell" aria-label="Alerts" />
-          </TableRow>
-        </TableHeader>
-        <TableBody ref={bodyRef} onKeyDown={onKeyDown}>
-          {flights.map((f) => (
-            <FlightRow
-              key={f.id}
-              flight={f}
-              version={allocationVersion}
-              selected={isFlightSelected(f, selection)}
-              skyeSelected={isFlightSelected(f, skyeSelection)}
-              tabStop={f.id === tabStopId}
-              acknowledged={acknowledged}
-              onActive={setActiveId}
-              selectFlight={selectFlight}
-              assignStands={assignStands}
-            />
-          ))}
-        </TableBody>
-      </Table>
+    // Multiselectable: several chart stays (shift-select) can mark several rows.
+    <div className="ops-list" role="grid" aria-label={label} aria-multiselectable="true">
+      <OverflowScroll className="ops-group-scroll" header={headings}>
+        <Table size="extra-small" role="presentation" className="ops-table">
+          {columns}
+          <TableBody role="rowgroup" ref={bodyRef} onKeyDown={onKeyDown}>
+            {flights.map((f) => (
+              <FlightRow
+                key={f.id}
+                flight={f}
+                version={allocationVersion}
+                selected={isFlightSelected(f, selection)}
+                skyeSelected={isFlightSelected(f, skyeSelection)}
+                tabStop={f.id === tabStopId}
+                acknowledged={acknowledged}
+                onActive={setActiveId}
+                selectFlight={selectFlight}
+                assignStands={assignStands}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </OverflowScroll>
     </div>
   );
 }
@@ -190,6 +205,7 @@ const FlightRow = memo(function FlightRow({
   const draggable = !f.standId && !!f.unplacedStay;
   return (
     <TableRow
+      role="row"
       className={draggable ? "ops-row ops-row--draggable" : "ops-row"}
       data-flight-id={f.id}
       data-ops-draggable={draggable || undefined}
@@ -202,27 +218,30 @@ const FlightRow = memo(function FlightRow({
         draggable ? (e) => beginFlightDrag(e, f, (stayId, standId) => assignStands([{ stayId, standId }])) : undefined
       }
     >
-      <TableCell className="ops-cell ops-flight">{f.flight}</TableCell>
-      <TableCell className="ops-cell ops-muted" title={airportLabel(f.routeEnd)}>
+      <TableCell role="gridcell" className="ops-cell ops-flight">{f.flight}</TableCell>
+      <TableCell role="gridcell" className="ops-cell ops-muted" title={airportLabel(f.routeEnd)}>
         {f.routeEnd}
       </TableCell>
-      <TableCell className="ops-cell ops-time" title={formatUtcFull(f.estimate)}>
+      <TableCell role="gridcell" className="ops-cell ops-time" title={formatUtcFull(f.estimate)}>
         <span aria-hidden="true">
           {formatUtc(f.estimate)}
           {day && <span className="ops-day">{day}</span>}
         </span>
         <span className="ops-visually-hidden">{formatUtcFull(f.estimate)}</span>
       </TableCell>
-      <TableCell className="ops-cell">
+      <TableCell role="gridcell" className="ops-cell">
         {f.standId ? (
           <span className="ops-stand">{f.standId}</span>
         ) : (
-          <Badge appearance="tint" color="warning" size="small" shape="rounded">
-            Unassigned
-          </Badge>
+          <>
+            <span className="ops-muted" aria-hidden="true">
+              -
+            </span>
+            <span className="ops-visually-hidden">No stand</span>
+          </>
         )}
       </TableCell>
-      <TableCell className="ops-cell ops-issue">
+      <TableCell role="gridcell" className="ops-cell ops-issue">
         {alerts.length > 0 && (
           <>
             {warning ? (

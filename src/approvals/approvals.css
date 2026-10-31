@@ -1,0 +1,26 @@
+/*
+ * The carousels chart on the call's shared screen (CarouselTimeline.tsx):
+ * the board's chart and colours (demo.css), filling the pane under its header.
+ */
+.bags-timeline {
+  flex: 1 1 0;
+  height: auto;
+}
+
+/*
+ * Where a change's bags came off before it: dashed, as the board's waiting
+ * bars are, so it never reads as bags on the carousel now.
+ */
+.demo-chart .bags-bar--was .st-bar-rect {
+  stroke-width: 1.5px;
+  stroke-dasharray: 6 3;
+}
+
+/*
+ * The change's bags while Skye talks a teammate through them (spotlight.ts):
+ * outlined as a selection is, in the brand's colour.
+ */
+.demo-chart .bags-bar--spotlit .st-bar-outline {
+  stroke: var(--colorBrandStroke1);
+  stroke-width: var(--st-stroke-focus);
+}

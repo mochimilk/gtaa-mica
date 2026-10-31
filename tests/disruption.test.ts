@@ -8,6 +8,7 @@ import { applyAppAction, validateAppAction, type AppAction } from "../src/live/a
 import { decisionToRequest } from "../src/live/backendInterpreter.ts";
 import { endGuestCall } from "../src/live/callGuests.ts";
 import { DelegationExecutor } from "../src/live/executor.ts";
+import { injectionByteLength, MAX_INJECTION_BYTES } from "../src/live/liveEvents.ts";
 import { matchDisruptionRequest, phraseInterpreter, withDemoShortcuts, type RequestInterpreter } from "../src/live/requestInterpreter.ts";
 import { TranscriptLog } from "../src/live/transcript.ts";
 import { mergeSkyeNotes, postSkyeNote, skyeNotes } from "../src/components/ask-skye/skyeNotes.ts";
@@ -17,15 +18,21 @@ import {
   DISRUPTION,
   disruptionNotice,
   disruptionState,
+  announceDisruption,
   dismissDisruptionNotice,
   explainPlan,
+  handOffLine,
   headsUp,
+  headsUpCue,
   landDisruption,
   markDisruptionRunning,
   planDisruption,
   settledLine,
   settleDisruption,
   teammateBrief,
+  teammateBriefScript,
+  teammateContext,
+  teammateCue,
 } from "../src/operations/disruption.ts";
 import { DISRUPTION_TRIGGER, isDisruptionShortcut } from "../src/operations/disruptionTrigger.ts";
 import { outputs } from "../src/operations/outputs.ts";
@@ -85,11 +92,15 @@ test("the news arrives once: XD472 runs late, its conflict shows, and nobody's c
   const listedBefore = outputs().length;
   assert.equal(landDisruption(), true);
   assert.equal(landDisruption(), false);
+  // On the board first; Skye tells the user a moment later, once.
+  assert.equal(disruptionState().notice, "none");
+  assert.equal(announceDisruption(), true);
+  assert.equal(announceDisruption(), false);
   const state = disruptionState();
   assert.equal(state.notice, "shown");
-  // The board as the news arrived is the baseline: 4 aircraft would wait 5h 45m for B11.
-  assert.equal(state.baseline?.gateHoldMinutes, 345);
-  assert.equal(state.baseline?.holds.length, 4);
+  // The board as the news arrived is the baseline: 5 aircraft would wait 13h 15m for B11.
+  assert.equal(state.baseline?.gateHoldMinutes, 795);
+  assert.equal(state.baseline?.holds.length, 5);
   assert.equal(state.baseline?.conflicts.length, 1);
   // News, not a change: nothing to undo or list.
   assert.equal(hasStandChanges(), false);
@@ -97,27 +108,47 @@ test("the news arrives once: XD472 runs late, its conflict shows, and nobody's c
   assert.equal(skyeReview(), null);
 });
 
-test("the notice says what happened, why, what it runs into, and what is needed", () => {
+test("the notice says what happened, why, and what it runs into", () => {
   assert.deepEqual(disruptionNotice(), {
     title: "XD472 from London Heathrow is 1h 50m late",
-    context: "Held at origin for a late inbound crew. Now due on B11 at 10:30, was 08:40.",
+    summary: "XD472 from LHR 1h 50m late",
+    context:
+      "XD472 was held at origin for a late inbound crew, who need their rest before taking it back out. Now due on B11 at 10:30, was 08:40.",
     conflict:
-      "Its turn now runs to 13:30, into XC344/345 (11:50) and XB232/233 (13:05). The knock-on holds 4 arrivals for 5h 45m in all.",
-    action: "Re-plan B11 before XC344 is due at 11:50.",
+      "Its turn now runs to 14:50, into XC344/345 (11:50), XB232/233 (13:05), XA117/118 (13:55) and XC336/337 (14:45). " +
+      "The knock-on holds 5 arrivals for 13h 15m in all.",
   });
-  assert.match(headsUp() ?? "", /^Heads-up: XD472 from London Heathrow is 1h 50m late\. .* Want me to work it\?$/);
+});
+
+test("the heads-up is short: the flight, where from, what it's doing, and an offer, the details left to the notice", () => {
+  assert.equal(
+    headsUp(),
+    "Heads-up: XD472 from London Heathrow is running late and causing conflicts on the board. Want to take a look?",
+  );
+  // On a call she is steered, not scripted: told the news, asked to put it briefly in her own words, in that order.
+  const cue = headsUpCue() ?? "";
+  assert.match(cue, /^News just in: XD472 from London Heathrow is 1h 50m late/);
+  assert.match(cue, /in your own words, one short casual sentence, in this order: the flight number, where it's from, then what it's doing/);
+  assert.match(cue, /"XD472 from London Heathrow is running late and causing conflicts on the board"/);
+  assert.match(cue, /Skip times and figures/);
+  assert.doesNotMatch(cue, /14:50|13h 15m|XC344/);
+  assert.ok(injectionByteLength(cue) <= MAX_INJECTION_BYTES);
 });
 
 test("Skye's plan moves what XD472 runs into, nearest stands first, and keeps XD472 on B11", () => {
   const plan = planDisruption();
   assert.equal(plan.stayId, DISRUPTION.stayId);
+  // Four flights, each to a stand of its own.
   assert.deepEqual(
     plan.moves.map((move) => [move.occupancyId, move.fromStand, move.standId, move.shiftMs]),
     [
       // The B788 has no widebody stand free on Pier B, so it goes to Pier A.
       ["T25-1", "B11", "A3", 0],
-      // The narrowbody stays on Pier B.
+      // The two narrowbodies stay on Pier B.
       ["T26-1", "B11", "B10", 0],
+      ["T27-1", "B11", "B14", 0],
+      // By then Pier B is full, so the E195 goes to Pier A too.
+      ["T16-1", "B11", "A5", 0],
     ],
   );
   assert.deepEqual(plan.stuck, []);
@@ -133,6 +164,17 @@ test("Skye's plan moves what XD472 runs into, nearest stands first, and keeps XD
       "A6: taken by XD616/617",
       "A5: taken by XD608/609",
       "A4: narrowbody only",
+    ],
+  );
+  assert.deepEqual(
+    plan.considered.filter((entry) => entry.occupancyId === "T16-1").map((entry) => `${entry.standId}: ${entry.reason}`),
+    [
+      "B10: taken by XD458/459",
+      "B12: taken by XD456/457",
+      "B14: taken by XB234/235",
+      "B15: taken by XB236/237",
+      "B16: taken by XC346/347",
+      "A6: taken by XA618/619",
     ],
   );
 });
@@ -168,38 +210,66 @@ test("the Run request and the follow-up questions are understood the same way ev
   assert.equal(decided.kind === "action" && decided.action.name === "resolve_disruption" && decided.action.flightId, DISRUPTION.flightId);
 });
 
+test("a yes to Skye's offer, however it's put, carries it out without asking the model", async () => {
+  const offered = validateAppAction("resolve_disruption", {});
+  assert.ok(offered.ok);
+  const history = [{ utterance: "(Skye raised this herself)", action: null, outcome: "applied" as const, result: headsUp() ?? "", proposal: offered.action }];
+  let asked = 0;
+  const inner: RequestInterpreter = {
+    id: "model",
+    interpret: () => {
+      asked += 1;
+      return Promise.resolve({ kind: "unclear", hint: "asked the model" });
+    },
+  };
+  const interpret = (utterance: string, taskHistory = history) =>
+    withDemoShortcuts(inner).interpret({ utterance, snapshot: createFakeHost().snapshot(), transcript: "", taskHistory });
+  for (const utterance of ["yes", "Yeah, let's work through it.", "sure", "go for it", "let's do it", "okay run it", "let's take a look", "show me"]) {
+    const result = await interpret(utterance);
+    assert.equal(result.kind === "action" && result.action.name, "resolve_disruption", utterance);
+  }
+  assert.equal(asked, 0);
+  // Anything else, or a yes once she has moved on, is the model's to work out.
+  await interpret("no, not yet");
+  await interpret("yes", []);
+  assert.equal(asked, 2);
+});
+
 test("Skye's heads-up is her offer: a yes carries out the plan", async () => {
   const { run, host } = executor();
   const offered = validateAppAction("resolve_disruption", {});
   assert.ok(offered.ok);
   run.offer(headsUp() ?? "", offered.action);
   const reply = await run.handleTypedRequest("yes, go ahead");
-  assert.match(reply ?? "", /^Done: XD472\/473 keeps B11, and I moved XC344\/345 to A3 and XB232\/233 to B10\./);
-  assert.equal(host.calls.at(-1), "applyFixes:2:0");
+  assert.match(reply ?? "", /^Done: XD472\/473 keeps B11, and we've given the 4 flights behind it new stands\./);
+  assert.equal(host.calls.at(-1), "applyFixes:4:0");
   undoSkyeChanges();
-  assert.deepEqual(["T24-1", "T25-1", "T26-1"].map(standOf), ["B11", "B11", "B11"]);
+  assert.deepEqual(["T24-1", "T25-1", "T26-1", "T27-1", "T16-1"].map(standOf), ["B11", "B11", "B11", "B11", "B11"]);
   run.dispose();
 });
 
-test("Run: Skye clears the knock-on, says what it did to gate hold, and it waits for baggage, then you", async () => {
+test("Run: Skye clears the knock-on, says what it did to gate hold, and it waits for baggage, then you, in a few words", async () => {
   markDisruptionRunning();
   assert.equal(disruptionState().notice, "running");
   const { run } = executor();
   const reply = await run.handleTypedRequest("Resolve XD472's late arrival");
+  // The moves are counted, not listed (they are on the board and in Outputs),
+  // and the conflict's clearing goes unsaid, as gate hold says it.
   assert.equal(
     reply,
-    "Done: XD472/473 keeps B11, and I moved XC344/345 to A3 and XB232/233 to B10. Gate hold goes from 5h 45m to none. " +
-      "That clears the B11 conflict. It's waiting for approval: Travis Hughes for baggage operations first, then you. " +
-      "Want me to give Travis a call?",
+    "Done: XD472/473 keeps B11, and we've given the 4 flights behind it new stands. Gate hold is down from 13h 15m to none. " +
+      "Baggage operations in Terminal A approves first, then you. Want me to call them?",
   );
-  assert.deepEqual(["T24-1", "T25-1", "T26-1"].map(standOf), ["B11", "A3", "B10"]);
+  assert.deepEqual(["T24-1", "T25-1", "T26-1", "T27-1", "T16-1"].map(standOf), ["B11", "A3", "B10", "B14", "A5"]);
   assert.equal(boardKpis(standState()).gateHoldMinutes, 0);
-  // Listed under the request, the move to Pier A waiting on baggage.
+  // Listed under the request, the moves to Pier A waiting on baggage.
   const [request] = outputs();
   assert.equal(request.title, "Clear XD472/473's knock-on");
   assert.deepEqual(
     request.steps.map((step) => [step.title, step.detail, step.status]),
     [
+      ["XC336/337", "B11 → A5", "pending-approval"],
+      ["XA117/118", "B11 → B14", "waiting"],
       ["XB232/233", "B11 → B10", "waiting"],
       ["XC344/345", "B11 → A3", "pending-approval"],
     ],
@@ -216,21 +286,90 @@ test("asked why, Skye says why XD472 keeps its stand and what the plan does to t
     result.spoken,
     "XD472/473 keeps B11: it's already inbound, with its passengers and bags headed there, and moving a widebody mid-turn means a tow. " +
       "The arrivals behind it haven't landed yet, so moving them costs nothing on the ground. " +
-      "So XC344/345 moves from B11 to A3 and XB232/233 moves from B11 to B10. " +
-      "Gate hold goes from 5h 45m to none: 4 aircraft no longer wait for a stand. " +
-      "Stand use goes from 47% to 48%, using free time on A3 and B10.",
+      "So XC344/345 moves from B11 to A3, XB232/233 moves from B11 to B10, XA117/118 moves from B11 to B14 and XC336/337 moves from B11 to A5. " +
+      "Gate hold goes from 13h 15m to none: 5 aircraft no longer wait for a stand. " +
+      "Stand use goes from 49% to 50%, using free time on A3, B10, B14 and A5.",
   );
 });
 
-test("Travis is briefed on his part: the move that takes bags to another pier", () => {
+test("with others on the call, Skye greets them all and says which part is Travis's", () => {
+  const review = skyeReview();
+  assert.ok(review);
+  const brief = teammateBrief("Travis Hughes", review.changes, ["Travis Hughes", "Priya Raman"]);
+  assert.match(brief, /^Hi Travis and Priya\. /);
+  assert.match(brief, / Travis, for you: XC344\/345 moves from B11 to A3/);
+  assert.match(
+    teammateBrief("Travis Hughes", review.changes, ["Travis Hughes", "Priya Raman", "Marcus Chen"]),
+    /^Hi everyone\. /,
+  );
+});
+
+test("Travis is briefed on his part: the moves that take bags to another pier", () => {
   const review = skyeReview();
   assert.ok(review);
   assert.equal(
     teammateBrief("Travis Hughes", review.changes),
-    "Travis, it's Skye. XD472 is 1h 50m late on B11, so I've re-planned the arrivals behind it. " +
+    "Hey Travis. XD472 is 1h 50m late on B11, so we've re-planned the arrivals behind it. " +
       "For you: XC344/345 moves from B11 to A3, 11:50–12:55, so its bags go to Pier A instead of Pier B. " +
-      "The other move stays on the same pier, so nothing changes for bags there. Can you approve?",
+      "And XC336/337 moves from B11 to A5, 14:45–15:30, so its bags go to Pier A instead of Pier B. " +
+      "The other 2 moves stay on the same pier, so nothing changes for bags there. Can you approve?",
   );
+});
+
+test("her brief says where she comes to each change, stand and what it does to the bags, for her cursor", () => {
+  const review = skyeReview();
+  assert.ok(review);
+  const { text, beats } = teammateBriefScript("Travis Hughes", review.changes);
+  assert.equal(text, teammateBrief("Travis Hughes", review.changes));
+  // Each beat, with the words it starts at.
+  assert.deepEqual(
+    beats.map((beat) => [beat.kind, "end" in beat ? beat.end : "", text.slice(beat.at, beat.at + 12)]),
+    [
+      ["look", "", "Hey Travis. "],
+      ["card", "", "XC344/345 mo"],
+      ["stand", "from", "from B11 to "],
+      ["stand", "to", "to A3, 11:50"],
+      ["bags", "", "so its bags "],
+      ["card", "", "XC336/337 mo"],
+      ["stand", "from", "from B11 to "],
+      ["stand", "to", "to A5, 14:45"],
+      ["bags", "", "so its bags "],
+      ["others", "", "The other 2 "],
+      ["ask", "", "Can you appr"],
+    ],
+  );
+  const others = beats.find((beat) => beat.kind === "others");
+  assert.deepEqual(others && "stayIds" in others ? others.stayIds.length : 0, 2);
+  // What she says that marks each, however she puts the rest: the flight, each stand, the bags, her ask.
+  assert.deepEqual(
+    beats.map((beat) => beat.words?.[0]),
+    [undefined, "XC344", "B11", "A3", "bags", "XC336", "B11", "A5", "bags", "other", "approve"],
+  );
+});
+
+test("answering aloud, Travis is cued to approve at an ordinary pace, then a plain thanks, knowing what he approves without reading it out; she thanks him, and then it's the user's", () => {
+  const review = skyeReview();
+  assert.ok(review);
+  const cue = teammateCue();
+  assert.equal(
+    cue,
+    "Skye just asked you to approve. Answer her now, out loud, in your own words, friendly and at an ordinary " +
+      "pace, with no long pauses: the carousels can take it; it's approved for baggage; then a " +
+      'plain "Thanks.", naming nobody, and "Let me know if you need anything else."',
+  );
+  // Nothing in it asks him to slow down or leave gaps.
+  assert.doesNotMatch(cue, /unhurried|pause after/);
+  assert.doesNotMatch(cue, /gotta hop/);
+  assert.ok(injectionByteLength(cue) <= MAX_INJECTION_BYTES);
+  const context = teammateContext(review.changes);
+  assert.equal(
+    context,
+    "What Skye asked you to approve: XC344/345's bags going to Pier A instead of Pier B and XC336/337's bags going to Pier A instead of Pier B.",
+  );
+  assert.ok(injectionByteLength(context ?? "") <= MAX_INJECTION_BYTES);
+  assert.equal(teammateContext(review.changes.filter((change) => !change.baggage)), null);
+  assert.equal(handOffLine("Travis Hughes", true), "Thanks, Travis! That's approved for baggage, so it's over to you.");
+  assert.equal(handOffLine("Travis Hughes", false), "Thanks, Travis!");
 });
 
 test("approved, the decision is logged with its figures, and the notice shows the result", () => {
@@ -251,22 +390,19 @@ test("approved, the decision is logged with its figures, and the notice shows th
   assert.deepEqual(
     request.decision?.figures.map((figure) => [figure.label, figure.before, figure.after, figure.better]),
     [
-      ["Gate hold", "5h 45m", "none", true],
+      ["Gate hold", "13h 15m", "none", true],
       ["Conflicts", "1", "0", true],
-      ["Stand use", "47%", "48%", null],
+      ["Stand use", "49%", "50%", null],
     ],
   );
   const state = disruptionState();
   assert.equal(state.notice, "approved");
-  assert.deepEqual(state.approved?.impact.gateHold, { before: 345, after: 0 });
-  assert.equal(
-    settledLine(),
-    "That's approved and logged. Gate hold is down from 5h 45m to none, with no conflicts left. " +
-      "XC344/345 on A3 and XB232/233 on B10, and XD472/473 keeps B11.",
-  );
+  assert.deepEqual(state.approved?.impact.gateHold, { before: 795, after: 0 });
+  // In a line: the moves are on the board.
+  assert.equal(settledLine(), "That's approved and logged. Gate hold is down from 13h 15m to none, with no conflicts left.");
   // Reset stands keeps the news: XD472 is still late, and its conflict comes back.
   resetStands();
-  assert.equal(boardKpis(standState()).gateHoldMinutes, 345);
+  assert.equal(boardKpis(standState()).gateHoldMinutes, 795);
   dismissDisruptionNotice();
   assert.equal(disruptionState().notice, "approved");
 });
@@ -296,6 +432,6 @@ test("the plan can still be undone: the stays go back and XD472 holds up B11 aga
   finish();
   assert.equal(boardKpis(standState()).gateHoldMinutes, 0);
   undoSkyeChanges();
-  assert.deepEqual(["T25-1", "T26-1"].map(standOf), ["B11", "B11"]);
-  assert.equal(boardKpis(standState()).gateHoldMinutes, 345);
+  assert.deepEqual(["T25-1", "T26-1", "T27-1", "T16-1"].map(standOf), ["B11", "B11", "B11", "B11"]);
+  assert.equal(boardKpis(standState()).gateHoldMinutes, 795);
 });

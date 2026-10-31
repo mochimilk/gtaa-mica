@@ -39,14 +39,34 @@ export type AppNavbarProps = {
   askActionsEnd?: ReactNode;
   /** What Skye brings up herself, right above her bar: e.g. DisruptionNotice. */
   askNotices?: ReactNode;
+  /** The page shows the call itself (the Chat page), so the call window stays hidden. */
+  callOnPage?: boolean;
+  /** The call going on is a channel's, which rings rather than its people. */
+  callToChannel?: boolean;
+  /** The user is sharing on the call (Skye, on their behalf). */
+  callSharing?: boolean;
+  /** The call window's Open: the call in its chat, on the Chat page. */
+  onOpenCall?: () => void;
+  /** The call window's Share and Stop sharing, when there is something to share. */
+  onCallShareChange?: (share: boolean) => void;
 };
 
 // App identity lives in the left panel's PanelHeader, so the bar has no branding.
-export function AppNavbar({ actionsStart, askActionsEnd, askNotices }: AppNavbarProps) {
+export function AppNavbar({
+  actionsStart,
+  askActionsEnd,
+  askNotices,
+  callOnPage,
+  callToChannel,
+  callSharing,
+  onOpenCall,
+  onCallShareChange,
+}: AppNavbarProps) {
   const styles = useStyles();
   // The orb's state is no longer passed in: it follows the live call. Mute is
   // the user's for the whole call, Skye and anyone else, so it sits at the
-  // bar's end, followed by Disconnect for either or both.
+  // bar's end, followed by Disconnect, for Skye. The people called in leave
+  // from the call window.
   return (
     <AppBar
       styles={{ actionsStart: styles.actionsStart, actionsCenter: styles.actionsCenter }}
@@ -56,7 +76,14 @@ export function AppNavbar({ actionsStart, askActionsEnd, askNotices }: AppNavbar
       actionsCenter={<AskSkye agentName="Skye" actionsEnd={askActionsEnd} notices={askNotices} />}
       actionsEnd={
         <Toolbar aria-label="Call" className={styles.callToolbar}>
-          <PeopleCallButton agentName="Skye" />
+          <PeopleCallButton
+            agentName="Skye"
+            callOnPage={callOnPage}
+            callToChannel={callToChannel}
+            sharing={callSharing}
+            onOpenCall={onOpenCall}
+            onShareChange={onCallShareChange}
+          />
           <ToolbarDivider />
           <MuteButton />
           <DisconnectButton agentName="Skye" />

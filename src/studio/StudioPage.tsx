@@ -13,8 +13,8 @@ import { ArrowReset } from "@coral-ai/bundleicons/ArrowReset";
 import { Save } from "@coral-ai/bundleicons/Save";
 import { ContentToolbar } from "../components/content-toolbar";
 import { Menu, MenuItem, MenuList, MenuPopover, MenuTrigger } from "../components/menu";
-import { NorvaraLogo } from "../components/navbar/NorvaraLogo";
 import { PanelHeader } from "../components/panel-header";
+import { SharedPanelLeft } from "../components/panel-left";
 import { DEMO_DATA } from "../stand-timeline-demo/demoData";
 import { AIRCRAFT_MAKER } from "../stand-timeline-demo/syntheticFixture";
 import {
@@ -70,7 +70,7 @@ interface History {
 }
 
 export interface StudioPageProps {
-  /** The drawings panel's Panel.Left id, shared with its toggle in the nav rail. */
+  /** The drawings panel's Panel.Left id, shared with its toggle (App's LEFT_PANELS). */
   panelID: string;
   panelClassName?: string;
 }
@@ -144,8 +144,8 @@ export function StudioPage({ panelID, panelClassName }: StudioPageProps) {
 
   return (
     <div className="studio">
-      <Panel.Left panelWidth={320} panelID={panelID} className={panelClassName}>
-        <PanelHeader logo={<NorvaraLogo />} />
+      <SharedPanelLeft panelID={panelID} className={panelClassName}>
+        <PanelHeader title="Studio" />
         <div className="studio-panel">
           <Panel.NavSection label="Aircraft" collapsible={false} actions={<NewDrawing taken={listed} onPick={setType} />}>
             {list.map((a) => {
@@ -174,7 +174,7 @@ export function StudioPage({ panelID, panelClassName }: StudioPageProps) {
             })}
           </Panel.NavSection>
         </div>
-      </Panel.Left>
+      </SharedPanelLeft>
 
       <main className="studio-main" onKeyDown={onKeyDown}>
         <ContentToolbar

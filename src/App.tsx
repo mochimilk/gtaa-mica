@@ -2,16 +2,16 @@ import {
   CoralShellColumn,
   CoralShellRow,
   Content,
-  Panel,
 } from "@coral-ai/react";
 import { ToolbarDivider, makeStyles, tokens } from "@fluentui/react-components";
 import { AppNavbar } from "./components/navbar";
-import { AppNavRail, type AppPage } from "./components/nav-rail";
+import { AppNavRail, usePageHistory, type AppPage } from "./components/nav-rail";
 import { NorvaraLogo } from "./components/navbar/NorvaraLogo";
 import { PanelHeader } from "./components/panel-header";
+import { SharedPanelLeft } from "./components/panel-left";
 import { LeftPanelToggle } from "./components/panel-toggle";
-import { DesktopTitleBar } from "./components/title-bar";
-import { useMemo, useRef, useState } from "react";
+import { DesktopTitleBar, hasDesktopTitleBar } from "./components/title-bar";
+import { useMemo, useRef } from "react";
 import { MINUTE, type DropPreview } from "./stand-timeline";
 import { DEMO_DATA } from "./stand-timeline-demo/demoData";
 import { StandTimelineDemo } from "./stand-timeline-demo/StandTimelineDemo";
@@ -27,9 +27,10 @@ import {
   type NoStandLane,
 } from "./operations/noStandLane";
 import { AlertsMenu } from "./operations/AlertsMenu";
-import { DisruptionNotice } from "./operations/DisruptionNotice";
+import { DisruptionNotice, DisruptionWatch } from "./operations/DisruptionNotice";
 import { KpiStrip } from "./operations/KpiStrip";
 import { ClosureBand, ClosureLabel } from "./operations/ClosureBand";
+import { FlightBarMenu } from "./operations/FlightBarMenu";
 import { FlightDragChip, FlightDropGhost } from "./operations/FlightDrag";
 import { OperationsPanel } from "./operations/OperationsPanel";
 import { OutputsPanel, OutputsToggle } from "./operations/OutputsPanel";
@@ -46,16 +47,22 @@ import { SelectionPopover } from "./operations/SelectionPopover";
 import { SwapConfirm } from "./operations/SwapConfirm";
 import { ViewsFiltersToolbar } from "./operations/ViewsFiltersToolbar";
 import { LiveCallProvider } from "./live";
+import { outOfSightStyle, useShownPage, useSkyeAt } from "./live/outOfSight";
 import { AgentCursor, AgentHelperCursors } from "./components/agent-cursor";
 import { SkyeGlowDefs } from "./components/skye-glow";
 import { LumaSkyeBackground } from "./components/luma-skye/LumaSkyeBackground";
 import { useDrawings } from "./studio/drawings";
 import { StudioPage } from "./studio/StudioPage";
+import { shareApproval, useOpenApprovals } from "./approvals/ApprovalsCall";
+import { ChatPage, useCallInChat, useCallShare, useCallThread, useUnreadChats } from "./chat/ChatPage";
+import { chatState, openThread } from "./chat/chatThreads";
 
-// Each page's left panel: its stable ID, shared with its toggle in the nav
-// rail, and its name in the toggle's label.
+// Each page's left panel: its stable ID, shared with its toggle (in the
+// desktop title bar, or the nav rail in a browser), and its name in the
+// toggle's label. All three open at one width (SharedPanelLeft).
 const LEFT_PANELS: Record<AppPage, { id: string; label: string }> = {
   planner: { id: "operations-panel", label: "operations panel" },
+  chat: { id: "chat-panel", label: "chat panel" },
   studio: { id: "studio-panel", label: "drawings panel" },
 };
 
@@ -110,8 +117,12 @@ function laneLabel(lane: NoStandLane) {
     ) : null;
 }
 
-/** Chart wired to the shared operations selection, views, filters and stands. */
-function ConnectedTimeline() {
+/**
+ * Chart wired to the shared operations selection, views, filters and stands.
+ * While `away`, out of sight behind another page (PlannerPage), what floats
+ * beside it is put away, so none of it shows over that page.
+ */
+function ConnectedTimeline({ away }: { away: boolean }) {
   // Not the details popover or swap question (useOpsDetails): the chart does not draw them.
   const { selection, skyeSelection } = useOpsSelections();
   const { applyChartIntent } = useOpsActions();
@@ -175,12 +186,14 @@ function ConnectedTimeline() {
     [zoom],
   );
   const summary = useMemo(() => <KpiStrip />, []);
+  // Where FlightBarMenu listens for right-clicks on the bars.
+  const boardRef = useRef<HTMLDivElement>(null);
   return (
     <>
       {/* Details show in SelectionPopover.
           Non-matching bars are dimmed (still occupied/selectable), never removed.
           What Skye selected is outlined in its orb's colours (skye-glow). */}
-      <div className="skye-selection-scope">
+      <div ref={boardRef} className="skye-selection-scope">
         <StandTimelineDemo
           selectedIds={selectedIds}
           skyeIds={skyeIds}
@@ -202,12 +215,64 @@ function ConnectedTimeline() {
           drawings={drawings}
         />
       </div>
-      <SelectionPopover />
-      {/* Asks before the user's swaps, beside the two stays. */}
-      <SwapConfirm />
-      {/* The flight being dragged from the list, beside the pointer. */}
-      <FlightDragChip />
+      {!away && (
+        <>
+          <SelectionPopover />
+          {/* A bar's right-click menu: Unassign stand. */}
+          <FlightBarMenu board={boardRef} />
+          {/* Asks before the user's swaps, beside the two stays. */}
+          <SwapConfirm />
+          {/* The flight being dragged from the list, beside the pointer. */}
+          <FlightDragChip />
+        </>
+      )}
     </>
+  );
+}
+
+/**
+ * The Stand planner page: the operations panel beside the board. While
+ * another page shows (`away`), the board stays mounted behind it, out of
+ * sight and inert, so Skye carries on working on it in the background (see
+ * live/outOfSight.ts), and it is as she and the user left it when they
+ * come back. The panel, which the other page has its own of, and the Outputs
+ * peek go meanwhile.
+ */
+function PlannerPage({ away, panelClassName }: { away: boolean; panelClassName: string }) {
+  return (
+    /* The panel sits inside the content window, beside the timeline. */
+    <div
+      style={{ display: "flex", flex: "1 1 auto", minHeight: 0, position: "relative", ...(away ? outOfSightStyle : {}) }}
+      inert={away}
+    >
+      {!away && (
+        <SharedPanelLeft panelID={LEFT_PANELS.planner.id} className={panelClassName}>
+          <PanelHeader logo={<NorvaraLogo />} />
+          <OperationsPanel />
+        </SharedPanelLeft>
+      )}
+      {/*
+        Bounded flex host: the timeline fills this height and scrolls its
+        own rows between pinned rulers. overflowY stays as a fallback for
+        viewports shorter than the timeline's minimum.
+      */}
+      <main
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          minWidth: 0,
+          boxSizing: "border-box",
+          flex: "1 1 0",
+          height: "100%",
+          minHeight: 0,
+          overflowY: "auto",
+        }}
+      >
+        <ConnectedTimeline away={away} />
+      </main>
+      {/* What Skye is changing, at the top right under the board's header, while the Outputs panel is closed. */}
+      {!away && <OutputsPeek />}
+    </div>
   );
 }
 
@@ -260,76 +325,100 @@ const useStyles = makeStyles({
   },
 });
 
+/**
+ * The app bar under the content. The Chat page shows the call itself while
+ * the call's chat is open (useCallInChat); anywhere else, other chats
+ * included, the call window floats over the page.
+ */
+function Navbar({ page, onOpenChat }: { page: AppPage; onOpenChat: () => void }) {
+  const callInChat = useCallInChat();
+  const { toChannel, canShare, sharing } = useCallShare();
+  const callThread = useCallThread();
+  return (
+    <AppNavbar
+      askActionsEnd={<AlertsMenu />}
+      // Skye catching the day's disruption (see docs/disruption-demo.md).
+      askNotices={page === "planner" ? <DisruptionNotice /> : undefined}
+      callOnPage={page === "chat" && callInChat}
+      callToChannel={toChannel}
+      callSharing={sharing}
+      onCallShareChange={canShare ? shareApproval : undefined}
+      // The call window's Open: the Chat page, on the call's chat.
+      onOpenCall={() => {
+        if (callThread) openThread(callThread);
+        onOpenChat();
+      }}
+    />
+  );
+}
+
 export default function App() {
   const styles = useStyles();
-  const [page, setPage] = useState<AppPage>("planner");
+  // The page on screen, with the pages before it for the title bar's Back and Forward.
+  const { page, go: setPage, back, forward } = usePageHistory<AppPage>("planner");
   const leftPanel = LEFT_PANELS[page];
+  // In the desktop app the left panel's toggle is in the title bar, after
+  // Back and Forward; in a browser, at the nav rail's foot.
+  const titleBar = hasDesktopTitleBar();
+  const panelToggle = (
+    <LeftPanelToggle
+      panelID={leftPanel.id}
+      panelLabel={leftPanel.label}
+      tooltipPositioning={titleBar ? "below" : "after"}
+      size={titleBar ? "small" : undefined}
+    />
+  );
+  // Bringing a teammate in on Skye's changes (Review with baggage) opens the
+  // call, in the chat it belongs to: their area's channel for the changes' terminal.
+  useOpenApprovals(() => {
+    const { returnTo } = chatState();
+    if (returnTo) openThread(returnTo);
+    setPage("chat");
+  });
+  const chatsUnread = useUnreadChats();
+  // Where Skye's cursor is at work: that page stays mounted, out of sight,
+  // while another shows, and the nav rail says she is there.
+  useShownPage(page);
+  const skyeAt = useSkyeAt();
   return (
     // OperationsProvider first: the voice session reaches the app through the
     // same selection, views, filters and acknowledgements the UI uses.
     <OperationsProvider>
       <LiveCallProvider>
         <LumaSkyeBackground />
+        {/* Skye catching the day's disruption and speaking up around it, on the board and in the chat alike. */}
+        {page !== "studio" && <DisruptionWatch />}
         <div className={styles.window}>
-          <DesktopTitleBar />
+          <DesktopTitleBar onBack={back} onForward={forward} actions={panelToggle} />
           {/* The nav rail runs the full height, beside the content and the app bar. */}
           <CoralShellRow>
             <AppNavRail
               page={page}
               onNavigate={setPage}
-              actionsEnd={
-                <LeftPanelToggle
-                  panelID={leftPanel.id}
-                  panelLabel={leftPanel.label}
-                  tooltipPositioning="after"
-                />
-              }
+              chatsUnread={chatsUnread}
+              skyeAt={skyeAt}
+              actionsEnd={titleBar ? undefined : panelToggle}
             />
             <CoralShellColumn className={styles.main}>
               <CoralShellRow>
                 <Content className={styles.content}>
-                  {page === "studio" ? (
-                    <StudioPage panelID={leftPanel.id} panelClassName={styles.panel} />
-                  ) : (
-                    /* The panel sits inside the content window, beside the timeline. */
-                    <div style={{ display: "flex", flex: "1 1 auto", minHeight: 0, position: "relative" }}>
-                      <Panel.Left panelWidth={320} panelID={leftPanel.id} className={styles.panel}>
-                        <PanelHeader logo={<NorvaraLogo />} />
-                        <OperationsPanel />
-                      </Panel.Left>
-                      {/*
-                        Bounded flex host: the timeline fills this height and scrolls its
-                        own rows between pinned rulers. overflowY stays as a fallback for
-                        viewports shorter than the timeline's minimum.
-                      */}
-                      <main
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          minWidth: 0,
-                          boxSizing: "border-box",
-                          flex: "1 1 0",
-                          height: "100%",
-                          minHeight: 0,
-                          overflowY: "auto",
-                        }}
-                      >
-                        <ConnectedTimeline />
-                      </main>
-                      {/* What Skye is changing, at the top right under the board's header, while the Outputs panel is closed. */}
-                      <OutputsPeek />
-                    </div>
+                  {/*
+                    The board on every page, first, so its controls come before
+                    any other page's chart in the document for whatever looks
+                    them up there (Skye's cursors among them). The Chat page
+                    while it shows, or while Skye is at work on it.
+                  */}
+                  <PlannerPage away={page !== "planner"} panelClassName={styles.panel} />
+                  {page === "studio" && <StudioPage panelID={leftPanel.id} panelClassName={styles.panel} />}
+                  {(page === "chat" || skyeAt?.page === "chat") && (
+                    <ChatPage panelID={LEFT_PANELS.chat.id} panelClassName={styles.panel} away={page !== "chat"} />
                   )}
                 </Content>
                 {/* Beside the content window; its toggle ends the board's header. */}
                 {page === "planner" && <OutputsPanel />}
               </CoralShellRow>
 
-              <AppNavbar
-                askActionsEnd={<AlertsMenu />}
-                // Skye catching the day's disruption (see docs/disruption-demo.md).
-                askNotices={page === "planner" ? <DisruptionNotice /> : undefined}
-              />
+              <Navbar page={page} onOpenChat={() => setPage("chat")} />
 
             </CoralShellColumn>
           </CoralShellRow>

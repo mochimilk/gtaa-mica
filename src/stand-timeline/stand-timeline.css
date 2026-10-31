@@ -382,7 +382,8 @@
   transition: filter 80ms;
 }
 
-.st-bar:hover .st-bar-rect {
+/* :hover, or a scripted pointer's (data-agent-hover), which no script can set :hover for. */
+.st-bar:is(:hover, [data-agent-hover]) .st-bar-rect {
   filter: brightness(1.06) saturate(1.15);
 }
 
@@ -502,7 +503,7 @@
   fill: color-mix(in srgb, currentColor 26%, transparent);
 }
 
-.st-ghost:hover .st-ghost-rect {
+.st-ghost:is(:hover, [data-agent-hover]) .st-ghost-rect {
   fill: color-mix(in srgb, currentColor 32%, transparent);
 }
 
@@ -511,7 +512,7 @@
   pointer-events: none;
 }
 
-.st-ghost:hover .st-ghost-pill {
+.st-ghost:is(:hover, [data-agent-hover]) .st-ghost-pill {
   visibility: visible;
 }
 

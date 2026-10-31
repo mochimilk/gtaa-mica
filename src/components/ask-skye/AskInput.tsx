@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 import { Chat, resolveTaskMessages, useChatContext } from "@coral-ai/chat";
-import { useCoralAuth } from "@coral-ai/react";
 import { Button } from "@fluentui/react-components";
 import {
   ArrowUp20Filled,
@@ -14,7 +13,6 @@ import { agentCursor } from "../agent-cursor";
 import { gtaaOpal, LiveOrb, skyeOrbStill } from "../orb";
 import { StepStatusIcon } from "../step-status-icon";
 import { AskButton } from "./AskButton";
-import { AskWaveform } from "./AskWaveform";
 
 /** Service indicator: red when unavailable, neutral when configured but unverified, green once a call connected. */
 export type AskServiceStatus = "disconnected" | "configured" | "verified";
@@ -35,10 +33,10 @@ export interface AskVoice {
   /** A call exists (starting, connecting, connected or ending); the voice bar shows. */
   onCall: boolean;
   muted: boolean;
-  /** Recent call audio levels from 0 to 1, oldest first. */
-  levels?: readonly number[];
-  /** The caller's microphone while on a call; the orb reacts to it. */
-  micStream?: MediaStream | null;
+  /** Skye's voice while on a call: her orb speeds up as she talks. */
+  agentStream?: MediaStream | null;
+  /** Skye is talking on the call: a brand ring shows round her orb, as Teams rings a speaker. */
+  agentSpeaking?: boolean;
   /** Connects to the agent. */
   onStart: () => void;
 }
@@ -67,39 +65,18 @@ export interface AskInputProps {
 // Regular at rest, filled on hover/press, as Fluent buttons expect.
 const RecallIcon = bundleIcon(ShareScreenStop20Filled, ShareScreenStop20Regular);
 
+/**
+ * Skye's orb barely turns while she is quiet, 0.3× the opal orb's usual
+ * speed, and races while she talks: 11 times that, 3.3× the usual speed. Any
+ * speech above a quiet level (ORB_VOICE_FULL) counts as full voice, so it
+ * reads as talking or not, rather than following each word (see LiveOrb).
+ */
+const ORB_SPEED = 0.3;
+const ORB_VOICE_SPEEDUP = 10;
+const ORB_VOICE_FULL = 0.15;
+
 /** Whether Skye's cursor is out in the app, so it can be called back. */
 const useCursorOut = () => useSyncExternalStore(agentCursor.subscribe, () => agentCursor.out);
-
-type PartOfDay = "morning" | "afternoon" | "evening";
-
-/** By the device's clock: morning from 5, afternoon from 12, evening from 18 and through the night. */
-function partOfDay(hour: number): PartOfDay {
-  if (hour >= 5 && hour < 12) return "morning";
-  if (hour >= 12 && hour < 18) return "afternoon";
-  return "evening";
-}
-
-/** The part of the day, checked again each minute: the app stays open from one into the next. */
-function usePartOfDay(): PartOfDay {
-  const [part, setPart] = useState(() => partOfDay(new Date().getHours()));
-  useEffect(() => {
-    const timer = window.setInterval(() => setPart(partOfDay(new Date().getHours())), 60_000);
-    return () => window.clearInterval(timer);
-  }, []);
-  return part;
-}
-
-/**
- * "Good morning, Eunsoo": the part of the day, then the signed-in user's
- * first name, from Coral's auth (as the user card shows it). Without a name,
- * signed out or no auth at all, a plain "Good morning".
- */
-function useGreeting(): string {
-  const auth = useCoralAuth();
-  const part = usePartOfDay();
-  const name = auth?.status === "signed-in" ? auth.user?.name?.trim().split(/\s+/)[0] : undefined;
-  return name ? `Good ${part}, ${name}` : `Good ${part}`;
-}
 
 /**
  * Calls Skye's cursor back into the orb. It fills the orb's place while the
@@ -170,21 +147,24 @@ function ThinkingIcon({ done }: { done: boolean }) {
 
 /**
  * Skye's orb, in place of a status dot; it greys out while the service is
- * unavailable, speeds up and glows brighter while the caller speaks, and
- * becomes the thinking dots while Skye works out a reply, which close into a
- * check when it has finished. It is also home to Skye's cursor, which leaves
- * the orb as a dot to click through the app and comes back into it. While the
- * cursor is out, the button that brings it back fills the orb's place.
+ * unavailable, speeds up while Skye speaks, with a brand ring round it
+ * (`speaking`), and becomes the thinking dots while Skye works
+ * out a reply, which close into a check when it has finished. It is also home
+ * to Skye's cursor, which leaves the orb as a dot to click through the app and
+ * comes back into it. While the cursor is out, the button that brings it back
+ * fills the orb's place.
  */
 function AgentOrb({
   agentName,
   status,
   voice,
+  speaking = false,
   phase,
 }: {
   agentName: string;
   status?: AskServiceStatus;
   voice?: MediaStream | null;
+  speaking?: boolean;
   phase: OrbPhase;
 }) {
   const out = useCursorOut();
@@ -206,11 +186,32 @@ function AgentOrb({
     );
   }
   return (
-    <span ref={slot} className="mica-ask__orb" data-status={status} role={label ? "img" : undefined} aria-label={label} title={label}>
+    <span
+      ref={slot}
+      className="mica-ask__orb"
+      data-status={status}
+      data-speaking={speaking || undefined}
+      role={label ? "img" : undefined}
+      aria-label={label}
+      title={label}
+    >
       {phase !== "orb" ? (
         <ThinkingIcon done={phase === "done"} />
       ) : (
-        <LiveOrb size={32} glow voice={voice} state="thinking" preset="opal" palette={gtaaOpal} still={skyeOrbStill} />
+        <LiveOrb
+          size={32}
+          glow
+          voice={voice}
+          speed={ORB_SPEED}
+          voiceSpeedup={ORB_VOICE_SPEEDUP}
+          voiceFull={ORB_VOICE_FULL}
+          // Her voice speeds the orb only: the speaking ring marks her talking, without a glow swelling under it.
+          voiceGlow={false}
+          state="thinking"
+          preset="opal"
+          palette={gtaaOpal}
+          still={skyeOrbStill}
+        />
       )}
     </span>
   );
@@ -236,12 +237,12 @@ function ThinkingText() {
 }
 
 /**
- * The composer, from VelmAI. Idle it is one button, the orb and a greeting
- * ("Good morning, Eunsoo"), that places a call; nothing in it opens the chat, which is
- * the toggle beside it (see AskSkye). Open it is the draft with Send or the
+ * The composer, from VelmAI. Idle it is one button, the orb, that places a
+ * call; nothing in it opens the chat, which is the toggle beside it (see
+ * AskSkye). Open it is the draft with Send or the
  * mic, and Stop beside them while a reply is being written. On a call it
- * becomes the voice bar: the orb and the waveform; Disconnect is at the app
- * bar's end. The orb always leads, standing in for Skye's state. Enter sends,
+ * becomes the voice bar: the orb alone, speeding up as Skye talks;
+ * Disconnect is at the app bar's end. The orb always leads, standing in for Skye's state. Enter sends,
  * Shift+Enter adds a line, Escape minimizes.
  *
  * The draft, sending and the streaming state are Coral's chat context; only
@@ -265,7 +266,6 @@ export function AskInput({
   const { onCall } = voice;
   const cursorOut = useCursorOut();
   const phase = useOrbPhase(thinking, stopped, cursorOut);
-  const greeting = useGreeting();
   const previous = useRef({ open, onCall });
 
   // Focus follows the controls that replace the ones just pressed: the draft
@@ -315,8 +315,13 @@ export function AskInput({
   if (onCall) {
     return (
       <div ref={rootRef} className="mica-ask__input" data-variant="voice">
-        <AgentOrb agentName={agentName} status={status} voice={voice.micStream} phase={phase} />
-        <AskWaveform levels={voice.levels} />
+        <AgentOrb
+          agentName={agentName}
+          status={status}
+          voice={voice.agentStream}
+          speaking={voice.agentSpeaking}
+          phase={phase}
+        />
         <span className="mica-ask__visually-hidden" role="status">
           {`Connected to ${agentName}${voice.muted ? ", microphone muted" : ""}`}
         </span>
@@ -324,23 +329,23 @@ export function AskInput({
     );
   }
 
-  // Idle, the whole pill is the button that calls Skye. It greets the user;
-  // its name starts with the greeting, so it can be asked for by what it says.
+  // Idle, the whole pill is the button that calls Skye: the orb, and Coral's
+  // thinking words beside it while she works out a reply, with Connect lying
+  // over them both. The orb leads the pill in every variant, as here, so it
+  // stays mounted, its renderer running, as the pill becomes the voice bar.
+  // While the cursor is out, its recall button, in the orb's place, stands
+  // over Connect.
   if (!open) {
     return (
       <div ref={rootRef} className="mica-ask__input" data-variant="idle">
-        {/* While the cursor is out, its recall button holds the orb's place
-            just outside Connect: a button cannot hold another. */}
-        {cursorOut && <AgentOrb agentName={agentName} status={status} voice={voice.micStream} phase={phase} />}
+        <AgentOrb agentName={agentName} status={status} voice={voice.agentStream} phase={phase} />
+        {thinking && <ThinkingText />}
         <button
           type="button"
           className="mica-ask__connect"
-          aria-label={`${greeting}. Connect to ${agentName}`}
+          aria-label={`Connect to ${agentName}`}
           onClick={voice.onStart}
-        >
-          {!cursorOut && <AgentOrb agentName={agentName} status={status} voice={voice.micStream} phase={phase} />}
-          {thinking ? <ThinkingText /> : <span className="mica-ask__connect-label">{greeting}</span>}
-        </button>
+        />
       </div>
     );
   }
@@ -377,7 +382,7 @@ export function AskInput({
 
   return (
     <div ref={rootRef} className="mica-ask__input" data-variant="composer">
-      <AgentOrb agentName={agentName} status={status} voice={voice.micStream} phase={phase} />
+      <AgentOrb agentName={agentName} status={status} voice={voice.agentStream} phase={phase} />
       <div className="mica-ask__field">
         <textarea
           ref={textareaRef}

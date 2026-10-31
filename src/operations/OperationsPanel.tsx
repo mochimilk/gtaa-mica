@@ -1,14 +1,13 @@
 // Composes the independent panel modules as vertically stacked, collapsible
 // Coral Panel.NavGroup sections (Arrivals, Departures). The panel fills
 // Coral's Panel.Left content area: open groups share the height and each
-// scrolls on its own, so all group headers stay visible. Alerts live in the
-// chart header's Alerts menu (AlertsMenu.tsx).
+// list scrolls on its own (FlightList), so all group headers stay visible.
+// Alerts live in the chart header's Alerts menu (AlertsMenu.tsx).
 import { useState, type ReactNode } from "react";
 import { Panel } from "@coral-ai/react";
 import { ArrivalList } from "./ArrivalList";
 import { DepartureList } from "./DepartureList";
 import { useOpsBoard } from "./OperationsContext";
-import { OverflowScroll } from "./OverflowScroll";
 import { ARRIVALS, DEPARTURES } from "./operationsData";
 import "./operations.css";
 
@@ -46,7 +45,7 @@ export function OperationsPanel() {
         onOpenChange={(_, d) => setOpen((cur) => ({ ...cur, [key]: d.open }))}
         className={open[key] ? "ops-group ops-group--open" : "ops-group"}
       >
-        <OverflowScroll className="ops-group-scroll">{content}</OverflowScroll>
+        {content}
       </Panel.NavGroup>
     </Panel.NavSection>
   );

@@ -1,6 +1,9 @@
-import { app, BrowserWindow, dialog, ipcMain, Menu, nativeTheme, net, protocol, session } from 'electron';
+import { app, BrowserWindow, dialog, ipcMain, Menu, nativeImage, nativeTheme, net, protocol, session } from 'electron';
+import os from 'node:os';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { createAppVoice } from './appVoice.mjs';
+import { BACKDROP_ARGUMENT, windowBackdrop } from './backdrop.mjs';
 import {
   allowPermissionCheck,
   allowPermissionRequest,
@@ -9,7 +12,9 @@ import {
 } from './permissionPolicy.mjs';
 import { TITLE_BAR_HEIGHT, WINDOW_MENUS, menuRequest, titleBarOverlayColors } from './titleBar.mjs';
 
-// The only preload and IPC are the title bar's; the UI needs no other native privileges.
+// The only preload and IPC are the title bar's, the right-click menu's Paste,
+// Skye's key from Settings → API (and the backdrop's argument); the UI needs
+// no other native privileges.
 protocol.registerSchemesAsPrivileged([
   { scheme: 'mica', privileges: { standard: true, secure: true, supportFetchAPI: true } },
 ]);
@@ -37,6 +42,11 @@ const isAppUrl = (/** @type {string} */ value) => {
  * the server-side key. So the only privileges added here are the microphone
  * and the network reach needed for that exchange.
  *
+ * Or, once the user gives a window their own key in Settings → API, this
+ * process answers the broker's routes for it instead (appVoice.mjs), keeping
+ * the key in memory for that window only and forgetting it when the window
+ * reloads or closes. The page hands it over and can't read it back.
+ *
  * In development the Vite dev server proxies /api/live to the broker, so
  * requests are same-origin and 'self' already covers them. A packaged build
  * has no proxy and must be built with VITE_MICA_API_BASE_URL, so the matching
@@ -47,6 +57,7 @@ const brokerOrigin = resolveBrokerOrigin(process.env.MICA_LIVE_BACKEND_ORIGIN);
 const renderCsp = contentSecurityPolicy(brokerOrigin);
 /** Undefined when packaged, which selects the mica://app policy. */
 const devOrigin = devUrl ? new URL(devUrl).origin : undefined;
+const appVoice = createAppVoice();
 
 /*
  * Title bar. On Windows and Linux the page draws it, the page's colour: the
@@ -57,22 +68,42 @@ const devOrigin = devUrl ? new URL(devUrl).origin : undefined;
  * as the page's own theme does.
  */
 const customTitleBar = process.platform !== 'darwin';
+/*
+ * Backdrop. On Windows 11 the window's base layer is Mica (backdrop.mjs), so
+ * the window paints nothing of its own and the title bar overlay is clear. The
+ * preload tells the page, which then leaves its page colour to Mica too.
+ */
+const backdrop = windowBackdrop(process.platform, os.release(), process.env.MICA_DESKTOP_BACKDROP);
+/*
+ * Icon. The site's logo (public/norvara.svg, drawn by scripts/desktop-icons.mjs):
+ * white on a dark system theme, black on a light one, so it shows on the
+ * taskbar or dock either way. It follows the theme as it changes.
+ */
+const appIcon = () => nativeImage.createFromPath(
+  path.join(app.getAppPath(), 'electron', 'icons', nativeTheme.shouldUseDarkColors ? 'norvara-white.png' : 'norvara-black.png'),
+);
 
 async function createWindow() {
   const window = new BrowserWindow({
     title: 'GTAA Mica', width: 1440, height: 960, minWidth: 900, minHeight: 640,
+    icon: appIcon(),
     show: false,
+    ...(backdrop && { backgroundMaterial: backdrop, backgroundColor: '#00000000' }),
     ...(customTitleBar && {
       titleBarStyle: 'hidden',
-      titleBarOverlay: { ...titleBarOverlayColors(nativeTheme.shouldUseDarkColors), height: TITLE_BAR_HEIGHT },
+      titleBarOverlay: { ...titleBarOverlayColors(nativeTheme.shouldUseDarkColors, backdrop), height: TITLE_BAR_HEIGHT },
     }),
     webPreferences: {
       nodeIntegration: false, contextIsolation: true, sandbox: true, webSecurity: true,
-      ...(customTitleBar && { preload: path.join(app.getAppPath(), 'electron', 'preload.cjs') }),
+      preload: path.join(app.getAppPath(), 'electron', 'preload.cjs'),
+      ...(backdrop && { additionalArguments: [`${BACKDROP_ARGUMENT}${backdrop}`] }),
     },
   });
   if (customTitleBar) {
-    const recolor = () => window.setTitleBarOverlay(titleBarOverlayColors(nativeTheme.shouldUseDarkColors));
+    const recolor = () => {
+      window.setTitleBarOverlay(titleBarOverlayColors(nativeTheme.shouldUseDarkColors, backdrop));
+      window.setIcon(appIcon());
+    };
     nativeTheme.on('updated', recolor);
     window.once('closed', () => nativeTheme.off('updated', recolor));
   }
@@ -80,6 +111,13 @@ async function createWindow() {
   window.webContents.on('will-navigate', (event, url) => { if (!isAppUrl(url)) event.preventDefault(); });
   window.webContents.on('will-redirect', (event, url) => { if (!isAppUrl(url)) event.preventDefault(); });
   window.webContents.on('will-attach-webview', (event) => event.preventDefault());
+  // A key from Settings → API lasts as long as the page it was given to.
+  const contentsId = window.webContents.id;
+  window.webContents.on('did-start-navigation', (details) => {
+    if (details.isMainFrame && !details.isSameDocument) appVoice.forget(contentsId);
+  });
+  window.webContents.on('render-process-gone', () => appVoice.forget(contentsId));
+  window.webContents.once('destroyed', () => appVoice.forget(contentsId));
   window.once('ready-to-show', () => window.show());
   await window.loadURL(startUrl);
 }
@@ -112,6 +150,24 @@ app.whenReady().then(async () => {
   );
   // getDisplayMedia is never part of Mica; deny it explicitly.
   session.defaultSession.setDisplayMediaRequestHandler((_request, callback) => callback({}));
+  // macOS takes its icon from the dock, not the window.
+  if (process.platform === 'darwin') {
+    const redock = () => app.dock?.setIcon(appIcon());
+    redock();
+    nativeTheme.on('updated', redock);
+  }
+  // Skye's key from Settings → API, and the voice routes answered with it
+  // (appVoice.mjs), each for the window that asks. Nothing hands the key back,
+  // only its masked form.
+  const fromApp = (/** @type {Electron.IpcMainInvokeEvent | Electron.IpcMainEvent} */ event) =>
+    isAppUrl(event.senderFrame?.url ?? '');
+  ipcMain.handle('mica:voice-set-key', (event, provider, key) =>
+    fromApp(event) && appVoice.setKey(event.sender.id, provider, key));
+  ipcMain.handle('mica:voice-describe-key', (event) => (fromApp(event) ? appVoice.describeKey(event.sender.id) : null));
+  ipcMain.handle('mica:voice-forget-key', (event) => { if (fromApp(event)) appVoice.forget(event.sender.id); });
+  ipcMain.handle('mica:voice-request', (event, input) =>
+    fromApp(event) ? appVoice.request(event.sender.id, input?.id, input?.route, input?.body) : null);
+  ipcMain.on('mica:voice-abort', (event, requestId) => { if (fromApp(event)) appVoice.abort(event.sender.id, requestId); });
   if (customTitleBar) {
     // Also the application menu, unshown, so its shortcuts (Ctrl+R, Ctrl+Shift+I, zoom…) keep working.
     const menu = Menu.buildFromTemplate(WINDOW_MENUS);
@@ -123,6 +179,11 @@ app.whenReady().then(async () => {
       const window = BrowserWindow.fromWebContents(event.sender);
       if (!request || !submenu || !window || !isAppUrl(event.senderFrame?.url ?? '')) return;
       return new Promise((resolve) => submenu.popup({ window, x: request.x, y: request.y, callback: () => resolve(undefined) }));
+    });
+    // The page's right-click Paste (DefaultContextMenu), as Edit's Paste does;
+    // it comes through the preload, so only where the title bar's does.
+    ipcMain.handle('mica:paste', (event) => {
+      if (isAppUrl(event.senderFrame?.url ?? '')) event.sender.paste();
     });
   }
   if (!devUrl) {

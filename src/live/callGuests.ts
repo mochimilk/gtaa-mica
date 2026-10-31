@@ -19,18 +19,28 @@ export const EXPERTISE_LABELS: Record<Expertise, string> = {
 /** A made-up teammate, and what they work on. */
 export type Person = { name: string; expertise: Expertise };
 
-/** Made-up teammates who can be called in, and who sign off on changes in their area (see skyeReview). */
+/**
+ * Made-up teammates who can be called in. The first in each area is its lead,
+ * on duty for it, who signs off on changes there (see skyeReview); the rest
+ * are their crews, who work its sectors with them (../chat/chatThreads).
+ */
 export const TEAM: readonly Person[] = [
   { name: "Priya Raman", expertise: "gates" },
   { name: "Marcus Chen", expertise: "ramp" },
   { name: "Aisha Okafor", expertise: "apron" },
   { name: "Travis Hughes", expertise: "baggage" },
+  { name: "Dana Kowalski", expertise: "baggage" },
+  { name: "Mateo Silva", expertise: "baggage" },
+  { name: "Hannah Lee", expertise: "gates" },
+  { name: "Kofi Mensah", expertise: "ramp" },
+  { name: "Ines Duarte", expertise: "ramp" },
+  { name: "Sofia Reyes", expertise: "apron" },
 ];
 
 /** The teammates' names, in TEAM's order. */
 export const PEOPLE: readonly string[] = TEAM.map((person) => person.name);
 
-/** The teammate who works on `expertise`, if anyone does. */
+/** The lead for `expertise`, its first in TEAM, if anyone works on it. */
 export const personWith = (expertise: Expertise): Person | undefined =>
   TEAM.find((person) => person.expertise === expertise);
 
@@ -104,6 +114,16 @@ export function removeFromCall(name: string): void {
   answers.delete(name);
   const drop = (list: readonly string[]) => list.filter((guest) => guest !== name);
   settle(drop(guests.names), drop(guests.calling), guests.since);
+}
+
+/**
+ * Someone on the call hangs up themself: they are off it, but, unlike
+ * removeFromCall, the call goes on for whoever is left (the user, at least)
+ * until they end it.
+ */
+export function leaveCall(name: string): void {
+  if (!guests?.names.includes(name)) return;
+  set({ ...guests, names: guests.names.filter((guest) => guest !== name) });
 }
 
 /** Ends the call for everyone called in, and stops calling anyone still ringing. */

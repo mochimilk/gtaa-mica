@@ -3,7 +3,8 @@
 // This is the only file that knows both React and the live session. It
 //   - implements OperationsHost over OperationsContext,
 //   - gives the controller the browser's real WebRTC and microphone,
-//   - plays the agent's audio,
+//   - plays the agent's audio, and a teammate's who answers her aloud
+//     (./teammateVoice), whose session hears silence,
 //   - and re-sends board context when the user changes something by hand.
 //
 // Mount it inside OperationsProvider so a voice request reaches the same
@@ -14,12 +15,14 @@ import { useOperations } from "../operations/OperationsContext.tsx";
 import { OPS_FLIGHTS_BY_ID } from "../operations/operationsData.ts";
 import { agentCursor } from "../components/agent-cursor";
 import { playAgentGesture } from "../operations/agentGestures.ts";
-import { beginSkyeChange } from "../operations/skyeReview.ts";
+import { markDisruptionRunning } from "../operations/disruption.ts";
+import { beginSkyeChange, setAnswerAloud } from "../operations/skyeReview.ts";
 import { resolveInterpreter } from "./backendInterpreter.ts";
 import { LiveCallController, type LiveCallState } from "./callController.ts";
-import { requestLiveSession } from "./liveBackend.ts";
+import { requestLiveSession, type LivePersona } from "./liveBackend.ts";
 import { phraseInterpreter, withDemoShortcuts } from "./requestInterpreter.ts";
-import { inviteToCall, removeFromCall as removeGuest } from "./callGuests.ts";
+import { guestNames, inviteToCall, removeFromCall as removeGuest, subscribeCallGuests } from "./callGuests.ts";
+import { TeammateVoice } from "./teammateVoice.ts";
 import { hideSkyeAlerts, showSkyeAlerts } from "../operations/skyeAlerts.ts";
 import { LiveTransport, type TransportHandlers } from "./liveTransport.ts";
 import { buildSnapshot, type OperationsHost, type OpsSnapshot } from "./opsHost.ts";
@@ -56,10 +59,37 @@ export type LiveCallValue = {
   /** Has Skye say `text` on the call, in her own words; false when no call is connected. */
   say: (text: string) => boolean;
   /**
-   * Skye brings something up herself, offering `proposal`: said on a call,
-   * and a yes (said or typed) carries it out.
+   * As `say`, once she has finished what she is saying; resolves true once
+   * she has said it, false when she was not heard (see LiveCallController.speak).
+   * `onWords` hears what she has said of it so far, as her words arrive;
+   * `ended` says when that has come to its end.
    */
-  offer: (text: string, proposal: AppAction) => void;
+  speak: (text: string, onWords?: (said: string) => void, ended?: (said: string) => boolean) => Promise<boolean>;
+  /** Starts the session of a teammate answering Skye aloud (./teammateVoice) ahead of his turn. */
+  teammateReady: (name: string) => void;
+  /**
+   * A teammate answering Skye aloud comes off mute and says what `cue` asks,
+   * knowing `context` without saying it, Skye not listening meanwhile.
+   * Resolves true once he has said it (`ended` says when what he has said has
+   * come to its end), false when he never got to.
+   */
+  teammateAnswers: (
+    name: string,
+    cue: string,
+    ended?: (said: string) => boolean,
+    context?: string,
+  ) => Promise<boolean>;
+  /** The teammate speaking on the call, for their tile; null when none is. */
+  teammateSpeaking: string | null;
+  /** The teammates on the call muted, until they answer; for their tiles. */
+  teammateMuted: readonly string[];
+  /**
+   * Skye brings something up herself, offering `proposal`: raised on a call
+   * (in her own words, steered by `cue` when given), and a yes (said or
+   * typed) carries it out. Resolves true as she is heard raising it, false
+   * when she is not (see LiveCallController.offer).
+   */
+  offer: (said: string, proposal: AppAction, cue?: string) => Promise<boolean>;
   /** The caller's microphone while a call holds it. For level meters only. */
   localStream: MediaStream | null;
   /** The agent's audio while a call is up. For level meters only; playback is handled here. */
@@ -90,6 +120,43 @@ function createBrowserTransport(handlers: TransportHandlers): LiveTransport {
       // not something to assume here.
       createPeerConnection: () => new RTCPeerConnection(),
       requestSession: (sdp, signal) => requestLiveSession(sdp, { signal }),
+    },
+    handlers,
+  );
+}
+
+/** The silence teammates' sessions hear: one source, each session a copy of it. */
+let silence: MediaStream | null = null;
+
+/**
+ * Silence for a microphone, rendered: a tone at no volume. A destination with
+ * nothing playing into it sends no audio at all, and a session that gets
+ * none never gets round to what it is told.
+ */
+function silentMicrophone(): MediaStream {
+  if (!silence) {
+    const context = new AudioContext();
+    const tone = context.createOscillator();
+    const volume = context.createGain();
+    volume.gain.value = 0;
+    const destination = context.createMediaStreamDestination();
+    tone.connect(volume).connect(destination);
+    tone.start();
+    silence = destination.stream;
+  }
+  return silence.clone();
+}
+
+/**
+ * Browser-backed transport for a teammate's session, as `persona`: his
+ * microphone is silence, so he hears nobody, the user included.
+ */
+function createTeammateTransport(persona: LivePersona, handlers: TransportHandlers): LiveTransport {
+  return new LiveTransport(
+    {
+      getUserMedia: async () => silentMicrophone(),
+      createPeerConnection: () => new RTCPeerConnection(),
+      requestSession: (sdp, signal) => requestLiveSession(sdp, { signal, persona }),
     },
     handlers,
   );
@@ -140,7 +207,7 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
         operations.allocationVersion,
         [...operations.acknowledged].sort(),
       ]),
-    [operations.view, operations.filters, operations.selection, operations.acknowledged],
+    [operations.view, operations.filters, operations.selection, operations.allocationVersion, operations.acknowledged],
   );
   const lastSignatureRef = React.useRef(signature);
   if (lastSignatureRef.current !== signature) {
@@ -259,8 +326,13 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
       },
       // What Skye changes on the board waits there for approval: the
       // teammates whose area it touches, then the user (OutputsApproval);
-      // each piece is listed in the Outputs panel meanwhile.
-      beginChange: (action) => beginSkyeChange(action),
+      // each piece is listed in the Outputs panel meanwhile. Taking up the
+      // disruption, however she was asked (its Run, a yes said or typed),
+      // puts its notice away as she starts.
+      beginChange: (action) => {
+        if (action.name === "resolve_disruption") markDisruptionRunning();
+        return beginSkyeChange(action);
+      },
     };
 
     controllerRef.current = new LiveCallController({
@@ -284,6 +356,7 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
         setLocalStream(stream);
         meterRef.current?.setInput(stream);
       },
+      outputLevel: () => meterRef.current?.output() ?? 0,
       onLog: (entry: ExecutorLogEntry) => {
         // A failed gesture is a warning: the change then lands unanimated.
         if (entry.outcome === "gesture_failed") console.warn("[mica-live]", entry.outcome, entry.detail);
@@ -293,10 +366,62 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
   }
   const controller = controllerRef.current;
 
+  // A teammate's voice, answering Skye on an approval call, played on its own
+  // element, so it never takes over hers, and metered on its own, to tell
+  // when he has said his piece.
+  const teammateAudioRef = React.useRef<HTMLAudioElement | null>(null);
+  const teammateMeterRef = React.useRef<VoiceMeter | null>(null);
+  const teammateRef = React.useRef<TeammateVoice | null>(null);
+  if (!teammateRef.current) {
+    teammateMeterRef.current = new VoiceMeter();
+    teammateRef.current = new TeammateVoice({
+      createTransport: createTeammateTransport,
+      play: (stream) => {
+        if (!teammateAudioRef.current) {
+          teammateAudioRef.current = new Audio();
+          teammateAudioRef.current.autoplay = true;
+        }
+        const element = teammateAudioRef.current;
+        element.srcObject = stream;
+        // Skye's call already had its gesture; should it still be refused, he
+        // goes unheard, and the approval goes on without his voice.
+        if (stream) void element.play().catch(() => undefined);
+        teammateMeterRef.current?.wake();
+        teammateMeterRef.current?.setOutput(stream);
+      },
+      level: () => teammateMeterRef.current?.output() ?? 0,
+    });
+  }
+  const teammate = teammateRef.current;
+
+  // A teammate with a voice of their own, asked to approve while on the call
+  // with Skye, answers her aloud (see skyeReview's askForSignoffs). Their
+  // voice goes as they leave the call, or as Skye's call ends.
+  React.useEffect(() => {
+    // He picks up muted, and comes off mute as he answers.
+    setAnswerAloud(
+      (name) => controller.getState().phase === "connected" && guestNames().includes(name) && teammate.pickUp(name),
+    );
+    const unsubscribeGuests = subscribeCallGuests(() => {
+      for (const name of teammate.names()) if (!guestNames().includes(name)) teammate.leave(name);
+    });
+    const unsubscribeCall = controller.subscribe(() => {
+      if (controller.getState().phase !== "connected") teammate.leaveAll();
+    });
+    return () => {
+      setAnswerAloud(null);
+      unsubscribeGuests();
+      unsubscribeCall();
+      teammate.leaveAll();
+    };
+  }, [controller, teammate]);
+
   const state = React.useSyncExternalStore(
     React.useCallback((listener) => controller.subscribe(listener), [controller]),
     React.useCallback(() => controller.getState(), [controller]),
   );
+  const teammateSpeaking = React.useSyncExternalStore(teammate.subscribe, teammate.speaking);
+  const teammateMuted = React.useSyncExternalStore(teammate.subscribe, teammate.muted);
 
   React.useEffect(() => {
     if (state.phase === "idle" || state.phase === "failed") meterRef.current?.dispose();
@@ -329,7 +454,29 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
   const runTypedRequest = React.useCallback((text: string) => controller.runTypedRequest(text), [controller]);
   const cancelTypedRequest = React.useCallback(() => void controller.cancelTypedRequest(), [controller]);
   const say = React.useCallback((text: string) => controller.say(text), [controller]);
-  const offer = React.useCallback((text: string, proposal: AppAction) => controller.offer(text, proposal), [controller]);
+  const speak = React.useCallback(
+    (text: string, onWords?: (said: string) => void, ended?: (said: string) => boolean) =>
+      controller.speak(text, onWords, ended),
+    [controller],
+  );
+  const teammateReady = React.useCallback((name: string) => teammate.ready(name), [teammate]);
+  const teammateAnswers = React.useCallback(
+    async (name: string, cue: string, ended?: (said: string) => boolean, context?: string) => {
+      // Skye stops listening while he talks, so his words, from the
+      // speakers, are not taken for the caller's.
+      controller.holdInput(true);
+      try {
+        return await teammate.answer(name, cue, ended, context);
+      } finally {
+        controller.holdInput(false);
+      }
+    },
+    [controller, teammate],
+  );
+  const offer = React.useCallback(
+    (said: string, proposal: AppAction, cue?: string) => controller.offer(said, proposal, cue),
+    [controller],
+  );
   const voiceLevel = React.useCallback((speaker: "user" | "agent") => {
     const current = controller.getState();
     if (current.phase !== "connected") return 0;
@@ -363,6 +510,11 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
       runTypedRequest,
       cancelTypedRequest,
       say,
+      speak,
+      teammateReady,
+      teammateAnswers,
+      teammateSpeaking,
+      teammateMuted,
       offer,
       localStream,
       remoteStream,
@@ -378,6 +530,11 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
       runTypedRequest,
       cancelTypedRequest,
       say,
+      speak,
+      teammateReady,
+      teammateAnswers,
+      teammateSpeaking,
+      teammateMuted,
       offer,
       localStream,
       remoteStream,

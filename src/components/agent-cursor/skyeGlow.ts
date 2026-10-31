@@ -5,17 +5,18 @@
 // cursors' layers are portalled to <body>.
 import { useSyncExternalStore } from "react";
 
-export type SkyeGlow = "default" | "aurora" | "glacier";
+export type SkyeGlow = "default" | "aurora" | "seafoam" | "iris";
 
 /**
  * The choices, in the order Settings shows them, with their names there:
  * ink (black over a light page, white over a dark one); the blue-violet of
- * the northern lights; and an electric ice-blue.
+ * the northern lights; a bright sea-green; and a soft sky blue.
  */
 export const SKYE_GLOWS: readonly { value: SkyeGlow; label: string }[] = [
   { value: "default", label: "Default" },
   { value: "aurora", label: "Aurora" },
-  { value: "glacier", label: "Glacier" },
+  { value: "seafoam", label: "Seafoam" },
+  { value: "iris", label: "Iris" },
 ];
 
 let glow: SkyeGlow = "default";

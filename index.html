@@ -9,7 +9,8 @@
       Electron CSP allows inline styles but not inline scripts, so dismissal
       lives in src/main.tsx. Backgrounds match the page colour the app later
       paints (Fluent colorNeutralBackground5, in LumaSkyeBackground) so there
-      is no flash on handoff.
+      is no flash on handoff. On Mica (data-backdrop, set by
+      electron/preload.cjs) the window paints it, so they are clear.
     -->
     <style>
       :root {
@@ -24,6 +25,9 @@
           --boot-mark: #2e2e2e;
           --boot-sheen: #575757;
         }
+      }
+      :root[data-backdrop] {
+        --boot-bg: transparent;
       }
       body {
         background: var(--boot-bg);

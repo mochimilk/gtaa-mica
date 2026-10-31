@@ -1,23 +1,24 @@
 // The Outputs panel: a Coral Panel.Right beside the board, listing every change
 // to it (outputs.ts), newest first: each request Skye worked on, and each
-// thing the user did, as a collapsible group like the operations panel's,
-// headed by who made it (Fluent's Avatar), with every piece it changed under
+// thing the user did, as a collapsible group in its own bordered section like
+// the operations panel's, headed by who made it (Fluent's Avatar), with every piece it changed under
 // it, turn by turn (OutputSteps); picking a piece takes the user to it on the
 // board, as picking a flight in the operations panel does. While Skye's changes wait to be approved,
-// the decision sits at its foot (OutputsApproval). Its toggle sits at the end
+// the decision (OutputsApproval) hangs off the newest request waiting, threaded
+// to its pieces; once they are cancelled, its pieces are struck through. Its toggle sits at the end
 // of the board's header, after Filters and Views; it starts closed, and while
 // there is nothing to list the toggle is greyed out and an open panel closes.
 // While it is closed, the request Skye is on peeks out under the header
 // (OutputsPeek).
 import { Fragment, useEffect, useMemo, useSyncExternalStore } from "react";
 import { Panel, eventBus, useCoralAuth } from "@coral-ai/react";
-import { Avatar, Caption1, makeStyles, tokens } from "@fluentui/react-components";
+import { Avatar, Caption1, makeStyles, mergeClasses, shorthands, tokens, type GriffelStyle } from "@fluentui/react-components";
 import { Branch20Filled, Branch20Regular, bundleIcon, createFluentIcon } from "@fluentui/react-icons";
 import { skyeOrbStill } from "../components/orb";
 import { RightPanelToggle } from "../components/panel-toggle";
 import { flightsAtStay } from "./allocation";
 import { selectedFlight, useOpsActions, useOpsSelections } from "./OperationsContext";
-import { describeApprovers, formatLogTime, type OutputActor, type OutputDecision, type OutputRequest, type OutputStep } from "./outputs";
+import { describeApprovers, describeRequest, formatLogTime, type OutputActor, type OutputDecision, type OutputRequest, type OutputStep } from "./outputs";
 import { OutputsApproval } from "./OutputsApproval";
 import { OUTPUT_ICON_GAP, OutputSteps, RequestMeta, useOutputs } from "./OutputSteps";
 import { revealRect } from "./SelectionPopover";
@@ -56,6 +57,25 @@ const OUTPUTS_PANEL_LABEL = "outputs";
  */
 const ICON_OUTSET = "-4px";
 
+/** Between the request's header and its pieces, between the pieces, and between the last of them and the decision log. */
+const STEP_GAP = tokens.spacingVerticalM;
+
+/**
+ * The line threading the pieces down to the decision log: a stroke in the gap
+ * above each, centred across it. `border` is the box's own border, inside
+ * which its pseudo-element is placed.
+ */
+const threadAbove = (border = "0px"): GriffelStyle => ({
+  content: '""',
+  position: "absolute",
+  left: "50%",
+  top: `calc(-1 * (${STEP_GAP} + ${border}))`,
+  width: tokens.strokeWidthThin,
+  height: STEP_GAP,
+  transform: "translateX(-50%)",
+  backgroundColor: tokens.colorNeutralStroke2,
+});
+
 const useStyles = makeStyles({
   // 56px with no vertical padding, like PanelHeader, to line up with the
   // board's ContentToolbar.
@@ -65,8 +85,23 @@ const useStyles = makeStyles({
     paddingTop: 0,
     paddingBottom: 0,
   },
-  // Each piece's icon box out by 4px, as the avatar's is.
+  // The pieces apart, threaded together, and as far from the header over them.
+  steps: {
+    display: "flex",
+    flexDirection: "column",
+    gap: STEP_GAP,
+    marginTop: STEP_GAP,
+    "& > li": { position: "relative" },
+    "& > li + li::before": threadAbove(),
+  },
+  // Each piece bordered, darker as it is hovered, pressed or selected (Fluent's
+  // subtle Button clears the border on hover and press, hence those selectors);
+  // its icon box out by 4px, as the avatar's is.
   row: {
+    ...shorthands.borderColor(tokens.colorNeutralStroke2),
+    ":hover": shorthands.borderColor(tokens.colorNeutralStroke1Hover),
+    ":hover:active": shorthands.borderColor(tokens.colorNeutralStroke1Pressed),
+    '&[aria-current="page"]': shorthands.borderColor(tokens.colorNeutralStroke1Selected),
     "& > span > span:first-child": {
       marginLeft: ICON_OUTSET,
     },
@@ -110,21 +145,24 @@ const useStyles = makeStyles({
     height: "32px",
     flexShrink: 0,
   },
-  // The requests scroll; the decision stays at the foot.
+  // The requests scroll, not the panel.
   content: {
     overflowY: "hidden",
   },
-  // An approved request's log, under its pieces: who approved it and when,
-  // then each figure before and after, the better ones in the success colour.
+  // An approved request's log, under its pieces, as wide as they are and
+  // threaded to them: who approved it and when, then each figure before and
+  // after, the better ones in the success colour.
   decision: {
+    position: "relative",
     display: "flex",
     flexDirection: "column",
     gap: tokens.spacingVerticalXXS,
-    margin: `${tokens.spacingVerticalXS} ${tokens.spacingHorizontalS} ${tokens.spacingVerticalS}`,
+    marginTop: STEP_GAP,
     padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalM}`,
     borderRadius: tokens.borderRadiusMedium,
     border: `1px solid ${tokens.colorNeutralStroke2}`,
     backgroundColor: tokens.colorNeutralBackground2,
+    "::before": threadAbove("1px"),
   },
   decisionBy: {
     color: tokens.colorNeutralForeground2,
@@ -142,18 +180,27 @@ const useStyles = makeStyles({
     color: tokens.colorStatusSuccessForeground1,
     fontWeight: tokens.fontWeightSemibold,
   },
+  // No gap: each request's section is padded 16px either side of its divider.
   requests: {
     display: "flex",
     flexDirection: "column",
     flex: "1 1 auto",
     minHeight: 0,
     overflowY: "auto",
-    gap: tokens.spacingVerticalXS,
     paddingBottom: tokens.spacingVerticalS,
   },
+  // The decision on what waits, under the newest request waiting, as wide as
+  // its pieces and threaded to them, as the decision log is once it is made;
+  // the line is its divider here.
   approval: {
-    flexShrink: 0,
-    padding: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalL}`,
+    position: "relative",
+    marginTop: STEP_GAP,
+    borderTop: "none",
+    "::before": threadAbove(),
+  },
+  // A cancelled request's title, struck through as its pieces are.
+  cancelled: {
+    textDecorationLine: "line-through",
   },
   request: {
     // Coral fixes the group's header at 36px; with its description it needs more.
@@ -223,7 +270,7 @@ function RequestLabel({ request }: { request: OutputRequest }) {
   const styles = useStyles();
   return (
     <span className={styles.labelStack}>
-      <span className={styles.labelTitle}>{request.title}</span>
+      <span className={mergeClasses(styles.labelTitle, describeRequest(request).cancelled && styles.cancelled)}>{request.title}</span>
       <Caption1 className={styles.labelMeta}>
         <RequestMeta request={request} />
       </Caption1>
@@ -307,6 +354,8 @@ export function OutputsPanel() {
     () => (waitingApproval ? <OutputsWaitingIcon className="ops-outputs-branch" /> : <OutputsIcon />),
     [waitingApproval],
   );
+  // What waits is decided as one, under the newest request it is for.
+  const deciding = requests.find((request) => describeRequest(request).waiting)?.id;
   // The toggle is greyed out while there is nothing to list, so it could not close the panel.
   useEffect(() => {
     if (requests.length === 0 && eventBus.getActivePanel() === OUTPUTS_PANEL_ID) eventBus.setActivePanel(null);
@@ -322,25 +371,31 @@ export function OutputsPanel() {
     >
       <Panel.Toolbar title="Outputs" className={styles.toolbar} />
       <div className={styles.requests}>
+        {/* Each request in its own headless Panel.NavSection, as the operations
+            panel's groups are: with no label it has no header and is always
+            open, and `border` gives the divider under it. Collapsing stays on
+            the NavGroup. */}
         {requests.map((request) => (
-          <Panel.NavGroup
-            key={request.id}
-            defaultOpen
-            icon={<ActorAvatar actor={request.actor} />}
-            label={<RequestLabel request={request} />}
-            className={styles.request}
-          >
-            <OutputSteps
-              steps={request.steps}
-              rowClassName={styles.row}
-              onOpen={openStep}
-              selectedStayIds={selectedStayIds}
-            />
-            {request.decision && <DecisionLog decision={request.decision} />}
-          </Panel.NavGroup>
+          <Panel.NavSection key={request.id} border>
+            <Panel.NavGroup
+              defaultOpen
+              icon={<ActorAvatar actor={request.actor} />}
+              label={<RequestLabel request={request} />}
+              className={styles.request}
+            >
+              <OutputSteps
+                steps={request.steps}
+                className={styles.steps}
+                rowClassName={styles.row}
+                onOpen={openStep}
+                selectedStayIds={selectedStayIds}
+              />
+              {request.decision && <DecisionLog decision={request.decision} />}
+              {request.id === deciding && <OutputsApproval className={styles.approval} />}
+            </Panel.NavGroup>
+          </Panel.NavSection>
         ))}
       </div>
-      <OutputsApproval className={styles.approval} />
     </Panel.Right>
   );
 }

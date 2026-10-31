@@ -45,13 +45,13 @@ import "./demo.css";
  * for a tow, round (aero) or tapered (classic) for a flight. One function per
  * style, so the chart lays its bars out again only when the style changes.
  */
-const BAR_ENDS: Record<FlightStyle, (o: Occupancy) => BarEnds> = {
+export const BAR_ENDS: Record<FlightStyle, (o: Occupancy) => BarEnds> = {
   aero: (o) => stayEnds(DATA.endpoints.get(o.id), "aero"),
   classic: (o) => stayEnds(DATA.endpoints.get(o.id), "classic"),
 };
 
 /** The labels' disclosure order; one array, so each bar's labels (memoized) keep their props. */
-const LABEL_PRIORITY = ["start", "end", "center"] as const;
+export const LABEL_PRIORITY = ["start", "end", "center"] as const;
 
 export interface StandTimelineDemoProps {
   /** Controlled selection. Omit both props to use the demo standalone. */

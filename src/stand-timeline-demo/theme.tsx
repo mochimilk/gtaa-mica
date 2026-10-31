@@ -129,7 +129,8 @@ const GLASS: StatusPalette = {
 
 /** A dimmed bar's fill: the glass at its faintest, still frosting what is behind it. */
 const DIM_FILL: FillStops = [["var(--flight-dim-glass-from)", 1], ["var(--flight-dim-glass-to)", 1]];
-const DIM_GRADIENT_ID = "demo-gradient-dimmed";
+/** The dimmed bars' fill's id, for `url(#…)`; DemoPatternDefs draws it. */
+export const DIM_GRADIENT_ID = "demo-gradient-dimmed";
 
 /**
  * Tow/hold stripes, in the bar's mark colour over the fill. Neutral labels
@@ -153,7 +154,8 @@ export const STATUS_PALETTE: Record<FlightStatus, StatusPalette> = {
 };
 
 const hatchId = (status: FlightStatus) => `demo-hatch-${status}`;
-const gradientId = (status: FlightStatus) => `demo-gradient-${status}`;
+/** A status's fill's id, for `url(#…)`; DemoPatternDefs draws it. */
+export const gradientId = (status: FlightStatus) => `demo-gradient-${status}`;
 
 /**
  * Custom layer: per-status defs, and the dimmed bars' fill. The fill gradients

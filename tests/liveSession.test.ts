@@ -6,9 +6,11 @@ import {
   createLiveSession,
   describeLiveConfig,
   LIVE_SESSIONS_URL,
+  MICA_GREETING,
   MICA_LIVE_INSTRUCTIONS,
   parseLiveSessionResponse,
   readLiveConfig,
+  TRAVIS_LIVE_INSTRUCTIONS,
   validateSdpOffer,
 } from "../server/live-session.mjs";
 import { FAKE_ANSWER_SDP, FAKE_OFFER_SDP } from "./support/mocks.ts";
@@ -84,6 +86,13 @@ test("session request matches the documented WebRTC shape", () => {
   // WebRTC negotiates audio on the media tracks.
   assert.equal("format" in body.session.audio, false);
   assert.ok(body.session.instructions.includes("no allocation backend"));
+  // Skye's session starts with a greeting in its input, so she speaks first.
+  assert.deepEqual(body.session.input, [
+    { type: "message", role: "developer", content: [{ type: "input_text", text: MICA_GREETING }] },
+  ]);
+  // A session that should not speak first has none.
+  const quiet = buildLiveSessionRequest({ config: config.config, sdp: FAKE_OFFER_SDP, greeting: null });
+  assert.equal("input" in quiet.session, false);
 });
 
 test("response parsing requires both the session id and the answer", () => {
@@ -140,6 +149,45 @@ test("a successful create forwards the key as a bearer token and returns the ans
     model: "gpt-live-1",
     voice: "marin",
   });
+});
+
+test("Travis's session is his own: his instructions and voice, ripple unless set; any other persona is refused", async () => {
+  const seen: { body?: { session: { instructions: string; input?: unknown; audio: { output: { voice: string } } } } } = {};
+  const upstream = (async (_url: string, init: RequestInit) => {
+    seen.body = JSON.parse(String(init.body));
+    return new Response(JSON.stringify({ session: { id: "live_t" }, transport: { sdp: FAKE_ANSWER_SDP } }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }) as unknown as typeof fetch;
+
+  const travis = await createLiveSession({ env: ENV, sdp: FAKE_OFFER_SDP, persona: "travis", fetchImpl: upstream });
+  assert.equal(travis.status, 200);
+  assert.equal(travis.body.voice, "ripple");
+  assert.equal(seen.body?.session.instructions, TRAVIS_LIVE_INSTRUCTIONS);
+  // He speaks only when cued, never first.
+  assert.equal(seen.body?.session.input, undefined);
+  assert.equal(seen.body?.session.audio.output.voice, "ripple");
+
+  await createLiveSession({ env: { ...ENV, MICA_TRAVIS_VOICE: "cedar" }, sdp: FAKE_OFFER_SDP, persona: "travis", fetchImpl: upstream });
+  assert.equal(seen.body?.session.audio.output.voice, "cedar");
+
+  // Skye's is still hers.
+  await createLiveSession({ env: ENV, sdp: FAKE_OFFER_SDP, fetchImpl: upstream });
+  assert.equal(seen.body?.session.instructions, MICA_LIVE_INSTRUCTIONS);
+  assert.equal(seen.body?.session.audio.output.voice, "marin");
+
+  let called = 0;
+  const unused = (() => {
+    called += 1;
+    throw new Error("upstream must not be called");
+  }) as unknown as typeof fetch;
+  for (const persona of ["priya", 3, null]) {
+    const refused = await createLiveSession({ env: ENV, sdp: FAKE_OFFER_SDP, persona, fetchImpl: unused });
+    assert.equal(refused.status, 400);
+    assert.equal((refused.body as { error: { code: string } }).error.code, "invalid_persona");
+  }
+  assert.equal(called, 0);
 });
 
 test("upstream errors are replaced with fixed messages, never echoed", async () => {

@@ -39,6 +39,15 @@
 // it was put (`moveTo`), its ring filling as they work (`setProgress`). Their
 // pointer events are not primary, as a second finger's are not, so they never
 // drive what only the primary pointer should (the chart's autoscroll).
+//
+// Every cursor hovers as a mouse does, wherever it goes and whatever it is
+// doing (the orb aside, which is Skye, not a hand): what comes under it gets
+// the pointer and mouse over, out, enter and leave events a mouse sends, so
+// what the app does on hover it does for Skye too (a bar's labels brighten, a
+// tooltip shows, a menu item takes focus); and, as no script can set :hover,
+// what is under it and everything it sits in carries `data-agent-hover`, which
+// the app's styles give :hover's looks (see HOVER_ATTR). The dot turns into
+// the hand over anything a person's pointer would.
 
 export type Point = { x: number; y: number };
 
@@ -285,9 +294,34 @@ export class AgentCursorController {
   #orbShown = false;
   /** Ends `orbShown` once the shrink has run. */
   #orbTimer: ReturnType<typeof setTimeout> | undefined;
+  /** What its tag shows it doing (setTask). */
+  #task: string | null = null;
+  /** What it is over (hoverAt), and everything that sits in, innermost first. */
+  #hovered: Element[] = [];
+  /** Whether what it is over would turn a person's pointer into the hand. */
+  #overClickable = false;
+
+  /** Every cursor, so what they are over can follow the page as it scrolls under them. */
+  static #all = new Set<AgentCursorController>();
+  static #rehover = 0;
 
   constructor({ pointerId = 1 }: AgentCursorOptions = {}) {
     this.#pointer = { pointerId, isPrimary: pointerId === 1 };
+    AgentCursorController.#all.add(this);
+    if (AgentCursorController.#all.size === 1 && typeof addEventListener === "function") {
+      // A scroll moves the page under a cursor that holds still: once a frame
+      // at most, each then hovers what has come under it, as a mouse would.
+      addEventListener(
+        "scroll",
+        () => {
+          AgentCursorController.#rehover ||= requestAnimationFrame(() => {
+            AgentCursorController.#rehover = 0;
+            for (const cursor of AgentCursorController.#all) if (cursor.#visible) cursor.#hoverAt(cursor.#pos);
+          });
+        },
+        { capture: true, passive: true },
+      );
+    }
   }
 
   /** Called by <AgentCursor /> with its overlay element, and with null on unmount. */
@@ -295,6 +329,7 @@ export class AgentCursorController {
     this.#root = root;
     if (!root) {
       this.#visible = false;
+      this.#hoverAt(null);
       clearTimeout(this.#idleTimer);
     }
   }
@@ -328,7 +363,12 @@ export class AgentCursorController {
     return this.#orbShown;
   }
 
-  /** Calls `listener` whenever `out` or `orbShown` changes; returns the unsubscribe. For useSyncExternalStore. */
+  /** What its tag shows it doing ("Pier B closed · 3/11 moved"), or null. */
+  get task(): string | null {
+    return this.#task;
+  }
+
+  /** Calls `listener` whenever `out`, `orbShown` or `task` changes; returns the unsubscribe. For useSyncExternalStore. */
   subscribe = (listener: () => void): (() => void) => {
     this.#listeners.add(listener);
     return () => this.#listeners.delete(listener);
@@ -366,6 +406,10 @@ export class AgentCursorController {
     const task = this.#root?.querySelector<HTMLElement>(".agent-cursor-task");
     if (task) task.textContent = text ?? "";
     this.#root?.toggleAttribute("data-task", !!text);
+    if (text !== this.#task) {
+      this.#task = text;
+      this.#notify();
+    }
     if (!this.#visible) return;
     this.#wake();
     if (!this.#busy) this.#armIdle();
@@ -382,6 +426,8 @@ export class AgentCursorController {
     clearTimeout(this.#orbTimer);
     this.#orb = on;
     this.#root?.toggleAttribute("data-orb", on);
+    // The orb is Skye, not a hand: it hovers nothing.
+    this.#hoverAt(on ? null : this.#pos);
     this.#wake();
     if (on) this.#setOrbShown(true);
     else {
@@ -453,6 +499,7 @@ export class AgentCursorController {
       if (!this.#visible) return;
       const point = prefersReducedMotion() ? null : (to?.() ?? null);
       if (point) await this.#travel(point, null);
+      this.#hoverAt(null);
       this.#root?.setAttribute("data-merge", "");
       this.#root?.removeAttribute("data-visible");
       this.setTask(null);
@@ -544,6 +591,8 @@ export class AgentCursorController {
     dispatchRelease(receiver, point, this.#pointer, modifiers);
     this.#ripple(point);
     this.#root?.removeAttribute("data-modifier");
+    // The click may have opened, closed or moved what is under it.
+    this.#hoverAt(this.#pos);
 
     // Afterwards the hand relaxes, a small drift, and the cursor stays there.
     if (!reduced && last) void this.#drift();
@@ -616,6 +665,9 @@ export class AgentCursorController {
       }
     }
     if (ready && this.#pos) this.#ripple(this.#pos);
+    // Dropped, the bar lands under the cursor once the board has drawn it there.
+    await nextFrame();
+    this.#hoverAt(this.#pos);
   }
 
   /**
@@ -771,6 +823,7 @@ export class AgentCursorController {
       if (signal.aborted) return;
     }
     this.#setAway(false);
+    this.#hoverAt(null);
     this.#root?.removeAttribute("data-visible");
     // Counted as visible until the fade finishes, so a follow-up in that
     // moment carries on rather than reappearing.
@@ -925,7 +978,39 @@ export class AgentCursorController {
     if (this.#holding) dispatchMove(point, this.#pointer);
     // Near the right edge the name tag goes to the left, so it is never cut off.
     root.toggleAttribute("data-tag-left", point.x > innerWidth - 96);
-    if (variant) this.#setVariant(variant);
+    if (!this.#visible) {
+      if (variant) this.#setVariant(variant);
+      return;
+    }
+    this.#hoverAt(point);
+    // Over the page, what is under it says arrow or hand, as for a person's
+    // pointer; holding a drag, it stays the hand that took hold.
+    const over = this.#hovered[0];
+    if (over && !this.#holding) this.#setVariant(this.#overClickable ? "hand" : "arrow");
+    else if (variant) this.#setVariant(variant);
+  }
+
+  /**
+   * Hovers what is at `point` now, as a mouse over it would (see the file's
+   * head), or nothing (null, or as the orb): what it leaves is told so and
+   * loses `data-agent-hover`, and what it comes onto is told and gains it.
+   */
+  #hoverAt(point: Point | null): void {
+    // At work on a page out of sight (data-skye-away, see agent-cursor.css),
+    // it is not over the one on screen.
+    const target =
+      point && !this.#orb && this.#root && !document.documentElement.hasAttribute("data-skye-away")
+        ? document.elementFromPoint(point.x, point.y)
+        : null;
+    const was = this.#hovered;
+    if ((was[0] ?? null) === target) return;
+    const now: Element[] = [];
+    for (let node: Element | null = target; node; node = node.parentElement) now.push(node);
+    this.#hovered = now;
+    this.#overClickable = !!target && isClickable(target);
+    markHovered(was, -1);
+    markHovered(now, 1);
+    dispatchHover(was, now, point ?? this.#pos ?? { x: 0, y: 0 }, this.#pointer, this.#holding);
   }
 
   #setVariant(variant: CursorVariant): void {
@@ -1096,6 +1181,52 @@ function dispatchDrop(point: Point, pointer: PointerInfo): void {
 function dispatchCancel(point: Point, pointer: PointerInfo): void {
   const init = mouseInit(point, 0);
   send(document.body, new PointerEvent("pointercancel", pointerInit(init, pointer)));
+}
+
+/* --------------------------------------------------------------- hovering */
+
+/**
+ * On what one of Skye's cursors is over, and everything that sits in, as
+ * :hover is: styles that give something a look on :hover give it the same
+ * on `:is(:hover, [data-agent-hover])`.
+ */
+const HOVER_ATTR = "data-agent-hover";
+
+/** How many of Skye's cursors are over each element, so it keeps HOVER_ATTR while any is. */
+const hoverCounts = new Map<Element, number>();
+
+/** One cursor comes onto (`by` 1) or leaves (-1) each of `elements`. */
+function markHovered(elements: readonly Element[], by: 1 | -1): void {
+  for (const element of elements) {
+    const count = (hoverCounts.get(element) ?? 0) + by;
+    if (count > 0) hoverCounts.set(element, count);
+    else hoverCounts.delete(element);
+    element.toggleAttribute(HOVER_ATTR, count > 0);
+  }
+}
+
+/**
+ * Moving from what `was` lists to what `now` does (each innermost first):
+ * out and over at the innermost of each, leave on each it is no longer in
+ * (innermost first) and enter on each it has come into (outermost first),
+ * pointer then mouse, as a mouse sends them.
+ */
+function dispatchHover(was: readonly Element[], now: readonly Element[], point: Point, pointer: PointerInfo, holding: boolean): void {
+  const init = mouseInit(point, holding ? 1 : 0);
+  const [from, to] = [was[0] ?? null, now[0] ?? null];
+  const still = new Set(now);
+  const already = new Set(was);
+  const pair = (target: Element, type: "out" | "over" | "leave" | "enter", relatedTarget: Element | null) => {
+    if (!target.isConnected) return;
+    const bubbles = type === "out" || type === "over";
+    const each = { ...init, bubbles, cancelable: bubbles, relatedTarget };
+    send(target, new PointerEvent(`pointer${type}`, pointerInit(each, pointer)));
+    send(target, new MouseEvent(`mouse${type}`, each));
+  };
+  if (from) pair(from, "out", to);
+  for (const element of was) if (!still.has(element)) pair(element, "leave", to);
+  if (to) pair(to, "over", from);
+  for (const element of [...now].reverse()) if (!already.has(element)) pair(element, "enter", from);
 }
 
 /** The one cursor Skye has. */

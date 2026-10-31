@@ -379,7 +379,7 @@ function Peek({
             <RequestMeta request={showing} />
           </Caption1>
         </div>
-        <OverflowScroll className={styles.steps} fade="mask">
+        <OverflowScroll className={styles.steps}>
           <OutputSteps steps={showing.steps} className={styles.rows} />
         </OverflowScroll>
         <OutputsApproval className={styles.approval} />

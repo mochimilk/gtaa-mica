@@ -1,5 +1,17 @@
-import type { ReactNode } from "react";
-import { Button, Tooltip, makeStyles, mergeClasses, type ButtonProps } from "@fluentui/react-components";
+import { useState, type ReactNode, type Ref } from "react";
+import { Dismiss } from "@coral-ai/bundleicons/Dismiss";
+import {
+  Button,
+  CounterBadge,
+  Popover,
+  PopoverSurface,
+  Tooltip,
+  makeStyles,
+  mergeClasses,
+  tokens,
+  useMergedRefs,
+  type ButtonProps,
+} from "@fluentui/react-components";
 import type { FluentIcon } from "@fluentui/react-icons";
 
 /** The rail's width, for layouts that offset against it. */
@@ -28,6 +40,33 @@ const useStyles = makeStyles({
     flexDirection: "column",
     alignItems: "center",
     gap: "12px",
+  },
+  // The icon, holding a count at its top right that overhangs it.
+  badged: {
+    position: "relative",
+    display: "inline-flex",
+  },
+  badge: {
+    position: "absolute",
+    top: "-6px",
+    right: "-8px",
+  },
+  // The callout: what it says, then its dismiss, at its top right.
+  callout: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: tokens.spacingHorizontalS,
+    maxWidth: "280px",
+    paddingRight: tokens.spacingHorizontalXS,
+  },
+  calloutBody: {
+    flex: "1 1 auto",
+    minWidth: 0,
+    alignSelf: "center",
+  },
+  calloutDismiss: {
+    flexShrink: 0,
+    marginTop: "-2px",
   },
 });
 
@@ -70,6 +109,19 @@ export type NavRailButtonProps = DistributiveOmit<ButtonProps, "icon" | "childre
   label: string;
   /** The page on screen: its icon stays filled and it is marked current. */
   current?: boolean;
+  /** How many things wait there, on a counter at the icon's top right; none at 0. */
+  count?: number;
+  /** A note beside the entry, pointing at it, while set: e.g. that Skye is at work on its page. */
+  callout?: NavRailCallout;
+  ref?: Ref<HTMLButtonElement | HTMLAnchorElement>;
+};
+
+export type NavRailCallout = {
+  /** What it says, with its own name for the surface (`label`). */
+  content: ReactNode;
+  label: string;
+  /** Its dismiss button, or Escape within it. */
+  onDismiss: () => void;
 };
 
 /**
@@ -77,16 +129,68 @@ export type NavRailButtonProps = DistributiveOmit<ButtonProps, "icon" | "childre
  * it. Its icon is regular at rest and filled on hover, or filled throughout
  * while `current`. Wrappers' props and refs (e.g. MenuTrigger's) reach the
  * button.
+ *
+ * Its `callout` is a Fluent popover beside it, its arrow on the button. It
+ * is a note, not a question: it takes no focus as it opens, and stays open
+ * through clicks elsewhere until dismissed (or no longer set).
  */
-export function NavRailButton({ icon: Icon, label, current = false, appearance = "subtle", ...rest }: NavRailButtonProps) {
+export function NavRailButton({
+  icon: Icon,
+  label,
+  current = false,
+  count = 0,
+  callout,
+  appearance = "subtle",
+  ref,
+  ...rest
+}: NavRailButtonProps) {
+  const styles = useStyles();
+  const [button, setButton] = useState<HTMLButtonElement | HTMLAnchorElement | null>(null);
+  const buttonRef = useMergedRefs(ref, setButton);
+  const icon = <Icon filled={current} />;
   return (
-    <Tooltip content={label} relationship="label" positioning="after">
-      <Button
-        {...rest}
-        appearance={appearance}
-        aria-current={current ? "page" : undefined}
-        icon={<Icon filled={current} />}
-      />
-    </Tooltip>
+    <>
+      <Tooltip content={count > 0 ? `${label}, ${count} waiting` : label} relationship="label" positioning="after">
+        <Button
+          {...rest}
+          ref={buttonRef}
+          appearance={appearance}
+          aria-current={current ? "page" : undefined}
+          icon={
+            count > 0 ? (
+              <span className={styles.badged}>
+                {icon}
+                <CounterBadge size="small" count={count} className={styles.badge} aria-hidden />
+              </span>
+            ) : (
+              icon
+            )
+          }
+        />
+      </Tooltip>
+      {callout && button && (
+        <Popover
+          open
+          onOpenChange={(event, data) => {
+            if (!data.open && event.type === "keydown") callout.onDismiss();
+          }}
+          positioning={{ target: button, position: "after", align: "center", offset: 10 }}
+          withArrow
+          unstable_disableAutoFocus
+        >
+          <PopoverSurface className={styles.callout} role="status" aria-label={callout.label}>
+            <div className={styles.calloutBody}>{callout.content}</div>
+            <Button
+              className={styles.calloutDismiss}
+              appearance="subtle"
+              size="small"
+              icon={<Dismiss />}
+              aria-label="Dismiss"
+              onClick={callout.onDismiss}
+            />
+          </PopoverSurface>
+        </Popover>
+      )}
+    </>
   );
 }

@@ -226,18 +226,42 @@ const RESOLVE_CUE = /\b(resolve|fix|sort( it)?( out)?|handle|work( it| on| out)?
 const EXPLAIN_CUE =
   /^(why|how come)\b|\bwhy (not|did|didn'?t|are|is|move|keep|those|that)\b|\b(explain|impact|trade-?offs?|compare[sd]?|comparison|what (does|did) (that|this|it|the plan) (do|change|cost)|what changed|what('?s| is) the (cost|catch|impact))\b/;
 
+/** Taking Skye up on her offer to work it ("want to take a look?"), besides a plain yes. */
+const WORK_IT_CUE =
+  /\b(let'?s (do|work|run|go|get|sort|look|see|have a look|take a look)|go for it|run (it|with it)|work (through )?it|sounds good|(take|have) a look|show me)\b/;
+
 /**
  * A request about the day's disruption (see ../operations/disruption):
  * dealing with it ("resolve the XD472 disruption", "fix the late arrival",
- * "run it"), or, once it has arrived, asking why the plan is what it is
- * ("why not move XD472 instead?", "what's the impact?"). Null otherwise.
+ * "run it"); a yes to Skye's offer to, when that is the last thing she said
+ * ("confirm": "yeah", "let's work through it"); or, once it has arrived,
+ * asking why the plan is what it is ("why not move XD472 instead?", "what's
+ * the impact?"). Null otherwise.
  */
-export function matchDisruptionRequest(utterance: string): "resolve" | "explain" | null {
+export function matchDisruptionRequest(
+  utterance: string,
+  taskHistory: readonly TaskHistoryEntry[] = [],
+): "resolve" | "confirm" | "explain" | null {
   const normalized = normalize(utterance);
   if (disruptionState().landedAt === null) return null;
+  if (
+    taskHistory.at(-1)?.proposal?.name === "resolve_disruption" &&
+    (CONFIRM_CUE.test(normalized) || WORK_IT_CUE.test(normalized))
+  ) {
+    return "confirm";
+  }
   if (EXPLAIN_CUE.test(normalized)) return "explain";
   if (DISRUPTION_CUE.test(normalized) && RESOLVE_CUE.test(normalized)) return "resolve";
   return null;
+}
+
+/** What matchDisruptionRequest found, as a request: a yes carries out exactly what Skye offered. */
+function disruptionRequest(found: "resolve" | "confirm" | "explain", taskHistory: readonly TaskHistoryEntry[]): InterpretedRequest {
+  if (found === "explain") return action("explain_plan");
+  const offered = found === "confirm" ? taskHistory.at(-1)?.proposal : undefined;
+  if (!offered) return action("resolve_disruption");
+  const { name, ...args } = offered;
+  return action(name, args);
 }
 
 /** Cue words that mean "keep the selection and add to it". */
@@ -349,8 +373,8 @@ function interpretPhrase(
   const closing = matchAreaClosure(utterance);
   if (closing) return action("close_area", closing);
   // The day's disruption: dealing with it, or why the plan is what it is.
-  const disruption = matchDisruptionRequest(utterance);
-  if (disruption) return action(disruption === "resolve" ? "resolve_disruption" : "explain_plan");
+  const disruption = matchDisruptionRequest(utterance, taskHistory);
+  if (disruption) return disruptionRequest(disruption, taskHistory);
   const spokenCodes = mentionedFlightCodes(squashed);
   if (SUGGEST_CUE.test(normalized) && STAND_CHANGE_CUE.test(normalized)) {
     if (spokenCodes.length === 0) return action("suggest_move", { flightId: null });
@@ -609,9 +633,10 @@ export function withDemoShortcuts(inner: RequestInterpreter): RequestInterpreter
       const closing = matchAreaClosure(request.utterance);
       if (closing) return Promise.resolve(action("close_area", closing));
       // The same for the disruption demo (docs/disruption-demo.md): its Run
-      // button's request, and the follow-up questions, always land.
-      const disruption = matchDisruptionRequest(request.utterance);
-      if (disruption) return Promise.resolve(action(disruption === "resolve" ? "resolve_disruption" : "explain_plan"));
+      // button's request, a yes to Skye's offer to work it, and the
+      // follow-up questions, always land.
+      const disruption = matchDisruptionRequest(request.utterance, request.taskHistory);
+      if (disruption) return Promise.resolve(disruptionRequest(disruption, request.taskHistory));
       return inner.interpret(request, signal);
     },
   };

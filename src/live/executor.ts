@@ -371,13 +371,14 @@ export class DelegationExecutor {
     switch (interpreted.kind) {
       case "unsupported": {
         this.#log({ delegationId: job.delegationId, outcome: "unsupported", detail: interpreted.reason });
-        job.reply(interpreted.reason);
         // Session-wide guardrail, so the model does not later imply it worked.
+        // Before the reply: an instruction arriving as she says it can cut her off.
         this.#inject(
           "instructions",
           null,
           "Mica did not perform that request and cannot. Do not say or imply that it was done, scheduled or queued.",
         );
+        job.reply(interpreted.reason);
         this.#remember(utterance, null, "unsupported", interpreted.reason);
         break;
       }

@@ -27,7 +27,8 @@ import { createFakeHost } from "./support/mocks.ts";
 
 // The plan starts clear; the day's news makes two conflicts. XA103/104 runs
 // 55 minutes late off A1, into XB210/211; and the disruption: XD472/473 is
-// 1h 50m late on B11, and runs into both arrivals behind it.
+// 1h 50m late onto B11 and 3h 10m late off it, and runs into the four
+// arrivals behind it.
 setRunningLate("T02-1", 0, 55);
 landDisruption();
 
@@ -58,8 +59,8 @@ test("each no-stand flight with stay times gets the first free stand that takes 
     { stayId: "U01-1", standId: "C27" },
     // XA130 has no aircraft type, so it only goes where any aircraft fits.
     { stayId: "U02-1", standId: "A3" },
-    // XD480, a B789.
-    { stayId: "U03-1", standId: "B10" },
+    // XD480, a B789: Pier B's widebody stands are taken that afternoon.
+    { stayId: "U03-1", standId: "C25" },
     // XC350 overlaps XB240, which was planned onto C27 first.
     { stayId: "U04-1", standId: "D44" },
   ]);
@@ -151,8 +152,8 @@ test("'fix the no-stand flights' places what fits and says why the rest can't be
   assert.deepEqual((action as Extract<AppAction, { name: "assign_stands" }>).flightIds, ["U01", "U02", "U03", "U04", "U05"]);
   assert.equal(mutated, true);
   // Placed; the next thing offered (the A1 conflict) is selected only as Skye says it.
-  assert.deepEqual(host.calls, ["assignStands:U01-1>C27|U02-1>A3|U03-1>B10|U04-1>D44"]);
-  assert.match(spoken, /^Placed XB240 on C27, XA130 on A3, XD480 on B10 and XC350 on D44\./);
+  assert.deepEqual(host.calls, ["assignStands:U01-1>C27|U02-1>A3|U03-1>C25|U04-1>D44"]);
+  assert.match(spoken, /^Placed XB240 on C27, XA130 on A3, XD480 on C25 and XC350 on D44\./);
   assert.match(spoken, /I couldn't place one: XB241 has no stay times in the demo data/);
   assert.match(spoken, /checked only for overlaps, stand sizes and closures/);
   // Having cleared what it could, Skye offers the next thing to do.
@@ -207,7 +208,7 @@ test("every open alert is read, grouped, and conflicts can be read on their own"
   const alerts = run("list_alerts").spoken;
   assert.match(alerts, /^9 open demo alerts\./);
   assert.match(alerts, /5 flights have no stand: XB240, XC350, XA130, XD480 and XB241\./);
-  assert.match(alerts, /2 conflicts: XA103\/104 runs 55m late off A1, into XB210\/211; XD472\/473 runs 1h 50m late off B11, into XC344\/345, XB232\/233\./);
+  assert.match(alerts, /2 conflicts: XA103\/104 runs 55m late off A1, into XB210\/211; XD472\/473 runs 3h 10m late off B11, into XC344\/345, XB232\/233, XA117\/118, XC336\/337\./);
   assert.match(alerts, /2 notices/);
 
   const conflicts = run("list_conflicts").spoken;

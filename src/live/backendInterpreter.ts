@@ -16,7 +16,7 @@ import { OPS_FLIGHTS, standMinutes } from "../operations/operationsData.ts";
 import { formatUtc } from "../stand-timeline-demo/demoData.ts";
 import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture.ts";
 import { PEOPLE } from "./callGuests.ts";
-import { liveApiBase } from "./liveBackend.ts";
+import { liveApiBase, liveFetch } from "./liveBackend.ts";
 import { describeAlertCounts, flightLabel } from "./opsHost.ts";
 import type { InterpretationRequest, InterpretedRequest, RequestInterpreter } from "./requestInterpreter.ts";
 
@@ -205,7 +205,7 @@ export function decisionToRequest(decision: InterpretDecision): InterpretedReque
  */
 export function createBackendInterpreter({
   baseUrl = liveApiBase(),
-  fetchImpl = fetch,
+  fetchImpl = liveFetch,
 }: BackendInterpreterOptions = {}): RequestInterpreter {
   return {
     id: "responses-backend",

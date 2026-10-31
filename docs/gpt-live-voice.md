@@ -108,10 +108,13 @@ the audio track, creates and sets the offer, waits for ICE gathering, posts the
 offer to the broker, applies the answer, and waits for `session.started`. It
 never sends `session.start`, which WebRTC forbids.
 
-Once the session is up, Mica sends the board context, then one
-`session.instructions.append` (`GREETING_INSTRUCTIONS` in
-`src/live/callController.ts`) so Skye picks up with a casual hello instead of
-waiting for the caller to speak first.
+Skye's session starts with a greeting in its input, as a developer message
+(`MICA_GREETING` in `server/live-session.mjs`). Once the session is up, Mica
+sends the board context, then the greeting once more as
+`session.commentary.append` (`GREETING_INSTRUCTIONS` in
+`src/live/callController.ts`), as GPT-Live's guide has a session greet, so Skye
+picks up with a casual hello instead of waiting for the caller to speak first.
+The guide is clear this improves the odds rather than guarantees it.
 
 Hanging up sends `session.close`, waits a bounded time for `session.closed`,
 then releases the tracks and the connection regardless — a disconnected
@@ -140,7 +143,7 @@ it:
 | `suggest_move` | Read-only: the move or swap that most widens the tightest gap between stays, offered with "Want me to do it?" |
 | `close_area` | Closes a stand area (optionally for a time window) and moves every stay on it then to free stands; Skye splits into several cursors to drag them at once. See [multi-agent-demo.md](multi-agent-demo.md) |
 | `assign_stands` | Gives stands to flights with none (named, or all of them), keeping their stay times: onto a named stand for one flight, otherwise the first free stand that takes each. Says why each flight it cannot place could not be placed. Skye drags each flight out of the Arrivals/Departures list and onto its stand, one at a time, even when asked to place them all; people can drag them the same way |
-| `add_to_call`, `remove_from_call` | Brings a teammate from the people list (Priya Raman, Marcus Chen, Aisha Okafor, Travis Hughes, each with an expertise; `TEAM` in `src/live/callGuests.ts`) into the call, or takes them off. Skye clicks the call window's **Add people** menu (or, off a call, the People list), or the tile's remove button. They only show on the call window; nothing reaches them |
+| `add_to_call`, `remove_from_call` | Brings a teammate from the people list (Priya Raman, Marcus Chen, Aisha Okafor, Travis Hughes, each with an expertise; `TEAM` in `src/live/callGuests.ts`) into the call, or takes them off. Off a call, Skye clicks the People list's call button on their row; on one, she shows the call window, which has no Add people, and they ring there. To take someone off, she clicks the tile's remove button. They only show on the call window; nothing reaches them |
 | `unassign_stands` | Takes flights' stays off their stands, and so off the chart; arrival and departure come off together. Skye clicks each bar, then the popover's **Unassign** |
 | `resolve_disruption` | Clears a late flight's knock-on: Skye's echoes weigh it across the plan, then move the stays it runs into, and the late aircraft keeps its stand. See [disruption-demo.md](disruption-demo.md) |
 | `explain_plan` | Read-only: why that plan is what it is, and what it does to gate hold and stand use |
@@ -190,9 +193,15 @@ simulated clicks. `SelectionPopover` behaviour is untouched, including the
 
 | Channel | Used for |
 | --- | --- |
-| `session.thinking.append` | Quiet facts: board context, progress. Not spoken. |
-| `session.commentary.append` | The result the user should hear. |
-| `session.instructions.append` | App-authored steering only, e.g. "do not claim that was done". |
+| `session.thinking.append` | Quiet facts: board context, progress, what Travis is approving. Not spoken. |
+| `session.commentary.append` | Anything to be said now: a result, the greeting, Skye's heads-up and briefing (`say`, `offer`, `speak`), Travis's cue. |
+| `session.instructions.append` | Standing rules only, e.g. "do not claim that was done", sent before the reply it goes with. |
+
+Instructions are never used to make anyone speak: they stay with the session
+for the rest of the call, and the guide warns that one arriving mid-sentence
+can cut speech off. Mica also waits for Skye's *voice* to stop, not just her
+transcript (which runs ahead of the audio), before giving her something new to
+say or cueing Travis after her.
 
 Injected content is held to a hard UTF-8 byte budget. The documented limit is
 500 tokens, and a character count cannot bound tokens; byte-level BPE gives
@@ -223,8 +232,8 @@ SDP exchange and the agent's audio. Camera, screen capture and every other
 permission stay denied, and sandboxing, context isolation and disabled Node
 integration are unchanged.
 
-A packaged build has no dev-server proxy, so it needs the broker's URL at build
-time:
+A packaged build has no dev-server proxy, so to use the broker it needs the
+broker's URL at build time (or see [Your own key, in the desktop app](#your-own-key-in-the-desktop-app)):
 
 ```text
 VITE_MICA_API_BASE_URL=http://127.0.0.1:8787 npm run build:desktop
@@ -232,6 +241,39 @@ VITE_MICA_API_BASE_URL=http://127.0.0.1:8787 npm run build:desktop
 
 Set `MICA_LIVE_BACKEND_ORIGIN` for the main process if the broker is not on the
 default port, so the CSP matches. Only loopback http origins are accepted.
+
+### Your own key, in the desktop app
+
+The desktop app can also run Skye without the broker, on a key typed into
+**Settings → API** (`electron/appVoice.mjs`):
+
+```
+renderer ──key, once──▶ main process                (key in memory, this window only)
+renderer ──SDP offer──▶ main process ──SDP offer──▶ api.openai.com
+         ◀─SDP answer──              ◀─SDP answer─  (key in the Authorization header)
+```
+
+- The page hands the key to the main process over IPC once and lets go of it.
+  There is no call that reads it back; the page only gets its provider and a
+  masked form (`sk-proj-…a1b2`, as OpenAI's dashboard shows it) for the table.
+  A window holds one key, so saving another replaces it.
+- The main process keeps it in memory for the window that set it, and forgets
+  it when that window reloads, navigates or closes, or its renderer crashes.
+  Requests in flight are abandoned. Nothing writes it to disk, to
+  `process.env` (which child processes inherit) or to a log, and the app's own
+  `OPENAI_API_KEY`, if it has one, is never used in its place.
+- The main process answers `/api/live/session`, `/api/live/interpret` and
+  `/api/live/health` itself, with the broker's own `live-session.mjs` and
+  `interpret.mjs`, so every check the broker makes still applies. The key only
+  ever travels in the Authorization header of those calls to api.openai.com,
+  never on a request the page makes, so it never shows in DevTools' network
+  panel either.
+- The interpreter model is `gpt-6-luna` unless `MICA_INTERPRETER_MODEL` says
+  otherwise, since the packaged app has no `.env`.
+- With no key set, the window goes to the broker exactly as before. A packaged
+  build with no broker says Skye needs a key, and where to add one.
+
+In a browser the field is off: there is nowhere to keep the key from the page.
 
 ## Security scope: local development only
 
@@ -263,10 +305,11 @@ conversational surface on Mica's own setup, with no second integration:
   what Mica actually did or refused. Stop cancels a typed request in flight
   (`cancelTypedRequest`) and never touches voice work.
 - **Voice** is the shared GPT-Live call from `LiveCallProvider`. Connect in
-  the pill places the call; the voice bar has Skye's orb, a level meter (read
-  from the call's own microphone and agent streams, nothing recorded), the
-  running time and a red Disconnect. Mute sits outside the bar, on its right. The call's transcript
-  joins the conversation as spoken turns.
+  the pill places the call; on the call the pill is Skye's orb alone, which
+  speeds up and glows brighter as she talks (read from her side of the call,
+  nothing recorded). Mute and Disconnect (Skye's) sit at the app bar's end;
+  the people called in leave with the call window's red Leave. The call's
+  transcript joins the conversation as spoken turns.
 - **Rendering**: Coral's `Chat.Canvas` owns the conversation and
   `Chat.Messages` draws it. The input, buttons and voice bar are VelmAI's
   custom controls (`src/components/ask-skye`), styled with Fluent's CSS

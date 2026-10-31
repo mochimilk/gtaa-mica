@@ -52,6 +52,16 @@
   overflow: hidden;
 }
 
+/*
+ * Skye at work on a page that is out of sight, the user on another
+ * (live/outOfSight.ts): her cursors, their tethers and their ripples go out
+ * of sight with it, while she carries on. Back on that page, they show where
+ * her work is.
+ */
+:root[data-skye-away] .agent-cursor-layer {
+  visibility: hidden;
+}
+
 @media (prefers-color-scheme: dark) {
   .agent-cursor-layer {
     --agent-cursor-fill: #ffffff;
@@ -81,15 +91,23 @@
   }
 }
 
-/* The other Skye glows (skyeGlow.ts): Aurora, the northern lights' blue-violet; Glacier, an electric ice-blue. */
+/*
+ * The other Skye glows (skyeGlow.ts): Aurora, the northern lights' blue-violet;
+ * Seafoam, a bright sea-green; Iris, a soft sky blue.
+ */
 :root[data-skye-glow="aurora"] .agent-cursor-layer,
 .skye-glow-swatch[data-glow="aurora"] {
   --agent-cursor-light: 92, 64, 224;
 }
 
-:root[data-skye-glow="glacier"] .agent-cursor-layer,
-.skye-glow-swatch[data-glow="glacier"] {
-  --agent-cursor-light: 0, 140, 190;
+:root[data-skye-glow="seafoam"] .agent-cursor-layer,
+.skye-glow-swatch[data-glow="seafoam"] {
+  --agent-cursor-light: 0, 155, 125;
+}
+
+:root[data-skye-glow="iris"] .agent-cursor-layer,
+.skye-glow-swatch[data-glow="iris"] {
+  --agent-cursor-light: 66, 150, 235;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -98,9 +116,14 @@
     --agent-cursor-light: 156, 136, 255;
   }
 
-  :root[data-skye-glow="glacier"] .agent-cursor-layer,
-  .skye-glow-swatch[data-glow="glacier"] {
-    --agent-cursor-light: 0, 229, 255;
+  :root[data-skye-glow="seafoam"] .agent-cursor-layer,
+  .skye-glow-swatch[data-glow="seafoam"] {
+    --agent-cursor-light: 80, 240, 190;
+  }
+
+  :root[data-skye-glow="iris"] .agent-cursor-layer,
+  .skye-glow-swatch[data-glow="iris"] {
+    --agent-cursor-light: 140, 200, 255;
   }
 }
 

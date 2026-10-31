@@ -46,7 +46,7 @@ many more moves and a longer run. For the demo, give a window.
    hand. Everything that glows here is one colour, `--agent-cursor-light` in
    `agent-cursor.css`: by default black on a light page and white on a dark
    one. **Glow** in Settings (the avatar's menu, Appearance) picks Default,
-   Aurora (blue-violet) or Glacier (electric ice-blue). A ring round the
+   Aurora (blue-violet), Seafoam (sea-green) or Iris (sky blue). A ring round the
    orb fills as the stays move, a loading bar for the whole job. Solid, glowing
    lines run from the ring to each helper, and more join everyone in
    triangles, a web over the work. Every 2.6 seconds a glowing orb of light
@@ -84,6 +84,7 @@ board visible, it takes fewer rounds. A larger window helps too.
 | Several drags at once: the chart keeps one drag per pointer; only the primary pointer autoscrolls | `useBarDrag` in `src/stand-timeline/layers.tsx` |
 | Moves land quietly during the run (no per-stay selection or popover), and the moved stays are highlighted at the end | `runSkyeBatch` and `closeArea` in `src/operations/OperationsContext.tsx` |
 | The trigger phrase, matched before any interpreter | `matchAreaClosure` and `withDemoShortcuts` in `src/live/requestInterpreter.ts` |
+| Working out of sight: the page Skye's cursor works on (the board, or the Chat page while she walks a teammate through the shared approval) stays mounted behind any other page, hidden and inert, so her work carries on there; her cursors hide with it, and a drag in flight when the board goes or comes back is let go and taken up again. Beside that page's nav rail entry, a note says "Skye is still working here" with what she's doing (her cursor's tally, as "Pier B closed · 3/12 moved"), then "Skye is done here" if she finishes while you're away, until you go there or dismiss it | `src/live/outOfSight.ts`, `App.tsx`, `AppNavRail.tsx`, `playAgentGesture` and `dragStay` in `agentGestures.ts`, `src/approvals/walkThrough.ts` |
 
 **The trigger is deterministic on purpose.** `withDemoShortcuts` recognises
 the closure phrasing before the interpreter model is asked, so the demo plays
@@ -109,7 +110,7 @@ The demo answers none of these. It picks the simplest thing that shows well.
 - **Who does the user talk to?** One Skye voice, one reply. If helpers are
   "agents", can the user address one ("Skye 3, stop")? Today they can't.
 - **Approval and trust.** Every stand change Skye makes now waits on the
-  board for approval, with one undo for the whole batch (see below). Still
+  board for approval, with one Cancel for the whole batch (see below). Still
   open: whether a plan this big should be confirmed *before* the cursors
   move (show the arrows, then go), and what happens when the board moves on
   while a review waits.
@@ -134,7 +135,7 @@ The demo answers none of these. It picks the simplest thing that shows well.
 Every change to the board is listed in the **Outputs** panel (its toggle ends
 the board's header, after Filters and Views), newest first, under who made
 it: each request Skye works on ("Fix all conflicts"), and each thing you do
-yourself (a drag, a swap, an undo, Reset stands). Under each one is every
+yourself (a drag, a swap, Reset stands). Under each one is every
 piece it moved, turn by turn, like moves listed under a chess game
 ("XA101/102 · A1 → C25"), each with Ask Skye's step spinner:
 
@@ -143,25 +144,43 @@ piece it moved, turn by turn, like moves listed under a chess game
   need no one's approval, so they show checks straight away.
 - **A half-dashed circle**, in amber, while a teammate still has to approve it, then a check
   once they have, with their avatar beside it.
-- **An undo arrow** once Skye's changes are undone.
+- **An undo arrow**, the piece struck through, once Skye's changes are
+  cancelled. The request then reads "Cancelled by you" instead of "Waiting
+  for approval"; cancelling isn't listed as a change of your own.
 
 While the panel is closed, the request Skye is on peeks out at the board's top
 right, under the header, showing up to five and a half pieces. Once she's
 done it becomes the compact approval: it glows like the light at the foot of
 the page, and stays until you decide. Opening the panel puts it away (the
-decision is at the panel's foot too), and closing the panel brings it back.
-The decision is a full-width primary button with **Undo** under it. When the
+decision is in the panel too, under the request waiting, threaded to its
+pieces), and closing the panel brings it back.
+The decision is a full-width primary button with **Cancel** under it. When the
 changes need baggage, the primary button reads **Review with baggage**, which
 calls Travis in, then **Waiting on baggage** while he's called and looks, and
 **Approve** once he has approved.
+
+**The Approvals page.** Calling Travis in (**Review with baggage**, or a yes
+to Skye's offer) switches to the Approvals page, the second entry in the nav
+rail, which counts what waits. Its panel lists what waits, then what was
+decided (approved or cancelled). The plan open fills the page: its title, with
+Teams' meeting bar while there is a call (only the microphone and **Leave**
+work), over the call's tiles (the floating call window stays hidden there). Under them, two panes. **Stand changes**
+lists every change as a card (arrival, from stand → to stand, departure);
+pick one. **Baggage carousels** shows what it does to the flight's bags, on
+the board's chart with the carousels for rows: where they came off before
+(dashed), where they come off now, and any other flight's bags they clash
+with there, in red. At the foot, **Cancel** and the decision: **Review with
+baggage**, "Waiting for approval" while Travis is called and looks, then
+**Approve plan**. The baggage data is synthetic, made from the sample
+flights (`src/stand-timeline-demo/baggageFixture.ts`).
 
 A change needs **Travis Hughes (Baggage operations)** when it moves a
 flight's bags: another pier or the remote stands, a stand gained or lost, or
 new times. A move between stands on the same pier at the same times doesn't.
 
 **Calling Travis.** When Travis has to approve and isn't on the call, Skye
-asks: "It's waiting for approval: Travis Hughes for baggage operations
-first, then you. Want me to give Travis a call?" A "yes" calls him (her
+asks, in a few words: "Baggage operations in Terminal B approves first,
+then you. Want me to call them?" A "yes" calls him (her
 cursor uses the People list), which is the same as pressing **Review with
 baggage**. He looks at the change once he picks up, about 5 seconds later
 (`ANSWER_MS`), and approves 10 seconds after that (`SIGNOFF_MS`), once Skye has briefed him. If he's
@@ -169,14 +188,17 @@ already on the call, the change goes straight to him. This call offer
 replaces any "want me to fix the next thing?" offer in the same reply, so a
 yes means one thing.
 
-**Approve** keeps the changes. **Undo** puts every stay Skye moved back where
+**Approve** keeps the changes. **Cancel** puts every stay Skye moved back where
 it was, reopens a closed area (a stay someone has moved again since is left
 alone), and clears every selection, yours and Skye's. Changes Skye makes
 while others are waiting join them, and Travis is asked again from the start.
 
 Nothing reaches Travis. The rule and the people are in
 `src/operations/skyeReview.ts` and the `TEAM` list in
-`src/live/callGuests.ts`, where every person has an expertise.
+`src/live/callGuests.ts`, where every person has an expertise. The page is
+`src/approvals/ApprovalsPage.tsx`, and what it lists is in
+`src/approvals/approvalList.ts`. The bags are in `src/operations/baggage.ts`,
+and their chart is `src/approvals/CarouselTimeline.tsx`.
 
 Skye's swaps are no longer asked about before she drags; the approval covers
 them. The user's own swaps still ask first, beside the two stays.

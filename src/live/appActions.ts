@@ -807,8 +807,9 @@ export function applyAppAction(
   const cleared = before.filter((alert) => !after.has(alert.id));
   if (cleared.length === 0) return result;
   const conflicts = cleared.filter((alert) => alert.kind === "conflict").map((alert) => alert.conflict?.standId ?? "");
+  // Clearing a disruption says what it cleared already, as gate hold.
   const clearedText =
-    conflicts.length > 0
+    conflicts.length > 0 && action.name !== "resolve_disruption"
       ? ` That clears the ${listWords(conflicts)} conflict${conflicts.length === 1 ? "" : "s"}.`
       : "";
   const next = nextUp(openWork(host));
@@ -1103,17 +1104,22 @@ function applyAction(action: AppAction, host: OperationsHost): ApplyResult {
           mutated: false,
         };
       }
+      // Short, so Skye gets to the approval quickly: what moved is on the
+      // board and in Outputs, so it is counted, not listed.
       const impact = impactNow();
-      const moved = listWords(landed.map((move) => `${stayLabel(move.occupancyId)} to ${move.standId}`));
+      const moved =
+        landed.length === 1
+          ? `${stayLabel(landed[0].occupancyId)} has a new stand`
+          : `we've given the ${landed.length} flights behind it new stands`;
       const figures =
         impact && impact.gateHold.before !== impact.gateHold.after
-          ? ` Gate hold goes from ${formatHold(impact.gateHold.before)} to ${formatHold(impact.gateHold.after)}.`
+          ? ` Gate hold is down from ${formatHold(impact.gateHold.before)} to ${formatHold(impact.gateHold.after)}.`
           : "";
       const stuck =
         action.stuck.length > 0 ? ` ${listWords(action.stuck.map(stayLabel))} still ${action.stuck.length === 1 ? "has" : "have"} no stand that fits.` : "";
       return {
         ok: true,
-        spoken: `Done: ${lateName} keeps ${late?.rowId ?? "its stand"}, and I moved ${moved}.${figures}${stuck}`,
+        spoken: `Done: ${lateName} keeps ${late?.rowId ?? "its stand"}, and ${moved}.${figures}${stuck}`,
         mutated: true,
       };
     }
@@ -1121,12 +1127,7 @@ function applyAction(action: AppAction, host: OperationsHost): ApplyResult {
       return { ok: true, spoken: explainPlan(), mutated: false };
     case "add_to_call": {
       host.addToCall(action.person);
-      return {
-        ok: true,
-        // Said plainly every time: the call window is a placeholder.
-        spoken: `Calling ${action.person} now. That's on the call window only; nothing actually reaches them.`,
-        mutated: true,
-      };
+      return { ok: true, spoken: `Calling ${action.person} now.`, mutated: true };
     }
     case "remove_from_call": {
       // Someone still ringing has their call stopped rather than being taken off.

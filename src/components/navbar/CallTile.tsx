@@ -78,6 +78,21 @@ const useStyles = makeStyles({
     left: tokens.spacingHorizontalS,
     bottom: tokens.spacingVerticalS,
     maxWidth: `calc(100% - 2 * ${tokens.spacingHorizontalS})`,
+    // The icons before the name, 16px each and 2px apart, their slot as wide
+    // as they are. Fluent fixes the slot at 16px inside its padding, which
+    // CoralProvider's border-box (everything inside the app, but not the call
+    // window, portaled outside it) squeezed; scoped to the tag, this outranks
+    // that, so the tile draws them the same wherever it is.
+    "& .fui-Tag__icon": {
+      width: "auto",
+      gap: tokens.spacingHorizontalXXS,
+      fontSize: "16px",
+    },
+    "& .fui-Tag__icon > svg": {
+      width: "16px",
+      height: "16px",
+      flexShrink: 0,
+    },
   },
   nameText: {
     minWidth: 0,
@@ -107,7 +122,7 @@ export type CallTileProps = {
   status?: string;
   /** Being called and not answered yet: rings ripple out from the media. */
   ringing?: boolean;
-  /** Before the name on the tag, e.g. a muted microphone. */
+  /** Before the name on the tag: e.g. a muted microphone, or the share icon (one or both). */
   nameIcon?: ReactElement;
   speaking?: boolean;
   /** Buttons in the top-right corner, shown on hover or focus. */

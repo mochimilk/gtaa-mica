@@ -1,0 +1,73 @@
+# The Windows app's releases, as jellyflower's: push a vMAJOR.MINOR.PATCH tag
+# and this builds the React app and the WinUI app (desktop/), packs them with
+# Velopack, and publishes a GitHub release on this repository. That release is
+# the update Help → Check for updates finds (desktop/Updates/Updater.cs). The
+# repository is private, so its releases are as private as its code: only
+# people who can see the repository can download or update.
+#
+# Uses the workflow's own GITHUB_TOKEN; no personal token is stored anywhere.
+name: Release (Windows app)
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    env:
+      # Electron is the other desktop shell; this build doesn't need its binary.
+      ELECTRON_SKIP_BINARY_DOWNLOAD: "1"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+      VPK_VERSION: "1.2.161"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version from the tag
+        id: version
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".Substring(1)
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Release tags are vMAJOR.MINOR.PATCH, not ${{ github.ref_name }}." }
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+      - run: npm ci
+      - name: Build the React app
+        run: npm run build
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - name: Build the Windows app
+        run: >
+          dotnet publish desktop/GtaaMica.csproj -c Release -r win-x64 -p:Platform=x64
+          -p:Version=${{ steps.version.outputs.version }} -o publish
+
+      - run: dotnet tool install --global vpk --version $env:VPK_VERSION
+      # The last release, so this one ships a small delta for those updating from it.
+      - name: Fetch the last release
+        continue-on-error: true
+        run: >
+          vpk download github --repoUrl ${{ github.server_url }}/${{ github.repository }}
+          --token ${{ secrets.GITHUB_TOKEN }} --outputDir releases
+      - name: Pack
+        run: >
+          vpk pack --packId GtaaMica --packVersion ${{ steps.version.outputs.version }}
+          --packDir publish --mainExe GtaaMica.exe --packTitle "GTAA Mica"
+          --icon desktop/Assets/AppIcon.ico --outputDir releases
+      - name: Publish the release
+        run: >
+          vpk upload github --repoUrl ${{ github.server_url }}/${{ github.repository }}
+          --token ${{ secrets.GITHUB_TOKEN }} --outputDir releases --publish
+          --tag ${{ github.ref_name }} --releaseName "GTAA Mica ${{ steps.version.outputs.version }}"

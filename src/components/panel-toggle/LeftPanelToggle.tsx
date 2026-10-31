@@ -19,7 +19,7 @@ export type LeftPanelToggleProps = {
   panelLabel: string;
   /** Where the label's tooltip opens, e.g. "after" from a left rail. */
   tooltipPositioning?: TooltipProps["positioning"];
-};
+} & Omit<React.ComponentProps<typeof Panel.Toggle>, "panelID" | "aria-label">;
 
 /**
  * Coral's Panel.Toggle for a Panel.Left, labelled (and tooltipped) by whether
@@ -27,12 +27,12 @@ export type LeftPanelToggleProps = {
  * focus stays on it, and as an explicit Panel.Toggle it is the panel's only
  * toggle.
  */
-export function LeftPanelToggle({ panelID, panelLabel, tooltipPositioning }: LeftPanelToggleProps) {
+export function LeftPanelToggle({ panelID, panelLabel, tooltipPositioning, ...rest }: LeftPanelToggleProps) {
   const open = useLeftPanelOpen(panelID);
   const label = `${open ? "Close" : "Open"} ${panelLabel}`;
   return (
     <Tooltip content={label} relationship="label" positioning={tooltipPositioning}>
-      <Panel.Toggle panelID={panelID} aria-label={label} />
+      <Panel.Toggle {...rest} panelID={panelID} aria-label={label} />
     </Tooltip>
   );
 }
