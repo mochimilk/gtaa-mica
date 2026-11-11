@@ -59,12 +59,13 @@ import {
 } from "@fluentui/react-components";
 import { ApprovalsCall, useShareableApproval, useSharedApproval } from "../approvals/ApprovalsCall";
 import { Menu, MenuGroup, MenuItem, MenuList, MenuPopover, MenuTrigger } from "../components/menu";
-import { skyeOrbStill } from "../components/orb";
+import { useSkyeOrbStill } from "../components/orb";
 import { photoOf } from "../components/people/photos";
 import { PanelHeader } from "../components/panel-header";
 import { SharedPanelLeft } from "../components/panel-left";
 import { useLiveCall } from "../live";
 import { callGuests, inviteToCall, PEOPLE, subscribeCallGuests } from "../live/callGuests";
+import { callForSignoffs, skyeReview, subscribeSkyeReview } from "../operations/skyeReview";
 import { outOfSightStyle } from "../live/outOfSight";
 import { describeApprovers, formatLogTime } from "../operations/outputs";
 import {
@@ -74,6 +75,7 @@ import {
   latestPost,
   markRead,
   ME,
+  reviewChannel,
   openThread,
   postMessage,
   presenceOf,
@@ -581,33 +583,35 @@ function ChatList() {
     const open = thread.id === chat.open;
     const onCall = onCallWith(thread);
     return (
-      <Panel.NavItem
-        key={thread.id}
-        value={thread.id}
-        className={mergeClasses(styles.item, open && styles.itemOpen)}
-        label={
-          unread > 0 ? (
-            <Body1Strong className={styles.unreadName}>{thread.name}</Body1Strong>
-          ) : (
-            <Body1 className={styles.readName}>{thread.name}</Body1>
-          )
-        }
-        description={latestPost(chat, thread.id)}
-        icon={<ThreadAvatar thread={thread} />}
-        selected={open}
-        onSelect={() => openThread(thread.id)}
-        actions={
-          (onCall || unread > 0) && (
-            <>
-              <span className={styles.rowMark} aria-hidden>
-                {onCall ? <Call /> : <span className={styles.unreadDot} />}
-              </span>
-              {onCall && <span className="ops-visually-hidden">On a call</span>}
-              {unread > 0 && <span className="ops-visually-hidden">{unread} unread</span>}
-            </>
-          )
-        }
-      />
+      // Panel.NavItem takes no attributes of its own: this is how Skye's cursor finds the row.
+      <div key={thread.id} style={{ display: "contents" }} data-chat-thread={thread.id}>
+        <Panel.NavItem
+          value={thread.id}
+          className={mergeClasses(styles.item, open && styles.itemOpen)}
+          label={
+            unread > 0 ? (
+              <Body1Strong className={styles.unreadName}>{thread.name}</Body1Strong>
+            ) : (
+              <Body1 className={styles.readName}>{thread.name}</Body1>
+            )
+          }
+          description={latestPost(chat, thread.id)}
+          icon={<ThreadAvatar thread={thread} />}
+          selected={open}
+          onSelect={() => openThread(thread.id)}
+          actions={
+            (onCall || unread > 0) && (
+              <>
+                <span className={styles.rowMark} aria-hidden>
+                  {onCall ? <Call /> : <span className={styles.unreadDot} />}
+                </span>
+                {onCall && <span className="ops-visually-hidden">On a call</span>}
+                {unread > 0 && <span className="ops-visually-hidden">{unread} unread</span>}
+              </>
+            )
+          }
+        />
+      </div>
     );
   };
 
@@ -654,6 +658,7 @@ function ChatList() {
  */
 function PersonAvatar({ name }: { name: string }) {
   const styles = useStyles();
+  const skyeOrbStill = useSkyeOrbStill();
   if (name === SKYE) {
     return (
       <span aria-hidden className={styles.orbBox}>
@@ -680,12 +685,18 @@ function ThreadAvatar({ thread }: { thread: ChatThread; filled?: boolean }) {
  * The open thread's header: who it is with, and Call. Calling Skye starts
  * the call with her; calling a teammate or a channel calls its people in
  * (callGuests), and the call is this chat's. On a call going on elsewhere,
- * Call adds them to it instead, which stays that chat's.
+ * Call adds them to it instead, which stays that chat's. In the channel that
+ * approves what Skye has waiting, it calls whoever has to approve it rather than
+ * everyone in the channel: this is the button she presses for that
+ * (data-call-control; agentGestures' callForReview).
  */
 function ChatHeader({ thread }: { thread: ChatThread }) {
   const styles = useStyles();
   const live = useLiveCall();
   const guests = useSyncExternalStore(subscribeCallGuests, callGuests);
+  const review = useSyncExternalStore(subscribeSkyeReview, skyeReview);
+  const waiting = review?.signoffs.find((signoff) => signoff.state === "needed");
+  const forReview = !!review && !!waiting && reviewChannel(review, waiting)?.id === thread.id;
   const onCall = live.active || guests !== null;
   const reached = new Set([...(guests?.names ?? []), ...(guests?.calling ?? [])]);
   const toCall = thread.members.filter((name) => PEOPLE.includes(name) && !reached.has(name));
@@ -696,7 +707,8 @@ function ChatHeader({ thread }: { thread: ChatThread }) {
           label: onCall ? `Add ${thread.name} to the call` : `Call ${thread.name}`,
           start: () => {
             if (!onCall) callFrom(thread.id);
-            toCall.forEach(inviteToCall);
+            if (forReview) callForSignoffs();
+            else toCall.forEach(inviteToCall);
           },
         };
 
@@ -712,7 +724,7 @@ function ChatHeader({ thread }: { thread: ChatThread }) {
       <div className={styles.headerActions}>
         {call && (
           <Tooltip content={call.label} relationship="label">
-            <Button appearance="subtle" icon={<Call />} onClick={call.start} />
+            <Button appearance="subtle" icon={<Call />} onClick={call.start} data-call-control={thread.id} />
           </Tooltip>
         )}
       </div>

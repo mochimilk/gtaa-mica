@@ -785,12 +785,17 @@ export interface BarGhost {
   ms: Millis;
   /** Shown in a pill while the ghost is hovered, e.g. "Delayed out 40m · 08:20 → 09:00". */
   label: string;
+  /** Written inside the ghost where it fits and nothing runs through it, e.g. "Late out, to 09:00". */
+  caption?: string;
   /** Drawn red, as running into something. The host decides what counts. */
   clash?: boolean;
   /** Its colour when it does not clash; --st-ghost by default. */
   color?: string;
   className?: string;
 }
+
+/** Roughly how wide a ghost's caption is per character, px, to tell if it fits. */
+const GHOST_CAPTION_CHAR_PX = 6.5;
 
 export interface BarGhostsProps {
   /** The ghosts reaching out from a bar, if any. */
@@ -860,6 +865,11 @@ export function BarGhosts({ ghosts }: BarGhostsProps) {
               <path className="st-ghost-rect" d={ghostPath} mask={`url(#${maskId})`} />
               {/* Masks do not change what takes the pointer: only the ghost itself does, never its bar. */}
               <rect className="st-ghost-hit" x={x0} y={bar.y} width={x1 - x0} height={bar.height} />
+              {ghost.caption && !ghost.clash && x1 - x0 >= ghost.caption.length * GHOST_CAPTION_CHAR_PX + 16 && (
+                <text className="st-ghost-caption" x={(x0 + x1) / 2} y={bar.y + bar.height / 2} textAnchor="middle" dominantBaseline="central">
+                  {ghost.caption}
+                </text>
+              )}
               <Pill
                 className="st-ghost-pill"
                 text={ghost.label}

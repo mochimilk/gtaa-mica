@@ -8,19 +8,30 @@
 // frame: two side by side, three as one big beside two stacked, more in rows.
 // Its View switches to the speaker, big, with everyone else in the row. One
 // big tile, the speaker's or anyone's alone, keeps to 16:9. A channel is called, not its
-// people: nobody shows as ringing, only once they pick up.
+// people: only whoever Skye is calling for her changes shows as ringing; the
+// rest only once they pick up.
 //
-// In an area's channel, where Skye's changes are approved, once anyone is on,
-// those changes and the decisions on them (./approvalList) are shared, as a
-// screen is, by Skye on the user's behalf (the share icon on the user's name
-// tag), under everyone in the participants row: two panes side by side. On the left, the stand changes:
-// pick one to see it. On the right, what it does to the flight's bags, on
-// the board's chart with the carousels for rows (./CarouselTimeline): where
-// they came off and where they come off now, and whatever they clash with,
-// which is what baggage has to sort out. At the foot, the decision: the
-// teammate first (Review with baggage calls them in; skyeReview's
-// needsBaggage says when), then the user. What is shared is what waits, and
-// stays shared once decided during the call.
+// In an area's channel, where Skye's changes are approved, as soon as anyone is
+// called or on, those changes and the decisions on them (./approvalList) are
+// shared, as a screen is, by Skye on the user's behalf (the share icon on the
+// user's name tag), under everyone in the participants row. First the agenda:
+// where things stand, in one place throughout (calling, presenting, a question,
+// waiting on the reviewer), and in writing what is asked, so it can be followed
+// without hearing Skye. Then two panes side by side. On the left, what is
+// proposed: each stand change with what it does to its flight's carousel,
+// and any carousel maintenance moved, each marked if baggage has to decide it.
+// Pick one to see it. On the right, the same flight's bags, on the board's chart
+// with the carousels for rows (./CarouselTimeline): where they came off and
+// where they come off now, and whatever they clash with. At the foot, the
+// review's states (reviewSteps) and the decision: the teammate first (Review
+// with baggage calls them in; skyeReview's needsBaggage says when), then the
+// user. What is shared is what waits, and stays shared once decided during
+// the call.
+//
+// Colour means one thing here: the brand's fill on a value is what changes (the
+// stand or carousel a flight goes to, maintenance's new times), and never on
+// what stays as it was. A ring in the brand's colour only draws the eye: what
+// is picked, or what Skye is talking about.
 //
 // The page opens on it once a teammate is brought in on what waits (Review
 // with baggage, or a yes to Skye's offer to call them): see useOpenApprovals.
@@ -39,25 +50,37 @@ import {
   Caption1Strong,
   createFocusOutlineStyle,
   Tag,
+  Badge,
   makeStyles,
   mergeClasses,
   tokens,
 } from "@fluentui/react-components";
-import { ArrowRight16Regular, Checkmark16Regular } from "@fluentui/react-icons";
+import { ArrowRight12Regular, ArrowRight16Regular, Checkmark12Regular, Checkmark16Regular, Circle12Regular } from "@fluentui/react-icons";
 import { ContentToolbar } from "../components/content-toolbar";
 import { CallControls, CallTiles, type CallView } from "../components/navbar";
 import { useDragResize } from "../components/resize-handle/useDragResize";
 import { useLiveCall } from "../live";
 import { callGuests, endGuestCall, removeFromCall, subscribeCallGuests } from "../live/callGuests";
 import { flightsAtStay } from "../operations/allocation";
-import { baggageDay, bagMove, describeBagMove, type BaggageDay, type BagMove } from "../operations/baggage";
+import {
+  baggageDay,
+  bagMove,
+  describeBagMove,
+  describeMaintenanceClash,
+  describeMaintenanceImpact,
+  type BaggageDay,
+  type BagMove,
+  type MaintenanceMove,
+} from "../operations/baggage";
+import { placeSignoffCall } from "../operations/agentGestures";
+import { reviewAgenda } from "../operations/disruption";
 import { useOpsActions, useOpsBoard } from "../operations/OperationsContext";
 import type { OpsFlight } from "../operations/operationsData";
 import { useOutputs } from "../operations/OutputSteps";
 import { describeApprovers, formatLogTime, type OutputStep } from "../operations/outputs";
-import { callForSignoffs, skyeReview, subscribeSkyeReview, teammatesBroughtIn, type SkyeReview } from "../operations/skyeReview";
+import { placingSignoffCall, skyeReview, subscribeSkyeReview, teammatesBroughtIn, type SkyeReview } from "../operations/skyeReview";
 import { formatUtc } from "../stand-timeline-demo/demoData";
-import { approvalEntries, approvalStatus, entrySteps, type ApprovalEntry } from "./approvalList";
+import { approvalEntries, approvalStatus, entrySteps, reviewSteps, type ApprovalEntry, type ApprovalTone } from "./approvalList";
 import { CarouselTimeline } from "./CarouselTimeline";
 import { spotlight, subscribeSpotlight } from "./spotlight";
 import "../operations/operations.css";
@@ -138,6 +161,13 @@ const useStyles = makeStyles({
     padding: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalXXL}`,
     overflowX: "auto",
     overflowY: "hidden",
+    // These tiles are short: a tile's "Calling…" goes in its corner, clear of its name.
+    "& [data-call-status]": {
+      position: "absolute",
+      top: tokens.spacingVerticalS,
+      right: tokens.spacingHorizontalS,
+      margin: 0,
+    },
   },
   // Coral's panel resize handle (Panel.Left's), turned for a row: an 8px band
   // over the divider, where a 128px bar shows on hover.
@@ -202,9 +232,52 @@ const useStyles = makeStyles({
     overflow: "hidden",
     textOverflow: "ellipsis",
   },
+  // The title, and which change the pane is about: the card picked says the same.
+  paneHeading: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: tokens.spacingHorizontalS,
+    minWidth: 0,
+  },
+  paneLink: {
+    minWidth: 0,
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    color: tokens.colorNeutralForeground2,
+    fontVariantNumeric: "tabular-nums",
+  },
   paneEmpty: {
     margin: `0 ${tokens.spacingHorizontalL}`,
     color: tokens.colorNeutralForeground3,
+  },
+  // What the review is for and where it has got to, over the panes: its state
+  // first, so it stays put, then the agenda; under them any question put to
+  // Skye and her answer.
+  agenda: {
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalXS,
+    flexShrink: 0,
+    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalL} 0`,
+  },
+  agendaLine: {
+    display: "flex",
+    alignItems: "center",
+    gap: tokens.spacingHorizontalM,
+    minWidth: 0,
+  },
+  phase: { flexShrink: 0 },
+  exchange: {
+    display: "grid",
+    gridTemplateColumns: "auto minmax(0, 1fr)",
+    columnGap: tokens.spacingHorizontalS,
+    margin: 0,
+    padding: `${tokens.spacingVerticalXS} ${tokens.spacingHorizontalM}`,
+    borderRadius: tokens.borderRadiusMedium,
+    backgroundColor: tokens.colorNeutralBackground3,
+    "& dt": { color: tokens.colorNeutralForeground2 },
+    "& dd": { margin: 0, color: tokens.colorNeutralForeground1 },
   },
   // The stand changes, 8px apart, scrolling under the pane's header. 4px
   // taller into the header than its cards start, so the first card's rings
@@ -220,19 +293,21 @@ const useStyles = makeStyles({
     overflowY: "auto",
     listStyle: "none",
   },
-  // One change, a 72px card, 16px in: the arrival, the stands it moves
-  // between (on outline tags), the departure. Quiet in every state: Stroke 2
-  // throughout, on Background 4 (its hover and pressed forms, its selected
-  // one once picked). Positioned, for the focus ring Fluent draws around it.
+  // One change, a card, 16px in: the arrival, the stands it moves between
+  // (on outline tags), the departure; under them, its carousel and whether
+  // baggage decides it. Quiet in every state: Stroke 2 throughout, on Background
+  // 4 (its hover and pressed forms, its selected one once picked). Positioned,
+  // for the focus ring Fluent draws around it.
   change: {
     position: "relative",
     display: "grid",
     gridTemplateColumns: "minmax(0, 1fr) auto minmax(0, 1fr)",
     alignItems: "center",
-    gap: tokens.spacingHorizontalL,
+    columnGap: tokens.spacingHorizontalL,
+    rowGap: tokens.spacingVerticalXS,
     width: "100%",
     minHeight: "72px",
-    padding: `0 ${tokens.spacingHorizontalL}`,
+    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalL}`,
     boxSizing: "border-box",
     border: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
     borderRadius: tokens.borderRadiusXLarge,
@@ -247,12 +322,50 @@ const useStyles = makeStyles({
     ":hover:active": { backgroundColor: tokens.colorNeutralBackground4Pressed },
     ...createFocusOutlineStyle({ style: { outlineRadius: tokens.borderRadiusXLarge } }),
   },
+  // Picked, it is the one the baggage pane is about, its bars outlined the same.
   changePicked: {
     backgroundColor: tokens.colorNeutralBackground4Selected,
+    borderTopColor: tokens.colorBrandStroke1,
+    borderRightColor: tokens.colorBrandStroke1,
+    borderBottomColor: tokens.colorBrandStroke1,
+    borderLeftColor: tokens.colorBrandStroke1,
     ":hover": { backgroundColor: tokens.colorNeutralBackground4Selected },
     "&[data-agent-hover]": { backgroundColor: tokens.colorNeutralBackground4Selected },
     ":hover:active": { backgroundColor: tokens.colorNeutralBackground4Selected },
   },
+  // Its second line, across the card: its carousel, its bags, and at the end whether baggage decides it.
+  changeBags: {
+    gridColumn: "1 / -1",
+    display: "flex",
+    alignItems: "center",
+    gap: tokens.spacingHorizontalS,
+    minWidth: 0,
+    paddingTop: tokens.spacingVerticalXS,
+    borderTop: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
+    color: tokens.colorNeutralForeground2,
+    fontVariantNumeric: "tabular-nums",
+  },
+  carousels: {
+    display: "flex",
+    alignItems: "center",
+    gap: tokens.spacingHorizontalXS,
+    flexShrink: 0,
+  },
+  bagsDetail: {
+    minWidth: 0,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  decide: {
+    flexShrink: 0,
+    marginLeft: "auto",
+    display: "flex",
+    alignItems: "center",
+    gap: tokens.spacingHorizontalXXS,
+  },
+  decideNone: { color: tokens.colorNeutralForeground3 },
+  decideDone: { color: tokens.colorStatusSuccessForeground1 },
   // The change Skye is talking a teammate through (./spotlight): ringed as
   // focus is, in the brand's colour.
   changeSpotlit: {
@@ -278,6 +391,16 @@ const useStyles = makeStyles({
     display: "flex",
     alignItems: "center",
     gap: tokens.spacingHorizontalL,
+  },
+  // A value that changes, wherever it shows (a stand, a carousel, maintenance's new times): filled.
+  proposedValue: {
+    backgroundColor: tokens.colorBrandBackground,
+    color: tokens.colorNeutralForegroundOnBrand,
+  },
+  // A stand Skye is naming that stays as it is: outlined to draw the eye, not filled as what changes is.
+  standNamed: {
+    outline: `${tokens.strokeWidthThick} solid ${tokens.colorBrandStroke1}`,
+    outlineOffset: tokens.strokeWidthThin,
   },
   // No stand, as NS, its outline tag in Fluent's warning orange: the
   // warning foreground, inside the warning stroke that goes with it.
@@ -310,12 +433,16 @@ const useStyles = makeStyles({
   bagsFigureAlert: { color: tokens.colorStatusDangerForeground1 },
   // The change in words, under the chart, which fills the pane flush above it.
   bagsSummary: {
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalXXS,
     flexShrink: 0,
     margin: 0,
-    padding: `${tokens.spacingVerticalM} ${tokens.spacingHorizontalL} ${tokens.spacingVerticalL}`,
+    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalL} ${tokens.spacingVerticalM}`,
     borderTop: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
     color: tokens.colorNeutralForeground1,
   },
+  bagsKey: { color: tokens.colorNeutralForeground3 },
   // The bags' tag in Fluent's status colours, as its tint badges have them.
   tagDanger: {
     backgroundColor: tokens.colorStatusDangerBackground1,
@@ -337,8 +464,33 @@ const useStyles = makeStyles({
     boxSizing: "border-box",
     borderTop: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
   },
-  disclaimer: { color: tokens.colorNeutralForeground2 },
+  disclaimer: { color: tokens.colorNeutralForeground2, flexShrink: 0 },
+  // The review's states, in order, between the disclaimer and the decision.
+  steps: {
+    display: "flex",
+    alignItems: "center",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    columnGap: tokens.spacingHorizontalM,
+    rowGap: tokens.spacingVerticalXXS,
+    flex: "1 1 0",
+    minWidth: 0,
+    margin: 0,
+    padding: 0,
+    listStyle: "none",
+  },
+  step: {
+    display: "flex",
+    alignItems: "center",
+    gap: tokens.spacingHorizontalXXS,
+    whiteSpace: "nowrap",
+    color: tokens.colorNeutralForeground3,
+  },
+  stepDone: { color: tokens.colorNeutralForeground2 },
+  stepCurrent: { color: tokens.colorNeutralForeground1, fontWeight: tokens.fontWeightSemibold },
+  stepDoneIcon: { color: tokens.colorStatusSuccessForeground1 },
   decision: {
+    flexShrink: 0,
     display: "flex",
     alignItems: "center",
     gap: tokens.spacingHorizontalS,
@@ -374,7 +526,7 @@ subscribeCallGuests(() => {
 
 /**
  * What a call can share, in an area's channel (`channel`), once anyone else
- * is on it: Skye's changes waiting for approval, or the latest decided since
+ * is on it or being called: Skye's changes waiting for approval, or the latest decided since
  * the call began; undefined otherwise.
  */
 export function useShareableApproval(channel: boolean): ApprovalEntry | undefined {
@@ -382,7 +534,7 @@ export function useShareableApproval(channel: boolean): ApprovalEntry | undefine
   const guests = useSyncExternalStore(subscribeCallGuests, callGuests);
   const live = useLiveCall();
   const latest = useMemo(() => approvalEntries(requests), [requests])[0];
-  const someoneOn = live.active || (guests?.names.length ?? 0) > 0;
+  const someoneOn = live.active || (guests?.names.length ?? 0) > 0 || (guests?.calling.length ?? 0) > 0;
   const began = guests?.since ?? live.state.startedAt ?? Number.POSITIVE_INFINITY;
   const decidedAt = latest?.requests[0]?.decision?.at;
   return channel && someoneOn && latest && (latest.waiting || (decidedAt !== undefined && decidedAt >= began))
@@ -401,8 +553,8 @@ export function useSharedApproval(channel: boolean): ApprovalEntry | undefined {
   return stopped ? undefined : shareable;
 }
 
-/** The participants row's tiles: 156px tall to start (Figma's 278px wide, at 16:9), and how far they can be dragged. */
-const RIBBON_TILE = 156;
+/** The participants row's tiles: how tall to start, short enough to leave room for the review under them, and how far they can be dragged. */
+const RIBBON_TILE = 108;
 const RIBBON_TILE_MIN = 90;
 const RIBBON_TILE_MAX = 320;
 
@@ -425,8 +577,9 @@ export function ApprovalsCall({ label, channel }: ApprovalsCallProps) {
   const guests = useSyncExternalStore(subscribeCallGuests, callGuests);
   const live = useLiveCall();
   const names = guests?.names ?? [];
-  // A channel rings, not its people; a person rings as themself.
-  const ringing = channel ? [] : (guests?.calling ?? []);
+  // A channel rings, not its people, apart from whoever Skye is calling for her
+  // changes, so it shows who the call is for; a person rings as themself.
+  const ringing = (guests?.calling ?? []).filter((name) => !channel || !!review?.signoffs.some((signoff) => signoff.name === name));
   const people = names.length + ringing.length;
   const shareable = useShareableApproval(channel);
   const shared = useSharedApproval(channel);
@@ -518,8 +671,10 @@ export function ApprovalsCall({ label, channel }: ApprovalsCallProps) {
 /** The plan shared: its stand changes beside what the one picked does to the bags, over the decision. */
 function Plan({ entry, review, calling }: { entry: ApprovalEntry; review: SkyeReview | null; calling: readonly string[] }) {
   const styles = useStyles();
-  // In the order of the day, as the board reads, so the first is the one Skye briefs first.
-  const steps = [...entrySteps(entry)].sort((a, b) => (a.move?.from.start ?? 0) - (b.move?.from.start ?? 0));
+  // In the order of the day, as the board reads, so the first is the one Skye
+  // briefs first; carousel maintenance moved among them by when it was planned.
+  const when = (candidate: OutputStep) => candidate.maintenance?.from.start ?? candidate.move?.from.start ?? 0;
+  const steps = [...entrySteps(entry)].sort((a, b) => when(a) - when(b));
   // The one picked; until then, the first baggage has to approve, else the first.
   const [picked, setPicked] = useState<string | null>(null);
   const step =
@@ -530,38 +685,160 @@ function Plan({ entry, review, calling }: { entry: ApprovalEntry; review: SkyeRe
   // What Skye points at as she walks a teammate through it.
   const spot = useSyncExternalStore(subscribeSpotlight, spotlight);
   const spotOn = (candidate?: OutputStep) => !!candidate?.stayId && !!spot?.stayIds.includes(candidate.stayId);
+  // Maintenance moved is about the flight it makes room for: the pane shows that flight's bags.
+  const bagsStep = step?.maintenance ? (steps.find((candidate) => candidate.stayId === step.maintenance?.stayId) ?? step) : step;
 
   return (
     <>
+      <ReviewAgenda entry={entry} steps={steps} review={review} tone={status.tone} phase={status.text} />
       <div className={styles.panes} data-approval-plan="">
         <section className={styles.pane} aria-labelledby={`${entry.id}-changes`}>
           <header className={styles.paneHeader}>
             <Body1Strong as="h2" id={`${entry.id}-changes`} className={styles.paneTitle}>
-              Stand changes
+              Proposed changes
             </Body1Strong>
           </header>
           <ul className={styles.changes} data-approval-changes="">
-            {steps.map((candidate) => (
-              <ChangeCard
-                key={candidate.id}
-                step={candidate}
-                picked={candidate.id === step?.id}
-                onPick={() => setPicked(candidate.id)}
-                spotlit={spotOn(candidate) ? (spot?.stands ?? []) : undefined}
-              />
-            ))}
+            {steps.map((candidate) =>
+              candidate.maintenance ? (
+                <MaintenanceCard
+                  key={candidate.id}
+                  step={candidate}
+                  maintenance={candidate.maintenance}
+                  picked={candidate.id === step?.id}
+                  proposed={entry.waiting}
+                  onPick={() => setPicked(candidate.id)}
+                  spotlit={!!spot?.maintenance}
+                />
+              ) : (
+                <ChangeCard
+                  key={candidate.id}
+                  step={candidate}
+                  picked={candidate.id === step?.id}
+                  proposed={entry.waiting}
+                  onPick={() => setPicked(candidate.id)}
+                  spotlit={spotOn(candidate) ? (spot?.stands ?? []) : undefined}
+                />
+              ),
+            )}
           </ul>
         </section>
-        <BaggagePane key={step?.id} step={step} spotlit={spotOn(step) && !!spot?.bags} />
+        <BaggagePane key={step?.id} step={bagsStep} maintenance={step?.maintenance} spotlit={(spotOn(bagsStep) && !!spot?.bags) || !!spot?.maintenance} />
       </div>
       <footer className={styles.footer}>
         <Caption1 className={styles.disclaimer}>Skye is AI. Check mistakes.</Caption1>
+        <ReviewSteps entry={entry} review={review} />
         <Decision entry={entry} review={review} calling={calling} />
         <p className="ops-visually-hidden" aria-live="polite">
           {status.text}
         </p>
       </footer>
     </>
+  );
+}
+
+const PHASE_COLOR: Record<ApprovalTone, "warning" | "brand" | "success" | "subtle"> = {
+  warning: "warning",
+  brand: "brand",
+  success: "success",
+  subtle: "subtle",
+};
+
+/**
+ * Over the panes: where the review has got to, always in this place, and what
+ * it is for, written so that whoever is called in can follow it without
+ * hearing Skye. Under them, any question the reviewer has put to her, with
+ * her answer once she gives it.
+ */
+function ReviewAgenda({
+  entry,
+  steps,
+  review,
+  tone,
+  phase,
+}: {
+  entry: ApprovalEntry;
+  steps: readonly OutputStep[];
+  review: SkyeReview | null;
+  tone: ApprovalTone;
+  phase: string;
+}) {
+  const styles = useStyles();
+  const moves = steps.filter((step) => step.move);
+  const agenda = reviewAgenda(
+    { moves: moves.length, forBaggage: moves.filter((step) => step.needs).length, maintenance: steps.some((step) => step.maintenance) },
+    !entry.waiting,
+  );
+  const asker = review?.signoffs.find((signoff) => signoff.exchange);
+  const exchange = asker?.exchange;
+  return (
+    <section className={styles.agenda} aria-label="Agenda">
+      <div className={styles.agendaLine}>
+        <Badge appearance="tint" color={PHASE_COLOR[tone]} className={styles.phase}>
+          {phase}
+        </Badge>
+        <Body1Strong>{agenda}</Body1Strong>
+      </div>
+      {exchange && asker && (
+        <dl className={styles.exchange} aria-label={`${asker.name}'s question`}>
+          <dt>
+            <Caption1Strong>{asker.name.split(" ")[0]}</Caption1Strong>
+          </dt>
+          <dd>
+            <Caption1>{exchange.question}</Caption1>
+          </dd>
+          {exchange.answer && (
+            <>
+              <dt>
+                <Caption1Strong>Skye</Caption1Strong>
+              </dt>
+              <dd>
+                <Caption1>{exchange.answer}</Caption1>
+              </dd>
+            </>
+          )}
+        </dl>
+      )}
+    </section>
+  );
+}
+
+/** The review's states in order, at the foot (reviewSteps): who approved it and when, and that it is applied, only once they are so. */
+function ReviewSteps({ entry, review }: { entry: ApprovalEntry; review: SkyeReview | null }) {
+  const styles = useStyles();
+  // Cancelled: the decision at the foot says so.
+  if (!entry.waiting && !entry.requests[0]?.decision) return null;
+  return (
+    <ol className={styles.steps} aria-label="Review states">
+      {reviewSteps(entry, review).map((step) => (
+        <li
+          key={step.id}
+          className={mergeClasses(styles.step, step.state === "done" && styles.stepDone, step.state === "current" && styles.stepCurrent)}
+          aria-current={step.state === "current" ? "step" : undefined}
+        >
+          {step.state === "done" ? <Checkmark12Regular aria-hidden className={styles.stepDoneIcon} /> : <Circle12Regular aria-hidden />}
+          <Caption1>{step.label}</Caption1>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/** Whether baggage decides a piece, and once they have, who did: at the end of its card, so what is asked can be found at a glance. */
+function DecideMark({ step }: { step: OutputStep }) {
+  const styles = useStyles();
+  if (step.approvedBy) {
+    return (
+      <Caption1 className={mergeClasses(styles.decide, styles.decideDone)}>
+        <Checkmark12Regular aria-hidden /> {step.approvedBy.split(" ")[0]} approved
+      </Caption1>
+    );
+  }
+  if (!step.needs) return <Caption1 className={mergeClasses(styles.decide, styles.decideNone)}>No baggage change</Caption1>;
+  return (
+    <Badge appearance="tint" color="warning" shape="rounded" className={styles.decide}>
+      {step.needs.expertise[0].toUpperCase() + step.needs.expertise.slice(1)} review
+    </Badge>
   );
 }
 
@@ -583,18 +860,23 @@ function FlightEnd({ flight, fallback, end }: { flight?: OpsFlight; fallback?: s
 
 /**
  * One stand change, Figma's card: the arrival, from stand → to stand, the
- * departure. A closure, which moves no stay itself, shows what it closed.
- * While Skye talks a teammate through it (`spotlit`), it is ringed in the
- * brand's colour, and so is the tag of each stand she is naming.
+ * departure; under them, what it does to its flight's carousel, its bags and
+ * when they come off, and whether baggage decides it. A closure, which moves no
+ * stay itself, shows what it closed. While it is `proposed`, the stand it goes
+ * to is filled in the brand's colour, as is a new carousel; what stays as it was
+ * never is. While Skye talks a teammate through it (`spotlit`), it is ringed in
+ * the brand's colour, and so is the tag of each stand she is naming.
  */
 function ChangeCard({
   step,
   picked,
+  proposed,
   onPick,
   spotlit,
 }: {
   step: OutputStep;
   picked: boolean;
+  proposed: boolean;
   onPick: () => void;
   spotlit?: readonly ("from" | "to")[];
 }) {
@@ -602,14 +884,25 @@ function ChangeCard({
   const flights = step.stayId ? flightsAtStay(step.stayId) : [];
   const arrival = flights.find((flight) => flight.direction === "arrival");
   const departure = flights.find((flight) => flight.direction === "departure");
+  const { move } = step;
+  // Read on every stand change too: its bags follow the board.
+  const { allocationVersion } = useOpsBoard();
+  const bags = useMemo(() => (step.stayId && move ? bagMove(step.stayId, move.from, move.to) : null), [step, allocationVersion]);
   const stand = (rowId: string, end: "from" | "to") => {
-    const lit = !!spotlit?.includes(end);
+    // Only the side that changes is blue: a move in time on one stand changes neither.
+    const changes = proposed && end === "to" && move?.from.rowId !== move?.to.rowId;
+    const named = !!spotlit?.includes(end) && styles.standNamed;
     return rowId ? (
-      <Tag size="small" appearance={lit ? "brand" : "outline"} data-approval-stand={end}>
+      <Tag size="small" appearance={changes ? "filled" : "outline"} className={mergeClasses(changes && styles.proposedValue, named || undefined)} data-approval-stand={end}>
         {rowId}
       </Tag>
     ) : (
-      <Tag size="small" appearance={lit ? "brand" : "outline"} className={lit ? undefined : styles.noStand} data-approval-stand={end}>
+      <Tag
+        size="small"
+        appearance={changes ? "filled" : "outline"}
+        className={mergeClasses(changes ? styles.proposedValue : styles.noStand, named || undefined)}
+        data-approval-stand={end}
+      >
         <span aria-hidden>NS</span>
         <span className="ops-visually-hidden">No stand</span>
       </Tag>
@@ -636,17 +929,120 @@ function ChangeCard({
           <Body1>{step.detail}</Body1>
         )}
         <FlightEnd flight={departure} end />
+        {bags && <CarouselDelta bags={bags} proposed={proposed} step={step} />}
       </button>
     </li>
   );
 }
 
 /**
- * What the change picked does to the flight's bags: the day on the carousels
- * in figures, then on the chart, then in words. While Skye talks about it
- * (`spotlit`), its bags' bars are outlined in the brand's colour.
+ * A change's carousel, on its card: where its bags came off → where they do
+ * now, the new one filled in the brand's colour while it is proposed, or the one
+ * they stay on, neutral. Then how many bags, and when they come off.
  */
-function BaggagePane({ step, spotlit = false }: { step?: OutputStep; spotlit?: boolean }) {
+function CarouselDelta({ bags, proposed, step }: { bags: BagMove; proposed: boolean; step: OutputStep }) {
+  const styles = useStyles();
+  const { was, now } = bags;
+  const shown = now ?? was;
+  const moved = !!was && !!now && was.carousel !== now.carousel;
+  return (
+    <span className={styles.changeBags} data-approval-carousels="">
+      {shown && (
+        <>
+          <span className={styles.carousels}>
+            <Caption1>Carousel</Caption1>
+            {moved && was && now ? (
+              <>
+                <Tag size="extra-small" appearance="outline">
+                  {was.carousel}
+                </Tag>
+                <ArrowRight12Regular aria-hidden />
+                <span className="ops-visually-hidden">to</span>
+                <Tag size="extra-small" appearance={proposed ? "filled" : "outline"} className={proposed ? styles.proposedValue : undefined}>
+                  {now.carousel}
+                </Tag>
+              </>
+            ) : (
+              <Tag size="extra-small" appearance="outline">
+                {shown.carousel}
+              </Tag>
+            )}
+          </span>
+          <Caption1 className={styles.bagsDetail}>
+            {shown.bags} bags · {formatUtc(shown.start)}–{formatUtc(shown.end)}
+          </Caption1>
+        </>
+      )}
+      <DecideMark step={step} />
+    </span>
+  );
+}
+
+/**
+ * Carousel maintenance moved, as a change of its own for baggage to approve:
+ * the carousel and its work, its old and new times (the new filled in the
+ * brand's colour while proposed), and the conflict it clears.
+ */
+function MaintenanceCard({
+  step,
+  maintenance,
+  picked,
+  proposed,
+  onPick,
+  spotlit,
+}: {
+  step: OutputStep;
+  maintenance: MaintenanceMove;
+  picked: boolean;
+  proposed: boolean;
+  onPick: () => void;
+  spotlit: boolean;
+}) {
+  const styles = useStyles();
+  const { from, to } = maintenance;
+  return (
+    <li>
+      <button
+        type="button"
+        aria-pressed={picked}
+        className={mergeClasses(styles.change, picked && styles.changePicked, spotlit && styles.changeSpotlit)}
+        onClick={onPick}
+        data-approval-maintenance=""
+      >
+        <span className={styles.flight}>
+          <Caption1Strong>Carousel {maintenance.carousel}</Caption1Strong>
+          <span className={styles.route}>
+            <Caption1>{maintenance.reason}</Caption1>
+          </span>
+        </span>
+        <span className={styles.stands}>
+          <Tag size="small" appearance="outline">
+            {formatUtc(from.start)}–{formatUtc(from.end)}
+          </Tag>
+          <ArrowRight16Regular aria-hidden />
+          <span className="ops-visually-hidden">to</span>
+          <Tag size="small" appearance={proposed ? "filled" : "outline"} className={proposed ? styles.proposedValue : undefined}>
+            {formatUtc(to.start)}–{formatUtc(to.end)}
+          </Tag>
+        </span>
+        <span className={mergeClasses(styles.flight, styles.flightEnd)} />
+        <span className={styles.changeBags}>
+          <Caption1 className={styles.bagsDetail}>{describeMaintenanceClash(maintenance)}</Caption1>
+          <DecideMark step={step} />
+        </span>
+      </button>
+    </li>
+  );
+}
+
+/**
+ * What the change picked does to the flight's bags: which change it is, the
+ * same flights and stands as its card, so the two panes read as one; the day on
+ * the carousels in figures, then on the chart, then in words, with any
+ * `maintenance` moved for it. While Skye talks about it (`spotlit`), its bags'
+ * bars are outlined in the brand's colour.
+ */
+function BaggagePane({ step, maintenance, spotlit = false }: { step?: OutputStep; maintenance?: MaintenanceMove; spotlit?: boolean }) {
   const styles = useStyles();
   // Read on every stand change too: everyone else's bags follow the board.
   const { allocationVersion } = useOpsBoard();
@@ -659,18 +1055,27 @@ function BaggagePane({ step, spotlit = false }: { step?: OutputStep; spotlit?: b
   return (
     <section className={styles.pane} aria-labelledby={id} data-approval-bags="">
       <header className={styles.paneHeader}>
-        <Body1Strong as="h2" id={id} className={styles.paneTitle}>
-          Baggage carousels
-        </Body1Strong>
+        <span className={styles.paneHeading}>
+          <Body1Strong as="h2" id={id} className={styles.paneTitle}>
+            Baggage carousels
+          </Body1Strong>
+          {step?.move && (
+            <Caption1 className={styles.paneLink} data-approval-link="">
+              {step.title} · {step.detail}
+            </Caption1>
+          )}
+        </span>
         {move && <BagsTag move={move} />}
       </header>
       <BagsFigures day={day} />
       {move ? (
         <>
           <CarouselTimeline move={move} spotlit={spotlit} />
-          <Body1 as="p" className={styles.bagsSummary}>
-            {describeBagMove(move)}
-          </Body1>
+          <div className={styles.bagsSummary}>
+            <Body1>{describeBagMove(move)}</Body1>
+            {maintenance && <Body1>{describeMaintenanceImpact(maintenance)}</Body1>}
+            <Caption1 className={styles.bagsKey}>Each bar is a flight's bags on the belt, first bag to last, not its aircraft's time on the stand.</Caption1>
+          </div>
         </>
       ) : (
         <Caption1 as="p" className={styles.paneEmpty}>
@@ -771,11 +1176,13 @@ function Decision({ entry, review, calling }: { entry: ApprovalEntry; review: Sk
   const waiting = review?.signoffs.find((signoff) => signoff.state !== "approved");
   const primary: { label: string; onClick?: () => unknown } = skyeWorking
     ? { label: "Skye is still at work" }
-    : waiting?.state === "needed" && !calling.includes(waiting.name)
-      ? { label: `Review with ${waiting.expertise}`, onClick: callForSignoffs }
-      : waiting
-        ? { label: "Waiting for approval" }
-        : { label: "Approve plan", onClick: approveSkyeChanges };
+    : placingSignoffCall()
+      ? { label: `Calling ${waiting?.expertise ?? ""}` }
+      : waiting?.state === "needed" && !calling.includes(waiting.name)
+        ? { label: `Review with ${waiting.expertise}`, onClick: placeSignoffCall }
+        : waiting
+          ? { label: "Waiting for approval" }
+          : { label: "Approve plan", onClick: approveSkyeChanges };
   return (
     <span className={styles.decision}>
       <Button appearance="secondary" onClick={undoSkyeChanges}>

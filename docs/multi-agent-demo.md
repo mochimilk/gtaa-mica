@@ -37,19 +37,21 @@ many more moves and a longer run. For the demo, give a window.
 
 1. A red hatched band appears over Pier B's stands, 09:00–13:00, labelled
    "Pier B closed 09:00–13:00", and the chart glides to frame it.
-2. Skye's cursor leaves the orb and goes to the middle of the screen, over the
-   band. Its tag counts the work: "Pier B closed · 0/11 moved".
-3. There Skye splits into up to five helpers, small orbs of light, and Skye's
-   own dot becomes a live orb (32px, as in the Ask pill) that stays in the
-   middle of the screen while they work (going back if the window is
-   resized), glowing, so it reads as Skye directing them rather than one more
-   hand. Everything that glows here is one colour, `--agent-cursor-light` in
-   `agent-cursor.css`: by default black on a light page and white on a dark
-   one. **Glow** in Settings (the avatar's menu, Appearance) picks Default,
-   Aurora (blue-violet), Seafoam (sea-green) or Iris (sky blue). A ring round the
-   orb fills as the stays move, a loading bar for the whole job. Solid, glowing
-   lines run from the ring to each helper, and more join everyone in
-   triangles, a web over the work. Every 2.6 seconds a glowing orb of light
+2. Skye's orb pops out of the dock (the Ask pill) and goes to the middle of the
+   screen, over the band. Its tag counts the work: "Pier B closed · 0/11 moved".
+3. There Skye splits into up to five helpers, small orbs of light, and her orb
+   stays in the middle of the screen while they work (going back if the window
+   is resized), glowing, so it reads as Skye directing them rather than one
+   more hand. Everything that glows here is one colour, `--agent-cursor-light`
+   in `agent-cursor.css`: by default the orb's neon yellow (#FCF951). **Glow** in
+   Settings (the avatar's menu, Appearance) is the app's whole colour theme
+   (`src/theme/glowThemes.ts`), Skye's orb and light with it: Neon (the default),
+   White (the original blue orb over Coral's own Fluent colours), Aurora
+   (blue-violet), Seafoam (sea-green) or Iris (sky blue). A ring round the
+   orb fills as the stays move, a loading bar for the whole job. With
+   **Tethers** on in Settings (off by default, when the helpers are orbs
+   alone), solid, glowing lines run from the ring to each helper, and more
+   join everyone in triangles, a web over the work. Every 2.6 seconds a glowing orb of light
    leaves the ring, runs down the lines to the helpers and splits at each one,
    with sparks along the web. A helper whose job only became possible because
    of another helper's move (it lands where that move took a stay from) waits
@@ -62,9 +64,8 @@ many more moves and a longer run. For the demo, give a window.
    lands.
 4. Stays out of view wait. The chart re-frames on what's left and the helpers
    go again, a few rounds until the pier is clear.
-5. The helpers merge back into Skye's orb, which shrinks back into a dot.
-   Skye returns to the now-empty band, every moved stay is outlined, and Skye
-   replies with what it did.
+5. The helpers merge back into Skye's orb. Skye returns to the now-empty band,
+   every moved stay is outlined, and Skye replies with what it did.
 
 In a 1600×1000 window, with the chat open over the bottom of the board, the
 cursors move all 11 stays in about 27 seconds, in four rounds. The reply
@@ -154,25 +155,32 @@ done it becomes the compact approval: it glows like the light at the foot of
 the page, and stays until you decide. Opening the panel puts it away (the
 decision is in the panel too, under the request waiting, threaded to its
 pieces), and closing the panel brings it back.
-The decision is a full-width primary button with **Cancel** under it. When the
-changes need baggage, the primary button reads **Review with baggage**, which
-calls Travis in, then **Waiting on baggage** while he's called and looks, and
-**Approve** once he has approved.
+Over it, a line says where it stands, with who approved it and when once they
+have. The decision is a full-width primary button with **Cancel** under it. When
+the changes need baggage, the primary button reads **Review with baggage**, which
+has Skye call Travis in, then **Waiting on baggage** while he's called and looks,
+and **Approve** only once he has approved.
 
-**The Approvals page.** Calling Travis in (**Review with baggage**, or a yes
-to Skye's offer) switches to the Approvals page, the second entry in the nav
-rail, which counts what waits. Its panel lists what waits, then what was
-decided (approved or cancelled). The plan open fills the page: its title, with
-Teams' meeting bar while there is a call (only the microphone and **Leave**
-work), over the call's tiles (the floating call window stays hidden there). Under them, two panes. **Stand changes**
-lists every change as a card (arrival, from stand → to stand, departure);
-pick one. **Baggage carousels** shows what it does to the flight's bags, on
-the board's chart with the carousels for rows: where they came off before
-(dashed), where they come off now, and any other flight's bags they clash
-with there, in red. At the foot, **Cancel** and the decision: **Review with
-baggage**, "Waiting for approval" while Travis is called and looks, then
-**Approve plan**. The baggage data is synthetic, made from the sample
-flights (`src/stand-timeline-demo/baggageFixture.ts`).
+**The call's shared review.** Calling Travis in (**Review with baggage**, or a
+yes to Skye's offer) has Skye go to the Chat page and press Call on the channel
+that approves it (`callForReview` in `agentGestures.ts`). The plan fills the
+page: its title, with Teams' meeting bar (only the microphone and **Leave**
+work), over the call's tiles (the floating call window stays hidden there).
+Under them, the agenda: where it has got to, in one place throughout, and what
+is asked, in writing, with any question put to Skye and her answer. Then two
+panes. **Proposed changes** lists every change as a card (arrival, from stand →
+to stand, departure, then its carousel, bags and hours, and whether baggage
+decides it), with any carousel maintenance moved as a card of its own; pick
+one. **Baggage carousels** shows what it does to the flight's bags, on the
+board's chart with the carousels for rows: where they came off before (dashed),
+where they come off now, and any other flight's bags they clash with there, in
+red. The brand's fill on a value means that value changes, and nothing else; a
+ring in the brand's colour only draws the eye. At the foot, the review's states
+(Pending review, Approved by Travis with the time, Ready for your approval,
+Applied), **Cancel** and the decision: **Review with baggage**, "Waiting for
+approval" while Travis is called and looks, then **Approve plan**, which goes
+back to the board. The baggage data is synthetic, made from the sample flights
+(`src/stand-timeline-demo/baggageFixture.ts`).
 
 A change needs **Travis Hughes (Baggage operations)** when it moves a
 flight's bags: another pier or the remote stands, a stand gained or lost, or
@@ -181,10 +189,14 @@ new times. A move between stands on the same pier at the same times doesn't.
 **Calling Travis.** When Travis has to approve and isn't on the call, Skye
 asks, in a few words: "Baggage operations in Terminal B approves first,
 then you. Want me to call them?" A "yes" calls him (her
-cursor uses the People list), which is the same as pressing **Review with
-baggage**. He looks at the change once he picks up, about 5 seconds later
-(`ANSWER_MS`), and approves 10 seconds after that (`SIGNOFF_MS`), once Skye has briefed him. If he's
-already on the call, the change goes straight to him. This call offer
+cursor goes to the channel's Call and presses it), which is the same as pressing
+**Review with baggage**. He looks at the change once he picks up, about 2.5 seconds
+later (`ANSWER_MS`), and approves 10 seconds after that (`SIGNOFF_MS`), once Skye
+has briefed him and answered any question of his. If he's
+already on the call, the change goes straight to him. On a voice call, you're
+on it with him: as he picks up you greet him and hand over to Skye, who
+briefs him once you stop; he answers her aloud, approves, and stays on until
+you approve too, then says goodbye. This call offer
 replaces any "want me to fix the next thing?" offer in the same reply, so a
 yes means one thing.
 
@@ -195,8 +207,8 @@ while others are waiting join them, and Travis is asked again from the start.
 
 Nothing reaches Travis. The rule and the people are in
 `src/operations/skyeReview.ts` and the `TEAM` list in
-`src/live/callGuests.ts`, where every person has an expertise. The page is
-`src/approvals/ApprovalsPage.tsx`, and what it lists is in
+`src/live/callGuests.ts`, where every person has an expertise. The review is
+`src/approvals/ApprovalsCall.tsx`, and what it lists is in
 `src/approvals/approvalList.ts`. The bags are in `src/operations/baggage.ts`,
 and their chart is `src/approvals/CarouselTimeline.tsx`.
 

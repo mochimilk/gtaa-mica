@@ -49,13 +49,15 @@ export interface CarouselOutage {
   from: string;
   to: string;
   reason: string;
+  /** Planned work, which can be moved to another time; a fault cannot. */
+  planned: boolean;
 }
 
 /** Planned work and faults on the day: no bags come off a carousel while it is out. */
 export const SYNTHETIC_CAROUSEL_OUTAGES: CarouselOutage[] = [
-  { carousel: "2", from: "12:00", to: "13:30", reason: "Belt maintenance" },
-  { carousel: "9", from: "10:00", to: "11:00", reason: "Belt fault" },
-  { carousel: "11", from: "14:30", to: "16:00", reason: "Belt maintenance" },
+  { carousel: "2", from: "12:00", to: "13:30", reason: "Belt maintenance", planned: true },
+  { carousel: "9", from: "10:00", to: "11:00", reason: "Belt fault", planned: false },
+  { carousel: "11", from: "14:30", to: "16:00", reason: "Belt maintenance", planned: true },
 ];
 
 /** Minutes from on-block to the first bag on the carousel. */
@@ -66,6 +68,9 @@ export const BAGS_PER_MIN = 7;
 
 /** The fewest minutes a flight's bags take to come off, however few: the belt's run. */
 export const MIN_RECLAIM_MIN = 20;
+
+/** Minutes a belt needs between one flight's last bag and whatever comes next on it, to clear. */
+export const BELT_TURNOVER_MIN = 10;
 
 /** Checked bags on a typical flight, by aircraft type: a widebody carries more. */
 export const BAGS_BY_TYPE: Readonly<Record<string, number>> = {

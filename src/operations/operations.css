@@ -1047,17 +1047,17 @@ html.ops-flight-drag--blocked * {
 
 /* The alert Skye is talking about, in her colours. */
 .ops-alert[data-mentioned] {
-  background: color-mix(in srgb, #3b82f6 16%, transparent);
-  box-shadow: inset 3px 0 0 #3b82f6;
+  background: color-mix(in srgb, var(--skye-chart-a) 16%, transparent);
+  box-shadow: inset 3px 0 0 var(--skye-chart-a);
 }
 
 /* A flight row in Skye's selection (the user's own keeps its usual look). */
 .ops-list .ops-row[data-skye-selected] > .ops-cell {
-  background: color-mix(in srgb, #3b82f6 14%, transparent);
+  background: color-mix(in srgb, var(--skye-chart-a) 14%, transparent);
 }
 
 .ops-list .ops-row[data-skye-selected] > .ops-cell:first-child {
-  box-shadow: inset 3px 0 0 #3b82f6;
+  box-shadow: inset 3px 0 0 var(--skye-chart-a);
 }
 
 /* --------------------------------------------------------------- KPI strip */

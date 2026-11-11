@@ -6,7 +6,7 @@
 // shows five and a half rows, so one cut in half says there is more, and
 // scrolls for the rest, fading at an edge with more past it (OverflowScroll);
 // with fewer it hugs them. Once she is done it is the compact approval: lit
-// in violet from its edges in, its glass clear at the middle, with the
+// in teal from its edges in, its glass clear at the middle, with the
 // decision at its foot (OutputsApproval), and
 // stays until her changes are approved or undone. Opening the panel puts it
 // away; closing the panel brings it back.
@@ -47,11 +47,12 @@ const HEADER_HEIGHT = 56;
  */
 const FILL = tokens.colorNeutralBackground2;
 /**
- * Done, in dark mode, the fill is the reference card's deep navy instead, so
- * the violet light over it stays saturated rather than greying on the
- * neutral fill. Light mode keeps its own, under dark text.
+ * Done, in dark mode, the fill is a shade deeper than the neutrals instead, in
+ * the Glow's hue (theme/glowThemes.ts), so the light over it stays saturated
+ * rather than greying on the neutral fill. Light mode keeps its own, under
+ * dark text.
  */
-const DONE_FILL = "#05051d";
+const DONE_FILL = "var(--skye-peek-done-fill)";
 
 const subscribeColorMode = (notify: () => void) => {
   eventBus.on("colorModeChanged", notify);
@@ -75,9 +76,9 @@ const ICON_AIR = "6px";
  * Done, the peek is lit from its edges in, over its glass, as the reference
  * card is: inner shadows, so the light follows a rounded shape, never a
  * circle, offset upward, so its top stays dark and the light rises from the
- * foot and up its sides. Lavender at full strength at the edge, the foot's
- * blue-violet at 45% further in, and nothing in the middle, so the glass (navy, done, in dark
- * mode) shows through.
+ * foot and up its sides. A pale shade of the Glow's hue at full strength at the
+ * edge, a quieter take on it at 45% further in, and nothing in the middle, so
+ * the glass (a deep shade of it, done, in dark mode) shows through.
  *
  * The light is cast on a layer LIT_BLEED past every edge, clipped by the
  * peek, with LIT_RADIUS corners: its dark middle then has those rounder
@@ -98,9 +99,9 @@ const LIT_ENTER_MS = 600;
 const LIT_BREATH = 0.6;
 const LIT_SINK = "4px";
 const LIT = [
-  `inset 0 -19px 18px ${2 + LIT_BLEED}px rgba(150, 138, 240, 1)`,
-  `inset 0 -36px 48px ${10 + LIT_BLEED}px rgba(84, 84, 228, 0.45)`,
-  `inset 0 -45px 56px ${8 + LIT_BLEED}px rgba(80, 84, 230, 0.45)`,
+  `inset 0 -19px 18px ${2 + LIT_BLEED}px var(--skye-peek-lit-edge)`,
+  `inset 0 -36px 48px ${10 + LIT_BLEED}px var(--skye-peek-lit-glow)`,
+  `inset 0 -45px 56px ${8 + LIT_BLEED}px var(--skye-peek-lit-glow)`,
 ].join(", ");
 
 /** Inside the 1px border: the fill layer is rounded itself, to match its parent's corners. */

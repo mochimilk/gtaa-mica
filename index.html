@@ -8,22 +8,23 @@
       Boot splash styles. Inline so the splash paints before any JS loads; the
       Electron CSP allows inline styles but not inline scripts, so dismissal
       lives in src/main.tsx. Backgrounds match the page colour the app later
-      paints (Fluent colorNeutralBackground5, in LumaSkyeBackground) so there
-      is no flash on handoff. On Mica (data-backdrop, set by
-      electron/preload.cjs) the window paints it, so they are clear.
+      paints (colorNeutralBackground5 in src/theme/fluentColors.ts, in
+      LumaSkyeBackground) so there is no flash on handoff. On Mica
+      (data-backdrop, set by electron/preload.cjs) the window paints it, so
+      they are clear.
     -->
     <style>
       :root {
         color-scheme: light dark;
-        --boot-bg: #ebebeb;
-        --boot-mark: #c7c7c7;
-        --boot-sheen: #fafafa;
+        --boot-bg: #e4eaed;
+        --boot-mark: #c0c6c9;
+        --boot-sheen: #f3f9fc;
       }
       @media (prefers-color-scheme: dark) {
         :root {
-          --boot-bg: #000000;
-          --boot-mark: #2e2e2e;
-          --boot-sheen: #575757;
+          --boot-bg: #090f12;
+          --boot-mark: #282f33;
+          --boot-sheen: #4e5459;
         }
       }
       :root[data-backdrop] {

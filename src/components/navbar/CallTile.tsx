@@ -136,7 +136,11 @@ export function CallTile({ name, media, status, ringing, nameIcon, speaking, act
   return (
     <li className={mergeClasses(styles.root, speaking && styles.speaking, className)}>
       <span className={mergeClasses(styles.media, ringing && styles.ringing)}>{media}</span>
-      {status && <span className={styles.status}>{status}</span>}
+      {status && (
+        <span className={styles.status} data-call-status="">
+          {status}
+        </span>
+      )}
       <Tag
         size="small"
         appearance="filled"

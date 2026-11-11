@@ -3,7 +3,8 @@
 // goes to each thing as she says it. Each change she talks about she clicks,
 // so it is picked and ringed, each stand is lit as she names it, its bags'
 // bars outlined as she says what it means for the carousels (./spotlight),
-// then the decision as she asks.
+// then the decision as she asks. She points from beside each thing, with her
+// tag away, so all of it stays readable as she highlights it (aimBeside).
 //
 // She puts her brief in her own words, so where she is in it is found by
 // what she says: each beat of it (teammateBriefScript) has words that mark
@@ -17,7 +18,7 @@
 // another page meanwhile, the Chat page stays mounted behind it while she
 // walks them through it (../live/outOfSight), so her walk-through goes on
 // there, out of sight, and is where she has got to when they come back.
-import { agentCursor } from "../components/agent-cursor";
+import { agentCursor, aimBeside } from "../components/agent-cursor";
 import { pageShift, skyeWorksOn } from "../live/outOfSight";
 import type { BriefBeat, BriefScript } from "../operations/disruption";
 import { setSpotlight, type Spotlight } from "./spotlight";
@@ -31,29 +32,46 @@ const onPlan = (selector: string) => (): Element | null =>
 
 const change = (stayId: string) => `[data-approval-change="${CSS.escape(stayId)}"]`;
 
-/** What a beat lights, where her cursor goes for it, and whether it clicks there. */
-function point(beat: BriefBeat): { spot: Spotlight; target: () => Element | null; clicks: boolean } {
+type Aim = ReturnType<typeof aimBeside>;
+
+/** What a beat lights, where her cursor goes for it and which side of it, and whether it clicks there. */
+function point(beat: BriefBeat): { spot: Spotlight; target: () => Element | null; aim: Aim; clicks: boolean } {
   switch (beat.kind) {
     case "look":
-      return { spot: null, target: onPlan("[data-approval-changes]"), clicks: false };
+      return { spot: null, target: onPlan("[data-approval-changes]"), aim: aimBeside("right"), clicks: false };
     case "card":
-      return { spot: { stayIds: [beat.stayId], stands: [], bags: false }, target: onPlan(change(beat.stayId)), clicks: true };
+      return { spot: { stayIds: [beat.stayId], stands: [], bags: false }, target: onPlan(change(beat.stayId)), aim: aimBeside("right"), clicks: true };
     case "stand":
       return {
         spot: { stayIds: [beat.stayId], stands: [beat.end], bags: false },
         target: onPlan(`${change(beat.stayId)} [data-approval-stand="${beat.end}"]`),
+        // Out from between the two stands, where the card is empty.
+        aim: aimBeside(beat.end === "from" ? "left" : "right"),
         clicks: false,
       };
     case "bags":
-      return { spot: { stayIds: [beat.stayId], stands: [], bags: true }, target: onPlan("[data-approval-bags] .bags-bar--now"), clicks: false };
+      return {
+        spot: { stayIds: [beat.stayId], stands: [], bags: true },
+        target: onPlan("[data-approval-bags] .bags-bar--now"),
+        aim: aimBeside("right"),
+        clicks: false,
+      };
+    case "maintenance":
+      return {
+        spot: { stayIds: [], stands: [], bags: false, maintenance: true },
+        target: onPlan("[data-approval-maintenance]"),
+        aim: aimBeside("right"),
+        clicks: true,
+      };
     case "others":
       return {
-        spot: { stayIds: beat.stayIds, stands: ["from", "to"], bags: false },
+        spot: { stayIds: beat.stayIds, stands: [], bags: false },
         target: onPlan(change(beat.stayIds[0])),
+        aim: aimBeside("right"),
         clicks: true,
       };
     case "ask":
-      return { spot: null, target: onPlan("[data-approval-decision]"), clicks: false };
+      return { spot: null, target: onPlan("[data-approval-decision]"), aim: aimBeside("above"), clicks: false };
   }
 }
 
@@ -97,6 +115,8 @@ export type WalkThrough = {
   asked: () => boolean;
   /** She has said it all: a beat her words never came to is shown now. */
   said: () => void;
+  /** On to what she says next, `script` (her answer to a question), from its start. */
+  next: (script: BriefScript) => void;
   /** Her cursor goes to the decision, as she hands it to the user. */
   toDecision: () => void;
   /** Done: the highlights go, and her cursor goes back into her orb. */
@@ -104,19 +124,23 @@ export type WalkThrough = {
 };
 
 /** Walks `who` through the shared approval along `script`, as her words of it arrive. */
-export function walkThrough({ beats }: BriefScript, who: string): WalkThrough {
+export function walkThrough(script: BriefScript, who: string): WalkThrough {
+  let { beats } = script;
   let next = 0;
   /** Where in what she has said the last beat came. */
   let from = 0;
   let ended = false;
   const timers = new Set<ReturnType<typeof setTimeout>>();
   const done = skyeWorksOn("chat", `Walk ${who} through the changes`);
-  /** Where her cursor went last. */
+  /** Where her cursor went last, and which side of it. */
   let last: (() => Element | null) | null = null;
+  let lastAim: Aim = aimBeside("right");
+  agentCursor.setTagless(true);
   const go = (beat: BriefBeat) => {
-    const { target, clicks } = point(beat);
+    const { target, aim, clicks } = point(beat);
     last = target;
-    void (clicks ? agentCursor.click(target) : agentCursor.hover(target));
+    lastAim = aim;
+    void (clicks ? agentCursor.click(target, { aim }) : agentCursor.hover(target, { aim }));
   };
   const show = (beat: BriefBeat) => {
     const { spot } = point(beat);
@@ -139,7 +163,7 @@ export function walkThrough({ beats }: BriefScript, who: string): WalkThrough {
         const target = last;
         if (!target) return;
         void settled(target).then(() => {
-          if (!ended && last === target) void agentCursor.hover(target);
+          if (!ended && last === target) void agentCursor.hover(target, { aim: lastAim });
         });
       },
       { once: true },
@@ -172,6 +196,11 @@ export function walkThrough({ beats }: BriefScript, who: string): WalkThrough {
       if (!ended && next < beats.length) show(beats[beats.length - 1]);
       next = beats.length;
     },
+    next(following) {
+      beats = following.beats;
+      next = 0;
+      from = 0;
+    },
     toDecision() {
       if (!ended) go({ kind: "ask", at: 0 });
     },
@@ -181,6 +210,7 @@ export function walkThrough({ beats }: BriefScript, who: string): WalkThrough {
       timers.clear();
       setSpotlight(null);
       done();
+      agentCursor.setTagless(false);
       if (agentCursor.out) void agentCursor.recall();
     },
   };

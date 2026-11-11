@@ -1,58 +1,134 @@
 # GTAA Mica
 
 Stand planning for Norvara Intl Airport, with Skye, a chat and voice
-assistant. A Vite + React app on the Coral libraries, also shipped as an
-Electron desktop app.
+assistant that reads the board and moves flights for you. It runs in a browser
+or as a Windows desktop app.
 
-Coral libraries used:
+![GTAA Mica's stand plan](docs/images/app.png)
 
-- `@coral-ai/react` — provider, layout, and UI components
-- `@coral-ai/markdown` — markdown and code rendering (chat messages)
-- `@coral-ai/chat` — chat surfaces and agent helpers
-- `@coral-ai/charts` — not used directly; `@coral-ai/chat` requires it
-- `@coral-ai/bundleicons` — Fluent icons
+Skye runs on OpenAI: GPT-Live (`gpt-live-1`) for voice, and `gpt-6-luna` to
+turn what you ask into actions on the board. You need an OpenAI API key with
+access to both. Without a key the stand plan still works, but Skye can't talk
+or act.
 
-## Start
+There are two ways to run it:
+
+- **[Download the Windows app](#download-the-windows-app)** and paste your key
+  into its Settings. Nothing else to install or configure.
+- **[Run it from source](#run-it-from-source)** with your key in a `.env` file.
+
+## Download the Windows app
+
+1. Open the [latest release](https://github.com/mochimilk/gtaa-mica/releases/latest)
+   and download `GTAA-Mica-win32-x64.zip`. The repository is private, so you
+   need read access to it to see its releases.
+2. Unzip it anywhere and run `GTAA Mica.exe`. The app isn't signed, so Windows
+   SmartScreen may warn you the first time: choose **More info → Run anyway**.
+3. Click the account button at the bottom of the left rail, then **Settings**.
+
+   ![The account menu, with Settings](docs/images/account-menu.png)
+
+4. Choose **API**, then **+**.
+
+   ![Settings → API, with no key yet](docs/images/settings-api.png)
+
+5. Paste your OpenAI API key (it starts with `sk-`), leave the provider as
+   **OpenAI**, and select **Save**.
+
+   ![Pasting a key into Settings → API](docs/images/settings-api-add-key.png)
+
+6. The key shows masked. Close Settings.
+
+   ![The saved key, masked](docs/images/settings-api-key-saved.png)
+
+7. Click Skye's orb at the bottom centre of the window to start a voice call,
+   or the keyboard button beside it to type to her instead. For voice, Windows
+   needs microphone access turned on for desktop apps (**Settings → Privacy &
+   security → Microphone**).
+
+The key stays in the app's memory only. It's never written to disk and is gone
+when you close or reload the app, so add it again each time you open it. To
+remove it sooner, use the trash button next to it.
+
+## Run it from source
+
+You need [Node.js](https://nodejs.org/) 22.12 or newer and an OpenAI API key.
+
+1. Get the code and install its dependencies:
+
+   ```sh
+   git clone https://github.com/mochimilk/gtaa-mica.git
+   cd gtaa-mica
+   npm install
+   ```
+
+2. Copy the settings template to `.env`:
+
+   ```sh
+   cp .env.example .env            # macOS, Linux or Git Bash
+   Copy-Item .env.example .env     # PowerShell
+   ```
+
+3. Open `.env` and set your key:
+
+   ```sh
+   OPENAI_API_KEY=sk-...
+   ```
+
+   The template already sets `MICA_INTERPRETER_MODEL=gpt-6-luna`, which Skye
+   needs to act on what you ask; leave the rest as it is. `.env` is
+   gitignored, so the key stays on your machine.
+
+4. Start Skye's voice server and the app, in two terminals:
+
+   ```sh
+   npm run dev:voice    # Skye's local voice server; reads .env
+   npm run dev          # the app
+   ```
+
+   `dev:voice` prints which settings it found, including whether the key is
+   set (never the key itself).
+
+5. Open <http://localhost:5173> and click Skye's orb at the bottom centre to
+   connect.
+
+To run it in a desktop window rather than the browser, use
+`npm run dev:desktop` in place of `npm run dev`, with `dev:voice` still
+running.
+
+The key lives only in the voice server (`server/micaLiveServer.mjs`), which
+runs on your machine and makes the OpenAI calls for the app; the page never
+sees it. Never put it in a `VITE_*` variable, as those are built into the
+page. Without `dev:voice` running, the app still works and shows Skye's voice
+as disconnected. Every setting in `.env`, and how a call works, is in
+[docs/gpt-live-voice.md](docs/gpt-live-voice.md).
+
+## Build the Windows app
 
 ```sh
-npm install
-npm run dev
+npm run package:desktop
 ```
 
-Voice needs the local broker (`npm run dev:voice`, `server/micaLiveServer.mjs`)
-and its settings (see `.env.example` and `docs/gpt-live-voice.md`). Without it
-the app runs and shows voice as disconnected.
+This writes `desktop-out/GTAA Mica-win32-x64/`, with `GTAA Mica.exe` inside.
+Zip that folder as `GTAA-Mica-win32-x64.zip` to share it or attach it to a
+release. It's an unsigned prototype for the OS and CPU you build it on, with
+no installer or updates. A build made this way takes its key from
+Settings → API, as above.
 
-## Project configuration
-
-`src/main.tsx` imports `coral.config.json` and passes it directly to `CoralProvider`. Change the app name or brand color there. If you rename the config or switch to TypeScript config, update the import too. Markdown styles are already imported in `src/main.tsx`.
-
-## Check and build
+## Check and test
 
 ```sh
-npm run build
-npm run preview
+npm test               # key-free tests; never calls an API
+npm run build          # checks TypeScript and builds the web app into dist/
+npm run preview        # serves dist/
 ```
-
-`build` checks TypeScript and creates the production output in `dist`.
-
-## Add recipes
-
-The existing `@coral-ai/cli` is included as a dev dependency:
-
-```sh
-npx coral add chat
-```
-
-You can also import any of the Coral libraries directly without adding a recipe.
 
 ## Desktop development (Electron)
 
-The desktop window and browser use the same React/Coral UI in `src/`.
-Use Node 22.12 or newer and install dependencies with `npm install`.
+The desktop window and browser use the same React UI in `src/`.
 
 ```sh
-npm run dev             # Existing browser workflow
+npm run dev             # Browser workflow
 npm run dev:desktop     # Vite + a native Electron window, with renderer hot reload
 ```
 

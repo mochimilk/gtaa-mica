@@ -27,12 +27,16 @@ export interface SkyePalette {
 }
 
 export const skyePalettes = {
-  /** The default: reference 1's look leaned toward the blue of references 2 and 3 (hue about 234°; violet is 255°, blue 222°), at the owner's request. */
-  luma: { deep: '42, 58, 208', light: '108, 130, 255', core: '238, 242, 255', edge: '56, 82, 255' },
+  /** The default: reference 1's look in the slate teal of the app's neutrals (theme/fluentColors.ts), at the owner's request; as saturated as that hue allows, so it still reads as light. */
+  luma: { deep: '2, 109, 142', light: '4, 174, 224', core: '228, 245, 253', edge: '1, 134, 175' },
   /** Reference 1: a violet wave (#5028CC) over a pale pink one (#FFF0FF). `light` and `edge` are picked to match it. */
   violet: { deep: '80, 40, 204', light: '140, 108, 255', core: '255, 240, 255', edge: '106, 61, 255' },
   /** References 2 and 3: #134BCD, #6D99FF at 50%, white and #1F62FF. */
   blue: { deep: '19, 75, 205', light: '109, 153, 255', core: '255, 255, 255', edge: '31, 98, 255' },
+  /** The look the app started with: reference 1's leaned toward the blue of references 2 and 3 (hue about 234°). */
+  original: { deep: '42, 58, 208', light: '108, 130, 255', core: '238, 242, 255', edge: '56, 82, 255' },
+  /** Reference 1's look in a deep sea-green, as saturated as that hue allows. */
+  seafoam: { deep: '2, 120, 96', light: '20, 200, 160', core: '228, 253, 245', edge: '1, 150, 120' },
 } as const satisfies Record<string, SkyePalette>
 
 export type SkyePaletteName = keyof typeof skyePalettes

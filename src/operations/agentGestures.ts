@@ -28,6 +28,7 @@
 import {
   agentCursor,
   agentHelpers,
+  aimBeside,
   showTethers,
   type AgentCursorController,
   type ClickOptions,
@@ -35,7 +36,7 @@ import {
 } from "../components/agent-cursor";
 import type { AppAction, SelectionMode } from "../live/appActions";
 import { rowsViewport, sectionOf } from "../stand-timeline";
-import { DEMO_DATA, DEMO_DOMAIN } from "../stand-timeline-demo/demoData";
+import { DEMO_DOMAIN } from "../stand-timeline-demo/demoData";
 import {
   areaMoveState,
   assignState,
@@ -45,7 +46,6 @@ import {
   offBoardStay,
   planDrop,
   setClosure,
-  standArea,
   standState,
   stayName,
   stayOfFlight,
@@ -54,11 +54,11 @@ import {
 } from "./allocation";
 import { pageShift, pageShown, skyeWorksOn } from "../live/outOfSight";
 import { boardKpis } from "./boardKpis";
-import { lateTag } from "./disruption";
 import { FIRST_LANE_ROW, isLaneRow } from "./noStandLane";
 import { formatDuration, OPS_FLIGHTS_BY_ID, type OpsFlight } from "./operationsData";
 import { describeBoardAction } from "./outputs";
-import { skyeTakesHold } from "./skyeReview";
+import { reviewChannel } from "../chat/chatThreads";
+import { callForSignoffs, placingSignoffCall, setPlacingSignoffCall, skyeReview, skyeTakesHold } from "./skyeReview";
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -126,6 +126,19 @@ function aimAtBar(rect: DOMRect) {
     x: left + Math.min(span * (0.25 + Math.random() * 0.3), 18 + Math.random() * 30),
     y: rect.top + rect.height / 2 + (Math.random() * 4 - 2),
   };
+}
+
+/**
+ * Just under the middle of the part of a bar that shows, so she points at it
+ * without covering it or what is next on its stand, and clear of its ghosts'
+ * pills, which show as anything goes over them.
+ */
+function aimBesideBar(rect: DOMRect) {
+  const scroller = document.querySelector(".st-scroller");
+  const box = scroller ? chartVisibleBox(scroller) : rect;
+  const left = Math.max(rect.left, box.left);
+  const right = Math.min(rect.right, box.right - 4);
+  return aimBeside("below")(new DOMRect(left, rect.top, right - left, rect.height));
 }
 
 /* --------------------------------------------------------------- pieces */
@@ -490,11 +503,14 @@ async function frameMoves(moves: readonly AreaMove[], signal: AbortSignal, assig
   ];
   if (!box || spans.length === 0) return;
   const room = box.height - 4 * REACH_MARGIN;
-  let framed = spans.slice(0, 1);
+  // The most work that fits; only when none does, the first, for Skye to
+  // carry herself. Framed on one that cannot fit, none would be in reach.
+  let framed: typeof spans = [];
   for (const first of spans) {
     const group = spans.filter((span) => span.low >= first.low && span.high <= first.low + room);
     if (group.length > framed.length) framed = group;
   }
+  if (framed.length === 0) framed = spans.slice(0, 1);
   const y = framed.flatMap((span) => [span.low, span.high]);
   const x = framed.flatMap((span) => span.xs);
   await centreChartOn({ x: (Math.min(...x) + Math.max(...x)) / 2, y: (Math.min(...y) + Math.max(...y)) / 2 }, signal);
@@ -561,7 +577,7 @@ function crewJobs(tethers: Tethers, moves: readonly AreaMove[]) {
   };
 }
 
-/** Has each of `crew` that is not out come out of Skye's dot (or orb) for its next job. */
+/** Has each of `crew` that is not out come out of Skye's orb for its next job. */
 function spawnCrew(crew: readonly { controller: AgentCursorController }[]): void {
   const from = agentCursor.position;
   if (from) for (const { controller } of crew) controller.spawnFrom(from);
@@ -592,15 +608,15 @@ function holdCentre(signal: AbortSignal): () => void {
 
 /**
  * Closes a stand area with several cursors at once. The area's closure shows
- * on the chart, the chart glides to it, and Skye's cursor goes to the middle
- * of the screen, over it. There it splits: helpers peel off its dot, which
- * becomes an orb and stays there, each tagged with its job, and between them
+ * on the chart, the chart glides to it, and Skye's orb goes to the middle of
+ * the screen, over it. There it splits: helpers peel off it, while it stays
+ * there, each tagged with its job, and between them
  * take the stays off the area, each dragging one stay at a time to where it
  * was planned to go while the others do the same; Skye's tag counts them
  * off, and the ring round her orb fills. Stays out of view wait for the next
  * round: the chart is framed on what is left and the helpers go again. Then
- * they merge back into Skye's orb, and it is a dot again. The apply that
- * follows lands whatever the cursors did not.
+ * they merge back into Skye's orb. The apply that follows lands whatever the
+ * cursors did not.
  */
 async function closeArea(action: Extract<AppAction, { name: "close_area" }>, signal: AbortSignal): Promise<void> {
   setClosure({ area: action.area, from: action.from, to: action.to });
@@ -632,12 +648,12 @@ async function closeArea(action: Extract<AppAction, { name: "close_area" }>, sig
   if (signal.aborted) return;
 
   const crew = agentHelpers.slice(0, crewSize(todo.length));
-  // Lines from Skye out to each helper while it works, and Skye an orb meanwhile.
+  // Lines from Skye out to each helper while it works, and Skye directing them meanwhile.
   const tethers = showTethers(
     agentCursor,
     crew.map(({ controller }) => controller),
   );
-  agentCursor.setOrb(true);
+  agentCursor.setDirecting(true);
   const release = holdCentre(signal);
   const take = crewJobs(tethers, todo);
   let left = todo;
@@ -679,12 +695,11 @@ async function closeArea(action: Extract<AppAction, { name: "close_area" }>, sig
       if (round > 0 && moved === before) break;
     }
   } finally {
-    // Back into Skye's orb, also when stopped part way; their lines go with
-    // them, and the orb becomes a dot again.
+    // Back into Skye's orb, also when stopped part way; their lines go with them.
     release();
     await Promise.all(crew.map(({ controller: helper }) => backToSkye(helper)));
     tethers.stop();
-    agentCursor.setOrb(false);
+    agentCursor.setDirecting(false);
   }
   if (signal.aborted) return;
   // Back to the area, now clear. The tally goes: the apply lands anything the
@@ -919,7 +934,7 @@ async function crewWork(
     agentCursor,
     crew.map(({ controller }) => controller),
   );
-  agentCursor.setOrb(true);
+  agentCursor.setDirecting(true);
   const release = holdCentre(signal);
   const take = crewJobs(tethers, moves);
   const queue: FixJob[] = [];
@@ -984,13 +999,12 @@ async function crewWork(
       if (round > 0 && done === before) break;
     }
   } finally {
-    // Back into Skye's orb, also when stopped part way; their lines go with
-    // them, and the orb becomes a dot again.
+    // Back into Skye's orb, also when stopped part way; their lines go with them.
     for (const { controller } of crew) controller.setTask(null);
     release();
     await Promise.all(crew.map(({ controller: helper }) => backToSkye(helper)));
     tethers.stop();
-    agentCursor.setOrb(false);
+    agentCursor.setDirecting(false);
   }
 
   // What the helpers could not reach in any round, Skye carries herself,
@@ -1014,12 +1028,18 @@ async function crewWork(
 
 /* -------------------------------------------- weighing a disruption first */
 
-/** How long a helper rests on what it looks at, ms: long enough to read its tag. */
-const CHECK_DWELL_MS = 420;
-/** How long the helpers stay on what would wait before they start moving it, ms. */
-const POINT_OUT_MS = 1_800;
-/** The most a sweep looks at: past this, more looks only make it longer. */
-const MAX_CHECKS = 28;
+/** How long Skye rests beside the late stay's bar before she splits, ms. */
+const LATE_BEAT_MS = 400;
+/** How long a helper rests on a stand it looks at, ms: long enough to read its tag. */
+const CHECK_DWELL_MS = 320;
+/** How long the helpers stay on what would wait, the problem, before they look for stands, ms. */
+const POINT_OUT_MS = 1_000;
+/**
+ * How many stands Skye is seen to turn down for each stay she moves before the
+ * one that will do: the nearest of each kind of reason ("taken", "narrowbody
+ * only"), so the look says why without walking the whole pier.
+ */
+const TRIED_PER_MOVE = 2;
 
 /** One look a helper takes while Skye weighs a disruption: a stay's bar, or a stand at a stay's hours. */
 type Check = { label: string; at: () => { x: number; y: number } | null };
@@ -1031,7 +1051,8 @@ function barPoint(stayId: string): { x: number; y: number } | null {
   if (!rect || !box) return null;
   const left = Math.max(rect.left, box.left + REACH_MARGIN);
   const right = Math.min(rect.right, box.right - REACH_MARGIN);
-  const point = { x: (left + right) / 2, y: rect.top + rect.height / 2 };
+  // On the bar's foot, its tag below it, so what the bar says stays readable.
+  const point = { x: (left + right) / 2, y: rect.bottom - 3 };
   return right > left && landingShows(point) ? point : null;
 }
 
@@ -1042,50 +1063,40 @@ function slotPoint(standId: string, stayId: string): { x: number; y: number } | 
   return point && landingShows(point) ? point : null;
 }
 
+/** The kind of reason a stand will not do: "taken by XB216/217" and "taken by XD456/457" are one kind. */
+const reasonKind = (reason: string) => (reason.startsWith("taken by") ? "taken" : reason);
+
 /**
- * What Skye looks at to weigh a late stay's knock-on, most telling first:
- * each aircraft that would wait for its stand, and how long; then, for each
- * stay she will move, the stands she tries before the one she picks and why
- * each will not do, and that one; then the other stays around it, to show
- * they are clear. Only what shows on the chart now.
+ * The stands Skye looks at for each stay she will move: the nearest she turns
+ * down for each kind of reason, TRIED_PER_MOVE at most, saying why, then the
+ * one that will do. Only what shows on the chart now.
  */
-function disruptionChecks(action: Extract<AppAction, { name: "resolve_disruption" }>): Check[] {
-  const late = occupancyById(action.stayId);
-  if (!late) return [];
-  const holds = boardKpis(standState()).holds.filter((hold) => hold.standId === late.rowId);
-  const checks: Check[] = holds.map((hold) => ({
-    label: `${hold.label} · would wait ${formatDuration(hold.minutes)}`,
-    at: () => barPoint(hold.stayId),
-  }));
+function standChecks(action: Extract<AppAction, { name: "resolve_disruption" }>): Check[] {
+  const checks: Check[] = [];
   for (const move of action.moves) {
-    for (const tried of action.considered.filter((entry) => entry.occupancyId === move.occupancyId)) {
-      checks.push({ label: `${tried.standId} · ${tried.reason}`, at: () => slotPoint(tried.standId, move.occupancyId) });
+    const kinds = new Set<string>();
+    const tried = action.considered.filter((entry) => {
+      if (entry.occupancyId !== move.occupancyId || kinds.has(reasonKind(entry.reason))) return false;
+      kinds.add(reasonKind(entry.reason));
+      return true;
+    });
+    for (const entry of tried.slice(0, TRIED_PER_MOVE)) {
+      checks.push({ label: `${entry.standId} · ${entry.reason}`, at: () => slotPoint(entry.standId, move.occupancyId) });
     }
     checks.push({ label: `${move.standId} · free ✓`, at: () => slotPoint(move.standId, move.occupancyId) });
   }
-  // Everything else around it: on the late stay's pier and the stands it
-  // could use, from when it gets in until the last aircraft it holds is due.
-  const looked = new Set([late.id, ...holds.map((hold) => hold.stayId)]);
-  const until = Math.max(late.end, ...holds.map((hold) => hold.due + hold.minutes * 60_000));
-  const piers = new Set([late.rowId, ...action.moves.map((move) => move.standId)].map((stand) => standArea(stand)));
-  const around = DEMO_DATA.occupancies
-    .filter((o) => !looked.has(o.id) && piers.has(standArea(o.rowId)) && o.start < until && late.start < o.end)
-    .sort((a, b) => a.start - b.start);
-  for (const other of around) checks.push({ label: `${stayName(other)} · clear`, at: () => barPoint(other.id) });
-  return checks.filter((check) => check.at() !== null).slice(0, MAX_CHECKS);
+  return checks.filter((check) => check.at() !== null);
 }
 
 /**
- * A late flight's knock-on, weighed across the plan and then cleared, with
- * every helper Skye has. The chart frames the work and Skye goes to the late
- * stay's bar, saying how late it is. Then she splits, her echoes fanning out
- * across the board at once: to each aircraft that would wait for its stand
- * (saying how long), to the stands she tries for what she will move (saying
- * why each will not do, and which will), and over the stays around them,
- * while her ring fills with what has been checked. They stop on what would
- * wait, a beat, so it is clear what the problem is; then the helpers move
- * what the late stay runs into, one each and all at once, as fixAll does,
- * and merge back into her.
+ * A late flight's knock-on, weighed and cleared in three quick beats, with
+ * every helper Skye has. The chart frames the work and Skye rests beside the
+ * late stay's bar. Then she splits: first the problem, her echoes on each
+ * aircraft that would wait for its stand, saying how long, while her tag
+ * gives the total; then the search, the echoes on the stands she turns down
+ * for what she will move (saying why) and the one that will do, while her
+ * ring fills; then the helpers move what the late stay runs into, one each
+ * and all at once, as fixAll does, and merge back into her.
  */
 async function resolveDisruption(action: Extract<AppAction, { name: "resolve_disruption" }>, signal: AbortSignal): Promise<void> {
   const late = occupancyById(action.stayId);
@@ -1095,34 +1106,61 @@ async function resolveDisruption(action: Extract<AppAction, { name: "resolve_dis
 
   // The late stay, and the stands its stays go to, in view; Skye on the late one.
   await frameMoves(pending, signal);
-  agentCursor.setTask(lateTag());
-  await agentCursor.hover(() => shown(barOf(late.id)), { signal, aim: aimAtBar, visibleBox: chartVisibleBox });
-  if (signal.aborted) return;
-  await wait(600);
+  // Beside the bar, her tag away, so its flights and times stay readable. What
+  // she is on stays in the dock (SkyeTask), not on her tag: her tag follows her about.
+  agentCursor.setTagless(true);
+  await agentCursor.hover(() => shown(barOf(late.id)), { signal, aim: aimBesideBar, visibleBox: chartVisibleBox });
+  if (signal.aborted) {
+    agentCursor.setTagless(false);
+    return;
+  }
+  await wait(LATE_BEAT_MS);
+  agentCursor.setTagless(false);
 
-  const checks = disruptionChecks(action);
-  if (checks.length > 0) {
-    await agentCursor.moveTo(screenCentre, { signal });
-    if (signal.aborted) return;
-    const crew = agentHelpers.slice(0, Math.min(agentHelpers.length, Math.max(3, Math.ceil(checks.length / 4))));
+  const holds = boardKpis(standState()).holds.filter((hold) => hold.standId === late.rowId);
+  const inView = holds.filter((hold) => barPoint(hold.stayId) !== null);
+  const checks = standChecks(action);
+  if (inView.length + checks.length > 0) {
+    // Skye stays beside the late stay, on what it is all about, and her
+    // echoes split off her there.
+    const crew = agentHelpers.slice(0, Math.min(agentHelpers.length, Math.max(inView.length, checks.length, 1)));
     const tethers = showTethers(
       agentCursor,
       crew.map(({ controller }) => controller),
     );
-    agentCursor.setOrb(true);
-    const release = holdCentre(signal);
-    let checked = 0;
-    const progress = () => {
-      agentCursor.setTask(`Weighing ${name} · ${checked}/${checks.length} checked`);
-      agentCursor.setProgress(checked / checks.length);
-    };
-    progress();
-    const queue = [...checks];
+    agentCursor.setDirecting(true);
     try {
       spawnCrew(crew);
-      // All at once, each taking the next look as it comes free.
+      // The problem: each on an aircraft that would wait, Skye's tag the total.
+      const minutes = holds.reduce((sum, hold) => sum + hold.minutes, 0);
+      agentCursor.setTask(
+        holds.length > 0
+          ? `${holds.length} aircraft would wait · ${formatDuration(minutes)} gate hold`
+          : `${name} runs into ${action.moves.length} stays`,
+      );
+      await Promise.all(
+        crew.map(async ({ controller: helper }, index) => {
+          const hold = inView[index];
+          const at = hold ? barPoint(hold.stayId) : null;
+          if (!hold || !at) return;
+          helper.setTask(`Waits ${formatDuration(hold.minutes)}`);
+          await helper.moveTo(() => barPoint(hold.stayId) ?? at, { signal });
+        }),
+      );
+      if (signal.aborted) return;
+      await wait(POINT_OUT_MS);
+
+      // The search: the stands she turns down and the one that will do, all at once.
+      let checked = 0;
+      const progress = () => {
+        agentCursor.setTask(`Finding stands · ${checked}/${checks.length} checked`);
+        agentCursor.setProgress(checks.length > 0 ? checked / checks.length : 1);
+      };
+      progress();
+      const queue = [...checks];
       await Promise.all(
         crew.map(async ({ controller: helper }) => {
+          helper.setTask(null);
           for (let check = queue.shift(); check && !signal.aborted; check = queue.shift()) {
             const at = check.at();
             if (at) {
@@ -1135,40 +1173,16 @@ async function resolveDisruption(action: Extract<AppAction, { name: "resolve_dis
           }
         }),
       );
-      if (signal.aborted) return;
-      // Then each stops on what would wait, so the problem is plain before anything moves.
-      const holds = boardKpis(standState()).holds.filter((hold) => hold.standId === late.rowId);
-      const minutes = holds.reduce((sum, hold) => sum + hold.minutes, 0);
-      agentCursor.setTask(
-        holds.length > 0
-          ? `${holds.length} aircraft would wait · ${formatDuration(minutes)} gate hold`
-          : `${name} runs into ${action.moves.length} stays`,
-      );
-      await Promise.all(
-        crew.map(async ({ controller: helper }, index) => {
-          const hold = holds[index];
-          const at = hold ? barPoint(hold.stayId) : null;
-          if (!hold || !at) {
-            helper.setTask(null);
-            await backToSkye(helper);
-            return;
-          }
-          helper.setTask(`Conflict · waits ${formatDuration(hold.minutes)}`);
-          await helper.moveTo(() => barPoint(hold.stayId) ?? at, { signal });
-        }),
-      );
-      await wait(POINT_OUT_MS);
     } finally {
       for (const { controller } of crew) controller.setTask(null);
-      release();
       await Promise.all(crew.map(({ controller: helper }) => backToSkye(helper)));
       tethers.stop();
-      agentCursor.setOrb(false);
+      agentCursor.setDirecting(false);
     }
   }
   if (signal.aborted) return;
   // One helper to each stay it runs into, all moving at once.
-  await crewWork(pending, [], signal, (done, total) => `Clearing ${name}'s knock-on · ${done}/${total} moved`, pending.length);
+  await crewWork(pending, [], signal, (done, total) => `Clearing the knock-on · ${done}/${total} moved`, pending.length);
 }
 
 /**
@@ -1192,12 +1206,76 @@ async function showCallWindow(ready: () => Element | null, signal: AbortSignal):
 }
 
 /**
- * Calling someone in, as a person does: off a call, from the People list,
- * with the call button on their row. On one, the call window has no Add
- * people, so there is nothing to click: the window is shown (if it is
- * closed), where their tile rings once they are called.
+ * Calling in the teammate who has to approve what waits, where that call is
+ * placed, so it can be seen happening rather than inferred from the page
+ * changing: to the Chat page, onto the channel that approves it, and beside
+ * its Call button, which she presses, her tag saying what she is doing.
+ * Returns false when `person` is not who is waited on, or there is no channel.
+ */
+async function callForReview(person: string, signal: AbortSignal): Promise<boolean> {
+  const review = skyeReview();
+  const signoff = review?.signoffs.find((entry) => entry.name === person && entry.state === "needed");
+  const channel = review && signoff ? reviewChannel(review, signoff) : undefined;
+  if (!channel) return false;
+  const control = () => shown(`[data-call-control="${CSS.escape(channel.id)}"]`);
+  agentCursor.setTask(`Calling ${channel.name}`);
+  if (!control()) {
+    await click(() => shown('[data-nav-page="chat"]'), signal, { last: false, aim: aimBeside("right") });
+    const row = () => shown(`[data-chat-thread="${CSS.escape(channel.id)}"] > *`);
+    if (await waitFor(row, signal, 1_500)) await click(row, signal, { last: false, aim: aimBeside("right") });
+    await waitFor(control, signal, 1_500);
+  }
+  await click(control, signal, { aim: aimBeside("below") });
+  agentCursor.setTask(null);
+  return true;
+}
+
+/**
+ * Brings `stayIds` to the middle of the board, as far as they fit: where a
+ * plan's outcome is on show once it is approved.
+ */
+export function frameStays(stayIds: readonly string[]): void {
+  const scroller = document.querySelector<HTMLElement>(".st-scroller");
+  const rects = stayIds.flatMap((id) => shown(barOf(id))?.getBoundingClientRect() ?? []);
+  if (!scroller || rects.length === 0) return;
+  const box = chartVisibleBox(scroller);
+  const middle = (low: number, high: number) => (low + high) / 2;
+  scroller.scrollBy({
+    left: middle(Math.min(...rects.map((rect) => rect.left)), Math.max(...rects.map((rect) => rect.right))) - middle(box.left, box.right),
+    top: middle(Math.min(...rects.map((rect) => rect.top)), Math.max(...rects.map((rect) => rect.bottom))) - middle(box.top, box.bottom),
+    behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+  });
+}
+
+/**
+ * Review with baggage, pressed: Skye places the call herself (callForReview),
+ * and it is placed whatever becomes of her cursor. Her cursor goes home after,
+ * unless she is walking them through it by then.
+ */
+export async function placeSignoffCall(): Promise<void> {
+  const person = skyeReview()?.signoffs.find((entry) => entry.state === "needed")?.name;
+  if (!person || placingSignoffCall()) return;
+  setPlacingSignoffCall(true);
+  try {
+    await playAgentGesture({ name: "add_to_call", person }, new AbortController().signal);
+  } finally {
+    setPlacingSignoffCall(false);
+    callForSignoffs();
+    setTimeout(() => {
+      if (agentCursor.out && !agentCursor.active) void agentCursor.recall();
+    }, 900);
+  }
+}
+
+/**
+ * Calling someone in, as a person does: who has to approve what waits, from
+ * the channel it is approved in (callForReview). Anyone else, off a call, from
+ * the People list, with the call button on their row. On one, the call window
+ * has no Add people, so there is nothing to click: the window is shown (if it
+ * is closed), where their tile rings once they are called.
  */
 async function addToCall(person: string, signal: AbortSignal): Promise<void> {
+  if (await callForReview(person, signal)) return;
   const people = () => shown("[data-call-people]");
   if (!people()) {
     await showCallWindow(() => shown('[role="dialog"][aria-label="Call"]'), signal);

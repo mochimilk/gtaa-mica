@@ -80,54 +80,107 @@ export const fluentChartTheme = {
 } as CSSProperties;
 
 /**
- * Status palette, scoped to the demo chart by demo.css (values per light/dark
- * mode live there). Only a stay that needs attention takes a colour:
- *   healthy: neutral glass, so the board stays quiet and Skye's purple (her
- *     cursors' aura, her selections) stands out on it: faint white, fading
- *     left to right as the coloured bars do, over the grid, inside
- *     Fluent's Stroke 1 at rest,
+ * Bar palettes, scoped to the demo chart by demo.css (values per light/dark
+ * mode live there). A stay that needs attention takes its status's colour:
  *   conflict: red, a late stay whose delay runs into another stay on its
  *     stand (the clashes the Alerts list as conflicts; see ./delays),
  *   waiting: orange, a stay with no stand, in the No stand lane.
  * A coloured bar's fill is its colour, fading left to right from
- * BAR_FADE.from to BAR_FADE.to opacity, inside a full-opacity border of it.
- * Every bar's labels use the neutral text colour.
+ * BAR_FADE.from to BAR_FADE.to opacity, inside a full-opacity border of it,
+ * its labels in the neutral text colour.
+ * Any other stay is healthy, and takes its aircraft type's tone
+ * (AIRCRAFT_TONE), as the EBC stand plan reference colours its bars, here in
+ * the hue of the Glow chosen in Settings: pale, mid or deep, solid, its labels
+ * in the tone's own text colour.
+ * A type with no tone stays neutral glass: faint white, fading left to right
+ * as the coloured bars do, over the grid, inside Fluent's Stroke 1 at rest.
  */
 export type FlightStatus = "healthy" | "conflict" | "waiting";
+
+/** A healthy stay's colour, by its aircraft type (AIRCRAFT_TONE). */
+export type AircraftTone = "pale" | "mid" | "deep";
+
+/** A bar's palette: its status's, or a healthy stay's aircraft tone. */
+type PaletteKey = FlightStatus | AircraftTone;
 
 /** A bar's fill: a gradient from its left end to its right, its stops as [colour, opacity]. */
 type FillStops = readonly (readonly [string, number])[];
 
-interface StatusPalette {
+interface BarPalette {
   /** The border at rest; hover and selection draw the chart's outline over it. */
   edge: string;
-  /** The colour of the bar's delay ghosts and tow/hold stripes. */
+  /** The colour of the bar's delay ghosts. */
   mark: string;
+  /** The colour of its tow/hold stripes, drawn at HATCH_OPACITY. */
+  hatch: string;
   fill: FillStops;
+  /** Its labels' colour, and its aircraft drawing's. */
+  text: string;
 }
 
 /** How much of the status colour a coloured bar's fill shows, at its left end and its right. Its border stays solid. */
 const BAR_FADE = { from: 0.3, to: 0.22 };
 
 /** A coloured bar: a fade of its colour, inside a border of it. */
-const faded = (status: FlightStatus): StatusPalette => {
+const faded = (status: FlightStatus): BarPalette => {
   const color = `var(--flight-${status})`;
-  return { edge: color, mark: color, fill: [[color, BAR_FADE.from], [color, BAR_FADE.to]] };
+  return {
+    edge: color,
+    mark: color,
+    hatch: color,
+    fill: [[color, BAR_FADE.from], [color, BAR_FADE.to]],
+    text: "var(--st-text)",
+  };
 };
 
 /**
- * A healthy bar: neutral glass, white fading left to right (its opacities per
- * mode in demo.css: a dark board needs far less white than a light one),
- * inside Fluent's Stroke 1 at rest; its ghosts and stripes in a
+ * A healthy bar with no tone: neutral glass, white fading left to right (its
+ * opacities per mode in demo.css: a dark board needs far less white than a
+ * light one), inside Fluent's Stroke 1 at rest; its ghosts and stripes in a
  * stronger neutral, so they still read.
  */
-const GLASS: StatusPalette = {
+const GLASS: BarPalette = {
   edge: "var(--flight-glass-edge)",
   mark: "var(--flight-glass-mark)",
+  hatch: "var(--flight-glass-mark)",
   fill: [["var(--flight-glass-from)", 1], ["var(--flight-glass-to)", 1]],
+  text: "var(--st-text)",
 };
 
-/** A dimmed bar's fill: the glass at its faintest, still frosting what is behind it. */
+/**
+ * A healthy bar in its aircraft's tone: solid, inside an edge of it, its
+ * labels and stripes in the tone's own colours (demo.css); its delay ghosts
+ * in the glass's neutral, which reads on and off any tone.
+ */
+const toned = (tone: AircraftTone): BarPalette => {
+  const color = `var(--flight-${tone})`;
+  return {
+    edge: `var(--flight-${tone}-edge)`,
+    mark: "var(--flight-glass-mark)",
+    hatch: `var(--flight-${tone}-hatch)`,
+    fill: [[color, 1], [color, 1]],
+    text: `var(--flight-${tone}-text)`,
+  };
+};
+
+/**
+ * Each aircraft type's tone: the A320 family pale, the 737s and E-Jets mid,
+ * widebodies deep. A type not listed stays neutral glass.
+ */
+export const AIRCRAFT_TONE: Readonly<Partial<Record<string, AircraftTone>>> = {
+  A319: "pale",
+  A320: "pale",
+  A321: "pale",
+  B738: "mid",
+  B38M: "mid",
+  E195: "mid",
+  B788: "deep",
+  B789: "deep",
+  B77W: "deep",
+  A339: "deep",
+};
+
+/** A dimmed bar's fill, whatever its tone or status: the glass at its faintest, still frosting what is behind it. */
 const DIM_FILL: FillStops = [["var(--flight-dim-glass-from)", 1], ["var(--flight-dim-glass-to)", 1]];
 /** The dimmed bars' fill's id, for `url(#…)`; DemoPatternDefs draws it. */
 export const DIM_GRADIENT_ID = "demo-gradient-dimmed";
@@ -147,20 +200,28 @@ const DRAWING_SIZE = 14;
 /** Room, px, on each side of the drawing for its glow (demo.css), which the bar's label box would clip. */
 const DRAWING_GLOW = 3;
 
-export const STATUS_PALETTE: Record<FlightStatus, StatusPalette> = {
+export const STATUS_PALETTE: Record<FlightStatus, BarPalette> = {
   healthy: GLASS,
   conflict: faded("conflict"),
   waiting: faded("waiting"),
 };
 
-const hatchId = (status: FlightStatus) => `demo-hatch-${status}`;
-/** A status's fill's id, for `url(#…)`; DemoPatternDefs draws it. */
-export const gradientId = (status: FlightStatus) => `demo-gradient-${status}`;
+export const TONE_PALETTE: Record<AircraftTone, BarPalette> = {
+  pale: toned("pale"),
+  mid: toned("mid"),
+  deep: toned("deep"),
+};
+
+const PALETTES: Record<PaletteKey, BarPalette> = { ...STATUS_PALETTE, ...TONE_PALETTE };
+
+const hatchId = (key: PaletteKey) => `demo-hatch-${key}`;
+/** A status's or tone's fill's id, for `url(#…)`; DemoPatternDefs draws it. */
+export const gradientId = (key: PaletteKey) => `demo-gradient-${key}`;
 
 /**
- * Custom layer: per-status defs, and the dimmed bars' fill. The fill gradients
+ * Custom layer: per-status and per-tone defs, and the dimmed bars' fill. The fill gradients
  * use bounding-box units, so they span each bar whatever its size. Hatch patterns for tow/hold stays
- * are stripes only, in the bar's mark colour at HATCH_OPACITY, drawn over its
+ * are stripes only, in the bar's hatch colour at HATCH_OPACITY, drawn over its
  * fill. Colours go through `style` because CSS variables don't resolve in SVG
  * presentation attributes. Drawn once, in the body's plot: bars in the
  * pinned rows' plot use the same ids, as one document they can reach.
@@ -169,9 +230,9 @@ export function DemoPatternDefs() {
   const region = useTimelineRegion();
   const { section } = useTimeline();
   if (region !== "plot" || section !== "body") return null;
-  const palettes = Object.entries(STATUS_PALETTE) as [FlightStatus, StatusPalette][];
+  const palettes = Object.entries(PALETTES) as [PaletteKey, BarPalette][];
   const fills: [string, FillStops][] = [
-    ...palettes.map(([status, p]): [string, FillStops] => [gradientId(status), p.fill]),
+    ...palettes.map(([key, p]): [string, FillStops] => [gradientId(key), p.fill]),
     [DIM_GRADIENT_ID, DIM_FILL],
   ];
   return (
@@ -183,16 +244,16 @@ export function DemoPatternDefs() {
           ))}
         </linearGradient>
       ))}
-      {palettes.map(([status, p]) => (
+      {palettes.map(([key, p]) => (
         <pattern
-          key={status}
-          id={hatchId(status)}
+          key={key}
+          id={hatchId(key)}
           width={6}
           height={6}
           patternUnits="userSpaceOnUse"
           patternTransform="rotate(45)"
         >
-          <line x1={0} y1={0} x2={0} y2={6} style={{ stroke: p.mark, strokeOpacity: HATCH_OPACITY, strokeWidth: 2 }} />
+          <line x1={0} y1={0} x2={0} y2={6} style={{ stroke: p.hatch, strokeOpacity: HATCH_OPACITY, strokeWidth: 2 }} />
         </pattern>
       ))}
     </defs>
@@ -276,7 +337,12 @@ export function makeDemoAccessors(
       : GHOST_SIDES.some((side) => clashes.has(ghostKey(bar.occupancy.id, side)))
         ? "conflict"
         : "healthy";
-  const paletteOf = (bar: BarDatum) => STATUS_PALETTE[statusOf(bar)];
+  /** Its status's palette; a healthy stay's, its aircraft type's tone, or the glass when the type has none. */
+  const keyOf = (bar: BarDatum): PaletteKey => {
+    const status = statusOf(bar);
+    return status === "healthy" ? (AIRCRAFT_TONE[turnOf(bar)?.aircraftType ?? ""] ?? status) : status;
+  };
+  const paletteOf = (bar: BarDatum) => PALETTES[keyOf(bar)];
   const isDimmed = (bar: BarDatum) =>
     !bar.selected && !bar.linked && (hasSelection || (!!isMatch && !isMatch(bar.occupancy.id)));
 
@@ -292,21 +358,22 @@ export function makeDemoAccessors(
         className: "demo-bar--dimmed",
       };
     }
-    // Glass, or a fade of the status colour, inside its edge. Selected, linked
-    // and focus states are drawn by the chart's separate outline, so they stay visible.
+    // Its aircraft's tone, the glass, or a fade of the status colour, inside
+    // its edge. Selected, linked and focus states are drawn by the chart's
+    // separate outline, so they stay visible.
     const className = bar.selected && skyeIds.has(bar.occupancy.id) ? "demo-bar--skye" : undefined;
-    const fill = `url(#${gradientId(statusOf(bar))})`;
-    return { fill, stroke: p.edge, color: "var(--st-text)", className };
+    const fill = `url(#${gradientId(keyOf(bar))})`;
+    return { fill, stroke: p.edge, color: p.text, className };
   };
 
-  /** Glass or gradient bar, plus a stripes-only hatch overlay for tow/hold stays. */
+  /** Toned, glass or gradient bar, plus a stripes-only hatch overlay for tow/hold stays. */
   const renderBar = (bar: BarDatum, style: BarStyle) => {
     const hatched = bar.occupancy.kind === "hold" && !isDimmed(bar);
     return (
       <>
         <DefaultBar bar={bar} style={style} />
         {hatched && (
-          <DefaultBar bar={bar} style={{ fill: `url(#${hatchId(statusOf(bar))})`, stroke: "none" }} />
+          <DefaultBar bar={bar} style={{ fill: `url(#${hatchId(keyOf(bar))})`, stroke: "none" }} />
         )}
       </>
     );
@@ -350,12 +417,14 @@ export function makeDemoAccessors(
   /**
    * The aircraft type's drawing in the middle, at DRAWING_SIZE, glowing a
    * little; none when it has none. The first label a bar too short sheds.
-   * One colour, its labels' (demo.css), muted on a dimmed bar as they are.
+   * One colour, its labels' (labelColor): its tone's, or muted on a dimmed
+   * bar as they are.
    */
   const drawingSlot = (bar: BarDatum, pixels: Pixels | undefined): BarLabelSlot | undefined => {
     if (!pixels) return undefined;
-    const className = isDimmed(bar) ? "demo-drawing demo-drawing--dimmed" : "demo-drawing";
-    const node = <PixelArt pixels={pixels} size={DRAWING_SIZE} className={className} />;
+    const node = (
+      <PixelArt pixels={pixels} size={DRAWING_SIZE} className="demo-drawing" style={{ color: labelColor(bar) }} />
+    );
     return {
       primary: "",
       html: {
@@ -366,7 +435,7 @@ export function makeDemoAccessors(
     };
   };
 
-  const labelColor = (bar: BarDatum) => (isDimmed(bar) ? "var(--flight-dim-text)" : "var(--st-text)");
+  const labelColor = (bar: BarDatum) => (isDimmed(bar) ? "var(--flight-dim-text)" : paletteOf(bar).text);
   /** Dimmed bars' labels keep their own muted colour, not the rest state's 80% (demo.css). */
   const labelClassName = (bar: BarDatum) => (isDimmed(bar) ? "demo-labels--dimmed" : undefined);
 
@@ -399,6 +468,7 @@ export function makeDemoAccessors(
           side,
           ms,
           label,
+          caption: side === "start" ? `Late in, was ${formatTime(scheduled)}` : `Late out, to ${formatTime(expected)}`,
           clash: !!into,
           color: dimmed ? "var(--flight-dim-text)" : paletteOf(bar).mark,
           className: dimmed ? "demo-ghost--dimmed" : undefined,

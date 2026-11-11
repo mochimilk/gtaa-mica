@@ -648,7 +648,7 @@ test("on a call, what Skye talks about is selected as she says it, not during th
   assert.deepEqual(s.host.calls.slice(1), ["selectFlights:replace:T02-ARR|T03-ARR", "showAlerts:ALERT-CLASH-T02-1-end"]);
   // Then the next one: the selection moves with her, to the late stay and what it runs into.
   s.transcript.append("agent", " then the B11 conflict after that.", 6_000, 8_000);
-  assert.deepEqual(s.host.calls.slice(-2), ["selectFlights:replace:T24-ARR|T25-ARR|T26-ARR|T27-ARR|T16-ARR", "showAlerts:ALERT-CLASH-T24-1-end"]);
+  assert.deepEqual(s.host.calls.slice(-2), ["selectFlights:replace:T24-ARR|T25-ARR|T26-ARR", "showAlerts:ALERT-CLASH-T24-1-end"]);
   // Quiet a while: the alerts close.
   s.scheduler.advance(5_000);
   assert.equal(s.host.calls.at(-1), "hideAlerts");

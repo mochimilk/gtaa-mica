@@ -5,8 +5,9 @@
  * Skye's bars (.demo-bar--skye) and the line linking Skye's pair
  * (.demo-link--skye) take the SVG gradients from <SkyeGlowDefs />; a pair
  * that cannot swap keeps its red line, since that warning matters more. The
- * colours are the orb's (gtaaOpal), deepened so the ring stands out on the
- * bars and the page.
+ * colours (--skye-chart-a to c) are the Glow chosen in Settings
+ * (theme/glowThemes.ts), deepened so the ring stands out on the bars and the
+ * page.
  */
 
 /* Kept in the layout (not display: none), or the browser may not paint its gradient. */
@@ -29,12 +30,14 @@
 .st-bar--selected.demo-bar--skye .st-bar-outline {
   stroke: url(#skye-glow-gradient);
   stroke-width: var(--st-stroke-thick);
-  filter: drop-shadow(0 0 2px rgba(15, 111, 255, 0.8)) drop-shadow(0 0 6px rgba(122, 92, 255, 0.55));
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--skye-chart-a) 80%, transparent))
+    drop-shadow(0 0 6px color-mix(in srgb, var(--skye-chart-b) 55%, transparent));
   animation: skye-glow-breathe 2.4s ease-in-out infinite;
 }
 
 .st-link.demo-link--skye:not(.demo-link--incompatible) {
-  filter: drop-shadow(0 0 2px rgba(15, 111, 255, 0.8)) drop-shadow(0 0 6px rgba(122, 92, 255, 0.55));
+  filter: drop-shadow(0 0 2px color-mix(in srgb, var(--skye-chart-a) 80%, transparent))
+    drop-shadow(0 0 6px color-mix(in srgb, var(--skye-chart-b) 55%, transparent));
   animation: skye-glow-breathe 2.4s ease-in-out infinite;
 }
 
@@ -48,7 +51,8 @@
 
 @keyframes skye-glow-breathe {
   50% {
-    filter: drop-shadow(0 0 3px rgba(15, 111, 255, 0.95)) drop-shadow(0 0 10px rgba(20, 184, 224, 0.7));
+    filter: drop-shadow(0 0 3px color-mix(in srgb, var(--skye-chart-a) 95%, transparent))
+      drop-shadow(0 0 10px color-mix(in srgb, var(--skye-chart-c) 70%, transparent));
   }
 }
 

@@ -1,13 +1,17 @@
 // Baggage's view of one stand change, on the board's own chart: the carousels
 // as rows in place of the stands, under the same time ruler, and every
 // arrival's bags on them as bars, from the first bag off to the last
-// (../operations/baggage), each with its flight and where from, and, given
-// room, how many bags and on what aircraft. A late arrival's bags reach back
-// to when they were due off, as a ghost, as the board draws a late stay; a
+// (../operations/baggage). A bar is the bags on the belt, never the aircraft's
+// turn: every bar says its flight and how many bags, one rule for them all, and,
+// given room, where from and the hours they take. A late arrival's bags reach
+// back to when they were due off, as a ghost, as the board draws a late stay; a
 // carousel out of service is hatched for its hours, as the board hatches a
-// closed area. The change's own bags stand out: where they came off before
-// it (dashed), joined by a link to where they come off now, and whatever they
-// clash with there, in the board's conflict red. Everything else is dimmed,
+// closed area, and maintenance moved has its new hours filled in the brand's
+// colour and its old ones dashed. The change's own bags stand out: where they
+// came off before it (dashed), joined by a link to where they come off now,
+// that bar filled in the brand's colour as a value that changes is on its card,
+// and whatever they clash with there, in the board's conflict red. Bags that
+// stay on their carousel are neutral. Everything else is dimmed,
 // as the board dims what a selection leaves out. The chart frames the change
 // as it opens, closer in than the board (bags take a quarter to three
 // quarters of an hour, a stay hours), and pinching or Ctrl + scrolling zooms
@@ -37,8 +41,8 @@ import {
   type Visit,
 } from "../stand-timeline";
 import { airportLabel } from "../stand-timeline-demo/airports";
-import { CAROUSEL_OUTAGES, SYNTHETIC_CAROUSELS } from "../stand-timeline-demo/baggageFixture";
-import { DEMO_DOMAIN } from "../stand-timeline-demo/demoData";
+import { SYNTHETIC_CAROUSELS } from "../stand-timeline-demo/baggageFixture";
+import { DEMO_DOMAIN, formatUtc } from "../stand-timeline-demo/demoData";
 import { formatDelay } from "../stand-timeline-demo/delays";
 import {
   BAR_INSET,
@@ -56,7 +60,7 @@ import {
   gradientId,
   rulerFor,
 } from "../stand-timeline-demo/theme";
-import type { BagMove, Reclaim } from "../operations/baggage";
+import { carouselOutages, type BagMove, type Reclaim } from "../operations/baggage";
 import "../stand-timeline-demo/demo.css";
 import "./approvals.css";
 
@@ -70,8 +74,8 @@ const ROWS: TimelineRow[] = SYNTHETIC_CAROUSELS.map((carousel) => ({
 const fillerRows = (count: number): TimelineRow[] =>
   Array.from({ length: count }, (_, i) => ({ id: `filler-${i}`, label: "" }));
 
-/** Pixels per hour to start at: the shortest reclaim's bar (20 minutes, 80px) then fits its flight number. */
-const HOUR_WIDTH = 240;
+/** Pixels per hour to start at: the shortest reclaim's bar (20 minutes, 93px) then fits its flight number over its bags. */
+const HOUR_WIDTH = 280;
 
 /** The labels' disclosure order, as the board's. */
 const LABEL_PRIORITY = ["start", "end", "center"] as const;
@@ -155,6 +159,15 @@ export function CarouselTimeline({ move, spotlit = false }: { move: BagMove; spo
             className: "demo-bar--dimmed",
           };
         }
+        // Moved, and clear of anyone: a new value, as its card has it.
+        if (partOf(bar) === "now" && moved && !conflict(bar)) {
+          return {
+            fill: "color-mix(in srgb, var(--colorBrandBackground) 60%, transparent)",
+            stroke: "var(--colorBrandStroke1)",
+            color: "var(--st-text)",
+            className: `bags-bar--now${spot}`,
+          };
+        }
         const status = conflict(bar) ? "conflict" : "healthy";
         return {
           fill: `url(#${gradientId(status)})`,
@@ -174,10 +187,18 @@ export function CarouselTimeline({ move, spotlit = false }: { move: BagMove; spo
           const room = reclaim.flight.length * LABEL_METRICS.charWidth + 2 * LABEL_PADDING.aero;
           if (((now.start - reclaim.start) / HOUR) * zoom.hourWidth < room) return {};
         }
-        // As the board's: the flight and where from first; how many bags, and on what, given room.
+        // Every bar its flight and bags, however narrow; where from and its hours given room.
+        const flightBags = `${reclaim.flight} · ${reclaim.bags} bags`;
+        const hours = `${formatUtc(reclaim.start)}–${formatUtc(reclaim.end)}`;
         return {
-          start: { primary: reclaim.flight, secondary: reclaim.origin },
-          end: { primary: `${reclaim.bags} bags`, secondary: reclaim.aircraftType },
+          start: {
+            primary: flightBags,
+            secondary: `${reclaim.origin} · ${hours}`,
+            narrower: [
+              { primary: flightBags, secondary: hours },
+              { primary: reclaim.flight, secondary: `${reclaim.bags} bags` },
+            ],
+          },
         };
       },
       labelColor: (bar: BarDatum) => (dimmed(bar) ? "var(--flight-dim-text)" : "var(--st-text)"),
@@ -213,12 +234,12 @@ export function CarouselTimeline({ move, spotlit = false }: { move: BagMove; spo
         return `${reclaim.flight} from ${airportLabel(reclaim.origin)}${aircraft}, ${reclaim.bags} bags on carousel ${reclaim.carousel} ${formatTime(reclaim.start)}–${formatTime(reclaim.end)} UTC${late}${role} (synthetic)`;
       },
     };
-  }, [parts, byId, clashes, outage, now, zoom.hourWidth, spotlit]);
+  }, [parts, byId, clashes, outage, now, moved, zoom.hourWidth, spotlit]);
 
   // Frames the change: its bags, before and after, and what they clash with,
   // in the middle of the chart. At once as it opens, gliding from one change
   // to the next.
-  const framed = useRef(false);
+  const framed = useRef<string | null>(null);
   const focusKey = `${was?.id}@${was?.carousel}:${was?.start}|${now?.carousel}:${now?.start}`;
   useLayoutEffect(() => {
     const scroller = hostRef.current?.querySelector<HTMLElement>(".st-scroller");
@@ -229,8 +250,9 @@ export function CarouselTimeline({ move, spotlit = false }: { move: BagMove; spo
     const header = scroller.querySelector<HTMLElement>(".st-header")?.offsetHeight ?? 0;
     const left = ((middle - DEMO_DOMAIN[0]) / HOUR) * zoom.hourWidth - (scroller.clientWidth - GUTTER_WIDTH) / 2;
     const top = ((Math.min(...rowsOf) + Math.max(...rowsOf) + 1) / 2) * ROW_HEIGHT - (scroller.clientHeight - header) / 2;
-    const glide = framed.current && !matchMedia("(prefers-reduced-motion: reduce)").matches;
-    framed.current = true;
+    // From one change to another: framing the same one again is not a change.
+    const glide = framed.current !== null && framed.current !== focusKey && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    framed.current = focusKey;
     // After the chart has laid out its width for the zoom.
     const frame = requestAnimationFrame(() => scroller.scrollTo({ left, top, behavior: glide ? "smooth" : "auto" }));
     return () => cancelAnimationFrame(frame);
@@ -285,17 +307,22 @@ export function CarouselTimeline({ move, spotlit = false }: { move: BagMove; spo
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
-/** Each outage's box on the plot, where any of it shows. */
+/** Each outage's box on the plot, where any of it shows, as things stand, and for maintenance moved, where it was. */
 function useOutageBoxes() {
   const region = useTimelineRegion();
   const { rows, rowHeight, scale } = useTimeline();
   if (region !== "plot") return [];
-  return CAROUSEL_OUTAGES.flatMap((outage) => {
+  return carouselOutages().flatMap((outage) => {
     const index = rows.findIndex((row) => row.id === outage.carousel);
-    const x0 = clamp(scale.x(outage.start), 0, scale.width);
-    const x1 = clamp(scale.x(outage.end), 0, scale.width);
-    if (index < 0 || x1 - x0 < 1) return [];
-    return [{ outage, box: { x: x0, y: index * rowHeight + 2, width: x1 - x0, height: rowHeight - 4 } }];
+    const boxAt = (start: number, end: number) => {
+      const x0 = clamp(scale.x(start), 0, scale.width);
+      const x1 = clamp(scale.x(end), 0, scale.width);
+      return x1 - x0 < 1 ? null : { x: x0, y: index * rowHeight + 2, width: x1 - x0, height: rowHeight - 4 };
+    };
+    if (index < 0) return [];
+    const box = boxAt(outage.start, outage.end);
+    const was = outage.movedFrom ? boxAt(outage.movedFrom.start, outage.movedFrom.end) : null;
+    return box || was ? [{ outage, box, was }] : [];
   });
 }
 
@@ -312,8 +339,11 @@ function OutageBands() {
           <line className="ops-closure-stripe" x1={0} y1={0} x2={0} y2={8} />
         </pattern>
       </defs>
-      {boxes.map(({ outage, box }) => (
-        <rect key={`${outage.carousel}@${outage.from}`} className="ops-closure-band" {...box} rx={4} fill={`url(#${hatchId})`} />
+      {boxes.map(({ outage, box, was }) => (
+        <g key={`${outage.carousel}@${outage.from}`} className={outage.movedFrom ? "bags-outage--moved" : undefined}>
+          {was && <rect className="bags-outage-was" {...was} rx={4} />}
+          {box && <rect className="ops-closure-band" {...box} rx={4} fill={`url(#${hatchId})`} />}
+        </g>
       ))}
     </g>
   );
@@ -322,15 +352,26 @@ function OutageBands() {
 /** Roughly how wide the label's 10px semibold text is per character, px; sizes its pill. */
 const OUTAGE_CHAR_PX = 6;
 
-/** What each outage is, over the bars: "Belt maintenance 12:00–13:30", in a pill at its start. */
+/**
+ * What each outage is, over the bars: "Belt maintenance 12:00–13:30", in a pill
+ * at its start, in the brand's colour once moved, saying when it was.
+ */
 function OutageLabels() {
   const boxes = useOutageBoxes();
   return (
     <>
       {boxes.map(({ outage, box }) => {
-        const text = `${outage.reason} ${outage.from}–${outage.to}`;
+        if (!box) return null;
+        const was = outage.movedFrom ? `, was ${formatUtc(outage.movedFrom.start)}–${formatUtc(outage.movedFrom.end)}` : "";
+        const text = `${outage.reason} ${outage.from}–${outage.to}${was}`;
         return (
-          <g key={`${outage.carousel}@${outage.from}`} className="ops-closure-label" pointerEvents="none" role="img" aria-label={`Carousel ${outage.carousel}: ${text}`}>
+          <g
+            key={`${outage.carousel}@${outage.from}`}
+            className={outage.movedFrom ? "ops-closure-label bags-outage-label--moved" : "ops-closure-label"}
+            pointerEvents="none"
+            role="img"
+            aria-label={`Carousel ${outage.carousel}: ${text}`}
+          >
             <rect x={box.x + 4} y={box.y + box.height / 2 - 8} width={text.length * OUTAGE_CHAR_PX + 12} height={16} rx={8} />
             <text x={box.x + 10} y={box.y + box.height / 2 + 3.5} aria-hidden="true">
               {text}

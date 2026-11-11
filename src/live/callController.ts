@@ -56,6 +56,12 @@ export type ControllerDeps = {
   onLog?: (entry: ExecutorLogEntry) => void;
   /** How loud Skye's voice is as it plays (0–1, see VoiceMeter), to tell when she has finished saying something. */
   outputLevel?: () => number;
+  /**
+   * How loud the caller is (0–1, as VoiceMeter reads it), heard whether or
+   * not Skye's hearing is held off (holdInput), for their turn to talk to
+   * someone else on the call (hearCaller).
+   */
+  callerLevel?: () => number;
   settleMs?: number;
   contextSyncMs?: number;
 };
@@ -108,6 +114,21 @@ export const ENDED_QUIET_MS = 300;
  * she is still heard, she can be cut off mid-sentence.
  */
 export const QUIET_GAP_MS = 300;
+
+/**
+ * The caller's turn to talk to someone else on the call (hearCaller). They are
+ * speaking at CALLER_SPEAKING_LEVEL or louder (0–1, as VoiceMeter reads their
+ * microphone; about -39 dBFS); doing so for CALLER_STARTED_MS is them starting,
+ * not a cough or a knock; and quiet for CALLER_QUIET_MS once started, longer
+ * than a pause between phrases, they have said it. They have
+ * CALLER_START_WITHIN_MS to start, and what they say is taken as said after
+ * CALLER_SAID_WITHIN_MS regardless, as a noisy room never goes quiet.
+ */
+export const CALLER_SPEAKING_LEVEL = 0.5;
+export const CALLER_STARTED_MS = 200;
+export const CALLER_QUIET_MS = 800;
+export const CALLER_START_WITHIN_MS = 4_000;
+export const CALLER_SAID_WITHIN_MS = 8_000;
 
 /**
  * Sent as commentary once the session is up, so Skye speaks first, the way a
@@ -429,6 +450,49 @@ export class LiveCallController {
     if (this.#held === held) return;
     this.#held = held;
     this.#transport?.hold(held);
+  }
+
+  /**
+   * The caller's turn to talk to someone else on the call: the user greeting
+   * a teammate Skye has called in, before she briefs him. Skye stops listening
+   * (holdInput), so she does not answer what was not said to her, and, once
+   * she has finished what she is saying, the caller is listened for on their
+   * own microphone instead (`callerLevel`), until they have spoken and
+   * stopped (see CALLER_SPEAKING_LEVEL). Resolves whether they spoke: true
+   * once they have; false when they did not start within
+   * CALLER_START_WITHIN_MS, are muted, cannot be heard, or the call is not
+   * up. `signal` cuts it short, as the presenter's next key does, resolving
+   * whether they had started. She listens again as it resolves.
+   */
+  async hearCaller(signal?: AbortSignal): Promise<boolean> {
+    const level = this.#deps.callerLevel;
+    if (this.#state.phase !== "connected" || !level || signal?.aborted) return false;
+    this.holdInput(true);
+    try {
+      await this.#whenQuiet(OFFER_QUIET_WITHIN_MS);
+      return await new Promise<boolean>((resolve) => {
+        let waited = 0;
+        let loudFor = 0;
+        let quietFor = 0;
+        let speaking = -1;
+        const poll = () => {
+          if (signal?.aborted || this.#state.phase !== "connected") return resolve(speaking >= 0);
+          waited += SAID_POLL_MS;
+          const loud = !this.#state.muted && level() >= CALLER_SPEAKING_LEVEL;
+          loudFor = loud ? loudFor + SAID_POLL_MS : 0;
+          quietFor = loud ? 0 : quietFor + SAID_POLL_MS;
+          if (speaking < 0 && loudFor >= CALLER_STARTED_MS) speaking = 0;
+          else if (speaking >= 0) speaking += SAID_POLL_MS;
+          const done =
+            speaking >= 0 ? quietFor >= CALLER_QUIET_MS || speaking >= CALLER_SAID_WITHIN_MS : waited >= CALLER_START_WITHIN_MS;
+          if (done) resolve(speaking >= 0);
+          else this.#schedule(poll, SAID_POLL_MS);
+        };
+        this.#schedule(poll, SAID_POLL_MS);
+      });
+    } finally {
+      this.holdInput(false);
+    }
   }
 
   /**

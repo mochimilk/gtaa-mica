@@ -96,7 +96,7 @@
  * stands over Skye's cursors and their tethers (agent-cursor.css), as the
  * Outputs peek does: WINDOW_Z in window-layer. What opens from it (a tooltip,
  * a menu) mounts over it there (AskSkye's PortalMountNodeProvider). Closed,
- * it stays under her cursor, which takes off from the pill's orb.
+ * it stays under her orb, which pops out of the pill.
  */
 .mica-ask__stack:has(.mica-ask__surface[data-open='true'], .mica-ask__float) {
   z-index: 2147483001;
@@ -499,9 +499,36 @@
   cursor: var(--cursor-pointer, pointer);
 }
 
-/* While Skye's cursor is out, the recall button in the orb's place stands over Connect. */
+/* While Skye is out, the recall button in her place stands over Connect. */
 .mica-ask__orb[data-recall] {
   z-index: 1;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+}
+
+/*
+ * Skye stays in the dock while her orb is out in the app: smaller, in the same
+ * colours, breathing, so she can always be found here.
+ */
+.mica-ask__orb-home {
+  width: 24px;
+  height: 24px;
+  animation: mica-ask-home-breathe 2400ms ease-in-out infinite alternate;
+}
+
+@keyframes mica-ask-home-breathe {
+  to {
+    opacity: 0.72;
+    transform: scale(0.9);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mica-ask__orb-home {
+    animation: none;
+  }
 }
 
 /*
@@ -541,7 +568,7 @@
 /*
  * Skye talking on a call: a 2px brand ring round her orb, as Teams rings
  * whoever is speaking, about 2px clear of its 29px ball. It fades in and out
- * with her voice, and is not drawn while her cursor is out of the orb.
+ * with her voice, and is not drawn while she is out of the dock.
  */
 .mica-ask__orb::after {
   content: '';
@@ -614,28 +641,11 @@
 }
 
 /*
- * While Skye's cursor is out in the app, the orb shrinks away beneath the dot
- * it became (see agent-cursor), and grows back as the dot returns into it.
- */
-.mica-ask__orb > * {
-  transition:
-    transform 320ms var(--ask-ease),
-    opacity 240ms var(--ask-ease);
-}
-
-.mica-ask__orb[data-agent-away] > * {
-  transform: scale(0.4);
-  opacity: 0;
-}
-
-/*
- * The recall button fills the orb's place once the cursor has left it,
- * appearing as the launch finishes (697ms, see cursorMotion's LAUNCH_MS).
+ * The recall button fills Skye's place while she is out in the app, appearing
+ * as she sets off (320ms, see cursorMotion's POP_MS).
  */
 .mica-ask__orb[data-agent-away] > .mica-ask__recall {
-  transform: none;
-  opacity: 1;
-  animation: mica-ask-recall-in 200ms var(--ask-ease) 697ms both;
+  animation: mica-ask-recall-in 200ms var(--ask-ease) 320ms both;
 }
 
 @keyframes mica-ask-recall-in {
@@ -649,11 +659,6 @@
   .mica-ask__orb[data-agent-away] > .mica-ask__recall {
     animation: none;
   }
-}
-
-/* The thinking dots hand over to the cursor's copy of them at once, so they never show twice. */
-.mica-ask__orb[data-agent-away] > [data-agent-spinner] {
-  transition: none;
 }
 
 /* No service: the orb goes grey and faint rather than turning red. */
@@ -706,19 +711,25 @@
   background: color-mix(in srgb, var(--ask-text) 85%, var(--ask-accent-strong));
 }
 
-/* Recall Skye's cursor: inverse, like Send, and the orb's size, in its place. */
+/*
+ * Recall Skye: over her smaller orb in her place, the orb's size, and there to
+ * see on hover or focus, inverse, like Send.
+ */
 .mica-ask__input .ask-button.mica-ask__recall {
+  position: absolute;
+  inset: 0;
   width: 32px;
   min-width: 32px;
   height: 32px;
-  background: var(--ask-text);
-  color: var(--colorNeutralBackground1);
+  background: transparent;
+  color: transparent;
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
 }
 
-.mica-ask__input .ask-button.mica-ask__recall:hover {
+.mica-ask__input .ask-button.mica-ask__recall:is(:hover, :focus-visible) {
   background: color-mix(in srgb, var(--ask-text) 85%, var(--ask-accent-strong));
+  color: var(--colorNeutralBackground1);
 }
 
 /* Its bundled icon: regular at rest, filled on hover, as on Fluent's buttons. */

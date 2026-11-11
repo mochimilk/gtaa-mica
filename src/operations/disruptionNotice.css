@@ -20,6 +20,43 @@
   }
 }
 
+/*
+ * Each thing on the late stay's stand, its flights, hours and part in it: the
+ * snippet's lozenges get too small to say all that.
+ */
+.disruption-segments {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: var(--fontSizeBase200);
+  line-height: var(--lineHeightBase200);
+  font-variant-numeric: tabular-nums;
+}
+
+.disruption-segments caption {
+  padding-bottom: 2px;
+  text-align: left;
+  color: var(--colorNeutralForeground2);
+}
+
+.disruption-segments th,
+.disruption-segments td {
+  padding: 2px 12px 2px 0;
+  text-align: left;
+  font-weight: var(--fontWeightRegular);
+  white-space: nowrap;
+}
+
+.disruption-segments td:last-child {
+  padding-right: 0;
+  white-space: normal;
+  color: var(--colorNeutralForeground2);
+}
+
+.disruption-segments tr[data-late] :is(th, td) {
+  font-weight: var(--fontWeightSemibold);
+  color: var(--colorStatusDangerForeground3);
+}
+
 /* The approved plan's figures against the baseline. */
 .disruption-impact {
   border-collapse: collapse;
@@ -61,4 +98,33 @@
   align-items: center;
   gap: 4px;
   color: var(--colorNeutralForeground2);
+}
+
+/*
+ * A control the presenter's "next" key pressed for the user (goldenPath.ts):
+ * a quick press and a ring of Skye's light, so the audience sees it pressed.
+ */
+[data-golden-press] {
+  animation: golden-press 450ms ease-out;
+}
+
+@keyframes golden-press {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(var(--agent-cursor-light, 252, 249, 81), 0.7);
+  }
+  25% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(var(--agent-cursor-light, 252, 249, 81), 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-golden-press] {
+    animation: none;
+    outline: 2px solid rgba(var(--agent-cursor-light, 252, 249, 81), 0.9);
+  }
 }

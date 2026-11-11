@@ -38,14 +38,55 @@ export const entrySteps = (entry: ApprovalEntry): OutputStep[] =>
       : request.steps,
   );
 
+/**
+ * The review's states, in order, for the shared screen's foot: `done` once
+ * passed, `current` the one it is at, otherwise yet to come. Pending review,
+ * then who approved it and when, then the user's, then applied. With nobody to
+ * review it first, only the last two.
+ */
+export type ReviewStep = { id: string; label: string; state: "done" | "current" | "todo" };
+
+export function reviewSteps(entry: ApprovalEntry, review: SkyeReview | null): ReviewStep[] {
+  const decision = entry.requests[0]?.decision;
+  const applied = !entry.waiting && !!decision;
+  const signoffs = review?.signoffs ?? decision?.signoffs ?? [];
+  const reviewers = signoffs.map((signoff) => {
+    const at = "at" in signoff ? signoff.at : undefined;
+    return { name: signoff.name, at, approved: !!at };
+  });
+  const allApproved = applied || reviewers.every((reviewer) => reviewer.approved);
+  const steps: ReviewStep[] = [];
+  if (reviewers.length > 0) {
+    steps.push({ id: "pending", label: "Pending review", state: allApproved ? "done" : "current" });
+    for (const reviewer of reviewers) {
+      steps.push({
+        id: `approved-${reviewer.name}`,
+        label: reviewer.approved
+          ? `Approved by ${reviewer.name}${reviewer.at ? ` · ${formatLogTime(reviewer.at)}` : ""}`
+          : `Approved by ${reviewer.name.split(" ")[0]}`,
+        state: reviewer.approved ? "done" : "todo",
+      });
+    }
+  }
+  steps.push({ id: "ready", label: "Ready for your approval", state: applied ? "done" : allApproved ? "current" : "todo" });
+  steps.push({
+    id: "applied",
+    label: applied && decision ? `Applied · ${formatLogTime(decision.at)}` : "Applied",
+    state: applied ? "done" : "todo",
+  });
+  return steps;
+}
+
 /** How an entry's status reads: in the warning colour while a teammate still has to approve, the brand's once it is the user's turn. */
 export type ApprovalTone = "warning" | "brand" | "success" | "subtle";
 
 /**
- * Where an entry stands, as the list and the page's header say it: "Needs
- * baggage", "Calling Travis", "Travis is reviewing", "Ready for your
- * approval"; "Approved 14:32", "Cancelled". `review` is what waits now, and
- * `calling` everyone being called.
+ * Where an entry stands, as the shared screen says it, in one place throughout:
+ * "Needs baggage", "Calling Travis", "Travis joined", "Skye is presenting changes", "Travis is
+ * asking Skye", "Skye is answering Travis", "Waiting for Travis", "Ready for
+ * your approval"; "Approved 14:32", "Cancelled". `review` is what waits now, and
+ * `calling` everyone being called. Only their approval moves it to the user: not
+ * anything they say.
  */
 export function approvalStatus(
   entry: ApprovalEntry,
@@ -57,6 +98,21 @@ export function approvalStatus(
   const first = review?.signoffs.find((signoff) => signoff.state !== "approved");
   if (!first) return { text: "Ready for your approval", tone: "brand" };
   const name = first.name.split(" ")[0];
-  if (first.state === "asked") return { text: `${name} is reviewing`, tone: "warning" };
+  if (first.state === "asked") {
+    switch (first.stage) {
+      case "joined":
+        return { text: `${name} joined`, tone: "warning" };
+      case "presenting":
+        return { text: "Skye is presenting changes", tone: "warning" };
+      case "asking":
+        return { text: `${name} is asking Skye`, tone: "warning" };
+      case "answering":
+        return { text: `Skye is answering ${name}`, tone: "warning" };
+      case "deciding":
+        return { text: `Waiting for ${name}`, tone: "warning" };
+      default:
+        return { text: `${name} is reviewing`, tone: "warning" };
+    }
+  }
   return calling.includes(first.name) ? { text: `Calling ${name}`, tone: "warning" } : { text: `Needs ${first.expertise}`, tone: "warning" };
 }

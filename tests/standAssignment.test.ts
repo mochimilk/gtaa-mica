@@ -208,7 +208,7 @@ test("every open alert is read, grouped, and conflicts can be read on their own"
   const alerts = run("list_alerts").spoken;
   assert.match(alerts, /^9 open demo alerts\./);
   assert.match(alerts, /5 flights have no stand: XB240, XC350, XA130, XD480 and XB241\./);
-  assert.match(alerts, /2 conflicts: XA103\/104 runs 55m late off A1, into XB210\/211; XD472\/473 runs 3h 10m late off B11, into XC344\/345, XB232\/233, XA117\/118, XC336\/337\./);
+  assert.match(alerts, /2 conflicts: XA103\/104 runs 55m late off A1, into XB210\/211; XD472\/473 runs 1h 50m late off B11, into XC344\/345, XB232\/233\./);
   assert.match(alerts, /2 notices/);
 
   const conflicts = run("list_conflicts").spoken;

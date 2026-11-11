@@ -128,6 +128,7 @@ export function AppNavRail({ page, onNavigate, chatsUnread = 0, skyeAt = null, a
         count={chatsUnread}
         callout={callout("chat")}
         onClick={() => onNavigate("chat")}
+        data-nav-page="chat"
       />
       <NavRailButton icon={Branch} label="Scenarios" />
       <NavRailButton

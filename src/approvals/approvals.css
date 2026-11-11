@@ -17,6 +17,38 @@
 }
 
 /*
+ * Where maintenance moved was planned: dashed, as bags before a change are, and
+ * empty, so it never reads as the carousel being out then. Its new hours and
+ * their pill are in the brand's colour, as a value that changes is.
+ */
+.bags-outage-was {
+  fill: none;
+  stroke: var(--colorNeutralStroke1);
+  stroke-width: 1.5px;
+  stroke-dasharray: 6 3;
+}
+
+.bags-outage--moved .ops-closure-band {
+  stroke: var(--colorBrandStroke1);
+}
+
+.bags-outage--moved .ops-closure-fill {
+  fill: color-mix(in srgb, var(--colorBrandBackground) 25%, transparent);
+}
+
+.bags-outage--moved .ops-closure-stripe {
+  stroke: var(--colorBrandStroke1);
+}
+
+.bags-outage-label--moved rect {
+  fill: var(--colorBrandBackground);
+}
+
+.bags-outage-label--moved text {
+  fill: var(--colorNeutralForegroundOnBrand);
+}
+
+/*
  * The change's bags while Skye talks a teammate through them (spotlight.ts):
  * outlined as a selection is, in the brand's colour.
  */

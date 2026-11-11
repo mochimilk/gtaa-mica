@@ -15,7 +15,14 @@
 // A placeholder: nothing reaches anyone. Each approves on their own after a
 // few seconds (SIGNOFF_MS), as people called in answer; one with a voice of
 // their own (../live/teammateVoice) answers Skye aloud and approves as they
-// say so (setAnswerAloud, approveSignoff).
+// say so (setAnswerAloud, approveSignoff). Either way, where they have got to
+// (presenting, a question of theirs, waiting on them) is on their sign-off for
+// the shared screen to say (setSignoffStage, setSignoffExchange).
+//
+// What Skye plans for a disruption can reach past the stands: a carousel's
+// maintenance moved to make room for bags her changes land on someone else's
+// (./baggage's planMaintenanceMove). It is one more thing waiting here, listed
+// and approved with the rest, and cancelling puts it back too.
 import {
   callingNames,
   EXPERTISE_LABELS,
@@ -59,15 +66,22 @@ import {
   type OutputStatus,
   type OutputStep,
 } from "./outputs";
+import { logActivity } from "./activity";
+import { describeMaintenanceTimes, planMaintenanceMove, setMaintenanceMove, type MaintenanceMove } from "./baggage";
+import { formatUtc } from "../stand-timeline-demo/demoData";
 import { boardKpis } from "./boardKpis";
 import { formatDuration } from "./operationsData";
 import { terminalOf } from "./terminals";
 
-/** How long a teammate takes to approve, ms: long enough for Skye to brief them first (DisruptionNotice). */
+/**
+ * How long a teammate takes to approve, ms: long enough for Skye to brief
+ * them first, and for a question of theirs and her answer to be read
+ * (DisruptionNotice).
+ */
 export const SIGNOFF_MS = 10_000;
 
 /** How long a teammate answering aloud has to approve, ms, should they never say so: a backstop. */
-export const SIGNOFF_ALOUD_MS = 60_000;
+export const SIGNOFF_ALOUD_MS = 90_000;
 
 /** One stay Skye changed: where it was before she did, and where she left it. */
 export type ReviewChange = {
@@ -77,6 +91,17 @@ export type ReviewChange = {
   /** It moves the flight's bags (see needsBaggage), so baggage has to approve it. */
   baggage: boolean;
 };
+
+/**
+ * Where a teammate who has been asked has got to: just joined, while the user
+ * greets them and hands over to Skye; Skye is presenting the changes to them,
+ * they are asking her something, she is answering, or it is theirs to decide.
+ * For the shared screen, not the decision: only `approved` moves it on.
+ */
+export type SignoffStage = "joined" | "presenting" | "asking" | "answering" | "deciding";
+
+/** A question a teammate put to Skye before deciding, and her answer once she has given it. */
+export type SignoffExchange = { question: string; answer?: string };
 
 /**
  * A teammate who has to approve before the user can: `needed` until the user
@@ -90,12 +115,16 @@ export type Signoff = {
   state: "needed" | "asked" | "approved";
   at?: number;
   aloud?: true;
+  stage?: SignoffStage;
+  exchange?: SignoffExchange;
 };
 
 export type SkyeReview = {
   changes: readonly ReviewChange[];
   /** The closure Skye put in force or lifted, and what was before; null when she left it alone. */
   closure: { from: Closure | null; to: Closure | null } | null;
+  /** A carousel's maintenance Skye moved for her changes, for baggage to approve with them; null when she left it alone. */
+  maintenance: MaintenanceMove | null;
   /** Who has to approve first, in order; the user approves last. */
   signoffs: readonly Signoff[];
 };
@@ -119,8 +148,11 @@ type Held = {
   after: Map<string, StayPlace>;
   closureBefore?: Closure | null;
   closureAfter?: Closure | null;
-  /** The Outputs panel's pieces for the changes waiting (outputs.ts), each with its stay's id, or CLOSURE. */
+  /** The Outputs panel's pieces for the changes waiting (outputs.ts), each with its stay's id, or CLOSURE, or MAINTENANCE. */
   steps: Map<string, string>;
+  /** Whether what waits is a disruption's, whose bags Skye plans room for (planMaintenanceMove), and what she planned, once she has. */
+  plansCarousels?: boolean;
+  maintenance?: MaintenanceMove | null;
 };
 
 let held: Held | null = null;
@@ -147,10 +179,11 @@ function syncSteps(current: SkyeReview): void {
   const approved: string[] = [];
   for (const [stepId, piece] of held.steps) {
     const change = current.changes.find((entry) => entry.stayId === piece);
-    if (piece === CLOSURE ? !current.closure : !change) byStatus.done.push(stepId);
-    else if (change?.baggage && baggage && baggage.state !== "approved") byStatus["pending-approval"].push(stepId);
+    const forBaggage = piece === MAINTENANCE || !!change?.baggage;
+    if (piece === CLOSURE ? !current.closure : piece === MAINTENANCE ? !current.maintenance : !change) byStatus.done.push(stepId);
+    else if (forBaggage && baggage && baggage.state !== "approved") byStatus["pending-approval"].push(stepId);
     else byStatus.waiting.push(stepId);
-    if (change?.baggage && baggage?.state === "approved") approved.push(stepId);
+    if (forBaggage && baggage?.state === "approved") approved.push(stepId);
   }
   for (const [status, stepIds] of Object.entries(byStatus)) setStepStatus(stepIds, status as keyof typeof byStatus);
   if (baggage) setStepApprover(approved, baggage.name);
@@ -172,12 +205,31 @@ function clearTimers(): void {
 function setSignoff(name: string, state: Signoff["state"], aloud = false): void {
   if (!review) return;
   const next = (entry: Signoff): Signoff => {
-    if (state === "approved") return { ...entry, state, at: Date.now() };
+    if (state === "approved") {
+      const { stage: _, ...rest } = entry;
+      return { ...rest, state, at: Date.now() };
+    }
     // How they answered the last time they were asked is no guide to the next.
-    const { aloud: _, ...rest } = entry;
+    const { aloud: _, stage: __, exchange: ___, ...rest } = entry;
     return state === "asked" && aloud ? { ...rest, state, aloud: true } : { ...rest, state };
   };
   set({ ...review, signoffs: review.signoffs.map((entry) => (entry.name === name ? next(entry) : entry)) });
+}
+
+/** Whether `name` has been asked and has yet to decide. */
+export const signoffAsked = (name: string): boolean =>
+  !!review?.signoffs.some((entry) => entry.name === name && entry.state === "asked");
+
+/** Where a teammate who has been asked has got to; nothing once they have decided. */
+export function setSignoffStage(name: string, stage: SignoffStage): void {
+  if (!review || !signoffAsked(name)) return;
+  set({ ...review, signoffs: review.signoffs.map((entry) => (entry.name === name ? { ...entry, stage } : entry)) });
+}
+
+/** The question a teammate who has been asked put to Skye, and her answer; shown on the shared screen with what they decide on. */
+export function setSignoffExchange(name: string, exchange: SignoffExchange): void {
+  if (!review || !signoffAsked(name)) return;
+  set({ ...review, signoffs: review.signoffs.map((entry) => (entry.name === name ? { ...entry, exchange } : entry)) });
 }
 
 /**
@@ -192,7 +244,19 @@ export function setAnswerAloud(decide: ((name: string) => boolean) | null): void
 
 /** A teammate approves, while they are asked: as they say so (aloud), or after SIGNOFF_MS. */
 export function approveSignoff(name: string): void {
-  if (review?.signoffs.some((entry) => entry.name === name && entry.state === "asked")) setSignoff(name, "approved");
+  if (!signoffAsked(name)) return;
+  setSignoff(name, "approved");
+  logActivity(name, "approval", approvalLine(name));
+}
+
+/** What a teammate approved, for the record: the changes in their area, by name. */
+function approvalLine(name: string): string {
+  const current = review;
+  const signoff = current?.signoffs.find((entry) => entry.name === name);
+  if (!current || !signoff) return "Approved.";
+  const moves = current.changes.filter((change) => change.baggage).map((change) => stayLabel(change.stayId));
+  const carousel = current.maintenance ? [`carousel ${current.maintenance.carousel}'s maintenance`] : [];
+  return `Approved for ${signoff.expertise}: ${listWords([...moves, ...carousel])}.`;
 }
 
 /**
@@ -207,6 +271,7 @@ export function askForSignoffs(names?: readonly string[]): boolean {
   for (const { name } of asking) {
     // Decided first, so whoever hears they are asked hears how they answer.
     const aloud = answersAloud?.(name) ?? false;
+    logActivity(name, "action", "Joined, and is reviewing the changes.");
     setSignoff(name, "asked", aloud);
     const timer = setTimeout(
       () => {
@@ -232,8 +297,22 @@ subscribeCallGuests(askThoseOnTheCall);
 export function callForSignoffs(): boolean {
   const reachable = new Set([...guestNames(), ...callingNames()]);
   const calling = review?.signoffs.filter((entry) => entry.state === "needed" && !reachable.has(entry.name)) ?? [];
-  for (const { name } of calling) inviteToCall(name);
+  for (const { name, expertise } of calling) {
+    logActivity("Skye", "action", `Called ${name} for ${expertise}'s review.`);
+    inviteToCall(name);
+  }
+  placingCall = false;
+  if (calling.length > 0) for (const listener of listeners) listener();
   return calling.length > 0;
+}
+
+/** Whether Skye's cursor is on its way to place that call: the decision says so, and cannot be pressed again. */
+let placingCall = false;
+export const placingSignoffCall = (): boolean => placingCall;
+export function setPlacingSignoffCall(placing: boolean): void {
+  if (placingCall === placing) return;
+  placingCall = placing;
+  for (const listener of listeners) listener();
 }
 
 /**
@@ -248,9 +327,10 @@ export const teammatesBroughtIn = (current: SkyeReview | null, calling: readonly
 /**
  * Puts what `held` changed up for approval, asking again from the start:
  * a change to what is waiting is a different plan. Nothing to approve when
- * the stays are back where they were.
+ * the stays are back where they were. A disruption's plan gets its room on
+ * the carousels here, once (`requestId`, the request to list it under).
  */
-function hold(next: Held): void {
+function hold(next: Held, requestId?: string): void {
   clearTimers();
   const changes = [...next.after].flatMap(([stayId, to]): ReviewChange[] => {
     const from = next.before.get(stayId);
@@ -263,18 +343,53 @@ function hold(next: Held): void {
   if (changes.length === 0 && !closure) {
     // Skye put it all back herself: nothing is left to approve.
     setStepStatus(next.steps.keys(), "done");
+    setMaintenanceMove(null);
     held = null;
     set(null);
     return;
   }
+  const fresh = !held;
   held = next;
+  if (next.plansCarousels && next.maintenance === undefined) {
+    // Against the carousels as planned: not a move kept from a plan since put back.
+    setMaintenanceMove(null);
+    next.maintenance = planMaintenanceMove(changes);
+    setMaintenanceMove(next.maintenance);
+    if (next.maintenance && requestId) {
+      const stepId = `${requestId}:${MAINTENANCE}`;
+      const person = personWith("baggage");
+      putStep(requestId, {
+        id: stepId,
+        title: `Carousel ${next.maintenance.carousel}`,
+        detail: `→ ${formatUtc(next.maintenance.to.start)}–${formatUtc(next.maintenance.to.end)}`,
+        status: "pending-approval",
+        needs: person && { name: person.name, expertise: person.expertise },
+        maintenance: next.maintenance,
+      });
+      next.steps.set(stepId, MAINTENANCE);
+    }
+  }
   const areas: Expertise[] = changes.some((change) => change.baggage) ? ["baggage"] : [];
   const signoffs = areas.flatMap((expertise): Signoff[] => {
     const person = personWith(expertise);
     return person ? [{ name: person.name, expertise, state: "needed" }] : [];
   });
-  set({ changes, closure, signoffs });
+  set({ changes, closure, maintenance: next.maintenance ?? null, signoffs });
+  if (fresh) logActivity("Skye", "action", proposalLine(changes, closure, next.maintenance ?? null));
   askThoseOnTheCall();
+}
+
+/** How many changes the record lists by name before saying how many more. */
+const PROPOSAL_NAMES = 6;
+
+/** What Skye put up for approval, for the record: "Proposed XC344/345 B11 → A3 and XB232/233 B11 → B10." */
+function proposalLine(changes: readonly ReviewChange[], closure: SkyeReview["closure"], maintenance: MaintenanceMove | null): string {
+  const named = changes.slice(0, PROPOSAL_NAMES).map((change) => `${stayLabel(change.stayId)} ${describeMove(change.from, change.to)}`);
+  const more = changes.length - named.length;
+  return (
+    `Proposed ${listWords([...named, ...(more > 0 ? [`${more} more`] : []), ...(closure ? ["closing an area"] : [])])}.` +
+    (maintenance ? ` Moved carousel ${maintenance.carousel}'s ${maintenance.reason.toLowerCase()} ${describeMaintenanceTimes(maintenance)}.` : "")
+  );
 }
 
 /** "a, b and c". */
@@ -323,6 +438,8 @@ function waitFor(current: SkyeReview): ChangeWait {
 
 /** The piece that is the area closure, among the stays' ids. */
 const CLOSURE = "closure";
+/** And the piece that is a carousel's maintenance moved. */
+const MAINTENANCE = "maintenance";
 
 /**
  * A run of changes to the board the Outputs panel lists together, under who
@@ -529,6 +646,7 @@ export function beginSkyeChange(action?: AppAction): () => ChangeWait | null {
     if (current) endSkyeTrail(current);
     const end = standState();
     const next: Held = held ?? { before: new Map(), after: new Map(), steps: new Map() };
+    next.plansCarousels ||= action?.name === "resolve_disruption";
     let touched = false;
     for (const [id, was] of start.stays) {
       const now = end.stays.get(id);
@@ -544,7 +662,7 @@ export function beginSkyeChange(action?: AppAction): () => ChangeWait | null {
     }
     if (!touched) return null;
     if (current) for (const [piece, id] of current.steps) next.steps.set(id, piece);
-    hold(next);
+    hold(next, current?.requestId);
     return review ? waitFor(review) : null;
   };
 }
@@ -561,6 +679,7 @@ export function approveSkyeChanges(): boolean {
     setStepStatus(held.steps.keys(), "done");
     const decision = decide(review, held);
     logDecision(held.steps.keys(), decision);
+    logActivity("You", "approval", review.signoffs.length > 0 ? "Approved the plan, after baggage." : "Approved the plan.");
     for (const listener of [...approvalListeners]) listener(decision);
   }
   held = null;
@@ -644,6 +763,8 @@ function undoHeld(): void {
   const { before, after, closureBefore, closureAfter } = held;
   clearTimers();
   setStepStatus(held.steps.keys(), "undone");
+  logActivity("You", "cancelled", "Cancelled the plan: every stay is back where it was.");
+  setMaintenanceMove(null);
   held = null;
   const now = standState().stays;
   const back = new Map<string, StayPlace>();

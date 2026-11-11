@@ -1,12 +1,12 @@
 // Scenario 1, disruption resolution (see docs/disruption-demo.md): a late
 // arrival, caught as the news comes in. XD472/473, a B789 on B11, is found
-// running 1h 50m late, and its crew, who take it back out, need their rest
-// first, so it leaves 3h 10m late. Its turn then runs into the four arrivals
-// behind it on B11, and the knock-on would hold five aircraft off their
-// stand. Skye says
-// so (DisruptionNotice, above Ask Skye), and on Run weighs it across the plan
-// and moves what the late aircraft runs into (resolve_disruption), keeping the
-// late aircraft where it is.
+// running 1h 50m late, so its 3h 00m turn now ends at 13:30. That runs into
+// the two arrivals behind it on B11, and the knock-on would hold three more:
+// five aircraft off their stand. Skye says so (DisruptionNotice, above Ask
+// Skye), and on Review weighs it across the plan and moves the two it runs
+// into (resolve_disruption), keeping the late aircraft where it is. Two moves,
+// on purpose: one on the same pier, one to another pier that brings baggage in,
+// which is the whole story in the time a demo has.
 //
 // When the news "arrives" is the demo's choice, not Skye's: see
 // ./disruptionTrigger. Everything here works from the board as it is, so
@@ -18,10 +18,13 @@ import { DEMO_DATA, formatUtc } from "../stand-timeline-demo/demoData";
 import { formatDelay, ghostClashes, ghostKey, GHOST_SIDES, type GhostClashes } from "../stand-timeline-demo/delays";
 import { AIRPORT_NAMES } from "../stand-timeline-demo/airports";
 import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture";
+import { logActivity } from "./activity";
+import { bagMove, maintenanceMove, type MaintenanceMove } from "./baggage";
 import { boardKpis, type BoardKpis, type GateHold } from "./boardKpis";
 import {
   closedDuring,
   fitsStand,
+  flightsAtStay,
   occupancyById,
   setRunningLate,
   standArea,
@@ -41,10 +44,14 @@ export const DISRUPTION = {
   flightId: "T24-ARR",
   /** Minutes late onto its stand. */
   delayIn: 110,
-  /** Minutes late off it: the delay carries through, and the crew's rest before taking it back out adds more. */
-  delayOut: 190,
-  /** Why, as the airline's update puts it. */
-  cause: "Held at origin for a late inbound crew, who need their rest before taking it back out",
+  /**
+   * Minutes late off it: the delay carries through its turn. It ends at 13:30,
+   * into XC344/345 and XB232/233 and clear of XA117/118 (13:55), so Skye
+   * moves two flights, not four.
+   */
+  delayOut: 110,
+  /** Why it is late in, as the airline's update puts it. */
+  cause: "Held at origin for a late inbound crew",
 } as const;
 
 /* ------------------------------------------------------------------ state */
@@ -56,7 +63,7 @@ export type NoticeState =
   | "shown"
   /** The user put it away without acting. */
   | "dismissed"
-  /** The user pressed Plan (or asked Skye): Skye is on it. */
+  /** The user pressed Review (or asked Skye): Skye is on it. */
   | "running"
   /** Her plan is approved: the notice shows what it did against the baseline, and that it is logged. */
   | "approved"
@@ -100,6 +107,8 @@ export function landDisruption(now = Date.now()): boolean {
   if (state.landedAt !== null) return false;
   if (!setRunningLate(DISRUPTION.stayId, DISRUPTION.delayIn, DISRUPTION.delayOut)) return false;
   set({ landedAt: now, notice: "none", baseline: boardKpis(standState()), approved: null });
+  const words = disruptionNotice();
+  if (words) logActivity("Flight update", "news", `${words.context} ${words.turn}`, now);
   return true;
 }
 
@@ -110,6 +119,8 @@ export function landDisruption(now = Date.now()): boolean {
 export function announceDisruption(): boolean {
   if (state.landedAt === null || state.notice !== "none") return false;
   set({ ...state, notice: "shown" });
+  const words = disruptionNotice();
+  if (words) logActivity("Skye", "said", `Flagged it. ${words.conflict}`);
   return true;
 }
 
@@ -123,6 +134,7 @@ export function settleDisruption(decision: OutputDecision): boolean {
   const impact = impactNow();
   if (state.landedAt === null || !impact || state.approved || standHolds().length > 0) return false;
   set({ ...state, notice: "approved", approved: { decision, impact } });
+  logActivity("Skye", "applied", appliedLine(impact));
   return true;
 }
 
@@ -137,12 +149,14 @@ export function dismissDisruptionNotice(): void {
 }
 
 /**
- * The user pressed Plan, or asked Skye, maybe before she spoke up: the notice
+ * The user pressed Review, or asked Skye, maybe before she spoke up: the notice
  * goes (or never shows), and Skye takes it from there.
  */
 export function markDisruptionRunning(): void {
   const before = state.notice === "none" && state.landedAt !== null;
-  if (before || state.notice === "shown" || state.notice === "dismissed") set({ ...state, notice: "running" });
+  if (!before && state.notice !== "shown" && state.notice !== "dismissed") return;
+  set({ ...state, notice: "running" });
+  logActivity("You", "action", "Asked Skye to review it.");
 }
 
 /* ---------------------------------------------------------------- reading */
@@ -175,15 +189,25 @@ const listWords = (words: readonly string[]) =>
 
 const plural = (count: number, one: string, many = `${one}s`) => `${count} ${count === 1 ? one : many}`;
 
-/** What the notice says: the news, why, and what it runs into. */
+/**
+ * One thing on the late stay's stand, for the notice to name: its flights,
+ * its hours there, and what it is doing in the story. The late stay first, its
+ * hours as they are now, then whoever would wait, soonest first.
+ */
+export type StandSegment = { stayId: string; name: string; times: string; purpose: string; late: boolean };
+
+/** What the notice says: the news, why, how long its turn runs, what it runs into, and what is on its stand. */
 export type DisruptionNotice = {
   title: string;
   /** The news in a line, on the notice's pill: "XD472 from LHR 1h 50m late". */
   summary: string;
   /** Why it is late, and when it is due now. */
   context: string;
+  /** How its turn comes to end when it does, in the figures the chart draws. */
+  turn: string;
   /** What it runs into, and the knock-on. */
   conflict: string;
+  segments: readonly StandSegment[];
 };
 
 /** "held at origin…": a cause, as it reads mid-sentence. */
@@ -204,15 +228,51 @@ export function disruptionNotice(): DisruptionNotice | null {
   const into = runsInto(stay.id);
   const holds = standHolds();
   const waits = holds.reduce((sum, hold) => sum + hold.minutes, 0);
+  const scheduledOn = stay.start - late;
+  const leaving = flightsAtStay(stay.id).find((candidate) => candidate.direction === "departure")?.flight ?? "It";
+  const dueLabel = (o: Occupancy) => `${stayName(o)} (${formatUtc(o.start)})`;
+  // Whoever waits only because the aircraft before them does.
+  const inTurn = holds.flatMap((hold) => {
+    const other = into.some((entry) => entry.id === hold.stayId) ? undefined : occupancyById(hold.stayId);
+    return other ? [other] : [];
+  });
+  const stayTimes = (o: Occupancy) => `${formatUtc(o.start)}–${formatUtc(o.end)}`;
   return {
     title: `${name} from ${AIRPORT_NAMES[flight.routeEnd] ?? flight.routeEnd} is ${formatDelay(late)} late`,
     summary: `${name} from ${flight.routeEnd} ${formatDelay(late)} late`,
-    context: `${name} was ${midSentence(DISRUPTION.cause)}. Now due on ${stay.rowId} at ${formatUtc(stay.start)}, was ${formatUtc(stay.start - late)}.`,
+    context: `${name} was ${midSentence(DISRUPTION.cause)}. Now due on ${stay.rowId} at ${formatUtc(stay.start)}, was ${formatUtc(scheduledOn)}.`,
+    turn: `${leaving} now leaves at ${formatUtc(leaves)}, was ${formatUtc(stay.end)}.`,
+    // Short: who it runs into by name, the knock-on counted; each is in the table below.
     conflict:
       into.length > 0
-        ? `Its turn now runs to ${formatUtc(leaves)}, into ${listWords(into.map((other) => `${stayName(other)} (${formatUtc(other.start)})`))}.` +
-          (waits > 0 ? ` The knock-on holds ${plural(holds.length, "arrival")} for ${formatDuration(waits)} in all.` : "")
-        : `Its turn now runs to ${formatUtc(leaves)}, clear of anything else on ${stay.rowId}.`,
+        ? `That runs into ${listWords(into.map(dueLabel))}` +
+          (inTurn.length > 0 ? `, and the knock-on holds ${inTurn.length} more` : "") +
+          "." +
+          (waits > 0 ? ` ${plural(holds.length, "aircraft", "aircraft")} would wait ${formatDuration(waits)} in all.` : "")
+        : `That is clear of anything else on ${stay.rowId}.`,
+    segments: [
+      {
+        stayId: stay.id,
+        name: stayName(stay),
+        times: `${formatUtc(stay.start)}–${formatUtc(leaves)}`,
+        purpose: `Late turn, was ${formatUtc(scheduledOn)}–${formatUtc(stay.end)}`,
+        late: true,
+      },
+      ...holds.flatMap((hold): StandSegment[] => {
+        const other = occupancyById(hold.stayId);
+        if (!other) return [];
+        const knockOn = inTurn.some((entry) => entry.id === other.id);
+        return [
+          {
+            stayId: other.id,
+            name: stayName(other),
+            times: stayTimes(other),
+            purpose: `${knockOn ? "Knock-on" : "Blocked"}, would wait ${formatDuration(hold.minutes)}`,
+            late: false,
+          },
+        ];
+      }),
+    ],
   };
 }
 
@@ -423,6 +483,23 @@ export function headsUpCue(): string | null {
     : null;
 }
 
+/** What the record says of the plan applied: where everything is now, against the board as the news arrived. */
+function appliedLine(impact: Impact): string {
+  const moved = [...movedFrom].flatMap(([id, from]) => {
+    const other = occupancyById(id);
+    return other && other.rowId !== from ? [`${stayName(other)} on ${other.rowId}`] : [];
+  });
+  const stay = lateStay();
+  const kept = stay ? `${stayName(stay)} keeps ${stay.rowId}` : "";
+  const carousels = maintenanceMove();
+  return (
+    `Applied. ${[kept, ...moved].filter(Boolean).join(", ")}.` +
+    (carousels ? ` Carousel ${carousels.carousel}'s maintenance is now ${formatUtc(carousels.to.start)}–${formatUtc(carousels.to.end)}.` : "") +
+    ` Gate hold ${formatHold(impact.gateHold.before)} → ${formatHold(impact.gateHold.after)}, conflicts ${impact.conflicts.before} → ${impact.conflicts.after},` +
+    ` stand use ${impact.standUse.before}% → ${impact.standUse.after}%.`
+  );
+}
+
 /**
  * What Skye says once her plan is approved: that it is logged, and what it
  * did against the baseline, in a line; the moves themselves are on the board.
@@ -432,20 +509,21 @@ export function settledLine(): string | null {
   if (!approved) return null;
   const { gateHold, conflicts } = approved.impact;
   return (
-    `That's approved and logged. Gate hold is down from ${formatHold(gateHold.before)} to ${formatHold(gateHold.after)}` +
-    `${conflicts.after === 0 ? ", with no conflicts left" : ""}.`
+    `Approved and logged. Gate hold is down from ${formatHold(gateHold.before)} to ${formatHold(gateHold.after)}` +
+    `${conflicts.after === 0 ? ", no conflicts left" : ""}.`
   );
 }
 
 /**
  * What Skye tells a teammate she has called in to approve her changes (see
  * ../operations/skyeReview), once they pick up: the news, when it is the
- * disruption's; each change in their area and what it means for them; what
- * else moved that does not touch them; and the ask. For baggage, the changes
- * that move a flight's bags. She greets whoever is on the call (`onCall`, the
- * teammate among them): them by name, two by both names, more all at once,
- * and with others there she says which part is the teammate's. She asks for
- * the user, so the re-plan is "ours", not hers.
+ * disruption's; each change in their area, by its arrival's flight, where it
+ * goes and what it means for them; any carousel maintenance moved; and the
+ * ask. For baggage, the changes that move a flight's bags. She greets whoever
+ * is on the call (`onCall`, the teammate among them): them by name, two by
+ * both names, more all at once, and with others there she says which part is
+ * the teammate's. As short as it can be: the agenda and the cards on screen
+ * say the rest (what doesn't touch them, where each came from, the figures).
  */
 export const teammateBrief = (name: string, changes: readonly ReviewChange[], onCall: readonly string[] = [name]): string =>
   teammateBriefScript(name, changes, onCall).text;
@@ -454,11 +532,13 @@ export const teammateBrief = (name: string, changes: readonly ReviewChange[], on
  * What Skye points at on the call's shared approval as her brief comes to it
  * (../approvals/walkThrough): the changes as a whole (`look`), a change in
  * the teammate's area (`card`), one of its stands (`stand`), what it does to
- * the bags (`bags`), the changes that move none (`others`), or the decision
- * (`ask`).
+ * the bags (`bags`), the carousel maintenance she has moved (`maintenance`),
+ * the changes that move none (`others`), or the decision (`ask`). Her brief
+ * names only the stand a change goes to; `from` and `others` are there for a
+ * longer walk-through.
  */
 export type BriefPoint =
-  | { kind: "look" | "ask" }
+  | { kind: "look" | "ask" | "maintenance" }
   | { kind: "card" | "bags"; stayId: string }
   | { kind: "stand"; stayId: string; end: "from" | "to" }
   | { kind: "others"; stayIds: readonly string[] };
@@ -473,18 +553,24 @@ export type BriefBeat = BriefPoint & { at: number; words?: readonly string[] };
 /** Words Skye comes to what a change does to the bags with, or, on the same pier, to its new times. */
 const BAGS_WORDS = ["bags", "bag", "baggage", "carousel", "carousels"];
 const TIMES_WORDS = ["now", "times", "bags"];
-/** And the changes that move none, and her ask. */
-const OTHERS_WORDS = ["other"];
+/** And the maintenance she has moved, and her ask. */
+const MAINTENANCE_WORDS = ["maintenance", "belt"];
 const ASK_WORDS = ["approve", "approval", "sign", "okay", "ok", "good"];
 
 /** Skye's brief (teammateBrief), with where in it she comes to each thing on the shared approval. */
 export type BriefScript = { text: string; beats: readonly BriefBeat[] };
 
-/** teammateBrief, with its beats: where each change, stand and what it does to the bags come up. */
+/**
+ * teammateBrief, with its beats: where each change, stand and what it does to
+ * the bags come up. `introduced` when the user has greeted them and handed
+ * over to Skye (hearCaller in ../live/callController): she goes straight to
+ * the changes, with no hello and no news, as the user has given both.
+ */
 export function teammateBriefScript(
   name: string,
   changes: readonly ReviewChange[],
   onCall: readonly string[] = [name],
+  { introduced = false }: { introduced?: boolean } = {},
 ): BriefScript {
   const theirs = changes.filter((change) => change.baggage);
   const firstName = (who: string) => who.split(" ")[0];
@@ -492,73 +578,127 @@ export function teammateBriefScript(
   let text = "";
   const beats: BriefBeat[] = [];
   const say = (words: string) => void (text += words);
+  /** A space between sentences, none before the first. */
+  const gap = () => (text ? " " : "");
   const point = (where: BriefPoint, words?: readonly string[]) => void beats.push({ ...where, at: text.length, words });
 
   point({ kind: "look" });
-  say(
-    onCall.length <= 1
-      ? `Hey ${firstName(name)}.`
-      : onCall.length === 2
-        ? `Hi ${listWords(onCall.map(firstName))}.`
-        : "Hi everyone.",
-  );
-  const stay = lateStay();
-  if (state.landedAt !== null && stay) {
-    say(` ${lateNames().flight} is ${formatDelay(DEMO_DATA.delays.get(stay.id)?.in ?? 0)} late on ${stay.rowId}, so we've re-planned the arrivals behind it.`);
+  if (!introduced) {
+    say(
+      onCall.length <= 1
+        ? `Hey ${firstName(name)}.`
+        : onCall.length === 2
+          ? `Hi ${listWords(onCall.map(firstName))}.`
+          : "Hi everyone.",
+    );
   }
+  // The news in a few words: the figures are on the agenda.
+  const lead = !introduced && state.landedAt !== null && lateStay() ? `${lateNames().flight} is running late` : "";
   const area = (standId: string) => (standId ? (standArea(standId) ?? standId) : "no stand");
   if (theirs.length > 0) {
-    say(` ${company ? `${firstName(name)}, for you` : "For you"}: `);
+    if (company) say(`${lead ? `${gap()}${lead}.` : ""}${gap()}${firstName(name)}, for you: `);
+    else say(lead ? `${gap()}${lead}, so ` : gap());
     theirs.forEach((change, index) => {
-      // Each its own sentence, as each says a good deal: "a. b. And c."
       if (index > 0) say(index === theirs.length - 1 ? ". And " : ". ");
       const { stayId } = change;
       const [from, to] = [area(change.from.rowId), area(change.to.rowId)];
-      const label = stayLabel(stayId);
-      // Its arrival's flight, however she says the rest ("XA101 slash 102").
-      point({ kind: "card", stayId }, [label.split("/")[0]]);
-      say(`${label} moves `);
-      if (change.from.rowId && change.to.rowId) {
-        point({ kind: "stand", stayId, end: "from" }, [change.from.rowId]);
-        say(`from ${change.from.rowId} `);
-      }
+      // Its arrival's flight alone: "XC344", not "XC344 slash 345".
+      const flight = stayLabel(stayId).split("/")[0];
+      point({ kind: "card", stayId }, [flight]);
+      say(`${flight} moves `);
       point({ kind: "stand", stayId, end: "to" }, change.to.rowId ? [change.to.rowId] : ["stand"]);
       say(`to ${change.to.rowId || "no stand"}`);
       const times = `${formatUtc(change.to.start)}–${formatUtc(change.to.end)}`;
+      const bags = bagMove(stayId, change.from, change.to);
+      say(from === to ? ", " : " and ");
       if (from === to) {
-        say(", ");
         point({ kind: "bags", stayId }, TIMES_WORDS);
         say(`now ${times}`);
       } else {
-        say(`, ${times}, `);
         point({ kind: "bags", stayId }, BAGS_WORDS);
-        say(`so its bags go to ${to} instead of ${from}`);
+        say(
+          bags?.was && bags.now
+            ? `its bags go from carousel ${bags.was.carousel} to ${bags.now.carousel}`
+            : `its bags go to ${to} instead of ${from}`,
+        );
       }
     });
     say(".");
+  } else if (lead) {
+    say(`${gap()}${lead}.`);
   }
-  const others = changes.filter((change) => !change.baggage);
-  if (others.length > 0) {
-    say(" ");
-    point({ kind: "others", stayIds: others.map((change) => change.stayId) }, OTHERS_WORDS);
-    say(`${others.length === 1 ? "The other move stays" : `The other ${others.length} moves stay`} on the same pier, so nothing changes for bags there.`);
+  const maintenance = maintenanceMove();
+  if (maintenance) {
+    say(gap());
+    point({ kind: "maintenance" }, MAINTENANCE_WORDS);
+    say(`To make room, carousel ${maintenance.carousel}'s maintenance moves to ${formatUtc(maintenance.to.start)}–${formatUtc(maintenance.to.end)}.`);
   }
-  say(" ");
+  say(gap());
   point({ kind: "ask" }, ASK_WORDS);
   say("Can you approve?");
   return { text, beats };
 }
 
 /**
- * What a teammate who answers Skye aloud (../live/teammateVoice) is cued to
- * say back to her brief (teammateBrief), straight on, as a colleague answers:
- * it works for the carousels, he approves, then a plain thanks, and to let
- * them know if they need anything else. App-authored.
+ * The question a baggage lead would put before signing off on carousel
+ * maintenance moved, and Skye's answer, in figures from the plan: nothing lands
+ * on it in the meantime. Null when she has moved none. Her answer is a script
+ * too, for her cursor: the maintenance itself, then the bags it makes room for.
  */
-export const teammateCue = (): string =>
-  "Skye just asked you to approve. Answer her now, out loud, in your own words, friendly and at an ordinary " +
-  "pace, with no long pauses: the carousels can take it; it's approved for baggage; then a " +
-  'plain "Thanks.", naming nobody, and "Let me know if you need anything else."';
+export type TeammateFollowUp = { question: string; answer: BriefScript };
+
+export function teammateFollowUp(maintenance: MaintenanceMove | null = maintenanceMove()): TeammateFollowUp | null {
+  if (!maintenance) return null;
+  const { carousel, bags, flight, stayId, next } = maintenance;
+  // One sentence each way: the times are on the maintenance card.
+  const lead = `No. ${flight}'s `;
+  const after = next ? `, and the next are ${next.flight}'s at ${formatUtc(next.start)}, after it's back.` : ", and nothing else is due on it after.";
+  const text = `${lead}bags are off by ${formatUtc(bags.end)}${after}`;
+  return {
+    question: `Quick one: does anything land on carousel ${carousel} while the belt's out?`,
+    answer: {
+      text,
+      beats: [
+        { kind: "maintenance", at: 0, words: MAINTENANCE_WORDS },
+        { kind: "bags", stayId, at: lead.length, words: BAGS_WORDS },
+      ],
+    },
+  };
+}
+
+/** What a teammate is cued to ask, before approving: only that, then to wait for Skye's answer. App-authored. */
+export const teammateQuestionCue = (question: string): string =>
+  "Skye just asked you to approve, but you want to check one thing first. Ask her now, out loud, in your own " +
+  `words, friendly and at an ordinary pace, one short question: "${question}" Then stop and wait for her answer. Don't approve yet.`;
+
+/** Where a teammate asking comes to the end of what teammateQuestionCue asks of him. */
+export const teammateQuestionEnded = (said: string): boolean => said.includes("?");
+
+/**
+ * What a teammate who answers Skye aloud (../live/teammateVoice) is cued to
+ * say back to her brief (teammateBrief), straight on, as a colleague answers,
+ * in one short sentence: that works, and he approves. No thanks: the user
+ * thanks him next, and he says goodbye to that (teammateGoodbyeCue). With
+ * what she `answered` to a question of his, that settles it first.
+ * App-authored.
+ */
+export const teammateCue = (answered?: string): string =>
+  (answered
+    ? `Skye just answered your question: "${answered}" That settles it. Answer her now, out loud, in your own words, friendly and quick, `
+    : "Skye just asked you to approve. Answer her now, out loud, in your own words, friendly and quick, ") +
+  "in one short sentence with no pauses: that works, and it's approved for baggage. Nothing more.";
+
+/**
+ * What a teammate who stayed on for the user (stayForGoodbye in
+ * ../live/callGuests) is cued to say as they approve the plan: they have just
+ * thanked him, so a goodbye in a couple of words. App-authored.
+ */
+export const teammateGoodbyeCue = (): string =>
+  "The stand allocator on the call just thanked you and approved the plan, and the call is ending. " +
+  'Say goodbye now, out loud, in two or three words, like "Cheers, bye!" Nothing more.';
+
+/** Where a teammate saying goodbye comes to the end of what teammateGoodbyeCue asks of him. */
+export const teammateGoodbyeEnded = (said: string): boolean => /\b(bye|cheers|see ya|later)\b/i.test(said);
 
 /**
  * What Skye asked him to approve, for him to know without saying it (it goes
@@ -574,22 +714,77 @@ export function teammateContext(changes: readonly ReviewChange[]): string | null
         ? `${stayLabel(change.stayId)} on new times`
         : `${stayLabel(change.stayId)}'s bags going to ${to} instead of ${from}`;
     });
+  const maintenance = maintenanceMove();
+  if (maintenance && moves.length > 0) {
+    moves.push(`carousel ${maintenance.carousel}'s maintenance moving to ${formatUtc(maintenance.to.start)}–${formatUtc(maintenance.to.end)}`);
+  }
   return moves.length > 0 ? `What Skye asked you to approve: ${listWords(moves)}.` : null;
 }
 
-/** Where a teammate answering aloud comes to the end of what teammateCue asks of him. */
-export const teammateCueEnded = (said: string): boolean => /\banything else\b/i.test(said);
+const COUNT_WORDS = ["No", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve"];
+const countWord = (count: number) => COUNT_WORDS[count] ?? String(count);
 
 /**
- * What Skye says once a teammate has approved aloud, as he hangs up: thanks,
- * and, when it is the user's to approve now (`yours`), that it's over to them.
+ * What a review is for, written where everyone on the call can read it,
+ * without hearing Skye: the delay, when it is the disruption's, then how many
+ * stand changes she proposes, then those baggage has to approve, then any
+ * carousel maintenance moved. Once decided, in the past.
+ */
+export function reviewAgenda(
+  { moves, forBaggage, maintenance }: { moves: number; forBaggage: number; maintenance: boolean },
+  decided = false,
+): string {
+  const stay = lateStay();
+  const news =
+    state.landedAt !== null && stay
+      ? `${lateNames().flight} ${decided ? "was" : "is"} ${formatDelay(DEMO_DATA.delays.get(stay.id)?.in ?? 0)} late. `
+      : "";
+  const count = `${countWord(moves)} stand change${moves === 1 ? "" : "s"} ${decided ? (moves === 1 ? "was" : "were") : moves === 1 ? "is" : "are"} proposed`;
+  const baggage =
+    forBaggage === 0
+      ? "; none affect baggage"
+      : `; ${countWord(forBaggage).toLowerCase()} ${decided ? (forBaggage === 1 ? "needed" : "needed") : forBaggage === 1 ? "requires" : "require"} baggage review`;
+  return `${news}${count}${baggage}${maintenance ? ", with one carousel maintenance move" : ""}.`;
+}
+
+/**
+ * Where a teammate answering aloud comes to the end of what teammateCue asks
+ * of him: he has approved. He is done once his voice stops too, so the rest of
+ * his sentence is heard out.
+ */
+export const teammateCueEnded = (said: string): boolean => /\bapprov/i.test(said);
+
+/**
+ * What Skye says once a teammate has approved aloud and someone else still
+ * has to, as he hangs up: thanks. When it is the user's to approve now
+ * (`yours`), that it's over to them; on a call, he stays on for the user
+ * instead, and she says nothing (DisruptionNotice's briefAloud).
  */
 export const handOffLine = (name: string, yours: boolean): string =>
-  `Thanks, ${name.split(" ")[0]}!${yours ? " That's approved for baggage, so it's over to you." : ""}`;
+  `Thanks, ${name.split(" ")[0]}!${yours ? " Over to you to approve." : ""}`;
 
-/** "XD472/473 · 1h 50m late": the late stay, on Skye's tag as she looks at it. */
-export function lateTag(): string {
+/**
+ * What Skye is on, pinned in the dock (SkyeTask): "XD472/473 · 1h 50m late",
+ * from as she brings it up until her plan's result is put away, "XD472/473 ·
+ * Cleared" meanwhile; null otherwise.
+ */
+export function disruptionTask(): string | null {
   const stay = lateStay();
-  const late = stay ? (DEMO_DATA.delays.get(stay.id)?.in ?? 0) : 0;
-  return `${lateNames().stay} · ${formatDelay(late)} late`;
+  if (!stay) return null;
+  if (state.notice === "approved") return `${lateNames().stay} · Cleared`;
+  if (state.notice !== "shown" && state.notice !== "running") return null;
+  return `${lateNames().stay} · ${formatDelay(DEMO_DATA.delays.get(stay.id)?.in ?? 0)} late`;
+}
+
+/** What the result's details say was applied, in a line: each stay moved, and any maintenance. */
+export function appliedSummary(): string {
+  const moved = [...movedFrom].flatMap(([id, from]) => {
+    const other = occupancyById(id);
+    return other && other.rowId !== from ? [`${stayName(other)} on ${other.rowId}`] : [];
+  });
+  const carousels = maintenanceMove();
+  return (
+    `${moved.length === 1 ? "1 stand change" : `${moved.length} stand changes`} applied: ${listWords(moved)}.` +
+    (carousels ? ` Carousel ${carousels.carousel}'s maintenance is now ${formatUtc(carousels.to.start)}–${formatUtc(carousels.to.end)}.` : "")
+  );
 }

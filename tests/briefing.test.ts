@@ -14,8 +14,7 @@ import { createFakeHost } from "./support/mocks.ts";
 
 // The plan starts clear; the day's news makes two conflicts. XA103/104 runs
 // 55 minutes late off A1, into XB210/211; and the disruption: XD472/473 is
-// 1h 50m late onto B11 and 3h 10m late off it, and runs into the four
-// arrivals behind it.
+// 1h 50m late onto B11 and off it, and runs into the two arrivals behind it.
 setRunningLate("T02-1", 0, 55);
 landDisruption();
 
@@ -60,8 +59,8 @@ test("a conflict's fix moves a stay to a nearby free stand, clearing it without 
 
 test("a late stay running into several: everything it runs into moves, and the late aircraft keeps its stand", () => {
   const conflict = currentAlerts()[1];
-  assert.deepEqual(conflict.conflict?.intoIds, ["T25-1", "T26-1", "T27-1", "T16-1"]);
-  // No one move clears it, so all four arrivals behind XD472/473 move, rather than XD472/473 itself.
+  assert.deepEqual(conflict.conflict?.intoIds, ["T25-1", "T26-1"]);
+  // No one move clears it, so both arrivals behind XD472/473 move, rather than XD472/473 itself.
   const fix = fixFor(conflict);
   assert.equal(fix?.kind, "knock_on");
   assert.deepEqual(
@@ -69,8 +68,6 @@ test("a late stay running into several: everything it runs into moves, and the l
     [
       ["T25-1", "A3"],
       ["T26-1", "B10"],
-      ["T27-1", "B14"],
-      ["T16-1", "A5"],
     ],
   );
   assert.equal(fix?.flightId, "T24-DEP");
@@ -80,7 +77,7 @@ test("the rundown names every open item, a few words each, and offers to take th
   const { spoken, proposal } = brief();
   assert.equal(
     spoken,
-    "9 open items. A1 conflict, XA103/104 55m late. B11 conflict, XD472/473 3h 10m late. " +
+    "9 open items. A1 conflict, XA103/104 55m late. B11 conflict, XD472/473 1h 50m late. " +
       "XB240, XC350, XA130 and XD480 need stands. XB241 has no stay times yet. " +
       "For info: XD452/453 is towed twice and XC335 departs after 17:00 UTC. " +
       "I can take it as one plan: the late aircraft stay put and I fit everything else around them. Want me to?",
@@ -104,10 +101,10 @@ test("a yes to the rundown carries out the plan, says the outcome in a sentence 
     "Done: the late aircraft stayed put, both conflicts are clear and 4 flights have stands. XB241 is still open. The details are in Outputs.",
   );
   assert.equal(occupancyById("T03-1")?.rowId, "B12");
-  // XD472/473 keeps B11; the four arrivals behind it moved.
+  // XD472/473 keeps B11; the two arrivals it ran into moved, and the rest keep B11, now clear.
   assert.deepEqual(
     ["T24-1", "T25-1", "T26-1", "T27-1", "T16-1"].map((id) => occupancyById(id)?.rowId),
-    ["B11", "A3", "B10", "B14", "A5"],
+    ["B11", "A3", "B10", "B11", "B11"],
   );
   assert.equal(currentAlerts().filter((alert) => alert.kind === "conflict").length, 0);
   // What's left is said, with nothing more to offer.
@@ -135,10 +132,10 @@ test("one at a time instead: after a change, each yes works through the next", (
   }
   assert.match(
     said[0],
-    /That clears the A1 conflict\. Next up: the B11 conflict: .+; moving XC344\/345 to A3, XB232\/233 to B10, XA117\/118 to B14 and XC336\/337 to A5 clears it\./,
+    /That clears the A1 conflict\. Next up: the B11 conflict: .+; moving XC344\/345 to A3 and XB232\/233 to B10 clears it\./,
   );
   // A yes to that clears XD472/473's knock-on in one go, said in a line (gate hold says what it cleared).
-  assert.match(said[1], /^Done: XD472\/473 keeps B11, and we've given the 4 flights behind it new stands\. .*Next up: XB240/);
+  assert.match(said[1], /^Done: XD472\/473 keeps B11 and 2 flights move, so gate hold is down from .+ to none\. .*Next up: XB240/);
   assert.doesNotMatch(said[1], /That clears the B11 conflict/);
   // Two conflicts and four placeable flights, one at a time.
   assert.equal(said.length, 6);
@@ -208,7 +205,7 @@ test("what a reply talks about comes with cues, which select nothing until fired
   // The late stay and everything it runs into.
   assert.ok(cues[1].words.includes("B11 conflict"));
   cues[1].show();
-  assert.deepEqual([...host.snapshot().selection.occupancyIds].sort(), ["T16-1", "T24-1", "T25-1", "T26-1", "T27-1"]);
+  assert.deepEqual([...host.snapshot().selection.occupancyIds].sort(), ["T24-1", "T25-1", "T26-1"]);
   // A flight with no stand is picked in its list.
   const waiting = validateAppAction("find_flights", { query: "no stand" });
   assert.ok(waiting.ok);
@@ -224,8 +221,8 @@ test("fix everything clears every conflict and places every waiting flight that 
   assert.equal(result.kind === "action" && result.action.name, "fix_all");
   const action = (result as { action: AppAction }).action;
   assert.ok(action.name === "fix_all");
-  // XB210/211 off A1, and the four arrivals behind XD472/473 off B11.
-  assert.equal(action.moves.length, 5);
+  // XB210/211 off A1, and the two arrivals XD472/473 runs into off B11.
+  assert.equal(action.moves.length, 3);
   assert.equal(action.conflictsCleared, 2);
   assert.equal(action.assigns.length, 4);
   const done = applyAppAction(action, host);

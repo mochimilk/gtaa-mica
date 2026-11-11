@@ -10,7 +10,7 @@ import {
   Stop20Filled,
 } from "@fluentui/react-icons";
 import { agentCursor } from "../agent-cursor";
-import { gtaaOpal, LiveOrb, skyeOrbStill } from "../orb";
+import { SkyeOrb, useSkyeOrbStill } from "../orb";
 import { StepStatusIcon } from "../step-status-icon";
 import { AskButton } from "./AskButton";
 
@@ -65,28 +65,18 @@ export interface AskInputProps {
 // Regular at rest, filled on hover/press, as Fluent buttons expect.
 const RecallIcon = bundleIcon(ShareScreenStop20Filled, ShareScreenStop20Regular);
 
-/**
- * Skye's orb barely turns while she is quiet, 0.3× the opal orb's usual
- * speed, and races while she talks: 11 times that, 3.3× the usual speed. Any
- * speech above a quiet level (ORB_VOICE_FULL) counts as full voice, so it
- * reads as talking or not, rather than following each word (see LiveOrb).
- */
-const ORB_SPEED = 0.3;
-const ORB_VOICE_SPEEDUP = 10;
-const ORB_VOICE_FULL = 0.15;
-
-/** Whether Skye's cursor is out in the app, so it can be called back. */
+/** Whether Skye's orb is out in the app, so it can be called back. */
 const useCursorOut = () => useSyncExternalStore(agentCursor.subscribe, () => agentCursor.out);
 
 /**
- * Calls Skye's cursor back into the orb. It fills the orb's place while the
- * cursor is out: after its first click the cursor stays where it was, and
- * carries on from there, until this brings it home.
+ * Calls Skye's orb back into the dock. It lies over her place there while she
+ * is out, showing on hover or focus: after her first click she stays where she
+ * was, and carries on from there, until this brings her home.
  */
 function RecallButton({ agentName }: { agentName: string }) {
   const out = useCursorOut();
   if (!out) return null;
-  const label = `Bring ${agentName}'s cursor back`;
+  const label = `Bring ${agentName} back`;
   // Inverse, like Send: dark on light, white in dark mode.
   return (
     <AskButton
@@ -111,8 +101,8 @@ const DONE_MS = 1_500;
 /**
  * The orb's place follows Skye's thinking: the dots while it works, then the
  * check once it has finished, then the orb again. No check when the work was
- * cut off (`stopped`), nor when the dots had left as Skye's cursor, which
- * comes back into the orb. Kept here, above the orb, so the check outlives
+ * cut off (`stopped`), nor when Skye was out in the app, who comes back as the
+ * orb. Kept here, above the orb, so the check outlives
  * the input changing shape.
  */
 function useOrbPhase(thinking: boolean, stopped: boolean, cursorOut: boolean): OrbPhase {
@@ -133,8 +123,8 @@ function useOrbPhase(thinking: boolean, stopped: boolean, cursorOut: boolean): O
 /**
  * The thinking dots, shown in the orb's place while Skye works out a reply:
  * Luma's step spinner, which closes into a check when Skye finishes. It stays
- * one icon from dots to check, so the one morphs into the other. Skye's
- * cursor takes over from the dots, in step, when it leaves the orb
+ * one icon from dots to check, so the one morphs into the other. Skye's orb
+ * grows out of the dots when she leaves the dock from them
  * (`data-agent-spinner`). The orb's label says what it shows.
  */
 function ThinkingIcon({ done }: { done: boolean }) {
@@ -149,10 +139,11 @@ function ThinkingIcon({ done }: { done: boolean }) {
  * Skye's orb, in place of a status dot; it greys out while the service is
  * unavailable, speeds up while Skye speaks, with a brand ring round it
  * (`speaking`), and becomes the thinking dots while Skye works
- * out a reply, which close into a check when it has finished. It is also home
- * to Skye's cursor, which leaves the orb as a dot to click through the app and
- * comes back into it. While the cursor is out, the button that brings it back
- * fills the orb's place.
+ * out a reply, which close into a check when it has finished. Skye pops out
+ * of here to click through the app (see agent-cursor) and comes back. While
+ * she is out she stays here too, a smaller orb in the same colours, so she never
+ * leaves the dock as she points elsewhere; over it, the button that brings her
+ * back.
  */
 function AgentOrb({
   agentName,
@@ -168,6 +159,10 @@ function AgentOrb({
   phase: OrbPhase;
 }) {
   const out = useCursorOut();
+  // Back from the app, she must not blink out as she hands over to the dock:
+  // her still stands in here while its renderer starts, not the skeleton.
+  const beenOut = useRef(false);
+  beenOut.current ||= out;
   const label =
     phase === "thinking"
       ? "Skye is thinking"
@@ -178,9 +173,11 @@ function AgentOrb({
           : undefined;
   const slot = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => agentCursor.setHome(slot.current), []);
+  const still = useSkyeOrbStill();
   if (out) {
     return (
       <span ref={slot} className="mica-ask__orb" data-recall>
+        <img src={still} alt="" className="mica-ask__orb-home" data-agent-home="" />
         <RecallButton agentName={agentName} />
       </span>
     );
@@ -198,20 +195,7 @@ function AgentOrb({
       {phase !== "orb" ? (
         <ThinkingIcon done={phase === "done"} />
       ) : (
-        <LiveOrb
-          size={32}
-          glow
-          voice={voice}
-          speed={ORB_SPEED}
-          voiceSpeedup={ORB_VOICE_SPEEDUP}
-          voiceFull={ORB_VOICE_FULL}
-          // Her voice speeds the orb only: the speaking ring marks her talking, without a glow swelling under it.
-          voiceGlow={false}
-          state="thinking"
-          preset="opal"
-          palette={gtaaOpal}
-          still={skyeOrbStill}
-        />
+        <SkyeOrb voice={voice} placeholder={beenOut.current ? "gradient" : undefined} />
       )}
     </span>
   );

@@ -33,6 +33,7 @@ import {
   type StandAssign,
 } from "./allocation";
 import { planBoardDrop, waitingFlight } from "./noStandLane";
+import { disruptionState } from "./disruption";
 import { approveSkyeChanges, asUser, undoSkyeChanges } from "./skyeReview";
 import { OPS_FLIGHTS_BY_ID, type OpsFlight } from "./operationsData";
 import {
@@ -480,7 +481,9 @@ export function OperationsProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const approveSkye = useCallback(() => {
-    if (approveSkyeChanges()) setSkyeSelection(EMPTY);
+    // What settles the disruption stays outlined until its result is put away
+    // (DisruptionNotice), so the outcome can be read off the board.
+    if (approveSkyeChanges() && disruptionState().notice !== "approved") setSkyeSelection(EMPTY);
   }, []);
 
   const undoSkye = useCallback(() => {

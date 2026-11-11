@@ -50,8 +50,8 @@ export function expertiseOf(name: string): string | undefined {
   return person && EXPERTISE_LABELS[person.expertise];
 }
 
-/** How long someone rings before they answer. */
-export const ANSWER_MS = 5_000;
+/** How long someone rings before they answer: long enough to see the call ring, no longer. */
+export const ANSWER_MS = 2_500;
 
 /**
  * People called in: who is on, in the order they answered; who is still being
@@ -89,6 +89,60 @@ export const guestNames = (): readonly string[] => guests?.names ?? [];
 /** The names of everyone being called who has not answered yet. */
 export const callingNames = (): readonly string[] => guests?.calling ?? [];
 
+/**
+ * Who stays on the call once their part is done, to say goodbye as it ends
+ * (stayForGoodbye), and how; and those goodbyes being said (farewell).
+ */
+const goodbyes = new Map<string, () => Promise<unknown>>();
+let parting: Promise<void> | null = null;
+
+/** How long a goodbye can take before whoever is saying it is taken off the call regardless, ms. */
+export const GOODBYE_WITHIN_MS = 4_000;
+
+/**
+ * `name`, on the call, stays on once their part is done, for the user: when
+ * the call comes to its end (farewell), they say goodbye (`say`) and leave.
+ * Should they leave or be taken off first, there is no goodbye.
+ */
+export function stayForGoodbye(name: string, say: () => Promise<unknown>): void {
+  if (guests?.names.includes(name)) goodbyes.set(name, say);
+}
+
+/** Whether `name` is staying on to say goodbye, the call not yet ending. */
+export const staysForGoodbye = (name: string): boolean => goodbyes.has(name);
+
+/**
+ * The call comes to its end: everyone who stayed on to say goodbye
+ * (stayForGoodbye) says it, then leaves, each taking GOODBYE_WITHIN_MS at
+ * most. Resolves once they all have; at once with nobody staying. Asked again
+ * meanwhile, it is the same goodbyes.
+ */
+export function farewell(): Promise<void> {
+  if (parting) return parting;
+  const saying = [...goodbyes];
+  goodbyes.clear();
+  if (saying.length === 0) return Promise.resolve();
+  const each = ([name, say]: [string, () => Promise<unknown>]) =>
+    new Promise<void>((resolve) => {
+      const timer = setTimeout(resolve, GOODBYE_WITHIN_MS);
+      void Promise.resolve()
+        .then(say)
+        .catch(() => undefined)
+        .finally(() => {
+          clearTimeout(timer);
+          resolve();
+        });
+    }).then(() => leaveCall(name));
+  const now = Promise.all(saying.map(each)).then(() => {
+    if (parting === now) parting = null;
+  });
+  parting = now;
+  return now;
+}
+
+/** The goodbyes being said now (farewell), resolving once they have been; at once when none are. */
+export const goodbyesSaid = (): Promise<void> => parting ?? Promise.resolve();
+
 /** Someone being called answers and joins. */
 function answer(name: string): void {
   answers.delete(name);
@@ -112,6 +166,7 @@ export function removeFromCall(name: string): void {
   if (!guests || (!guests.names.includes(name) && !guests.calling.includes(name))) return;
   clearTimeout(answers.get(name));
   answers.delete(name);
+  goodbyes.delete(name);
   const drop = (list: readonly string[]) => list.filter((guest) => guest !== name);
   settle(drop(guests.names), drop(guests.calling), guests.since);
 }
@@ -122,14 +177,16 @@ export function removeFromCall(name: string): void {
  * until they end it.
  */
 export function leaveCall(name: string): void {
+  goodbyes.delete(name);
   if (!guests?.names.includes(name)) return;
   set({ ...guests, names: guests.names.filter((guest) => guest !== name) });
 }
 
-/** Ends the call for everyone called in, and stops calling anyone still ringing. */
+/** Ends the call for everyone called in, and stops calling anyone still ringing. No goodbyes: see farewell. */
 export function endGuestCall(): void {
   for (const timer of answers.values()) clearTimeout(timer);
   answers.clear();
+  goodbyes.clear();
   set(null);
 }
 

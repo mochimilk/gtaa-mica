@@ -2,13 +2,15 @@
 // through it (./walkThrough), for its panes to show (./ApprovalsCall): the
 // changes she means, ringed in the brand's colour; the stand on them she is
 // naming, its tag in the brand's colour; and, as she says what a change does
-// to the bags, their bars on the carousels, outlined in it. Null while she is
-// not walking anyone through.
+// to the bags, their bars on the carousels, outlined in it; or the carousel
+// maintenance she has moved, its card ringed. Null while she is not walking
+// anyone through.
 
 export type Spotlight = {
   stayIds: readonly string[];
   stands: readonly ("from" | "to")[];
   bags: boolean;
+  maintenance?: boolean;
 } | null;
 
 let current: Spotlight = null;

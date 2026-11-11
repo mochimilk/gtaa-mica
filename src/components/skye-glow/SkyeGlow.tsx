@@ -10,8 +10,18 @@ const SKYE_GLOW_FLOW_ID = "skye-glow-flow";
 const reducedMotion = () =>
   typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/** The Glow's colours (theme/glowThemes.ts); through `style`, as CSS variables don't resolve in SVG presentation attributes. */
+const GlowStops = () => (
+  <>
+    <stop offset="0" style={{ stopColor: "var(--skye-chart-a)" }} />
+    <stop offset="0.35" style={{ stopColor: "var(--skye-chart-b)" }} />
+    <stop offset="0.65" style={{ stopColor: "var(--skye-chart-c)" }} />
+    <stop offset="1" style={{ stopColor: "var(--skye-chart-a)" }} />
+  </>
+);
+
 /**
- * The orb's colours as SVG gradients, for drawing what Skye has selected on
+ * The Glow's colours as SVG gradients, for drawing what Skye has selected on
  * the chart (see skyeGlow.css): one that slowly turns, for a bar's outline,
  * and one that flows across the chart, for the line linking two bars. Mount
  * it once; any SVG in the page can use them. They move only while Skye has
@@ -36,10 +46,7 @@ export function SkyeGlowDefs() {
     <svg ref={svgRef} className="skye-glow-defs" width="0" height="0" aria-hidden focusable="false">
       <defs>
         <linearGradient id={SKYE_GLOW_GRADIENT_ID} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#0F6FFF" />
-          <stop offset="0.35" stopColor="#7A5CFF" />
-          <stop offset="0.65" stopColor="#14B8E0" />
-          <stop offset="1" stopColor="#0F6FFF" />
+          <GlowStops />
           {animate && (
             <animateTransform
               attributeName="gradientTransform"
@@ -64,10 +71,7 @@ export function SkyeGlowDefs() {
           y2="120"
           spreadMethod="repeat"
         >
-          <stop offset="0" stopColor="#0F6FFF" />
-          <stop offset="0.35" stopColor="#7A5CFF" />
-          <stop offset="0.65" stopColor="#14B8E0" />
-          <stop offset="1" stopColor="#0F6FFF" />
+          <GlowStops />
           {animate && (
             <animateTransform
               attributeName="gradientTransform"

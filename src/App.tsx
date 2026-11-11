@@ -11,7 +11,7 @@ import { PanelHeader } from "./components/panel-header";
 import { SharedPanelLeft } from "./components/panel-left";
 import { LeftPanelToggle } from "./components/panel-toggle";
 import { DesktopTitleBar, hasDesktopTitleBar } from "./components/title-bar";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { MINUTE, type DropPreview } from "./stand-timeline";
 import { DEMO_DATA } from "./stand-timeline-demo/demoData";
 import { StandTimelineDemo } from "./stand-timeline-demo/StandTimelineDemo";
@@ -35,6 +35,9 @@ import { FlightDragChip, FlightDropGhost } from "./operations/FlightDrag";
 import { OperationsPanel } from "./operations/OperationsPanel";
 import { OutputsPanel, OutputsToggle } from "./operations/OutputsPanel";
 import { OutputsPeek } from "./operations/OutputsPeek";
+import { SkyeTask } from "./operations/SkyeTask";
+import { frameStays } from "./operations/agentGestures";
+import { skyeReview, subscribeApprovals } from "./operations/skyeReview";
 import {
   OperationsProvider,
   selectedFlight,
@@ -46,7 +49,8 @@ import {
 import { SelectionPopover } from "./operations/SelectionPopover";
 import { SwapConfirm } from "./operations/SwapConfirm";
 import { ViewsFiltersToolbar } from "./operations/ViewsFiltersToolbar";
-import { LiveCallProvider } from "./live";
+import { LiveCallProvider, useLiveCall } from "./live";
+import { endGuestCall, farewell } from "./live/callGuests";
 import { outOfSightStyle, useShownPage, useSkyeAt } from "./live/outOfSight";
 import { AgentCursor, AgentHelperCursors } from "./components/agent-cursor";
 import { SkyeGlowDefs } from "./components/skye-glow";
@@ -68,6 +72,9 @@ const LEFT_PANELS: Record<AppPage, { id: string; label: string }> = {
 
 /** Bars drag anywhere on the board: to any stand, and along in time in 5-minute steps. */
 const DRAG_SNAP_MS = 5 * MINUTE;
+
+/** How long the board takes to come back on screen, ms, before it can be framed. */
+const PLAN_SHOWN_AFTER_MS = 200;
 
 /**
  * The verdict shown while a bar is dragged over a row (and along in time):
@@ -336,7 +343,13 @@ function Navbar({ page, onOpenChat }: { page: AppPage; onOpenChat: () => void })
   const callThread = useCallThread();
   return (
     <AppNavbar
-      askActionsEnd={<AlertsMenu />}
+      askActionsEnd={
+        <>
+          <AlertsMenu />
+          {/* What Skye is on, fixed here wherever her cursor goes, and the way to its record. */}
+          <SkyeTask />
+        </>
+      }
       // Skye catching the day's disruption (see docs/disruption-demo.md).
       askNotices={page === "planner" ? <DisruptionNotice /> : undefined}
       callOnPage={page === "chat" && callInChat}
@@ -350,6 +363,12 @@ function Navbar({ page, onOpenChat }: { page: AppPage; onOpenChat: () => void })
       }}
     />
   );
+}
+
+/** Skye's orb out on the screen, which hears her on a call as the one in the dock does. */
+function SkyeCursor() {
+  const live = useLiveCall();
+  return <AgentCursor name="Skye" voice={live.active ? live.remoteStream : null} />;
 }
 
 export default function App() {
@@ -375,6 +394,24 @@ export default function App() {
     if (returnTo) openThread(returnTo);
     setPage("chat");
   });
+  // Once the plan is approved, back to the board, framed on what it moved: its
+  // outcome is there to see, not only a word that it was approved. Whoever was
+  // called in has done their part, so the call with them ends, once anyone who
+  // stayed on for the user has said goodbye (farewell).
+  const goRef = useRef(setPage);
+  goRef.current = setPage;
+  useEffect(
+    () =>
+      subscribeApprovals(() => {
+        const moved = skyeReview()?.changes.map((change) => change.stayId) ?? [];
+        void farewell().then(() => {
+          endGuestCall();
+          goRef.current("planner");
+          setTimeout(() => frameStays(moved), PLAN_SHOWN_AFTER_MS);
+        });
+      }),
+    [],
+  );
   const chatsUnread = useUnreadChats();
   // Where Skye's cursor is at work: that page stays mounted, out of sight,
   // while another shows, and the nav rail says she is there.
@@ -414,8 +451,8 @@ export default function App() {
                     <ChatPage panelID={LEFT_PANELS.chat.id} panelClassName={styles.panel} away={page !== "chat"} />
                   )}
                 </Content>
-                {/* Beside the content window; its toggle ends the board's header. */}
-                {page === "planner" && <OutputsPanel />}
+                {/* Beside the content window, on every page; its toggles end the board's header and sit in the dock. */}
+                <OutputsPanel toBoard={() => setPage("planner")} />
               </CoralShellRow>
 
               <Navbar page={page} onOpenChat={() => setPage("chat")} />
@@ -423,8 +460,8 @@ export default function App() {
             </CoralShellColumn>
           </CoralShellRow>
         </div>
-        {/* Skye's own cursor, shown while Skye clicks things in the app. */}
-        <AgentCursor name="Skye" />
+        {/* Skye herself, her orb out of the dock, while she clicks things in the app. */}
+        <SkyeCursor />
         {/* The cursors Skye splits into to work on several things at once. */}
         <AgentHelperCursors />
         {/* The gradient that outlines Skye's selections on the chart. */}

@@ -5,24 +5,28 @@
 // it, turn by turn (OutputSteps); picking a piece takes the user to it on the
 // board, as picking a flight in the operations panel does. While Skye's changes wait to be approved,
 // the decision (OutputsApproval) hangs off the newest request waiting, threaded
-// to its pieces; once they are cancelled, its pieces are struck through. Its toggle sits at the end
-// of the board's header, after Filters and Views; it starts closed, and while
-// there is nothing to list the toggle is greyed out and an open panel closes.
-// While it is closed, the request Skye is on peeks out under the header
+// to its pieces; once they are cancelled, its pieces are struck through. Under
+// them, Activity (./activity): the written record of what happened, who did it
+// and when, then what is next, to catch up from without replaying anything. Its
+// toggle sits at the end of the board's header, after Filters and Views, and the
+// task pinned in the dock (SkyeTask) opens it on every page; it starts closed,
+// and while there is nothing to list the toggle is greyed out and an open panel
+// closes. While it is closed, the request Skye is on peeks out under the header
 // (OutputsPeek).
 import { Fragment, useEffect, useMemo, useSyncExternalStore } from "react";
 import { Panel, eventBus, useCoralAuth } from "@coral-ai/react";
-import { Avatar, Caption1, makeStyles, mergeClasses, shorthands, tokens, type GriffelStyle } from "@fluentui/react-components";
+import { Avatar, Caption1, Caption1Strong, makeStyles, mergeClasses, shorthands, tokens, type GriffelStyle } from "@fluentui/react-components";
 import { Branch20Filled, Branch20Regular, bundleIcon, createFluentIcon } from "@fluentui/react-icons";
-import { skyeOrbStill } from "../components/orb";
+import { useSkyeOrbStill } from "../components/orb";
 import { RightPanelToggle } from "../components/panel-toggle";
+import { activity, subscribeActivity } from "./activity";
 import { flightsAtStay } from "./allocation";
 import { selectedFlight, useOpsActions, useOpsSelections } from "./OperationsContext";
 import { describeApprovers, describeRequest, formatLogTime, type OutputActor, type OutputDecision, type OutputRequest, type OutputStep } from "./outputs";
 import { OutputsApproval } from "./OutputsApproval";
 import { OUTPUT_ICON_GAP, OutputSteps, RequestMeta, useOutputs } from "./OutputSteps";
 import { revealRect } from "./SelectionPopover";
-import { skyeReview, subscribeSkyeReview } from "./skyeReview";
+import { skyeReview, subscribeSkyeReview, type SkyeReview } from "./skyeReview";
 import { KEEP_SELECTION_ATTR } from "./ViewsFiltersToolbar";
 import "./operations.css";
 
@@ -46,6 +50,9 @@ const OutputsIcon = bundleIcon(Branch20Filled, Branch20Regular);
 const OutputsWaitingIcon = bundleIcon(BranchDotFilled, BranchDotRegular);
 
 const useApprovalWaiting = () => useSyncExternalStore(subscribeSkyeReview, skyeReview) !== null;
+
+/** Whether there is anything on the record yet, listed or logged. */
+const useAnyActivity = () => useSyncExternalStore(subscribeActivity, activity).length > 0;
 
 // Stable ID shared by the right panel, its toggle in the board's header and the peek.
 export const OUTPUTS_PANEL_ID = "outputs-panel";
@@ -180,6 +187,39 @@ const useStyles = makeStyles({
     color: tokens.colorStatusSuccessForeground1,
     fontWeight: tokens.fontWeightSemibold,
   },
+  // The written record, in the order it happened: who and when over what.
+  activity: {
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalM,
+    margin: 0,
+    padding: `0 ${tokens.spacingHorizontalS}`,
+    listStyle: "none",
+  },
+  activityEntry: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  activityHead: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: tokens.spacingHorizontalS,
+    color: tokens.colorNeutralForeground1,
+  },
+  activityTime: {
+    flexShrink: 0,
+    color: tokens.colorNeutralForeground3,
+    fontVariantNumeric: "tabular-nums",
+  },
+  activityText: {
+    color: tokens.colorNeutralForeground2,
+  },
+  activityNext: {
+    marginTop: tokens.spacingVerticalM,
+    padding: `${tokens.spacingVerticalS} ${tokens.spacingHorizontalS}`,
+    borderTop: `1px solid ${tokens.colorNeutralStroke2}`,
+    color: tokens.colorNeutralForeground1,
+  },
   // No gap: each request's section is padded 16px either side of its divider.
   requests: {
     display: "flex",
@@ -241,6 +281,7 @@ function ActorAvatar({ actor }: { actor: OutputActor; filled?: boolean }) {
   const styles = useStyles();
   const auth = useCoralAuth();
   const user = auth?.status === "signed-in" ? auth.user : undefined;
+  const skyeOrbStill = useSkyeOrbStill();
   return (
     <span className={styles.avatarBox}>
       {actor === "skye" ? (
@@ -304,12 +345,45 @@ function DecisionLog({ decision }: { decision: OutputDecision }) {
   );
 }
 
+/** What is next on what waits, in a line; null with nothing waiting. */
+function nextLine(review: SkyeReview | null): string | null {
+  if (!review) return null;
+  const first = review.signoffs.find((entry) => entry.state !== "approved");
+  return first ? `Next: ${first.name} approves for ${first.expertise}, then you.` : "Next: your approval.";
+}
+
+/** The written record (./activity): what has happened, who did it and when; and what is next. */
+function ActivityLog() {
+  const styles = useStyles();
+  const entries = useSyncExternalStore(subscribeActivity, activity);
+  const next = nextLine(useSyncExternalStore(subscribeSkyeReview, skyeReview));
+  if (entries.length === 0) return null;
+  return (
+    <Panel.NavSection label="Activity">
+      <ol className={styles.activity} aria-label="Activity">
+        {entries.map((entry) => (
+          <li key={entry.id} className={styles.activityEntry} data-activity={entry.kind}>
+            <span className={styles.activityHead}>
+              <Caption1Strong>{entry.who}</Caption1Strong>
+              <Caption1 className={styles.activityTime}>{formatLogTime(entry.at)}</Caption1>
+            </span>
+            <Caption1 className={styles.activityText}>{entry.text}</Caption1>
+          </li>
+        ))}
+      </ol>
+      {next && <Caption1Strong as="p" className={styles.activityNext}>{next}</Caption1Strong>}
+    </Panel.NavSection>
+  );
+}
+
 /**
  * Opens and closes the Outputs panel, subtle as the Filters and Views beside
  * it; greyed out while there is nothing to list. Its icon is the panel's.
  */
 export function OutputsToggle() {
-  const empty = useOutputs().length === 0;
+  const listed = useOutputs().length > 0;
+  const logged = useAnyActivity();
+  const empty = !listed && !logged;
   const waiting = useApprovalWaiting();
   return (
     <RightPanelToggle
@@ -323,12 +397,15 @@ export function OutputsToggle() {
 }
 
 /**
- * Takes the user to a piece on the board: its flight selected, its bar brought
- * into view with its details beside it; or, for an area's closure, its band.
+ * Takes the user to a piece on the board, from any page (`toBoard`): its flight
+ * selected, its bar brought into view with its details beside it; or, for an
+ * area's closure, its band. Carousel maintenance is not on the board.
  */
-function useOpenStep() {
+function useOpenStep(toBoard?: () => void) {
   const { selectFlight } = useOpsActions();
   return (step: OutputStep) => {
+    if (step.maintenance) return;
+    toBoard?.();
     const flight = step.stayId ? flightsAtStay(step.stayId)[0] : undefined;
     if (flight) {
       selectFlight(flight);
@@ -340,11 +417,12 @@ function useOpenStep() {
   };
 }
 
-export function OutputsPanel() {
+export function OutputsPanel({ toBoard }: { toBoard?: () => void }) {
   const styles = useStyles();
   const requests = useOutputs();
+  const logged = useAnyActivity();
   const { selection } = useOpsSelections();
-  const openStep = useOpenStep();
+  const openStep = useOpenStep(toBoard);
   // The stays the user has selected: a flight waiting for a stand is selected by its flight.
   const waiting = selectedFlight(selection)?.unplacedStay?.stayId;
   const selectedStayIds = waiting ? [...selection.occupancyIds, waiting] : selection.occupancyIds;
@@ -358,8 +436,8 @@ export function OutputsPanel() {
   const deciding = requests.find((request) => describeRequest(request).waiting)?.id;
   // The toggle is greyed out while there is nothing to list, so it could not close the panel.
   useEffect(() => {
-    if (requests.length === 0 && eventBus.getActivePanel() === OUTPUTS_PANEL_ID) eventBus.setActivePanel(null);
-  }, [requests.length]);
+    if (requests.length === 0 && !logged && eventBus.getActivePanel() === OUTPUTS_PANEL_ID) eventBus.setActivePanel(null);
+  }, [requests.length, logged]);
 
   return (
     <Panel.Right
@@ -395,6 +473,7 @@ export function OutputsPanel() {
             </Panel.NavGroup>
           </Panel.NavSection>
         ))}
+        <ActivityLog />
       </div>
     </Panel.Right>
   );

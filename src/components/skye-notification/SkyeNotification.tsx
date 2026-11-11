@@ -46,6 +46,8 @@ export type SkyeNotificationProps = {
   /** The line under the details; null for none. */
   disclaimer?: string | null;
   defaultOpen?: boolean;
+  /** What it is about, as `data-notif`, for code to find it by (the demo's golden path presses its action). */
+  name?: string;
 };
 
 export function SkyeNotification({
@@ -60,6 +62,7 @@ export function SkyeNotification({
   children,
   disclaimer = "Skye is AI. Check mistakes.",
   defaultOpen = false,
+  name,
 }: SkyeNotificationProps) {
   const [open, setOpen] = useState(defaultOpen);
   const [leaving, setLeaving] = useState(false);
@@ -94,6 +97,7 @@ export function SkyeNotification({
   return (
     <section
       className="skye-notif"
+      data-notif={name}
       data-tone={tone}
       data-open={open || undefined}
       data-leaving={leaving || undefined}

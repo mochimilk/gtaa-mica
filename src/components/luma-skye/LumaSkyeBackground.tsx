@@ -2,6 +2,8 @@ import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { eventBus } from "@coral-ai/react";
 import { makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
 import { useLiveCall } from "../../live";
+import { GLOW_THEMES } from "../../theme/glowThemes";
+import { useSkyeGlow } from "../../theme/skyeGlow";
 import { holdAwake, useReduceEffects } from "../effects";
 import { hasDesktopBackdrop } from "../title-bar";
 import { VoiceSkye } from "./VoiceSkye";
@@ -56,6 +58,7 @@ export function LumaSkyeBackground() {
   const busy = state !== "idle" && state !== "unavailable";
   useEffect(() => (busy ? holdAwake() : undefined), [busy]);
   const reduceEffects = useReduceEffects();
+  const palette = GLOW_THEMES[useSkyeGlow()].skye;
   const backdrop = hasDesktopBackdrop();
   return (
     <div
@@ -68,7 +71,7 @@ export function LumaSkyeBackground() {
       aria-hidden="true"
     >
       <div className={mergeClasses(styles.skye, colorMode === "light" && styles.light)}>
-        <VoiceSkye state={state} level={level} still={reduceEffects} />
+        <VoiceSkye state={state} level={level} palette={palette} still={reduceEffects} />
       </div>
     </div>
   );

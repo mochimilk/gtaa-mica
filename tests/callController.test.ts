@@ -3,6 +3,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  CALLER_QUIET_MS,
+  CALLER_SAID_WITHIN_MS,
+  CALLER_START_WITHIN_MS,
   ENDED_IDLE_MS,
   ENDED_QUIET_MS,
   GREETING_INSTRUCTIONS,
@@ -47,7 +50,9 @@ type Harness = {
   localStreams: (MediaStream | null)[];
 };
 
-function harness(options: { interpreter?: RequestInterpreter; level?: () => number } = {}): Harness {
+function harness(
+  options: { interpreter?: RequestInterpreter; level?: () => number; callerLevel?: () => number } = {},
+): Harness {
   const scheduler = createScheduler();
   const host = createFakeHost();
   const states: LiveCallState[] = [];
@@ -64,6 +69,7 @@ function harness(options: { interpreter?: RequestInterpreter; level?: () => numb
     onRemoteStream: (stream) => streams.push(stream),
     onLocalStream: (stream) => localStreams.push(stream),
     outputLevel: options.level,
+    callerLevel: options.callerLevel,
     createTransport: (handlers) => {
       let resolve: ((value: { sessionId: string }) => void) | null = null;
       let reject: ((error: unknown) => void) | null = null;
@@ -314,6 +320,90 @@ test("at the end of what she says, she is done once her voice stops too, so whoe
   level = 0;
   await pass(h, ENDED_QUIET_MS);
   assert.equal(said, true);
+});
+
+test("the caller's turn to talk to someone else: Skye stops listening until they have spoken and stopped", async () => {
+  let caller = 0;
+  const h = harness({ callerLevel: () => caller });
+  assert.equal(await h.controller.hearCaller(), false);
+  await connect(h);
+
+  let spoke: boolean | undefined;
+  void h.controller.hearCaller().then((result) => (spoke = result));
+  await flush();
+  // Held at once, so she does not take what they say as said to her.
+  assert.equal(h.latest.held, true);
+  assert.equal(h.latest.muted, false);
+  await pass(h, QUIET_GAP_MS);
+  // A knock is not them starting.
+  caller = 0.9;
+  await pass(h, SAID_POLL_MS);
+  caller = 0;
+  await pass(h, CALLER_QUIET_MS * 2);
+  assert.equal(spoke, undefined);
+  // Speaking, with a pause between phrases: not done yet.
+  caller = 0.9;
+  await pass(h, 1_000);
+  caller = 0;
+  await pass(h, CALLER_QUIET_MS - 2 * SAID_POLL_MS);
+  caller = 0.9;
+  await pass(h, 500);
+  assert.equal(spoke, undefined);
+  assert.equal(h.latest.held, true);
+  // Quiet once they have said it: she listens again.
+  caller = 0;
+  await pass(h, CALLER_QUIET_MS);
+  assert.equal(spoke, true);
+  assert.equal(h.latest.held, false);
+});
+
+test("the caller's turn ends unspoken if they don't start in time or are muted, after a while in a noisy room, or when cut short", async () => {
+  let caller = 0;
+  const h = harness({ callerLevel: () => caller });
+  await connect(h);
+  const hear = async (signal?: AbortSignal) => {
+    let spoke: boolean | undefined;
+    void h.controller.hearCaller(signal).then((result) => (spoke = result));
+    await flush();
+    return () => spoke;
+  };
+
+  let spoke = await hear();
+  await pass(h, QUIET_GAP_MS + CALLER_START_WITHIN_MS);
+  assert.equal(spoke(), false);
+  assert.equal(h.latest.held, false);
+
+  // Muted, they are not heard, however loud.
+  await h.controller.setMuted(true);
+  caller = 0.9;
+  spoke = await hear();
+  await pass(h, QUIET_GAP_MS + CALLER_START_WITHIN_MS);
+  assert.equal(spoke(), false);
+  await h.controller.setMuted(false);
+
+  // A room that never goes quiet: taken as said.
+  spoke = await hear();
+  await pass(h, QUIET_GAP_MS + CALLER_SAID_WITHIN_MS - 1_000);
+  assert.equal(spoke(), undefined);
+  await pass(h, 1_500);
+  assert.equal(spoke(), true);
+
+  // Cut short (the presenter's next key): whether they had started.
+  caller = 0;
+  const before = new AbortController();
+  spoke = await hear(before.signal);
+  await pass(h, QUIET_GAP_MS + 500);
+  before.abort();
+  await pass(h, SAID_POLL_MS);
+  assert.equal(spoke(), false);
+  caller = 0.9;
+  const during = new AbortController();
+  spoke = await hear(during.signal);
+  await pass(h, QUIET_GAP_MS + 500);
+  during.abort();
+  await pass(h, SAID_POLL_MS);
+  assert.equal(spoke(), true);
+  assert.equal(h.latest.held, false);
 });
 
 test("an unconfigured backend surfaces its reason and leaves no call running", async () => {

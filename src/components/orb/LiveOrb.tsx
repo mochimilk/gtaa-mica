@@ -51,7 +51,7 @@ export type LiveOrbProps = {
    */
   placeholder?: "skeleton" | "gradient";
   /**
-   * A still of this orb (a PNG of its canvas; see skyeOrbStill), shown as the
+   * A still of this orb (a PNG of its canvas; see skyeOrbLook), shown as the
    * static orb in place of the gradient: as the placeholder, and when it
    * cannot run live (no WebGPU, reduced motion).
    */

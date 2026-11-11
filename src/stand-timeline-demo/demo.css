@@ -91,9 +91,14 @@
 }
 
 /*
- * Flight-bar palette: one colour per status, not per carrier (see theme.tsx,
- * STATUS_PALETTE):
- *   healthy: neutral glass, so Skye's purple stands out on a quiet board: a
+ * Flight-bar palette: a healthy stay in its aircraft type's tone, any other
+ * in its status's colour (see theme.tsx, TONE_PALETTE and STATUS_PALETTE):
+ *   tones, the EBC stand plan reference's lightness ramp in the hue of the
+ *     Glow chosen in Settings (theme.tsx, AIRCRAFT_TONE; their colours, with
+ *     --flight-healthy and --flight-outline, are set on the root from
+ *     theme/glowThemes.ts). Their delay ghosts take the glass's neutral
+ *     (--flight-glass-mark),
+ *   healthy, of a type with no tone: neutral glass: a
  *     white, fading left to right as the coloured bars' colours do (from
  *     --flight-glass-from to --flight-glass-to: 30% to 22% on the light
  *     board, 10% to 7% on the dark one, where white shows far more),
@@ -110,8 +115,8 @@
  *   waiting: orange, for a stay with no stand, near the Unassigned badge
  *     and the lane's warning count.
  * A coloured bar's fill is its base, fading left to right from a low opacity
- * to a lower one (theme.tsx, BAR_FADE), inside a solid 1px base border. All
- * bars have neutral Fluent labels; those labels keep ≥ 4.5:1 over the fill
+ * to a lower one (theme.tsx, BAR_FADE), inside a solid 1px base border. Glass
+ * and status bars have neutral Fluent labels; those labels keep ≥ 4.5:1 over the fill
  * and over the tow/hold hatch, and every coloured border is ≥ 3:1 against
  * the chart surface, in both modes. The conflict red also carries a clash ghost's pill, so it
  * has a paired text colour, with its approximate WCAG contrast. Only flight
@@ -123,7 +128,6 @@
  */
 .demo-timeline,
 .board-snippet {
-  --flight-healthy: #6a89dc;        /* base, deepened from the dark-mode pastel for ≥ 3:1 on white */
   --flight-glass-from: rgb(255 255 255 / 30%);
   --flight-glass-to: rgb(255 255 255 / 22%);
   --flight-glass-edge: var(--colorNeutralStroke1);
@@ -131,7 +135,6 @@
   --flight-conflict: #d92c2c;         /* base */
   --flight-conflict-text: #ffffff;    /* ≈ 4.9:1 */
   --flight-waiting: #d96d0b;          /* base */
-  --flight-outline: #08151b;     /* selected / linked / focus, on light surfaces */
   --flight-link-blocked: #ff2d2d; /* an incompatible swap's link; ≈ 3.6:1, past 3:1 for graphics */
   /*
    * Context bars (dimmed by a selection, view or filter), drawn as disabled
@@ -151,14 +154,12 @@
   .demo-timeline,
   .board-snippet {
     /* Brighter, so the colours read off dark surfaces; the red's pill takes dark text. */
-    --flight-healthy: #93adf4;        /* base */
     --flight-glass-from: rgb(255 255 255 / 10%);
     --flight-glass-to: rgb(255 255 255 / 7%);
     --flight-glass-mark: rgb(255 255 255 / 40%);  /* ≈ 3.7:1 on the dark surface */
     --flight-conflict: #f05252;       /* base */
-    --flight-conflict-text: #08151b;  /* ≈ 5.3:1 */
+    --flight-conflict-text: #091216;  /* ≈ 5.4:1 */
     --flight-waiting: #f08a24;        /* base */
-    --flight-outline: #dff6fa;    /* the HUD's ice white */
     --flight-link-blocked: #ff5252;
   }
 }
@@ -232,18 +233,14 @@
 
 /*
  * An aircraft type's drawing in its bars' middle (theme.tsx, drawingSlot):
- * one colour, the bar's label colour, so on a dimmed bar it takes the
- * dimmed labels' muted colour. It glows a little in that colour, within the
- * room theme.tsx leaves around it (DRAWING_GLOW, 3px).
+ * one colour, the bar's label colour (set there), so it takes its tone's
+ * text colour, and on a dimmed bar the dimmed labels' muted colour. It glows
+ * a little in that colour, within the room theme.tsx leaves around it
+ * (DRAWING_GLOW, 3px).
  */
 .demo-drawing {
   display: block;
-  color: var(--st-text);
   filter: drop-shadow(0 0 3px color-mix(in srgb, currentColor 60%, transparent));
-}
-
-.demo-chart .demo-drawing--dimmed {
-  color: var(--flight-dim-text);
 }
 
 /* Secondary airport codes are normal-size text too. Full opacity keeps

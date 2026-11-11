@@ -55,7 +55,7 @@ import {
   VideoOff20Regular,
 } from "@fluentui/react-icons";
 import { useCallDuration, useSpeaking } from "../agent-call";
-import { gtaaOpal, LiveOrb, skyeOrbStill } from "../orb";
+import { LiveOrb, useSkyeOrbPalette, useSkyeOrbStill } from "../orb";
 import { photoOf } from "../people/photos";
 import { isRinging, useLiveCall } from "../../live";
 import { callGuests, subscribeCallGuests } from "../../live/callGuests";
@@ -433,6 +433,7 @@ function CallAvatars({ agentName, guests, calling }: Pick<CallPanelProps, "agent
   const live = useLiveCall();
   const auth = useCoralAuth();
   const user = auth?.status === "signed-in" ? auth.user : undefined;
+  const skyeOrbStill = useSkyeOrbStill();
   const people: { key: string; name: string; image?: string }[] = [
     ...(live.active ? [{ key: agentName, name: agentName, image: skyeOrbStill }] : []),
     ...[...guests, ...calling].map((name) => ({ key: name, name, image: photoOf(name)?.src })),
@@ -483,6 +484,8 @@ export function CallTiles({
   const auth = useCoralAuth();
   const user = auth?.status === "signed-in" ? auth.user : undefined;
   const ringing = isRinging(live.state);
+  const orbPalette = useSkyeOrbPalette();
+  const orbStill = useSkyeOrbStill();
 
   const { voiceLevel } = live;
   const agentSpeaking = useSpeaking(React.useCallback(() => voiceLevel("agent"), [voiceLevel]));
@@ -500,8 +503,8 @@ export function CallTiles({
               voice={live.remoteStream}
               state={ringing ? "idle" : "thinking"}
               preset="opal"
-              palette={gtaaOpal}
-              still={skyeOrbStill}
+              palette={orbPalette}
+              still={orbStill}
             />
           }
           status={ringing ? "Calling…" : undefined}

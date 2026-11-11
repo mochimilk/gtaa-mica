@@ -5,7 +5,8 @@
 // The rest are a row each, the name on the left and the control on the
 // right: the theme, visual only for now (the app's look follows the system's,
 // in Fluent's tokens and in the prefers-color-scheme rules alike); Glow, the
-// colour of Skye's light while her helpers work (agent-cursor/skyeGlow.ts);
+// app's colour theme, Skye's orb and light with it (theme/glowThemes.ts);
+// Tethers, whether lines join Skye to her helpers (agent-cursor/skyeTethers.ts);
 // Noise, the app's film grain (components/grain); and Reduce effects, the
 // look for slower machines (components/effects). Each choice applies as it is
 // made, behind the overlay.
@@ -25,7 +26,10 @@ import {
   tokens,
 } from "@fluentui/react-components";
 import type { FluentIcon } from "@fluentui/react-icons";
-import { SKYE_GLOWS, setSkyeGlow, useSkyeGlow, type SkyeGlow } from "../agent-cursor";
+import { setSkyeTethers, useSkyeTethers } from "../agent-cursor";
+import { useColorMode } from "../../theme/FluentOverrides";
+import { GLOW_THEMES, SKYE_GLOWS, type SkyeGlow } from "../../theme/glowThemes";
+import { setSkyeGlow, useSkyeGlow } from "../../theme/skyeGlow";
 import { setReduceEffects, useReduceEffects } from "../effects";
 import { setGrain, useGrain } from "../grain";
 import { useOperations } from "../../operations/OperationsContext";
@@ -98,13 +102,14 @@ const useStyles = makeStyles({
     alignItems: "center",
     gap: tokens.spacingHorizontalS,
   },
-  // A glow's own colour (.skye-glow-swatch in agent-cursor.css), whichever is chosen.
+  // A glow's own colour, whichever is chosen (set in GlowName); a hairline
+  // inside, so White and Neon still show on a light list.
   swatch: {
     flexShrink: 0,
     width: "12px",
     height: "12px",
     borderRadius: tokens.borderRadiusSmall,
-    backgroundColor: "rgb(var(--agent-cursor-light))",
+    boxShadow: `inset 0 0 0 ${tokens.strokeWidthThin} ${tokens.colorNeutralStroke1}`,
   },
   cards: {
     display: "flex",
@@ -236,9 +241,10 @@ const TIMELINE_CHOICES: Choice<FlightStyle>[] = (["aero", "classic"] as const).m
 /** A glow's name after a square of its colour. */
 function GlowName({ glow, label }: { glow: SkyeGlow; label: string }) {
   const styles = useStyles();
+  const light = GLOW_THEMES[glow].light[useColorMode()];
   return (
     <span className={styles.glowValue}>
-      <span className={mergeClasses(styles.swatch, "skye-glow-swatch")} data-glow={glow} aria-hidden />
+      <span className={styles.swatch} style={{ backgroundColor: `rgb(${light})` }} aria-hidden />
       {label}
     </span>
   );
@@ -260,6 +266,8 @@ export function AppearanceSettings() {
   const skyeGlow = useSkyeGlow();
   const glowLabel = SKYE_GLOWS.find((g) => g.value === skyeGlow)?.label ?? "";
   const [glowOpen, setGlowOpen] = useState(false);
+  const tethers = useSkyeTethers();
+  const tethersId = useId();
   const grain = useGrain();
   const glowId = useId();
   const noiseId = useId();
@@ -303,7 +311,7 @@ export function AppearanceSettings() {
         <div className={styles.row}>
           <div className={styles.rowText}>
             <Label id={glowId}>Glow</Label>
-            <Caption1 className={styles.description}>Skye's tether and orb colors</Caption1>
+            <Caption1 className={styles.description}>Skye's orb and the app's colors</Caption1>
           </div>
           {/* Inline, so its list sits inside the overlay rather than under its backdrop. */}
           <Dropdown
@@ -324,6 +332,14 @@ export function AppearanceSettings() {
               </Option>
             ))}
           </Dropdown>
+        </div>
+
+        <div className={styles.row}>
+          <div className={styles.rowText}>
+            <Label htmlFor={tethersId}>Tethers</Label>
+            <Caption1 className={styles.description}>Lines from Skye to her echoes</Caption1>
+          </div>
+          <Switch id={tethersId} checked={tethers} onChange={(_, data) => setSkyeTethers(data.checked)} />
         </div>
 
         <div className={styles.row}>

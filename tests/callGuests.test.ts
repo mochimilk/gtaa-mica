@@ -5,10 +5,23 @@ import assert from "node:assert/strict";
 import { afterEach, beforeEach, mock, test } from "node:test";
 import { applyAppAction, validateAppAction } from "../src/live/appActions.ts";
 import { decisionToRequest } from "../src/live/backendInterpreter.ts";
-import { ANSWER_MS, callingNames, endGuestCall, findPerson, guestNames } from "../src/live/callGuests.ts";
+import {
+  ANSWER_MS,
+  callingNames,
+  endGuestCall,
+  farewell,
+  findPerson,
+  GOODBYE_WITHIN_MS,
+  goodbyesSaid,
+  guestNames,
+  inviteToCall,
+  leaveCall,
+  stayForGoodbye,
+  staysForGoodbye,
+} from "../src/live/callGuests.ts";
 import { describeSnapshot } from "../src/live/opsHost.ts";
 import { phraseInterpreter } from "../src/live/requestInterpreter.ts";
-import { createFakeHost } from "./support/mocks.ts";
+import { createFakeHost, flush } from "./support/mocks.ts";
 
 beforeEach(() => mock.timers.enable({ apis: ["setTimeout", "Date"] }));
 afterEach(() => {
@@ -74,6 +87,66 @@ test("taking someone off while they ring stops calling them, and they never join
   mock.timers.tick(ANSWER_MS);
   assert.deepEqual(callingNames(), []);
   assert.deepEqual(guestNames(), []);
+});
+
+test("someone who stays on for the user says goodbye as the call comes to its end, then leaves", async () => {
+  const travis = "Travis Hughes";
+  // Only someone on the call can stay on.
+  stayForGoodbye(travis, async () => undefined);
+  assert.equal(staysForGoodbye(travis), false);
+  inviteToCall(travis);
+  mock.timers.tick(ANSWER_MS);
+  assert.deepEqual(guestNames(), [travis]);
+  // Nobody staying: the call can end at once.
+  await farewell();
+
+  let said = 0;
+  let finish = () => {};
+  stayForGoodbye(travis, () => {
+    said += 1;
+    return new Promise<void>((resolve) => (finish = resolve));
+  });
+  assert.equal(staysForGoodbye(travis), true);
+  let parted = false;
+  void farewell().then(() => (parted = true));
+  // Asked again meanwhile, the same goodbye: said once.
+  void farewell();
+  await flush();
+  assert.equal(said, 1);
+  assert.equal(staysForGoodbye(travis), false);
+  // On the call until he has said it.
+  assert.deepEqual(guestNames(), [travis]);
+  assert.equal(parted, false);
+  finish();
+  await goodbyesSaid();
+  assert.equal(parted, true);
+  assert.deepEqual(guestNames(), []);
+});
+
+test("a goodbye never said takes GOODBYE_WITHIN_MS at most, and someone who leaves first says none", async () => {
+  const travis = "Travis Hughes";
+  inviteToCall(travis);
+  mock.timers.tick(ANSWER_MS);
+  stayForGoodbye(travis, () => new Promise(() => {}));
+  let parted = false;
+  void farewell().then(() => (parted = true));
+  await flush();
+  mock.timers.tick(GOODBYE_WITHIN_MS - 1);
+  await flush();
+  assert.equal(parted, false);
+  mock.timers.tick(1);
+  await flush();
+  assert.equal(parted, true);
+  assert.deepEqual(guestNames(), []);
+
+  inviteToCall(travis);
+  mock.timers.tick(ANSWER_MS);
+  let said = false;
+  stayForGoodbye(travis, async () => void (said = true));
+  leaveCall(travis);
+  assert.equal(staysForGoodbye(travis), false);
+  await farewell();
+  assert.equal(said, false);
 });
 
 test("someone not on the people list is not added, and Skye says who can be", () => {

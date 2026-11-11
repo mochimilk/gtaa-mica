@@ -5,6 +5,9 @@ import "@coral-ai/markdown/styles";
 import App from "./App";
 import { DefaultContextMenu } from "./components/context-menu";
 import { hasDesktopBackdrop } from "./components/title-bar";
+import { FluentOverrides } from "./theme/FluentOverrides";
+import { GLOW_THEMES } from "./theme/glowThemes";
+import { useSkyeGlow } from "./theme/skyeGlow";
 import coralConfig from "../coral.config.json";
 import "./components/cursor/cursor.css";
 import "./components/grain/grain.css";
@@ -32,18 +35,32 @@ function BootSplashDismiss() {
   return null;
 }
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    {/* On Mica, the window paints the body (hasDesktopBackdrop) in place of Coral. */}
+/** Coral's provider, in the brand of the Glow chosen in Settings; none leaves Coral's own. */
+function GlowCoralProvider({ children }: { children: React.ReactNode }) {
+  const color = GLOW_THEMES[useSkyeGlow()].brand;
+  return (
+    // On Mica, the window paints the body (hasDesktopBackdrop) in place of Coral.
     <CoralProvider
       config={coralConfig as CoralConfig}
+      brand={{ color }}
       glow={false}
       bodyBackground={hasDesktopBackdrop() ? "transparent" : undefined}
     >
-      <App />
-      {/* Right-click's Cut, Copy and Paste, wherever the app has no menu of its own; never the browser's. */}
-      <DefaultContextMenu />
-      <BootSplashDismiss />
+      {children}
     </CoralProvider>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <GlowCoralProvider>
+      {/* The app's colours over Coral's theme: src/theme/glowThemes.ts. */}
+      <FluentOverrides>
+        <App />
+        {/* Right-click's Cut, Copy and Paste, wherever the app has no menu of its own; never the browser's. */}
+        <DefaultContextMenu />
+        <BootSplashDismiss />
+      </FluentOverrides>
+    </GlowCoralProvider>
   </React.StrictMode>,
 );

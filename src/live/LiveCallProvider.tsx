@@ -79,6 +79,17 @@ export type LiveCallValue = {
     ended?: (said: string) => boolean,
     context?: string,
   ) => Promise<boolean>;
+  /**
+   * The user's turn to talk to someone else on the call, Skye not listening
+   * meanwhile: resolves whether they spoke, once they have and stopped (see
+   * LiveCallController.hearCaller). `signal` cuts it short.
+   */
+  hearCaller: (signal?: AbortSignal) => Promise<boolean>;
+  /**
+   * Holds what Skye hears off, the user not muted, while what is said is not
+   * for her (LiveCallController.holdInput).
+   */
+  holdInput: (held: boolean) => void;
   /** The teammate speaking on the call, for their tile; null when none is. */
   teammateSpeaking: string | null;
   /** The teammates on the call muted, until they answer; for their tiles. */
@@ -186,6 +197,12 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
   const operations = useOperations();
   const meterRef = React.useRef<VoiceMeter | null>(null);
   if (!meterRef.current) meterRef.current = new VoiceMeter();
+  // The user's voice, for their turn to talk to someone else on the call
+  // (hearCaller): metered on a copy of the microphone, which Skye's hold
+  // (holdInput) does not silence, apart from the meter the background reads.
+  const callerMeterRef = React.useRef<VoiceMeter | null>(null);
+  if (!callerMeterRef.current) callerMeterRef.current = new VoiceMeter();
+  const callerCopyRef = React.useRef<MediaStream | null>(null);
 
   // The executor reads state when it runs, not when it was created, so the
   // host reads through a ref that every render refreshes.
@@ -355,8 +372,16 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
       onLocalStream: (stream) => {
         setLocalStream(stream);
         meterRef.current?.setInput(stream);
+        // The copy is the app's to stop, so the microphone is released with the call.
+        for (const track of callerCopyRef.current?.getTracks() ?? []) track.stop();
+        const copy = stream?.clone() ?? null;
+        // Copied as it is: on, though a mute or hold has the original off.
+        for (const track of copy?.getTracks() ?? []) track.enabled = true;
+        callerCopyRef.current = copy;
+        callerMeterRef.current?.setInput(copy);
       },
       outputLevel: () => meterRef.current?.output() ?? 0,
+      callerLevel: () => callerMeterRef.current?.input() ?? 0,
       onLog: (entry: ExecutorLogEntry) => {
         // A failed gesture is a warning: the change then lands unanimated.
         if (entry.outcome === "gesture_failed") console.warn("[mica-live]", entry.outcome, entry.detail);
@@ -424,7 +449,9 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
   const teammateMuted = React.useSyncExternalStore(teammate.subscribe, teammate.muted);
 
   React.useEffect(() => {
-    if (state.phase === "idle" || state.phase === "failed") meterRef.current?.dispose();
+    if (state.phase !== "idle" && state.phase !== "failed") return;
+    meterRef.current?.dispose();
+    callerMeterRef.current?.dispose();
   }, [state.phase]);
 
   // Hand-made board changes re-sync context (debounced in the executor).
@@ -439,14 +466,18 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
     return () => {
       void controller.hangup();
       meterRef.current?.dispose();
+      callerMeterRef.current?.dispose();
+      for (const track of callerCopyRef.current?.getTracks() ?? []) track.stop();
+      callerCopyRef.current = null;
       if (element) element.srcObject = null;
     };
   }, [controller]);
 
   const startCall = React.useCallback(() => {
     // The existing Call button supplies the gesture; no extra permission or
-    // autoplay flow is introduced. The meter never connects to the speakers.
+    // autoplay flow is introduced. The meters never connect to the speakers.
     meterRef.current?.wake();
+    callerMeterRef.current?.wake();
     void controller.start();
   }, [controller]);
   const hangup = React.useCallback(() => void controller.hangup(), [controller]);
@@ -473,6 +504,8 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
     },
     [controller, teammate],
   );
+  const hearCaller = React.useCallback((signal?: AbortSignal) => controller.hearCaller(signal), [controller]);
+  const holdInput = React.useCallback((held: boolean) => controller.holdInput(held), [controller]);
   const offer = React.useCallback(
     (said: string, proposal: AppAction, cue?: string) => controller.offer(said, proposal, cue),
     [controller],
@@ -513,6 +546,8 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
       speak,
       teammateReady,
       teammateAnswers,
+      hearCaller,
+      holdInput,
       teammateSpeaking,
       teammateMuted,
       offer,
@@ -533,6 +568,8 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
       speak,
       teammateReady,
       teammateAnswers,
+      hearCaller,
+      holdInput,
       teammateSpeaking,
       teammateMuted,
       offer,

@@ -592,6 +592,13 @@
   font-weight: var(--st-font-weight-strong);
 }
 
+.st-ghost-caption {
+  fill: currentColor;
+  font-size: 11px;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
 .st-bar-label--secondary {
   opacity: 0.85;
 }

@@ -18,6 +18,7 @@
 import type { AppAction } from "../live/appActions";
 import type { Expertise } from "../live/callGuests";
 import { describeShift, stayName, flightsAtStay, occupancyById, offBoardStay, stayOfFlight, type Closure, type StayPlace } from "./allocation";
+import type { MaintenanceMove } from "./baggage";
 import { OPS_FLIGHTS_BY_ID } from "./operationsData";
 import { formatUtc } from "../stand-timeline-demo/demoData";
 
@@ -28,7 +29,7 @@ import { formatUtc } from "../stand-timeline-demo/demoData";
  */
 export type OutputStatus = "working" | "pending-approval" | "waiting" | "done" | "undone";
 
-/** One piece changed: a stay moved, placed or taken off its stand, or an area closed or reopened. */
+/** One piece changed: a stay moved, placed or taken off its stand, an area closed or reopened, or a carousel's maintenance moved. */
 export type OutputStep = {
   id: string;
   /** The stay it is, to find on the board; none for an area's closure. */
@@ -42,6 +43,8 @@ export type OutputStep = {
   needs?: { name: string; expertise: Expertise };
   /** Where the stay was before the change and where it is after, for a stay's. */
   move?: { from: StayPlace; to: StayPlace };
+  /** A carousel's maintenance moved, for a piece that is one. */
+  maintenance?: MaintenanceMove;
   /** That teammate, once they have. */
   approvedBy?: string;
 };

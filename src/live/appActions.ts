@@ -1104,22 +1104,19 @@ function applyAction(action: AppAction, host: OperationsHost): ApplyResult {
           mutated: false,
         };
       }
-      // Short, so Skye gets to the approval quickly: what moved is on the
-      // board and in Outputs, so it is counted, not listed.
+      // One sentence, so Skye gets to the approval quickly: what moved is on
+      // the board and in Outputs, so it is counted, not listed.
       const impact = impactNow();
-      const moved =
-        landed.length === 1
-          ? `${stayLabel(landed[0].occupancyId)} has a new stand`
-          : `we've given the ${landed.length} flights behind it new stands`;
+      const moved = landed.length === 1 ? `${stayLabel(landed[0].occupancyId)} moves` : `${landed.length} flights move`;
       const figures =
         impact && impact.gateHold.before !== impact.gateHold.after
-          ? ` Gate hold is down from ${formatHold(impact.gateHold.before)} to ${formatHold(impact.gateHold.after)}.`
+          ? `, so gate hold is down from ${formatHold(impact.gateHold.before)} to ${formatHold(impact.gateHold.after)}`
           : "";
       const stuck =
         action.stuck.length > 0 ? ` ${listWords(action.stuck.map(stayLabel))} still ${action.stuck.length === 1 ? "has" : "have"} no stand that fits.` : "";
       return {
         ok: true,
-        spoken: `Done: ${lateName} keeps ${late?.rowId ?? "its stand"}, and ${moved}.${figures}${stuck}`,
+        spoken: `Done: ${lateName} keeps ${late?.rowId ?? "its stand"} and ${moved}${figures}.${stuck}`,
         mutated: true,
       };
     }

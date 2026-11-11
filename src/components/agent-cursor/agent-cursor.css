@@ -1,21 +1,19 @@
 /*
- * Skye's cursor: a small dark dot with a white outline (a white dot with a
- * dark outline in dark mode), softly glowing. It starts as the orb's
- * thinking dots in the Ask pill, which pull together into the one dot on its
- * way out, and it grows back into the orb when it returns. While its helpers
- * work, it is a live orb itself, the pill orb's size, in the skye's glow, and
- * they are small orbs of its light. Left idle, its name tag dims and the dot breathes, easing smaller and back.
- * The element's origin is the click point; the dot is centred on it.
+ * Skye on screen: her orb, out of the dock, the size it is there. It pops out
+ * of her place in the Ask pill and fades back into it when it returns. While
+ * her helpers work, it glows in their light, with a ring round it, and they
+ * are small orbs of that light, her echoes. Left idle, her name tag dims and
+ * the orb breathes, easing smaller and back. The element's origin is the click
+ * point; the orb is centred on it.
  *
- * The dot is never scaled. Each state sets its diameter (--agent-cursor-dot),
- * which the dot's vector circles follow, so it resizes smoothly, at
- * sub-pixel sizes, and its ring stays --agent-cursor-outline wide.
+ * An echo is never scaled. Each state sets its diameter (--agent-cursor-dot),
+ * so it resizes smoothly, at sub-pixel sizes.
  *
  * The layer is portalled to <body>, outside Fluent's theme provider, so it
  * follows the system colour scheme, as the chart does (see demo.css).
  */
 
-/* Registered, so it animates as a length; the circles' radii follow it. */
+/* Registered, so it animates as a length. */
 @property --agent-cursor-dot {
   syntax: "<length>";
   inherits: true;
@@ -28,21 +26,6 @@
   /* The tag's text, on the fill colour. */
   --agent-cursor-ink: #ffffff;
   --agent-cursor-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
-  /* A soft white glow round the dot (x 0, y 0, blur 12, spread 2). */
-  --agent-cursor-glow: 0 0 12px 2px #ffffff;
-  /* The dot's fill at rest; the outline ring sits outside it, 1px all round (10px in all). */
-  --agent-cursor-size: 8px;
-  --agent-cursor-outline: 1px;
-  /* The orb in the Ask pill (see AskInput), which the cursor grows back into. */
-  --agent-cursor-orb-size: 32px;
-  /*
-   * The dot under the orb it becomes while its helpers work (setOrb): that
-   * orb is 32px, as the pill's is, and draws its ball 29px across, so the
-   * dot, 26px with its ring, stays out of sight beneath it.
-   */
-  --agent-cursor-lead-dot: 24px;
-  /* One of the orb's thinking dots: r 3 in StepStatusIcon's 20px box (the script scales it to the spinner's size). */
-  --agent-cursor-swarm-size: 6px;
   --agent-cursor-morph: 360ms cubic-bezier(0.2, 0, 0, 1);
 
   position: fixed;
@@ -72,60 +55,11 @@
 }
 
 /*
- * The colour of everything that glows while Skye's helpers work (her orb's
- * glow and the ring round it, the helpers, the tethers and the light along
- * them), as channels; change it here. By default it is ink, the dot's own
- * black, white over a dark page; Glow in Settings (skyeGlow.ts) picks
- * another (below). Each choice's swatch there (components/settings) shows
- * its own, whichever is chosen.
+ * --agent-cursor-light, used below, is the colour of everything that glows
+ * while Skye's helpers work (her orb's glow and the ring round it, the helpers,
+ * the tethers and the light along them), as channels. It comes from the Glow
+ * chosen in Settings, set on the root (theme/glowThemes.ts).
  */
-.agent-cursor-layer,
-.skye-glow-swatch {
-  --agent-cursor-light: 27, 27, 31;
-}
-
-@media (prefers-color-scheme: dark) {
-  .agent-cursor-layer,
-  .skye-glow-swatch {
-    --agent-cursor-light: 255, 255, 255;
-  }
-}
-
-/*
- * The other Skye glows (skyeGlow.ts): Aurora, the northern lights' blue-violet;
- * Seafoam, a bright sea-green; Iris, a soft sky blue.
- */
-:root[data-skye-glow="aurora"] .agent-cursor-layer,
-.skye-glow-swatch[data-glow="aurora"] {
-  --agent-cursor-light: 92, 64, 224;
-}
-
-:root[data-skye-glow="seafoam"] .agent-cursor-layer,
-.skye-glow-swatch[data-glow="seafoam"] {
-  --agent-cursor-light: 0, 155, 125;
-}
-
-:root[data-skye-glow="iris"] .agent-cursor-layer,
-.skye-glow-swatch[data-glow="iris"] {
-  --agent-cursor-light: 66, 150, 235;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root[data-skye-glow="aurora"] .agent-cursor-layer,
-  .skye-glow-swatch[data-glow="aurora"] {
-    --agent-cursor-light: 156, 136, 255;
-  }
-
-  :root[data-skye-glow="seafoam"] .agent-cursor-layer,
-  .skye-glow-swatch[data-glow="seafoam"] {
-    --agent-cursor-light: 80, 240, 190;
-  }
-
-  :root[data-skye-glow="iris"] .agent-cursor-layer,
-  .skye-glow-swatch[data-glow="iris"] {
-    --agent-cursor-light: 140, 200, 255;
-  }
-}
 
 /* Only its position is promoted: promoting opacity too would cut the tag's frosting off from the page behind. */
 .agent-cursor {
@@ -141,7 +75,7 @@
   opacity: 1;
 }
 
-/* A fixed square centred on the click point; what is inside it sizes itself by --agent-cursor-dot. */
+/* A fixed square centred on the click point; an echo inside it sizes itself by --agent-cursor-dot. */
 .agent-cursor-body {
   --agent-cursor-target: var(--agent-cursor-size);
   --agent-cursor-dot: var(--agent-cursor-target);
@@ -153,98 +87,55 @@
   transition: --agent-cursor-dot 120ms ease-out;
 }
 
-/* Dot and ring together, centred in the square. */
-.agent-cursor-glow,
-.agent-cursor-opal {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: calc(var(--agent-cursor-dot) + 2 * var(--agent-cursor-outline));
-  height: calc(var(--agent-cursor-dot) + 2 * var(--agent-cursor-outline));
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-}
-
-/* The glow, behind the dot; it gives way to the orb's own as the dot grows into it. */
-.agent-cursor-glow {
-  box-shadow: var(--agent-cursor-glow);
-  transition: box-shadow var(--agent-cursor-morph);
-}
-
-.agent-cursor[data-morph] .agent-cursor-glow {
-  box-shadow: 0 0 12px 2px transparent;
-}
-
-.agent-cursor-dot {
-  position: absolute;
-  inset: 0;
-  overflow: visible;
-  filter: drop-shadow(var(--agent-cursor-shadow));
-}
-
-.agent-cursor-dot-fill {
-  r: calc(var(--agent-cursor-dot) / 2);
-  fill: var(--agent-cursor-fill);
-}
-
-/* Centred on the fill's edge plus half its width, so it lies just outside the fill. */
-.agent-cursor-dot-ring {
-  r: calc(var(--agent-cursor-dot) / 2 + var(--agent-cursor-outline) / 2);
-  fill: none;
-  stroke: var(--agent-cursor-ring);
-  stroke-width: var(--agent-cursor-outline);
-}
-
-/* Over something clickable the dot swells a little, as a touch pointer does. */
+/* Over something clickable an echo swells a little, as a touch pointer does. */
 .agent-cursor[data-variant="hand"] .agent-cursor-body {
   --agent-cursor-target: calc(var(--agent-cursor-size) + 3px);
 }
 
-/* Pressing: the dot dips, as it does under a finger. */
+/* Pressing: it dips, as under a finger. */
 .agent-cursor[data-pressed] .agent-cursor-body {
   --agent-cursor-target: calc(var(--agent-cursor-size) - 2px);
 }
 
-/* A helper merging back into Skye's dot: it shrinks away as it fades. */
+/* An echo merging back into Skye's orb: it shrinks away as it fades. */
 .agent-cursor[data-merge] .agent-cursor-body {
   --agent-cursor-target: 0px;
   transition: --agent-cursor-dot 180ms ease-in;
 }
 
-/*
- * An orb while its helpers work (setOrb): the orb grows out of the dot, which
- * swells beneath it, and shrinks back into it after. The dot's glow gives way
- * to the skye's. The orb's renderer runs only meanwhile.
- */
-.agent-cursor[data-orb] .agent-cursor-body {
-  --agent-cursor-target: var(--agent-cursor-lead-dot);
-  transition: --agent-cursor-dot var(--agent-cursor-morph);
-}
-
-.agent-cursor[data-orb] .agent-cursor-glow {
-  box-shadow: 0 0 12px 2px transparent;
-}
-
+/* Skye's orb, which dips as it presses. */
 .agent-cursor-orb {
   position: absolute;
   left: 50%;
   top: 50%;
   display: flex;
   translate: -50% -50%;
-  scale: 0.4;
-  opacity: 0;
-  /* Shrinking back; matches cursorMotion's ORB_SHRINK_MS. */
-  transition:
-    scale 200ms ease-in,
-    opacity 200ms ease-in;
+  transition: scale 120ms ease-out;
 }
 
-.agent-cursor[data-orb] .agent-cursor-orb {
-  scale: 1;
-  opacity: 1;
-  transition:
-    scale var(--agent-cursor-morph),
-    opacity var(--agent-cursor-morph);
+.agent-cursor[data-pressed] .agent-cursor-orb {
+  scale: 0.88;
+}
+
+/*
+ * Popping out of the dock: it swells and settles, from where the dock's orb
+ * was, or from smaller when it grows out of the thinking dots (see leaveHome,
+ * which sets where from). Matches cursorMotion's POP_MS.
+ */
+@keyframes agent-cursor-orb-pop {
+  from {
+    scale: var(--agent-cursor-pop-from, 1);
+  }
+  55% {
+    scale: 1.2;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+.agent-cursor[data-launch] .agent-cursor-orb {
+  animation: agent-cursor-orb-pop 320ms cubic-bezier(0.2, 0, 0.2, 1) both;
 }
 
 /*
@@ -252,8 +143,8 @@
  * (--agent-cursor-light), turned outward round the ball as the light along
  * the bottom of the screen (VoiceSkye) rises from its edge: a fine bright
  * line round the ball, then the glow, widest of all, leaning to one side as
- * the skye's crest does and swinging slowly round. It comes up once the orb
- * has formed, and breathes as the skye does while Skye works.
+ * the skye's crest does and swinging slowly round. It comes up as they set
+ * off, and breathes as the skye does while Skye works.
  */
 .agent-cursor-skye {
   position: absolute;
@@ -268,7 +159,7 @@
   transition: opacity 200ms ease-in;
 }
 
-.agent-cursor[data-orb] .agent-cursor-skye {
+.agent-cursor[data-directing] .agent-cursor-skye {
   opacity: 1;
   transition: opacity 480ms ease-out 160ms;
 }
@@ -298,15 +189,15 @@
 
 /* The skye's breath while Skye works: one every 2.4s. */
 @media (prefers-reduced-motion: no-preference) {
-  .agent-cursor[data-orb] .agent-cursor-skye {
+  .agent-cursor[data-directing] .agent-cursor-skye {
     animation: agent-cursor-skye-swell 1.2s ease-in-out infinite alternate;
   }
 
-  .agent-cursor[data-orb] .agent-cursor-skye::before {
+  .agent-cursor[data-directing] .agent-cursor-skye::before {
     animation: agent-cursor-skye-turn 7.4s linear infinite;
   }
 
-  .agent-cursor[data-orb] .agent-cursor-skye::after {
+  .agent-cursor[data-directing] .agent-cursor-skye::after {
     animation: agent-cursor-skye-brighten 1.2s ease-in-out infinite alternate;
   }
 }
@@ -335,8 +226,9 @@
  * agentSwarm.ts), after the HUD rings in reference art. A thin track; the
  * bar along it from the top, clockwise, in the light (--agent-cursor-light); a
  * notch just outside marking how far it has come; and a dotted orbit round
- * it all, creeping slowly round. The track draws itself round as the orb
- * forms. The circles' lengths come from the script, for their dashes.
+ * it all, creeping slowly round. It grows out from the orb as they set off, the
+ * track drawing itself round, and shrinks back into it after. The circles'
+ * lengths come from the script, for their dashes.
  */
 @property --agent-cursor-progress {
   syntax: "<number>";
@@ -350,7 +242,21 @@
   top: 50%;
   translate: -50% -50%;
   overflow: visible;
-  transition: --agent-cursor-progress 480ms cubic-bezier(0.2, 0, 0, 1);
+  scale: 0.4;
+  opacity: 0;
+  transition:
+    --agent-cursor-progress 480ms cubic-bezier(0.2, 0, 0, 1),
+    scale 200ms ease-in,
+    opacity 200ms ease-in;
+}
+
+.agent-cursor[data-directing] .agent-cursor-aura {
+  scale: 1;
+  opacity: 1;
+  transition:
+    --agent-cursor-progress 480ms cubic-bezier(0.2, 0, 0, 1),
+    scale var(--agent-cursor-morph),
+    opacity var(--agent-cursor-morph);
 }
 
 .agent-cursor-aura circle {
@@ -389,11 +295,11 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .agent-cursor[data-orb] .agent-cursor-aura-track {
+  .agent-cursor[data-directing] .agent-cursor-aura-track {
     animation: agent-cursor-aura-draw 720ms cubic-bezier(0.2, 0, 0, 1) 120ms both;
   }
 
-  .agent-cursor[data-orb] .agent-cursor-aura-orbit {
+  .agent-cursor[data-directing] .agent-cursor-aura-orbit {
     animation: agent-cursor-aura-creep 1.2s linear infinite;
   }
 }
@@ -412,10 +318,9 @@
 
 /*
  * Skye's helpers (her echoes) are orbs of her light (--agent-cursor-light),
- * as the light along her tethers is, a little bigger than the dot, in a
- * soft bloom breathing as Skye's orb does. They size by --agent-cursor-dot,
- * so they dip as they press and shrink away as they merge back, as the dot
- * does.
+ * as the light along her tethers is, in a soft bloom breathing as Skye's orb
+ * does. They size by --agent-cursor-dot, so they dip as they press and shrink
+ * away as they merge back.
  */
 .agent-cursor[data-helper] {
   --agent-cursor-size: 10px;
@@ -456,15 +361,9 @@
   }
 }
 
-/* Back into the orb: dot and ring grow to the orb's size, the opal covering them. */
-.agent-cursor[data-morph] .agent-cursor-body {
-  --agent-cursor-target: calc(var(--agent-cursor-orb-size) - 2 * var(--agent-cursor-outline));
-  transition: --agent-cursor-dot var(--agent-cursor-morph);
-}
-
 /*
- * At rest: the name tag dims to half, slowly, and the dot breathes, easing a little
- * smaller and back to its size, ring unchanged. It wakes at the next gesture.
+ * At rest: the name tag dims to half, slowly, and the orb, or an echo, breathes,
+ * easing a little smaller and back to its size. It wakes at the next gesture.
  * With reduced motion it just rests.
  */
 .agent-cursor[data-idle] .agent-cursor-tag {
@@ -475,6 +374,10 @@
 @media (prefers-reduced-motion: no-preference) {
   .agent-cursor[data-idle] .agent-cursor-body {
     animation: agent-cursor-breathe 3.2s ease-in-out infinite;
+  }
+
+  .agent-cursor[data-idle] .agent-cursor-orb {
+    animation: agent-cursor-orb-breathe 3.2s ease-in-out infinite;
   }
 }
 
@@ -488,59 +391,19 @@
   }
 }
 
-/*
- * The thinking dots, while the cursor takes off from the orb. The script
- * moves each one and sets the group's opacity (see `leaveHome`), and fades
- * the dot in as they merge. Their fill is the spinner's own, so the
- * hand-over shows no seam.
- */
-.agent-cursor-swarm {
-  display: none;
-  position: absolute;
-  left: 0;
-  top: 0;
+@keyframes agent-cursor-orb-breathe {
+  50% {
+    scale: 0.92;
+  }
 }
 
-.agent-cursor[data-launch] .agent-cursor-swarm {
-  display: block;
-}
-
-.agent-cursor-swarm > span {
-  position: absolute;
-  left: calc(var(--agent-cursor-swarm-size) / -2);
-  top: calc(var(--agent-cursor-swarm-size) / -2);
-  width: var(--agent-cursor-swarm-size);
-  height: var(--agent-cursor-swarm-size);
-  border-radius: 50%;
-  background: var(--agent-cursor-swarm-fill, var(--agent-cursor-fill));
-  will-change: transform;
-}
-
+/* Her tag comes up as she sets off from the dock, and goes as she settles back. */
 .agent-cursor[data-launch] .agent-cursor-tag {
   opacity: 0;
 }
 
-/* The orb's opal, over the dot while it is still the orb. */
-.agent-cursor-opal {
-  background:
-    radial-gradient(circle at 34% 30%, rgba(255, 255, 255, 0.95) 0 12%, rgba(255, 255, 255, 0) 42%),
-    conic-gradient(from 210deg, #b2cdfb, #bbeff7, #a7a4ea, #0f6fff, #b2cdfb);
-  box-shadow: 0 0 10px 2px rgba(15, 111, 255, 0.45);
-  opacity: 0;
-  transition: opacity var(--agent-cursor-morph);
-}
-
-.agent-cursor[data-morph] .agent-cursor-opal {
-  opacity: 1;
-}
-
-/* Placed in its starting state at once, before the morph animates out of it. */
+/* Placed at once, not faded in, popping out of the dock over where its orb was. */
 .agent-cursor[data-snap],
-.agent-cursor[data-snap] .agent-cursor-body,
-.agent-cursor[data-snap] .agent-cursor-glow,
-.agent-cursor[data-snap] .agent-cursor-opal,
-.agent-cursor[data-snap] .agent-cursor-orb,
-.agent-cursor[data-snap] .agent-cursor-skye,
 .agent-cursor[data-snap] .agent-cursor-tag {
   transition: none;
 }
@@ -568,12 +431,21 @@
     translate var(--agent-cursor-morph);
 }
 
-/* Stepped out round the orb and its aura, which are wider than the dot, clear of the aura's orbit. */
-.agent-cursor[data-orb] .agent-cursor-tag {
+/* Beside Skye's orb, clear of it. */
+.agent-cursor:not([data-helper]) .agent-cursor-tag {
+  translate: 10px 0;
+}
+
+.agent-cursor:not([data-helper])[data-tag-left] .agent-cursor-tag {
+  translate: -10px 0;
+}
+
+/* Stepped out round the aura, clear of its orbit. */
+.agent-cursor[data-directing] .agent-cursor-tag {
   translate: 13px 13px;
 }
 
-.agent-cursor[data-orb][data-tag-left] .agent-cursor-tag {
+.agent-cursor[data-directing][data-tag-left] .agent-cursor-tag {
   translate: -13px 13px;
 }
 
@@ -582,7 +454,12 @@
   display: none;
 }
 
-.agent-cursor[data-morph] .agent-cursor-tag {
+/* Pointing at something closely (setTagless), the tag would sit over it. */
+.agent-cursor[data-tagless] .agent-cursor-tag {
+  display: none;
+}
+
+.agent-cursor[data-docking] .agent-cursor-tag {
   opacity: 0;
 }
 
@@ -628,8 +505,8 @@
 }
 
 /*
- * The click: a ring that spreads from the click point and fades. It grows by
- * size, not scale, so its stroke stays 2px.
+ * The click: a ring that spreads from Skye's orb, from just round its rim, and
+ * fades. It grows by size, not scale, so its stroke stays 2px.
  */
 .agent-cursor-ripple {
   position: absolute;
@@ -649,13 +526,27 @@
   border: 2px solid var(--agent-cursor-fill);
   box-shadow: 0 0 0 1px var(--agent-cursor-ring);
   transform: translate(-50%, -50%);
-  animation: agent-cursor-ripple 450ms ease-out forwards;
+  animation: agent-cursor-ripple-orb 450ms ease-out forwards;
 }
 
-/* A helper's click (its ripple follows it in the layer) is a ring of its light. */
+/* A helper's click (its ripple follows it in the layer) is a ring of its light, from its own smaller size. */
 .agent-cursor[data-helper] ~ .agent-cursor-ripple::after {
   border: 1.5px solid rgb(var(--agent-cursor-light));
   box-shadow: 0 0 4px rgba(var(--agent-cursor-light), 0.5);
+  animation-name: agent-cursor-ripple;
+}
+
+@keyframes agent-cursor-ripple-orb {
+  from {
+    opacity: 0.9;
+    width: 34px;
+    height: 34px;
+  }
+  to {
+    opacity: 0;
+    width: 68px;
+    height: 68px;
+  }
 }
 
 @keyframes agent-cursor-ripple {
@@ -689,6 +580,11 @@
   z-index: 2147482999;
   opacity: 0;
   transition: opacity 240ms ease-out;
+}
+
+/* Tethers off in Settings (skyeTethers.ts), the default: the helpers are orbs alone. */
+:root:not([data-skye-tethers]) .agent-tether-layer {
+  display: none;
 }
 
 .agent-tether-layer[data-visible] {

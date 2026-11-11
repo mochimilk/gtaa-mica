@@ -1,4 +1,4 @@
-import { memo } from "react";
+import { memo, type CSSProperties } from "react";
 import { GRID, type Pixels } from "./drawings";
 
 /**
@@ -37,6 +37,8 @@ export interface PixelArtProps {
   /** Its width and height, px; from crispSize, to keep every pixel crisp. */
   size: number;
   className?: string;
+  /** E.g. its `color`, where that differs bar to bar. */
+  style?: CSSProperties;
 }
 
 /**
@@ -45,10 +47,11 @@ export interface PixelArtProps {
  * one path (a board shows a hundred of these). Decorative; where it matters,
  * the text beside it names what it belongs to.
  */
-export const PixelArt = memo(function PixelArt({ pixels, size, className }: PixelArtProps) {
+export const PixelArt = memo(function PixelArt({ pixels, size, className, style }: PixelArtProps) {
   return (
     <svg
       className={className}
+      style={style}
       width={size}
       height={size}
       viewBox={`0 0 ${GRID} ${GRID}`}
