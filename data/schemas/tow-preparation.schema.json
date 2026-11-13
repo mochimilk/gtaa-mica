@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:tow-preparation:1.0.0",
+  "title": "Capacity pressure and provisional tow alternatives",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "airport_id", "demand_id", "profile", "baseline", "baseline_analysis", "excluded_segment_ids", "visit_assessments", "proposals", "selection", "solver_ready", "findings"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "airport_id": { "$ref": "#/definitions/id" },
+    "demand_id": { "$ref": "#/definitions/id" },
+    "profile": { "$ref": "urn:gtaa-mica:tow-profile:1.0.0" },
+    "baseline": { "$ref": "urn:gtaa-mica:occupancy:1.0.0" },
+    "baseline_analysis": { "$ref": "#/definitions/analysis" },
+    "excluded_segment_ids": { "$ref": "#/definitions/ids" },
+    "visit_assessments": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["visit_id", "reason"],
+        "properties": {
+          "visit_id": { "$ref": "#/definitions/id" },
+          "reason": { "enum": ["blocked-source", "single-leg-boundary-unresolved", "preserve-supplied-movements", "no-reliable-occupancy", "insufficient-parking-window", "proposal-generated"] }
+        }
+      }
+    },
+    "proposals": { "type": "array", "items": { "$ref": "#/definitions/proposal" } },
+    "selection": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "selected_proposal_ids", "generated_movement_count", "steps", "rejected", "analysis"],
+      "properties": {
+        "status": { "const": "provisional-review" },
+        "selected_proposal_ids": { "$ref": "#/definitions/ids" },
+        "generated_movement_count": { "type": "integer", "minimum": 0, "multipleOf": 2 },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["proposal_id", "estimated_relief_minutes", "net_benefit_minutes", "before_shortfall_ms", "after_shortfall_ms"],
+            "properties": {
+              "proposal_id": { "$ref": "#/definitions/id" },
+              "estimated_relief_minutes": { "type": "number", "exclusiveMinimum": 0 },
+              "net_benefit_minutes": { "type": "number", "exclusiveMinimum": 0 },
+              "before_shortfall_ms": { "$ref": "#/definitions/count" },
+              "after_shortfall_ms": { "$ref": "#/definitions/count" }
+            }
+          }
+        },
+        "rejected": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["proposal_id", "estimated_relief_minutes", "net_benefit_minutes", "reason"],
+            "properties": {
+              "proposal_id": { "$ref": "#/definitions/id" },
+              "estimated_relief_minutes": { "type": "number" },
+              "net_benefit_minutes": { "type": "number" },
+              "reason": { "enum": ["no-compatible-alternative-stand", "no-marginal-shortfall-relief", "below-cost-or-benefit-threshold", "movement-budget"] }
+            }
+          }
+        },
+        "analysis": { "$ref": "#/definitions/analysis" }
+      }
+    },
+    "solver_ready": { "const": false },
+    "findings": {
+      "type": "array",
+      "items": { "$ref": "urn:gtaa-mica:occupancy:1.0.0#/properties/findings/items" }
+    }
+  },
+  "definitions": {
+    "id": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/id" },
+    "ids": { "$ref": "urn:gtaa-mica:linked-demand:2.0.0#/definitions/ids" },
+    "instant": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/instant" },
+    "count": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+    "flight": {
+      "type": "object", "additionalProperties": false, "required": ["sectorId", "operatingAirlineId"],
+      "properties": { "sectorId": { "$ref": "#/definitions/id" }, "operatingAirlineId": { "$ref": "#/definitions/id" } }
+    },
+    "demand": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "aircraft_id", "aircraft_registration", "source_segment_id", "operating_airline_ids", "start", "end", "role", "timing_basis", "stand_kind"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "aircraft_id": { "$ref": "#/definitions/id" },
+        "aircraft_registration": { "$ref": "#/definitions/id" },
+        "source_segment_id": { "$ref": "#/definitions/id" },
+        "visit_id": { "$ref": "#/definitions/id" },
+        "stand_id": { "$ref": "#/definitions/id" },
+        "operating_airline_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } },
+        "arrival": { "$ref": "#/definitions/flight" },
+        "departure": { "$ref": "#/definitions/flight" },
+        "start": { "$ref": "#/definitions/instant" },
+        "end": { "$ref": "#/definitions/instant" },
+        "role": { "enum": ["service", "parking"] },
+        "timing_basis": { "enum": ["fixed", "minimum-service", "proposed"] },
+        "stand_kind": { "enum": ["any", "non-contact"] },
+        "candidate_stand_ids": { "$ref": "#/definitions/ids" },
+        "excluded_stands": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["stand_id", "reasons"],
+            "properties": { "stand_id": { "$ref": "#/definitions/id" }, "reasons": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } } }
+          }
+        }
+      }
+    },
+    "analysis": {
+      "type": "object", "additionalProperties": false,
+      "required": ["method", "total_shortfall_ms", "shortfall_minutes", "demands", "scarcity_order", "pressure_slices", "limitations"],
+      "properties": {
+        "method": { "const": "event-sliced-bipartite-relaxation" },
+        "total_shortfall_ms": { "$ref": "#/definitions/count" },
+        "shortfall_minutes": { "type": "number", "minimum": 0 },
+        "demands": {
+          "type": "array",
+          "items": { "allOf": [{ "$ref": "#/definitions/demand" }], "required": ["candidate_stand_ids", "excluded_stands"], "type": "object" }
+        },
+        "scarcity_order": { "$ref": "#/definitions/ids" },
+        "pressure_slices": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["start", "end", "active_demand_ids", "shortfall", "matched_count", "unmatched_demand_ids", "constrained_pool_demand_ids", "constrained_pool_stand_ids"],
+            "properties": {
+              "start": { "$ref": "#/definitions/instant" },
+              "end": { "$ref": "#/definitions/instant" },
+              "active_demand_ids": { "$ref": "#/definitions/ids" },
+              "shortfall": { "type": "integer", "minimum": 1 },
+              "matched_count": { "$ref": "#/definitions/count" },
+              "unmatched_demand_ids": { "$ref": "#/definitions/ids" },
+              "constrained_pool_demand_ids": { "$ref": "#/definitions/ids" },
+              "constrained_pool_stand_ids": { "$ref": "#/definitions/ids" }
+            }
+          }
+        },
+        "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "proposal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "visit_id", "baseline_demand_id", "demands", "parking_minutes", "tow_window", "movements", "unassignable_demand_ids", "peak_exposure", "competing_demand_ids", "estimated_relief_minutes", "net_benefit_minutes", "movement_cost_minutes", "rationale", "rank"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "visit_id": { "$ref": "#/definitions/id" },
+        "baseline_demand_id": { "$ref": "#/definitions/id" },
+        "demands": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/definitions/demand" } },
+        "parking_minutes": { "type": "number", "exclusiveMinimum": 0 },
+        "tow_window": { "$ref": "urn:gtaa-mica:linked-demand:2.0.0#/definitions/window" },
+        "movements": {
+          "type": "array", "minItems": 2, "maxItems": 2,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "from_demand_id", "to_demand_id", "scheduled_off_block", "scheduled_on_block"],
+            "properties": {
+              "id": { "$ref": "#/definitions/id" },
+              "from_demand_id": { "$ref": "#/definitions/id" },
+              "to_demand_id": { "$ref": "#/definitions/id" },
+              "scheduled_off_block": { "$ref": "#/definitions/instant" },
+              "scheduled_on_block": { "$ref": "#/definitions/instant" }
+            }
+          }
+        },
+        "unassignable_demand_ids": { "$ref": "#/definitions/ids" },
+        "peak_exposure": { "type": "number", "minimum": 0 },
+        "competing_demand_ids": { "$ref": "#/definitions/ids" },
+        "estimated_relief_minutes": { "type": "number" },
+        "net_benefit_minutes": { "type": "number" },
+        "movement_cost_minutes": { "type": "number", "exclusiveMinimum": 0 },
+        "rationale": { "enum": ["no-compatible-alternative-stand", "repair-incompatible-continuous-stay", "relieve-shared-stand-pool"] },
+        "rank": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

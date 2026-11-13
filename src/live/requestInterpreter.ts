@@ -26,7 +26,7 @@ import { currentAlerts } from "../operations/boardAlerts.ts";
 import { disruptionState } from "../operations/disruption.ts";
 import { OPS_FLIGHTS, OPS_FLIGHTS_BY_ID, standMinutes, type OpsFlight } from "../operations/operationsData.ts";
 import { FILTER_OPTIONS, UNASSIGNED_AREA, VIEWS, type FilterDim, type ViewKey } from "../operations/opsFilters.ts";
-import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture.ts";
+import { ACTIVE_DATASET } from "../operations/activeDataset.ts";
 import { validateAppAction, type AppAction } from "./appActions.ts";
 import { PEOPLE } from "./callGuests.ts";
 import type { OpsSnapshot } from "./opsHost.ts";
@@ -139,7 +139,7 @@ const listPeople = () => (PEOPLE.length <= 1 ? (PEOPLE[0] ?? "") : `${PEOPLE.sli
 
 /** Stands named in the utterance, matched as whole words ("to c25"). */
 function mentionedStands(normalized: string): string[] {
-  return SYNTHETIC_STANDS.map((stand) => stand.code).filter((code) =>
+  return ACTIVE_DATASET.stands.map((stand) => stand.code).filter((code) =>
     new RegExp(`\\b${code.toLowerCase()}\\b`).test(normalized),
   );
 }
@@ -343,7 +343,9 @@ function longestStay(longest: boolean): OpsFlight | null {
 /** Wraps validation so an interpreter can never emit an unvalidated action. */
 function action(name: string, args: Record<string, unknown> = {}): InterpretedRequest {
   const result = validateAppAction(name, args);
-  if (!result.ok) return { kind: "unclear", hint: result.message };
+  if (!result.ok) return result.code === "read_only_source" || result.code === "unsupported_analysis"
+    ? { kind: "unsupported", reason: result.message }
+    : { kind: "unclear", hint: result.message };
   return { kind: "action", action: result.action };
 }
 
@@ -361,6 +363,12 @@ function interpretPhrase(
   const normalized = normalize(utterance);
   const squashed = squash(utterance);
   if (normalized.length === 0) return { kind: "unclear", hint: "I did not catch that." };
+  if (!ACTIVE_DATASET.capabilities.fixtureAnalyses && EXPLAIN_CUE.test(normalized)) return action("explain_plan");
+  if (!ACTIVE_DATASET.capabilities.editStands &&
+      (MOVE_CUE.test(normalized) || SWAP_CUE.test(normalized) || UNASSIGN_CUE.test(normalized) ||
+       ASSIGN_CUE.test(normalized) || (SUGGEST_CUE.test(normalized) && STAND_CHANGE_CUE.test(normalized)))) {
+    return action("move_stay");
+  }
 
   // 0. Stand changes. A yes carries out the move or swap just suggested, and
   //    nothing else: a suggestion is never acted on without one.
@@ -644,6 +652,9 @@ export function withDemoShortcuts(inner: RequestInterpreter): RequestInterpreter
 
 /** The spoken vocabulary hint used when a request cannot be interpreted. */
 export const SUPPORTED_REQUEST_SUMMARY =
+  !ACTIVE_DATASET.capabilities.editStands
+    ? "This is a read-only synthetic schedule. Mica can select flights, change views and filters, describe selections and report prepared schedule facts. Stand changes and fixture-only analyses are unavailable."
+    :
   `Mica's voice control can select a flight by number, or several together, move a stay to another stand or swap two, ` +
   `give a stand to flights that have none or take a flight off its stand, ` +
   `close a stand area for a while and move everything on it elsewhere (for example "Pier B is closed from 9 to 1"), ` +

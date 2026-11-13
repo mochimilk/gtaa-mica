@@ -18,6 +18,7 @@ import {
 import type { Closure, DropPlan, StandAssign } from "../operations/allocation.ts";
 import type { AppAction, SelectionMode } from "./appActions.ts";
 import { callingNames, guestNames } from "./callGuests.ts";
+import { ACTIVE_DATASET } from "../operations/activeDataset.ts";
 
 /** A flight the current selection refers to, already validated. */
 export type SelectedFlightRef = {
@@ -240,6 +241,9 @@ export function buildSnapshot(input: {
  */
 export function describeSnapshot(snapshot: OpsSnapshot): string {
   const parts: string[] = [`Mica board, synthetic data. View: ${snapshot.viewLabel}.`];
+  if (!ACTIVE_DATASET.capabilities.editStands) {
+    parts.push(`Source ${ACTIVE_DATASET.airportId}; read-only scheduled UTC. No fixture analyses or operational certification.`);
+  }
 
   const dimensions = (Object.keys(FILTER_LABELS) as FilterDim[])
     .filter((dimension) => snapshot.filters[dimension].length > 0)

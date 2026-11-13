@@ -17,6 +17,7 @@ import { isSkyeEvent } from "../components/agent-cursor";
 import type { ChartIntent } from "../stand-timeline";
 import { applySelection } from "../stand-timeline-demo/selection";
 import type { FlightStyle } from "../stand-timeline-demo/theme";
+
 import {
   allocationVersion as readAllocationVersion,
   applyAssigns,
@@ -43,6 +44,8 @@ import {
   type OpsMatcher,
   type ViewKey,
 } from "./opsFilters";
+
+let sessionFlightStyle: FlightStyle = "aero";
 
 export interface OpsSelection {
   /** Selected chart occupancies (shared with the chart). */
@@ -506,7 +509,11 @@ export function OperationsProvider({ children }: { children: ReactNode }) {
     [],
   );
   const resetFilters = useCallback(() => setFilters(EMPTY_FILTERS), []);
-  const [flightStyle, setFlightStyle] = useState<FlightStyle>("aero");
+  const [flightStyle, updateFlightStyle] = useState<FlightStyle>(() => sessionFlightStyle);
+  const setFlightStyle = useCallback((style: FlightStyle) => {
+    sessionFlightStyle = style;
+    updateFlightStyle(style);
+  }, []);
   // Recomputed when the view, filters or acknowledgements change ("Needs
   // attention" follows open alerts).
   // Stand changes move stays between areas; allocationVersion rebuilds it for

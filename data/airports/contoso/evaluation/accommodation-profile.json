@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../schemas/accommodation-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "contoso:late-service-request:v1",
+  "max_changed_visits": 1,
+  "max_displayed_options": 3,
+  "cases": [
+    { "case_id": "comfortable", "probe_id": "aal-domestic", "start_offset_minutes": 60, "duration_minutes": 75 },
+    { "case_id": "constrained", "probe_id": "baw-international", "start_offset_minutes": 240, "duration_minutes": 120 },
+    { "case_id": "full-day", "probe_id": "aal-domestic", "start_offset_minutes": 870, "duration_minutes": 120 }
+  ]
+}

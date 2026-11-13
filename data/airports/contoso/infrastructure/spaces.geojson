@@ -1,0 +1,2416 @@
+{
+  "type": "FeatureCollection",
+  "schema_version": "1.0.0",
+  "airport_id": "contoso",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "t1:space:curbside-dropoff",
+      "properties": {
+        "name": "Departures curbside dropoff",
+        "category": "curbside-dropoff",
+        "associated_building_id": "t1",
+        "serves_level_id": "t1:l2",
+        "elevation_m": 4,
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Approximate outdoor frontage immediately north of the main departures entrance; approach roads and parking are excluded.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.1432255,
+              47.65022814
+            ],
+            [
+              -122.14322549,
+              47.64999995
+            ],
+            [
+              -122.13677367,
+              47.64999995
+            ],
+            [
+              -122.13677366,
+              47.65022814
+            ],
+            [
+              -122.1432255,
+              47.65022814
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:landside-departures",
+      "properties": {
+        "name": "Departures public hall",
+        "category": "public-hall",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Functional division along the illustrated screening boundary; not a surveyed security boundary.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14322549,
+              47.64999995
+            ],
+            [
+              -122.14322542865776,
+              47.64904586
+            ],
+            [
+              -122.13677373134225,
+              47.64904586
+            ],
+            [
+              -122.13677367,
+              47.64999995
+            ],
+            [
+              -122.14322549,
+              47.64999995
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:ticketing-west",
+      "properties": {
+        "name": "West ticketing counters",
+        "category": "ticketing",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Approximate extent of the illustrated west counters.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14288687,
+              47.64985658
+            ],
+            [
+              -122.14288685,
+              47.64960577
+            ],
+            [
+              -122.14068735,
+              47.64960581
+            ],
+            [
+              -122.14068735,
+              47.64985661
+            ],
+            [
+              -122.14288687,
+              47.64985658
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:ticketing-east",
+      "properties": {
+        "name": "East ticketing counters",
+        "category": "ticketing",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Approximate extent of the illustrated east counters.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13928516,
+              47.64960581
+            ],
+            [
+              -122.13704441,
+              47.64960577
+            ],
+            [
+              -122.1370444,
+              47.64985658
+            ],
+            [
+              -122.13928516,
+              47.64985661
+            ],
+            [
+              -122.13928516,
+              47.64960581
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:bag-drop-west",
+      "properties": {
+        "name": "West baggage drop",
+        "category": "baggage-drop",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Baggage-drop extent inferred within the illustrated public hall.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14288684,
+              47.64947573
+            ],
+            [
+              -122.14288682,
+              47.64911345
+            ],
+            [
+              -122.14178708,
+              47.64911347
+            ],
+            [
+              -122.14178709,
+              47.64947575
+            ],
+            [
+              -122.14288684,
+              47.64947573
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:bag-drop-east",
+      "properties": {
+        "name": "East baggage drop",
+        "category": "baggage-drop",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Baggage-drop extent inferred within the illustrated public hall.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13804796,
+              47.64911347
+            ],
+            [
+              -122.13704444,
+              47.64911345
+            ],
+            [
+              -122.13704442,
+              47.64947572
+            ],
+            [
+              -122.13804794,
+              47.64947575
+            ],
+            [
+              -122.13804796,
+              47.64911347
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-queue",
+      "properties": {
+        "name": "Security queue",
+        "category": "security-queue",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Queue footprint positioned ahead of the screening lanes.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14151216,
+              47.64942002
+            ],
+            [
+              -122.14,
+              47.64942003
+            ],
+            [
+              -122.14,
+              47.64959652
+            ],
+            [
+              -122.14151216,
+              47.64959651
+            ],
+            [
+              -122.14151216,
+              47.64942002
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-checkpoint",
+      "properties": {
+        "name": "Security checkpoint",
+        "category": "security-screening",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Twelve conceptual lane extents based on the user-supplied lane count and illustrated screening bank.",
+          "requires_review": true
+        },
+        "lane_count": 12
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14151215,
+              47.64941073
+            ],
+            [
+              -122.14151214,
+              47.6490459
+            ],
+            [
+              -122.14,
+              47.64904591
+            ],
+            [
+              -122.14,
+              47.64941074
+            ],
+            [
+              -122.14151215,
+              47.64941073
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:01",
+      "properties": {
+        "name": "Security lane 1",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14148466,
+              47.64939215
+            ],
+            [
+              -122.14148465,
+              47.64906703
+            ],
+            [
+              -122.14138842,
+              47.64906703
+            ],
+            [
+              -122.14138843,
+              47.64939215
+            ],
+            [
+              -122.14148466,
+              47.64939215
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:02",
+      "properties": {
+        "name": "Security lane 2",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14136369,
+              47.64939215
+            ],
+            [
+              -122.14136368,
+              47.64906703
+            ],
+            [
+              -122.14126745,
+              47.64906703
+            ],
+            [
+              -122.14126746,
+              47.64939215
+            ],
+            [
+              -122.14136369,
+              47.64939215
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:03",
+      "properties": {
+        "name": "Security lane 3",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14124272,
+              47.64939215
+            ],
+            [
+              -122.14124271,
+              47.64906704
+            ],
+            [
+              -122.14114648,
+              47.64906704
+            ],
+            [
+              -122.14114649,
+              47.64939215
+            ],
+            [
+              -122.14124272,
+              47.64939215
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:04",
+      "properties": {
+        "name": "Security lane 4",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14112174,
+              47.64906704
+            ],
+            [
+              -122.14102551,
+              47.64906704
+            ],
+            [
+              -122.14102552,
+              47.64939216
+            ],
+            [
+              -122.14112174,
+              47.64939216
+            ],
+            [
+              -122.14112174,
+              47.64906704
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:05",
+      "properties": {
+        "name": "Security lane 5",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14100077,
+              47.64906704
+            ],
+            [
+              -122.14090454,
+              47.64906704
+            ],
+            [
+              -122.14090454,
+              47.64939216
+            ],
+            [
+              -122.14100077,
+              47.64939216
+            ],
+            [
+              -122.14100077,
+              47.64906704
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:06",
+      "properties": {
+        "name": "Security lane 6",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.1408798,
+              47.64939216
+            ],
+            [
+              -122.14087979,
+              47.64906704
+            ],
+            [
+              -122.14078357,
+              47.64906704
+            ],
+            [
+              -122.14078357,
+              47.64939216
+            ],
+            [
+              -122.1408798,
+              47.64939216
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:07",
+      "properties": {
+        "name": "Security lane 7",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14075883,
+              47.64939216
+            ],
+            [
+              -122.14075882,
+              47.64906704
+            ],
+            [
+              -122.14066259,
+              47.64906704
+            ],
+            [
+              -122.1406626,
+              47.64939216
+            ],
+            [
+              -122.14075883,
+              47.64939216
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:08",
+      "properties": {
+        "name": "Security lane 8",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14063785,
+              47.64906704
+            ],
+            [
+              -122.14054162,
+              47.64906704
+            ],
+            [
+              -122.14054163,
+              47.64939216
+            ],
+            [
+              -122.14063785,
+              47.64939216
+            ],
+            [
+              -122.14063785,
+              47.64906704
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:09",
+      "properties": {
+        "name": "Security lane 9",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14051688,
+              47.64906704
+            ],
+            [
+              -122.14042065,
+              47.64906704
+            ],
+            [
+              -122.14042065,
+              47.64939216
+            ],
+            [
+              -122.14051688,
+              47.64939216
+            ],
+            [
+              -122.14051688,
+              47.64906704
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:10",
+      "properties": {
+        "name": "Security lane 10",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14039591,
+              47.64906704
+            ],
+            [
+              -122.14029968,
+              47.64906704
+            ],
+            [
+              -122.14029968,
+              47.64939216
+            ],
+            [
+              -122.14039591,
+              47.64939216
+            ],
+            [
+              -122.14039591,
+              47.64906704
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:11",
+      "properties": {
+        "name": "Security lane 11",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14027494,
+              47.64906704
+            ],
+            [
+              -122.14017871,
+              47.64906704
+            ],
+            [
+              -122.14017871,
+              47.64939216
+            ],
+            [
+              -122.14027494,
+              47.64939216
+            ],
+            [
+              -122.14027494,
+              47.64906704
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:security-lane:12",
+      "properties": {
+        "name": "Security lane 12",
+        "category": "security-lane",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual individual lane; equipment and aisle dimensions are not measured.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14015396,
+              47.64906704
+            ],
+            [
+              -122.14005774,
+              47.64906704
+            ],
+            [
+              -122.14005774,
+              47.64939216
+            ],
+            [
+              -122.14015396,
+              47.64939216
+            ],
+            [
+              -122.14015396,
+              47.64906704
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:pier-a-concourse",
+      "properties": {
+        "name": "A Pier domestic concourse",
+        "category": "passenger-concourse",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "vector-trace",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "operator_indices": [
+            8
+          ]
+        },
+        "arrival_sector": "domestic",
+        "departure_sector": "domestic"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14322542865776,
+              47.64904586
+            ],
+            [
+              -122.1432254,
+              47.64860013
+            ],
+            [
+              -122.14058562,
+              47.64860018
+            ],
+            [
+              -122.14058562003349,
+              47.64860013
+            ],
+            [
+              -122.13938341999905,
+              47.64860013
+            ],
+            [
+              -122.13938342,
+              47.64860018
+            ],
+            [
+              -122.13677376,
+              47.64860013
+            ],
+            [
+              -122.13677373134225,
+              47.64904586
+            ],
+            [
+              -122.14322542865776,
+              47.64904586
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:pier-b-concourse",
+      "properties": {
+        "name": "B Pier concourse",
+        "category": "passenger-concourse",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "vector-trace",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "operator_indices": [
+            2237
+          ]
+        },
+        "sector_configuration_status": "not-specified"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14059054,
+              47.64125479
+            ],
+            [
+              -122.13938328,
+              47.64125479
+            ],
+            [
+              -122.13938342,
+              47.64860018
+            ],
+            [
+              -122.14058562,
+              47.64860018
+            ],
+            [
+              -122.14059054,
+              47.64125479
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:pier-c-departures",
+      "properties": {
+        "name": "C Pier international departures",
+        "category": "passenger-concourse",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "vector-trace",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "operator_indices": [
+            2237
+          ]
+        },
+        "arrival_sector": "international",
+        "departure_sector": "international"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14126745,
+              47.63964968
+            ],
+            [
+              -122.14125748,
+              47.63959209
+            ],
+            [
+              -122.14123588,
+              47.63953755
+            ],
+            [
+              -122.14120285,
+              47.6394862
+            ],
+            [
+              -122.1411586,
+              47.63943815
+            ],
+            [
+              -122.14110333,
+              47.63939357
+            ],
+            [
+              -122.14103724,
+              47.63935258
+            ],
+            [
+              -122.14096053,
+              47.63931532
+            ],
+            [
+              -122.14087342,
+              47.63928193
+            ],
+            [
+              -122.1407761,
+              47.63925254
+            ],
+            [
+              -122.14066878,
+              47.6392273
+            ],
+            [
+              -122.14055166,
+              47.63920633
+            ],
+            [
+              -122.14042495,
+              47.63918979
+            ],
+            [
+              -122.14028885,
+              47.6391778
+            ],
+            [
+              -122.14014356,
+              47.63917051
+            ],
+            [
+              -122.1399893,
+              47.63916805
+            ],
+            [
+              -122.13983503,
+              47.63917051
+            ],
+            [
+              -122.13968974,
+              47.6391778
+            ],
+            [
+              -122.13955363,
+              47.63918979
+            ],
+            [
+              -122.13942692,
+              47.63920633
+            ],
+            [
+              -122.1393098,
+              47.6392273
+            ],
+            [
+              -122.13920248,
+              47.63925254
+            ],
+            [
+              -122.13910516,
+              47.63928192
+            ],
+            [
+              -122.13901805,
+              47.63931532
+            ],
+            [
+              -122.13894134,
+              47.63935258
+            ],
+            [
+              -122.13887525,
+              47.63939357
+            ],
+            [
+              -122.13881998,
+              47.63943815
+            ],
+            [
+              -122.13877572,
+              47.6394862
+            ],
+            [
+              -122.1387427,
+              47.63953755
+            ],
+            [
+              -122.1387211,
+              47.63959209
+            ],
+            [
+              -122.13871113,
+              47.63964968
+            ],
+            [
+              -122.138713,
+              47.63971017
+            ],
+            [
+              -122.13872662,
+              47.63977315
+            ],
+            [
+              -122.13875165,
+              47.63984528
+            ],
+            [
+              -122.13878645,
+              47.63992555
+            ],
+            [
+              -122.13882938,
+              47.64001296
+            ],
+            [
+              -122.13887882,
+              47.64010651
+            ],
+            [
+              -122.13893311,
+              47.6402052
+            ],
+            [
+              -122.13899063,
+              47.64030803
+            ],
+            [
+              -122.13904973,
+              47.640414
+            ],
+            [
+              -122.13910879,
+              47.64052211
+            ],
+            [
+              -122.13916615,
+              47.64063136
+            ],
+            [
+              -122.1392202,
+              47.64074075
+            ],
+            [
+              -122.13926928,
+              47.64084928
+            ],
+            [
+              -122.13931177,
+              47.64095595
+            ],
+            [
+              -122.13934602,
+              47.64105976
+            ],
+            [
+              -122.1393704,
+              47.6411597
+            ],
+            [
+              -122.13938328,
+              47.64125479
+            ],
+            [
+              -122.14059054,
+              47.64125479
+            ],
+            [
+              -122.14060347,
+              47.6411597
+            ],
+            [
+              -122.140628,
+              47.64105976
+            ],
+            [
+              -122.14066249,
+              47.64095595
+            ],
+            [
+              -122.14070528,
+              47.64084928
+            ],
+            [
+              -122.14075473,
+              47.64074075
+            ],
+            [
+              -122.14080917,
+              47.64063136
+            ],
+            [
+              -122.14086697,
+              47.64052211
+            ],
+            [
+              -122.14092647,
+              47.640414
+            ],
+            [
+              -122.14098602,
+              47.64030803
+            ],
+            [
+              -122.14104396,
+              47.6402052
+            ],
+            [
+              -122.14109866,
+              47.64010651
+            ],
+            [
+              -122.14114845,
+              47.64001296
+            ],
+            [
+              -122.14119169,
+              47.63992555
+            ],
+            [
+              -122.14122672,
+              47.63984528
+            ],
+            [
+              -122.14125191,
+              47.63977315
+            ],
+            [
+              -122.14126558,
+              47.63971017
+            ],
+            [
+              -122.14126745,
+              47.63964968
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:domestic-exit",
+      "properties": {
+        "name": "Domestic arrivals exit beside security",
+        "category": "one-way-passenger-exit",
+        "building_id": "t1",
+        "level_id": "t1:l2",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "One-way domestic exit on the drawing's right side of security. Detailed barriers and access controls are not drawn.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13903773,
+              47.64869547
+            ],
+            [
+              -122.13862533,
+              47.64869547
+            ],
+            [
+              -122.13862532,
+              47.64929926
+            ],
+            [
+              -122.13903772,
+              47.64929927
+            ],
+            [
+              -122.13903773,
+              47.64869547
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:baggage-hall",
+      "properties": {
+        "name": "Main baggage reclaim hall",
+        "category": "baggage-reclaim",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Ground-level hall beneath the main departures building, per the user description.",
+          "requires_review": true
+        },
+        "carousel_count": 12
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14302434,
+              47.64985658
+            ],
+            [
+              -122.14302427,
+              47.64874188
+            ],
+            [
+              -122.13697573,
+              47.64874188
+            ],
+            [
+              -122.13697566,
+              47.64985658
+            ],
+            [
+              -122.14302434,
+              47.64985658
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:01",
+      "properties": {
+        "name": "Baggage carousel 1",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14281812,
+              47.6495872
+            ],
+            [
+              -122.14281811,
+              47.64940142
+            ],
+            [
+              -122.14222699,
+              47.64940143
+            ],
+            [
+              -122.142227,
+              47.64958721
+            ],
+            [
+              -122.14281812,
+              47.6495872
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:02",
+      "properties": {
+        "name": "Baggage carousel 2",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14191082,
+              47.64958722
+            ],
+            [
+              -122.14191081,
+              47.64940143
+            ],
+            [
+              -122.1413197,
+              47.64940144
+            ],
+            [
+              -122.1413197,
+              47.64958722
+            ],
+            [
+              -122.14191082,
+              47.64958722
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:03",
+      "properties": {
+        "name": "Baggage carousel 3",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14100352,
+              47.64940145
+            ],
+            [
+              -122.14041241,
+              47.64940145
+            ],
+            [
+              -122.14041241,
+              47.64958723
+            ],
+            [
+              -122.14100352,
+              47.64958723
+            ],
+            [
+              -122.14100352,
+              47.64940145
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:04",
+      "properties": {
+        "name": "Baggage carousel 4",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14009623,
+              47.64940145
+            ],
+            [
+              -122.13950511,
+              47.64940145
+            ],
+            [
+              -122.13950511,
+              47.64958723
+            ],
+            [
+              -122.14009623,
+              47.64958723
+            ],
+            [
+              -122.14009623,
+              47.64940145
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:05",
+      "properties": {
+        "name": "Baggage carousel 5",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13918894,
+              47.64940145
+            ],
+            [
+              -122.13859782,
+              47.64940144
+            ],
+            [
+              -122.13859782,
+              47.64958722
+            ],
+            [
+              -122.13918893,
+              47.64958723
+            ],
+            [
+              -122.13918894,
+              47.64940145
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:06",
+      "properties": {
+        "name": "Baggage carousel 6",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13828164,
+              47.64940144
+            ],
+            [
+              -122.13769053,
+              47.64940143
+            ],
+            [
+              -122.13769052,
+              47.64958721
+            ],
+            [
+              -122.13828164,
+              47.64958722
+            ],
+            [
+              -122.13828164,
+              47.64940144
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:07",
+      "properties": {
+        "name": "Baggage carousel 7",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14281809,
+              47.6491599
+            ],
+            [
+              -122.14281808,
+              47.64897412
+            ],
+            [
+              -122.14222697,
+              47.64897413
+            ],
+            [
+              -122.14222698,
+              47.64915991
+            ],
+            [
+              -122.14281809,
+              47.6491599
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:08",
+      "properties": {
+        "name": "Baggage carousel 8",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.1419108,
+              47.64897413
+            ],
+            [
+              -122.14131969,
+              47.64897414
+            ],
+            [
+              -122.14131969,
+              47.64915993
+            ],
+            [
+              -122.1419108,
+              47.64915992
+            ],
+            [
+              -122.1419108,
+              47.64897413
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:09",
+      "properties": {
+        "name": "Baggage carousel 9",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14100352,
+              47.64915993
+            ],
+            [
+              -122.14100351,
+              47.64897415
+            ],
+            [
+              -122.1404124,
+              47.64897415
+            ],
+            [
+              -122.1404124,
+              47.64915993
+            ],
+            [
+              -122.14100352,
+              47.64915993
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:10",
+      "properties": {
+        "name": "Baggage carousel 10",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14009623,
+              47.64897415
+            ],
+            [
+              -122.13950512,
+              47.64897415
+            ],
+            [
+              -122.13950512,
+              47.64915993
+            ],
+            [
+              -122.14009623,
+              47.64915993
+            ],
+            [
+              -122.14009623,
+              47.64897415
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:11",
+      "properties": {
+        "name": "Baggage carousel 11",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13918894,
+              47.64897415
+            ],
+            [
+              -122.13859783,
+              47.64897414
+            ],
+            [
+              -122.13859783,
+              47.64915992
+            ],
+            [
+              -122.13918894,
+              47.64915993
+            ],
+            [
+              -122.13918894,
+              47.64897415
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:carousel:12",
+      "properties": {
+        "name": "Baggage carousel 12",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual arrangement of the twelve user-specified main reclaim carousels.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13828166,
+              47.64897414
+            ],
+            [
+              -122.13769055,
+              47.64897413
+            ],
+            [
+              -122.13769054,
+              47.64915991
+            ],
+            [
+              -122.13828165,
+              47.64915992
+            ],
+            [
+              -122.13828166,
+              47.64897414
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:customs",
+      "properties": {
+        "name": "International arrivals and customs",
+        "category": "customs-processing",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Customs below C Pier departures. Internal routing and partitions are not traced.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14126745,
+              47.63964968
+            ],
+            [
+              -122.14125748,
+              47.63959209
+            ],
+            [
+              -122.14123588,
+              47.63953755
+            ],
+            [
+              -122.14120285,
+              47.6394862
+            ],
+            [
+              -122.1411586,
+              47.63943815
+            ],
+            [
+              -122.14110333,
+              47.63939357
+            ],
+            [
+              -122.14103724,
+              47.63935258
+            ],
+            [
+              -122.14096053,
+              47.63931532
+            ],
+            [
+              -122.14087342,
+              47.63928193
+            ],
+            [
+              -122.1407761,
+              47.63925254
+            ],
+            [
+              -122.14066878,
+              47.6392273
+            ],
+            [
+              -122.14055166,
+              47.63920633
+            ],
+            [
+              -122.14042495,
+              47.63918979
+            ],
+            [
+              -122.14028885,
+              47.6391778
+            ],
+            [
+              -122.14014356,
+              47.63917051
+            ],
+            [
+              -122.1399893,
+              47.63916805
+            ],
+            [
+              -122.13983503,
+              47.63917051
+            ],
+            [
+              -122.13968974,
+              47.6391778
+            ],
+            [
+              -122.13955363,
+              47.63918979
+            ],
+            [
+              -122.13942692,
+              47.63920633
+            ],
+            [
+              -122.1393098,
+              47.6392273
+            ],
+            [
+              -122.13920248,
+              47.63925254
+            ],
+            [
+              -122.13910516,
+              47.63928192
+            ],
+            [
+              -122.13901805,
+              47.63931532
+            ],
+            [
+              -122.13894134,
+              47.63935258
+            ],
+            [
+              -122.13887525,
+              47.63939357
+            ],
+            [
+              -122.13881998,
+              47.63943815
+            ],
+            [
+              -122.13877572,
+              47.6394862
+            ],
+            [
+              -122.1387427,
+              47.63953755
+            ],
+            [
+              -122.1387211,
+              47.63959209
+            ],
+            [
+              -122.13871113,
+              47.63964968
+            ],
+            [
+              -122.138713,
+              47.63971017
+            ],
+            [
+              -122.13872662,
+              47.63977315
+            ],
+            [
+              -122.13875165,
+              47.63984528
+            ],
+            [
+              -122.13878645,
+              47.63992555
+            ],
+            [
+              -122.13882938,
+              47.64001296
+            ],
+            [
+              -122.13887882,
+              47.64010651
+            ],
+            [
+              -122.13893311,
+              47.6402052
+            ],
+            [
+              -122.13899063,
+              47.64030803
+            ],
+            [
+              -122.13904973,
+              47.640414
+            ],
+            [
+              -122.13910879,
+              47.64052211
+            ],
+            [
+              -122.13916615,
+              47.64063136
+            ],
+            [
+              -122.1392202,
+              47.64074075
+            ],
+            [
+              -122.13926928,
+              47.64084928
+            ],
+            [
+              -122.13931177,
+              47.64095595
+            ],
+            [
+              -122.13934602,
+              47.64105976
+            ],
+            [
+              -122.1393704,
+              47.6411597
+            ],
+            [
+              -122.13938328,
+              47.64125479
+            ],
+            [
+              -122.14059054,
+              47.64125479
+            ],
+            [
+              -122.14060347,
+              47.6411597
+            ],
+            [
+              -122.140628,
+              47.64105976
+            ],
+            [
+              -122.14066249,
+              47.64095595
+            ],
+            [
+              -122.14070528,
+              47.64084928
+            ],
+            [
+              -122.14075473,
+              47.64074075
+            ],
+            [
+              -122.14080917,
+              47.64063136
+            ],
+            [
+              -122.14086697,
+              47.64052211
+            ],
+            [
+              -122.14092647,
+              47.640414
+            ],
+            [
+              -122.14098602,
+              47.64030803
+            ],
+            [
+              -122.14104396,
+              47.6402052
+            ],
+            [
+              -122.14109866,
+              47.64010651
+            ],
+            [
+              -122.14114845,
+              47.64001296
+            ],
+            [
+              -122.14119169,
+              47.63992555
+            ],
+            [
+              -122.14122672,
+              47.63984528
+            ],
+            [
+              -122.14125191,
+              47.63977315
+            ],
+            [
+              -122.14126558,
+              47.63971017
+            ],
+            [
+              -122.14126745,
+              47.63964968
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:customs-baggage",
+      "properties": {
+        "name": "Customs baggage reclaim",
+        "category": "baggage-reclaim",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Illustrative reclaim area. Three carousels are a placeholder for the unspecified 'few' in the user description.",
+          "requires_review": true
+        },
+        "carousel_count": 3,
+        "count_status": "assumed-requires-confirmation"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.1397526,
+              47.6395457
+            ],
+            [
+              -122.13913411,
+              47.63954569
+            ],
+            [
+              -122.1391341,
+              47.64028882
+            ],
+            [
+              -122.1397526,
+              47.64028883
+            ],
+            [
+              -122.1397526,
+              47.6395457
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:customs-carousel:1",
+      "properties": {
+        "name": "Customs carousel 1",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Unconfirmed illustrative customs carousel.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13968388,
+              47.64010304
+            ],
+            [
+              -122.13920282,
+              47.64010304
+            ],
+            [
+              -122.13920282,
+              47.6402238
+            ],
+            [
+              -122.13968388,
+              47.6402238
+            ],
+            [
+              -122.13968388,
+              47.64010304
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:customs-carousel:2",
+      "properties": {
+        "name": "Customs carousel 2",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Unconfirmed illustrative customs carousel.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13968388,
+              47.6398801
+            ],
+            [
+              -122.13920283,
+              47.6398801
+            ],
+            [
+              -122.13920283,
+              47.64000086
+            ],
+            [
+              -122.13968388,
+              47.64000086
+            ],
+            [
+              -122.13968388,
+              47.6398801
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:customs-carousel:3",
+      "properties": {
+        "name": "Customs carousel 3",
+        "category": "baggage-carousel",
+        "building_id": "t1",
+        "level_id": "t1:l1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Unconfirmed illustrative customs carousel.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.13968388,
+              47.63965717
+            ],
+            [
+              -122.13920283,
+              47.63965716
+            ],
+            [
+              -122.13920283,
+              47.63977792
+            ],
+            [
+              -122.13968388,
+              47.63977792
+            ],
+            [
+              -122.13968388,
+              47.63965717
+            ]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:space:customs-exit-tunnel",
+      "properties": {
+        "name": "Customs to main terminal exit tunnel",
+        "category": "passenger-tunnel",
+        "building_id": "t1",
+        "level_id": "t1:b1",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Conceptual subterranean connection; exact tunnel alignment, width and elevations require review.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -122.14008248,
+              47.64920638
+            ],
+            [
+              -122.14008247,
+              47.64075328
+            ],
+            [
+              -122.13991753,
+              47.64075328
+            ],
+            [
+              -122.13991752,
+              47.64920638
+            ],
+            [
+              -122.14008248,
+              47.64920638
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

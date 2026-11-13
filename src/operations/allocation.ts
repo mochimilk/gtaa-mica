@@ -23,7 +23,8 @@
 // lane above the stands (see ./noStandLane).
 import type { Millis, Occupancy } from "../stand-timeline";
 import { DEMO_DATA, formatUtc, formatUtcWithDay } from "../stand-timeline-demo/demoData";
-import { AIRCRAFT_SIZE, SYNTHETIC_STANDS, type StandSize } from "../stand-timeline-demo/syntheticFixture";
+import type { StandSize } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET, READ_ONLY_REASON, requireStandEditing } from "./activeDataset";
 import { formatDuration, NO_STAND_STAYS, OPS_FLIGHTS, type OpsFlight } from "./operationsData";
 
 /** What dropping a stay on a stand would do. */
@@ -46,8 +47,8 @@ export type SwapCheck = { ok: true } | { ok: false; reason: string };
 const STAYS = new Map([...DEMO_DATA.occupancies, ...NO_STAND_STAYS].map((o) => [o.id, o]));
 /** Stays with no stand, so off the chart; every other stay is on DEMO_DATA.occupancies. */
 const OFF_BOARD = new Set(NO_STAND_STAYS.map((o) => o.id));
-const STAND_SIZE = new Map(SYNTHETIC_STANDS.map((stand) => [stand.code, stand.size]));
-const STAND_AREA = new Map(SYNTHETIC_STANDS.map((stand) => [stand.code, stand.area]));
+const STAND_SIZE = new Map(ACTIVE_DATASET.stands.map((stand) => [stand.code, stand.size]));
+const STAND_AREA = new Map(ACTIVE_DATASET.stands.map((stand) => [stand.code, stand.area]));
 const ORIGINAL = new Map(
   [...DEMO_DATA.occupancies, ...NO_STAND_STAYS].map((o) => [o.id, { rowId: o.rowId, start: o.start, end: o.end }]),
 );
@@ -64,7 +65,7 @@ export const isStand = (standId: string) => STAND_SIZE.has(standId);
 /** The area a stand belongs to, e.g. "Pier B". */
 export const standArea = (standId: string) => STAND_AREA.get(standId);
 /** Every stand area, in chart order. */
-export const STAND_AREAS: readonly string[] = [...new Set(SYNTHETIC_STANDS.map((stand) => stand.area))];
+export const STAND_AREAS: readonly string[] = [...new Set(ACTIVE_DATASET.stands.map((stand) => stand.area))];
 
 /* ------------------------------------------------------------------ state */
 
@@ -152,6 +153,27 @@ function changed(): void {
   for (const listener of listeners) listener();
 }
 
+export function refreshAccommodationAllocation(): void {
+  if (ACTIVE_DATASET.capabilities.editStands) throw new Error("Accommodation cannot replace an editable allocation.");
+  STAYS.clear();
+  OFF_BOARD.clear();
+  ORIGINAL.clear();
+  for (const stay of [...DEMO_DATA.occupancies, ...NO_STAND_STAYS]) {
+    STAYS.set(stay.id, stay);
+    ORIGINAL.set(stay.id, { rowId: stay.rowId, start: stay.start, end: stay.end });
+  }
+  for (const stay of NO_STAND_STAYS) OFF_BOARD.add(stay.id);
+  ORIGINAL_ON_BOARD.splice(0, ORIGINAL_ON_BOARD.length, ...DEMO_DATA.occupancies);
+  closure = null;
+  planRevision += 1;
+  updatingPlan = true;
+  try {
+    changed();
+  } finally {
+    updatingPlan = false;
+  }
+}
+
 /** Whether any stay is off its fixture stand or times, or an area is closed. */
 export const hasStandChanges = () =>
   closure !== null ||
@@ -185,6 +207,7 @@ function putBack(id: string, was: StayPlace): void {
  * a flight that had no stand), and reopens any closed area.
  */
 export function resetStands(): void {
+  requireStandEditing();
   if (!hasStandChanges()) return;
   for (const [id, was] of ORIGINAL) putBack(id, was);
   // The chart's stays in fixture order again.
@@ -227,6 +250,7 @@ export const planUpdating = () => updatingPlan;
  * Returns false when there is no such stay on the board.
  */
 export function setRunningLate(stayId: string, delayIn: number, delayOut: number): boolean {
+  requireStandEditing();
   const stay = occupancyById(stayId);
   if (!stay) return false;
   const minute = 60_000;
@@ -260,6 +284,7 @@ export const sameClosure = (a: Closure | null, b: Closure | null) =>
  * when `closureTo` is given (null reopens the area), all at once.
  */
 export function restoreStays(places: ReadonlyMap<string, StayPlace>, closureTo?: Closure | null): void {
+  requireStandEditing();
   for (const [id, was] of places) putBack(id, was);
   if (closureTo !== undefined) closure = closureTo;
   changed();
@@ -278,6 +303,7 @@ export const currentClosure = (): Closure | null => closure;
 
 /** Closes an area (replacing any earlier closure), or reopens it with null. */
 export function setClosure(next: Closure | null): void {
+  requireStandEditing();
   if (closure?.area === next?.area && closure?.from === next?.from && closure?.to === next?.to) return;
   closure = next;
   changed();
@@ -304,9 +330,10 @@ const recordedType = (occupancy: Occupancy) =>
  * The sample size class of the aircraft at this stay. With no type recorded
  * it counts as wide, so it only goes on a stand that takes any aircraft.
  */
-export function aircraftSize(occupancy: Occupancy): StandSize {
+export function aircraftSize(occupancy: Occupancy): StandSize | undefined {
   const type = recordedType(occupancy);
-  return (type && AIRCRAFT_SIZE[type]) || (type ? "narrow" : "wide");
+  if (!ACTIVE_DATASET.capabilities.fixtureAnalyses) return type ? ACTIVE_DATASET.aircraftSizes[type] : undefined;
+  return (type && ACTIVE_DATASET.aircraftSizes[type]) || (type ? "narrow" : "wide");
 }
 
 const aircraftType = (occupancy: Occupancy) => recordedType(occupancy) ?? "aircraft";
@@ -346,6 +373,7 @@ const tooBig = (occupancy: Occupancy, standId: string) =>
 
 /** Whether two stays can exchange stands under the sample rules. */
 export function checkSwap(aId: string, bId: string): SwapCheck {
+  if (!ACTIVE_DATASET.capabilities.editStands) return { ok: false, reason: READ_ONLY_REASON };
   const a = occupancyById(aId);
   const b = occupancyById(bId);
   if (!a || !b || a === b) return { ok: false, reason: "Pick two different stays to swap." };
@@ -380,6 +408,7 @@ export function planDrop(occupancyId: string, standId: string, shiftMs = 0): Dro
     reason,
     blockingIds,
   });
+  if (!ACTIVE_DATASET.capabilities.editStands) return conflict(READ_ONLY_REASON);
   if (!occupancy || !isStand(standId)) return conflict("That is not a stay and a stand on the chart.");
   if (occupancy.rowId === standId && shiftMs === 0) return { kind: "stay", occupancyId };
   const moved = shifted(occupancy, shiftMs);
@@ -410,6 +439,7 @@ export function planDrop(occupancyId: string, standId: string, shiftMs = 0): Dro
 
 /** Carries out a move or swap plan. Returns false when there was nothing to do. */
 export function applyPlan(plan: DropPlan): boolean {
+  requireStandEditing();
   if (plan.kind === "move") {
     const occupancy = occupancyById(plan.occupancyId);
     if (!occupancy) return false;
@@ -464,6 +494,7 @@ const HOLD_MINUTES = [0, 15, 30, 45, 60, 90];
  * against it. A greedy pass under the sample rules, not an allocator.
  */
 export function planAreaClosure(area: string, from: Millis, to: Millis): AreaPlan {
+  requireStandEditing();
   const rowOf = new Map(DEMO_DATA.rows.map((row, index) => [row.id, index]));
   const areaRows = DEMO_DATA.rows.flatMap((row, index) => (STAND_AREA.get(row.id) === area ? [index] : []));
   const [first, last] = [Math.min(...areaRows), Math.max(...areaRows)];
@@ -471,7 +502,7 @@ export function planAreaClosure(area: string, from: Millis, to: Millis): AreaPla
     const row = rowOf.get(standId) ?? 0;
     return row < first ? first - row : row > last ? row - last : 0;
   };
-  const candidates = SYNTHETIC_STANDS.filter((stand) => stand.area !== area)
+  const candidates = ACTIVE_DATASET.stands.filter((stand) => stand.area !== area)
     .map((stand) => stand.code)
     .sort((a, b) => distance(a) - distance(b) || (rowOf.get(a) ?? 0) - (rowOf.get(b) ?? 0));
   // Hardest to place first: widebodies (fewer stands take them), then the
@@ -570,7 +601,10 @@ export function planAssign(
   /** Stays planned onto stands by other changes not made yet, which count against those stands too. */
   alsoPlanned: readonly Occupancy[] = [],
 ): AssignPlan {
-  const narrowFirst = [...SYNTHETIC_STANDS].sort(
+  if (!ACTIVE_DATASET.capabilities.editStands) {
+    return { assigns: [], unplaceable: stayIds.map(stayId => ({ stayId, reason: READ_ONLY_REASON })) };
+  }
+  const narrowFirst = [...ACTIVE_DATASET.stands].sort(
     (a, b) => Number(a.size !== "narrow") - Number(b.size !== "narrow"),
   );
   const hardestFirst = [...stayIds].sort((a, b) => {
@@ -628,6 +662,7 @@ export function assignState(assign: StandAssign): "done" | "pending" | "moved" {
  * against the board as it is now. Returns the stays it placed.
  */
 export function applyAssigns(assigns: readonly StandAssign[]): string[] {
+  requireStandEditing();
   const placed: string[] = [];
   for (const assign of assigns) {
     const stay = offBoardStay(assign.stayId);
@@ -645,6 +680,7 @@ export function applyAssigns(assigns: readonly StandAssign[]): string[] {
  * stays it took off.
  */
 export function unassignStays(stayIds: readonly string[]): string[] {
+  requireStandEditing();
   const removed: string[] = [];
   for (const id of stayIds) {
     const stay = occupancyById(id);
@@ -727,6 +763,7 @@ export type Suggestion = {
  * changes of `occupancyId` when given. Null when nothing makes it wider.
  */
 export function suggestBest(occupancyId?: string): Suggestion | null {
+  requireStandEditing();
   const subjects = occupancyId
     ? DEMO_DATA.occupancies.filter((o) => o.id === occupancyId)
     : DEMO_DATA.occupancies;
@@ -742,7 +779,7 @@ export function suggestBest(occupancyId?: string): Suggestion | null {
     }
   };
   for (const a of subjects) {
-    for (const stand of SYNTHETIC_STANDS) {
+    for (const stand of ACTIVE_DATASET.stands) {
       const plan = planDrop(a.id, stand.code);
       if (plan.kind === "move") consider(plan, new Map([[a.id, stand.code]]), [a.rowId, stand.code]);
     }

@@ -9,7 +9,7 @@
 // A suggestion for a person to accept, not an allocator.
 import { DEMO_DATA } from "../stand-timeline-demo/demoData";
 import { ghostClashes, ghostKey } from "../stand-timeline-demo/delays";
-import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET } from "./activeDataset";
 import type { Occupancy } from "../stand-timeline";
 import {
   closedDuring,
@@ -25,6 +25,7 @@ import {
 import type { OpsAlert } from "./boardAlerts";
 import { planDisruption, planKnockOn } from "./disruption";
 import { OPS_FLIGHTS_BY_ID } from "./operationsData";
+import { requireFixtureAnalyses } from "./activeDataset";
 
 export type AlertFix =
   /** Move a stay (named by one of its flights) to another stand, keeping its times. */
@@ -55,7 +56,7 @@ function conflictFix(alert: OpsAlert): AlertFix | null {
     const flight = flightsAtStay(stayId)[0];
     if (!stay || !flight) return null;
     const area = standArea(stay.rowId);
-    const nearestFirst = [...SYNTHETIC_STANDS].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
+    const nearestFirst = [...ACTIVE_DATASET.stands].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
     for (const stand of nearestFirst) {
       if (stand.code === stay.rowId || planDrop(stayId, stand.code).kind !== "move") continue;
       const after = clashesWithMove(stayId, stand.code);
@@ -107,6 +108,7 @@ const overlapsOn = (stay: Occupancy, standId: string, board: readonly Occupancy[
  * the board changes here.
  */
 export function planFixAll(alerts: readonly OpsAlert[], scope: "all" | "conflicts"): FixAllPlan {
+  requireFixtureAnalyses();
   const board: Occupancy[] = DEMO_DATA.occupancies.map((o) => ({ ...o }));
   const byId = new Map(board.map((o) => [o.id, o]));
   const moved = new Map<string, AreaMove>();
@@ -134,7 +136,7 @@ export function planFixAll(alerts: readonly OpsAlert[], scope: "all" | "conflict
       const stay = byId.get(stayId);
       if (!stay) return false;
       const area = standArea(stay.rowId);
-      const nearestFirst = [...SYNTHETIC_STANDS].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
+      const nearestFirst = [...ACTIVE_DATASET.stands].sort((a, b) => Number(a.area !== area) - Number(b.area !== area));
       for (const stand of nearestFirst) {
         if (
           stand.code === stay.rowId ||
@@ -213,6 +215,7 @@ export function movesLateStay(moves: readonly { occupancyId: string }[]): boolea
 
 /** The change that clears `alert`, or null when there is none (or it is only a notice). */
 export function fixFor(alert: OpsAlert): AlertFix | null {
+  requireFixtureAnalyses();
   if (alert.kind === "conflict") return conflictFix(alert);
   if (alert.kind !== "no_stand") return null;
   const flight = OPS_FLIGHTS_BY_ID.get(alert.flightId);

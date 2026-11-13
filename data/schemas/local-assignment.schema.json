@@ -1,0 +1,116 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:local-assignment:1.0.0",
+  "title": "Local stand assignment comparison and validation evidence",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "airport_id", "demand_id", "preparation", "variants", "operationally_ready", "limitations"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "airport_id": { "$ref": "#/definitions/id" },
+    "demand_id": { "$ref": "#/definitions/id" },
+    "preparation": { "$ref": "urn:gtaa-mica:tow-preparation:1.0.0" },
+    "variants": {
+      "type": "object", "additionalProperties": false, "required": ["baseline", "tow-options"],
+      "properties": { "baseline": { "$ref": "#/definitions/result" }, "tow-options": { "$ref": "#/definitions/result" } }
+    },
+    "operationally_ready": { "const": false },
+    "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+  },
+  "definitions": {
+    "id": { "$ref": "urn:gtaa-mica:local-solver-request:1.0.0#/definitions/id" },
+    "ids": { "$ref": "urn:gtaa-mica:local-solver-request:1.0.0#/definitions/ids" },
+    "count": { "type": "integer", "minimum": 0 },
+    "rawResult": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "request_id", "engine", "engine_version", "status", "assignments", "selected_option_ids", "unassigned_group_ids", "covered_flight_count", "generated_movement_count"],
+      "properties": {
+        "schema_version": { "const": "1.0.0" },
+        "request_id": { "$ref": "#/definitions/id" },
+        "engine": { "const": "google-or-tools-cp-sat" },
+        "engine_version": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["optimal", "feasible", "infeasible", "unknown", "modelinvalid"] },
+        "assignments": { "type": "array", "items": { "$ref": "urn:gtaa-mica:local-solver-request:1.0.0#/definitions/candidate" } },
+        "selected_option_ids": { "$ref": "#/definitions/ids" },
+        "unassigned_group_ids": { "$ref": "#/definitions/ids" },
+        "covered_flight_count": { "$ref": "#/definitions/count" },
+        "generated_movement_count": { "$ref": "#/definitions/count" }
+      }
+    },
+    "result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["schema_version", "request_id", "engine", "engine_version", "status", "assignments", "selected_option_ids", "unassigned_group_ids", "covered_flight_count", "generated_movement_count", "disposition", "generated_movements", "stand_validation", "excluded_segment_ids", "request_fingerprint", "request", "candidate_evidence", "conflict_evidence"],
+      "properties": {
+        "schema_version": { "const": "1.0.0" },
+        "request_id": { "$ref": "#/definitions/id" },
+        "engine": { "const": "google-or-tools-cp-sat" },
+        "engine_version": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["optimal", "feasible", "infeasible", "unknown", "modelinvalid"] },
+        "selected_option_ids": { "$ref": "#/definitions/ids" },
+        "unassigned_group_ids": { "$ref": "#/definitions/ids" },
+        "covered_flight_count": { "$ref": "#/definitions/count" },
+        "generated_movement_count": { "$ref": "#/definitions/count" },
+        "disposition": { "enum": ["no-solution", "partial-assignment", "stand-rules-validated"] },
+        "assignments": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["id", "demand_id", "stand_id", "demand"],
+            "properties": {
+              "id": { "$ref": "#/definitions/id" },
+              "demand_id": { "$ref": "#/definitions/id" },
+              "stand_id": { "$ref": "#/definitions/id" },
+              "demand": { "$ref": "urn:gtaa-mica:tow-preparation:1.0.0#/definitions/demand" }
+            }
+          }
+        },
+        "generated_movements": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "from_demand_id", "to_demand_id", "scheduled_off_block", "scheduled_on_block", "origin_stand_id", "destination_stand_id"],
+            "properties": {
+              "id": { "$ref": "#/definitions/id" },
+              "from_demand_id": { "$ref": "#/definitions/id" },
+              "to_demand_id": { "$ref": "#/definitions/id" },
+              "scheduled_off_block": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/instant" },
+              "scheduled_on_block": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/instant" },
+              "origin_stand_id": { "$ref": "#/definitions/id" },
+              "destination_stand_id": { "$ref": "#/definitions/id" }
+            }
+          }
+        },
+        "stand_validation": {
+          "type": "object", "additionalProperties": false, "required": ["passed", "findings"],
+          "properties": { "passed": { "type": "boolean" }, "findings": { "type": "array", "maxItems": 0 } }
+        },
+        "excluded_segment_ids": { "$ref": "#/definitions/ids" },
+        "request_fingerprint": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "request": { "$ref": "urn:gtaa-mica:local-solver-request:1.0.0" },
+        "candidate_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["demand_id", "candidate_stand_ids", "excluded_stands"],
+            "properties": {
+              "demand_id": { "$ref": "#/definitions/id" },
+              "candidate_stand_ids": { "$ref": "#/definitions/ids" },
+              "excluded_stands": { "$ref": "urn:gtaa-mica:tow-preparation:1.0.0#/definitions/demand/properties/excluded_stands" }
+            }
+          }
+        },
+        "conflict_evidence": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["first_candidate_id", "second_candidate_id", "reasons", "rule_paths"],
+            "properties": {
+              "first_candidate_id": { "$ref": "#/definitions/id" },
+              "second_candidate_id": { "$ref": "#/definitions/id" },
+              "reasons": { "$ref": "#/definitions/ids" },
+              "rule_paths": { "$ref": "#/definitions/ids" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

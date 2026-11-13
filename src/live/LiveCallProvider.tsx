@@ -13,6 +13,7 @@
 import * as React from "react";
 import { useOperations } from "../operations/OperationsContext.tsx";
 import { OPS_FLIGHTS_BY_ID } from "../operations/operationsData.ts";
+import { beforeAccommodationChange } from "../operations/accommodationSession";
 import { agentCursor } from "../components/agent-cursor";
 import { playAgentGesture } from "../operations/agentGestures.ts";
 import { markDisruptionRunning } from "../operations/disruption.ts";
@@ -436,7 +437,9 @@ export function LiveCallProvider({ children }: { children: React.ReactNode }) {
   // unmount, so hang up rather than leaving a live session behind.
   React.useEffect(() => {
     const element = audioRef.current;
+    const unsubscribe = beforeAccommodationChange(() => { void controller.hangup(); });
     return () => {
+      unsubscribe();
       void controller.hangup();
       meterRef.current?.dispose();
       if (element) element.srcObject = null;

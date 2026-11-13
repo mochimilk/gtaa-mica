@@ -14,6 +14,7 @@ import { CalendarCancel20Regular } from "@fluentui/react-icons";
 import { flightsAtStay, occupancyById } from "./allocation";
 import { useOpsActions } from "./OperationsContext";
 import { KEEP_SELECTION_ATTR } from "./ViewsFiltersToolbar";
+import { ACTIVE_DATASET } from "./activeDataset";
 
 /** A bar, or a delay ghost, which stands for its bar (layers.tsx, BarGhosts). */
 const BAR = "[data-occupancy-id], [data-ghost-of]";
@@ -27,7 +28,8 @@ interface BarMenuAt {
 }
 
 /** On a stand, with a flight to give it a stand again by: FlightCard's rule. */
-const canUnassign = (stayId: string) => !!occupancyById(stayId) && flightsAtStay(stayId).length > 0;
+const canUnassign = (stayId: string) =>
+  ACTIVE_DATASET.capabilities.editStands && !!occupancyById(stayId) && flightsAtStay(stayId).length > 0;
 
 const within = (x: number, y: number, rect: DOMRect) =>
   x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;

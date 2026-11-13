@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Planning.Solver.OrTools</PackageId>
+    <RootNamespace>Planning.Solver.OrTools</RootNamespace>
+    <Description>Google OR-Tools CP-SAT strategy for the domain-neutral planning solver.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Planning.Solver.Core\Planning.Solver.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.OrTools" />
+  </ItemGroup>
+
+</Project>

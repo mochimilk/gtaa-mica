@@ -1,0 +1,22 @@
+{
+  "sectors": [
+    {
+      "id": "domestic",
+      "name": "Domestic",
+      "description": "Domestic sector of the airport",
+      "requires-passport-check": false
+    },
+    {
+      "id": "international",
+      "name": "International",
+      "description": "International sector of the airport",
+      "requires-passport-check": true
+    },
+    {
+      "id": "transborder",
+      "name": "Transborder",
+      "description": "Allows travel between countries without passport checks",
+      "requires-passport-check": true
+    }
+  ]
+}

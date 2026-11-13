@@ -1,0 +1,2245 @@
+{
+  "schema_version": "1.0.0",
+  "case_id": "constrained",
+  "demand_id": "scenario:contoso%3Ademo-days%3Av1/constrained/614caf47bc226349dfc78ffde8e595bc2a2a9313705ca0d7864b530603fc4a10",
+  "airport": {
+    "id": "contoso",
+    "name": "Contoso International Airport",
+    "time_zone": "America/Los_Angeles"
+  },
+  "plan_window": {
+    "start": "2026-10-21T14:00:00Z",
+    "end": "2026-10-22T14:00:00Z"
+  },
+  "rows": [
+    {
+      "id": "t1:stand:101",
+      "label": "101",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:102",
+      "label": "102",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:103",
+      "label": "103",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:104",
+      "label": "104",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:105",
+      "label": "105",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:106",
+      "label": "106",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:107",
+      "label": "107",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:108",
+      "label": "108",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:109",
+      "label": "109",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:110",
+      "label": "110",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:111",
+      "label": "111",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:112",
+      "label": "112",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:113",
+      "label": "113",
+      "group": "A"
+    },
+    {
+      "id": "t1:stand:220",
+      "label": "220",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:221",
+      "label": "221",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:222",
+      "label": "222",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:223",
+      "label": "223",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:224",
+      "label": "224",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:225",
+      "label": "225",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:226",
+      "label": "226",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:227",
+      "label": "227",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:228",
+      "label": "228",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:229",
+      "label": "229",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:230",
+      "label": "230",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:231",
+      "label": "231",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:232",
+      "label": "232",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:233",
+      "label": "233",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:234",
+      "label": "234",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:235",
+      "label": "235",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:236",
+      "label": "236",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:237",
+      "label": "237",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:238",
+      "label": "238",
+      "group": "B"
+    },
+    {
+      "id": "t1:stand:302",
+      "label": "302",
+      "group": "C"
+    },
+    {
+      "id": "t1:stand:303",
+      "label": "303",
+      "group": "C"
+    },
+    {
+      "id": "t1:stand:304",
+      "label": "304",
+      "group": "C"
+    },
+    {
+      "id": "t1:stand:305",
+      "label": "305",
+      "group": "C"
+    },
+    {
+      "id": "t1:stand:306",
+      "label": "306",
+      "group": "C"
+    },
+    {
+      "id": "t1:stand:307",
+      "label": "307",
+      "group": "C"
+    },
+    {
+      "id": "t1:stand:R01",
+      "label": "R01",
+      "group": "remote"
+    },
+    {
+      "id": "t1:stand:R02",
+      "label": "R02",
+      "group": "remote"
+    },
+    {
+      "id": "t1:stand:R03",
+      "label": "R03",
+      "group": "remote"
+    },
+    {
+      "id": "t1:stand:R04",
+      "label": "R04",
+      "group": "remote"
+    },
+    {
+      "id": "t1:stand:R05",
+      "label": "R05",
+      "group": "remote"
+    },
+    {
+      "id": "t1:stand:R06",
+      "label": "R06",
+      "group": "remote"
+    },
+    {
+      "id": "t1:stand:R07",
+      "label": "R07",
+      "group": "remote"
+    },
+    {
+      "id": "t1:stand:R08",
+      "label": "R08",
+      "group": "remote"
+    }
+  ],
+  "visits": [
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA1177",
+      "depFlight": "UA2746",
+      "origin": "LHR",
+      "destination": "ICN",
+      "registration": "SYN-4FC40A4F72B6",
+      "aircraftType": "B789"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA1209",
+      "depFlight": "UA7712",
+      "origin": "FRA",
+      "destination": "PVG",
+      "registration": "SYN-5757BB14851E",
+      "aircraftType": "B789"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA2651",
+      "depFlight": "UA4851",
+      "origin": "HND",
+      "destination": "HND",
+      "registration": "SYN-39B6CB8CFDAB",
+      "aircraftType": "B789"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA6851",
+      "depFlight": "UA1712",
+      "origin": "CDG",
+      "destination": "CDG",
+      "registration": "SYN-CEF4C18BABE7",
+      "aircraftType": "B789"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA6719",
+      "depFlight": "UA1641",
+      "origin": "HND",
+      "destination": "HND",
+      "registration": "SYN-9A26D136E110",
+      "aircraftType": "B789"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA2710",
+      "depFlight": "AA3822",
+      "origin": "CLT",
+      "destination": "ORD",
+      "registration": "SYN-7C6B3BCD903E",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA5798",
+      "depFlight": "UA1565",
+      "origin": "DEN",
+      "destination": "BOS",
+      "registration": "SYN-9E476966FA26",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA2160",
+      "depFlight": "AA632",
+      "origin": "PHL",
+      "destination": "JFK",
+      "registration": "SYN-68C65F8CDB4D",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA2980",
+      "depFlight": "AA2590",
+      "origin": "DCA",
+      "destination": "ITO",
+      "registration": "SYN-48C199C03CEE",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA1708",
+      "depFlight": "AA9122",
+      "origin": "CLT",
+      "destination": "ITO",
+      "registration": "SYN-89B352B9EF7D",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA7784",
+      "depFlight": "AA411",
+      "origin": "PHX",
+      "destination": "JFK",
+      "registration": "SYN-9EAD098D0F02",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA6408",
+      "depFlight": "AA1246",
+      "origin": "PHL",
+      "destination": "DCA",
+      "registration": "SYN-B93BA81D5C26",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA8266",
+      "depFlight": "AA4519",
+      "origin": "DCA",
+      "destination": "HNL",
+      "registration": "SYN-E80AB35C8595",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA3890",
+      "depFlight": "AA8902",
+      "origin": "OGG",
+      "destination": "LAX",
+      "registration": "SYN-8504ADE4B526",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA864",
+      "depFlight": "AA5988",
+      "origin": "JFK",
+      "destination": "IAD",
+      "registration": "SYN-A45A7F5D4921",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA830",
+      "depFlight": "AA5573",
+      "origin": "CLT",
+      "destination": "PHX",
+      "registration": "SYN-99044EC037EF",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA490",
+      "depFlight": "AA9572",
+      "origin": "ORD",
+      "destination": "ITO",
+      "registration": "SYN-F731FCBB21CF",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA2351",
+      "depFlight": "AA534",
+      "origin": "CLT",
+      "destination": "EWR",
+      "registration": "SYN-1F7D6F59BC00",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA8845",
+      "depFlight": "AA4257",
+      "origin": "BOS",
+      "destination": "MSP",
+      "registration": "SYN-426058D61905",
+      "aircraftType": "B738"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA3064",
+      "depFlight": "AA8816",
+      "origin": "CDG",
+      "destination": "ICN",
+      "registration": "SYN-F3B1494519BB",
+      "aircraftType": "B789"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA3147",
+      "depFlight": "AA7385",
+      "origin": "HKG",
+      "destination": "CDG",
+      "registration": "SYN-70BF6A7CBB72",
+      "aircraftType": "B789"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA952",
+      "depFlight": "AA5945",
+      "origin": "ICN",
+      "destination": "LHR",
+      "registration": "SYN-70D441E511C1",
+      "aircraftType": "B789"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+      "carrier": "AAL",
+      "arrFlight": "AA5336",
+      "depFlight": "AA8766",
+      "origin": "CDG",
+      "destination": "FRA",
+      "registration": "SYN-49C50B24678F",
+      "aircraftType": "B789"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA4636",
+      "depFlight": "UA6255",
+      "origin": "EWR",
+      "destination": "KOA",
+      "registration": "SYN-151A2F117CF9",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA460",
+      "depFlight": "UA8926",
+      "origin": "OGG",
+      "destination": "ORD",
+      "registration": "SYN-ED4F6B4C5BD1",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA9468",
+      "depFlight": "UA4803",
+      "origin": "LAX",
+      "destination": "DEN",
+      "registration": "SYN-E797FFC65188",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA1598",
+      "depFlight": "UA9736",
+      "origin": "PHX",
+      "destination": "IAD",
+      "registration": "SYN-F2C715874158",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA8783",
+      "depFlight": "UA2307",
+      "origin": "SAN",
+      "destination": "IAD",
+      "registration": "SYN-A8EDF18AA83D",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA9920",
+      "depFlight": "UA8612",
+      "origin": "LAX",
+      "destination": "EWR",
+      "registration": "SYN-2DE4C7435A85",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA8912",
+      "depFlight": "UA8284",
+      "origin": "IAD",
+      "destination": "ORD",
+      "registration": "SYN-6A83B39634D2",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA5439",
+      "depFlight": "UA2639",
+      "origin": "MCO",
+      "destination": "ANC",
+      "registration": "SYN-56629C42199C",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA9542",
+      "depFlight": "UA7036",
+      "origin": "KOA",
+      "destination": "LAX",
+      "registration": "SYN-2C02F6BF8F7C",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA6340",
+      "depFlight": "UA4116",
+      "origin": "KOA",
+      "destination": "LGA",
+      "registration": "SYN-ACB375837C22",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA1332",
+      "depFlight": "UA8562",
+      "origin": "DCA",
+      "destination": "ITO",
+      "registration": "SYN-369623969E59",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA7133",
+      "depFlight": "UA6812",
+      "origin": "DEN",
+      "destination": "DEN",
+      "registration": "SYN-22BC4F82BB20",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA5654",
+      "depFlight": "UA3847",
+      "origin": "CLT",
+      "destination": "EWR",
+      "registration": "SYN-EEC35558C776",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA9947",
+      "depFlight": "UA8840",
+      "origin": "EWR",
+      "destination": "LGA",
+      "registration": "SYN-70698CD3B82B",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA482",
+      "depFlight": "UA2128",
+      "origin": "IAD",
+      "destination": "LAX",
+      "registration": "SYN-B72206C57B57",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA7748",
+      "depFlight": "UA1352",
+      "origin": "SLC",
+      "destination": "PHX",
+      "registration": "SYN-9A34F6A89ED2",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA1919",
+      "depFlight": "UA3839",
+      "origin": "LAX",
+      "destination": "ORD",
+      "registration": "SYN-68B4C376220F",
+      "aircraftType": "A320"
+    },
+    {
+      "turnId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+      "carrier": "UAL",
+      "arrFlight": "UA788",
+      "depFlight": "UA3308",
+      "origin": "EWR",
+      "destination": "DEN",
+      "registration": "SYN-91313EA7A3A8",
+      "aircraftType": "A320"
+    }
+  ],
+  "flights": [
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Along%3A1/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA1177",
+      "routeEnd": "LHR",
+      "scheduled": "2026-10-21T20:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Along%3A1/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA2746",
+      "routeEnd": "ICN",
+      "scheduled": "2026-10-22T02:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A1/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA1209",
+      "routeEnd": "FRA",
+      "scheduled": "2026-10-21T22:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A1/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA7712",
+      "routeEnd": "PVG",
+      "scheduled": "2026-10-22T00:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A2/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA2651",
+      "routeEnd": "HND",
+      "scheduled": "2026-10-21T22:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A2/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA4851",
+      "routeEnd": "HND",
+      "scheduled": "2026-10-22T00:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A3/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA6851",
+      "routeEnd": "CDG",
+      "scheduled": "2026-10-21T22:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A3/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA1712",
+      "routeEnd": "CDG",
+      "scheduled": "2026-10-22T00:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A4/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA6719",
+      "routeEnd": "HND",
+      "scheduled": "2026-10-21T22:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A4/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA1641",
+      "routeEnd": "HND",
+      "scheduled": "2026-10-22T00:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Afinal-overnight/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA2710",
+      "routeEnd": "CLT",
+      "scheduled": "2026-10-22T12:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Afinal-overnight/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA3822",
+      "routeEnd": "ORD",
+      "scheduled": "2026-10-22T18:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Ainitial-overnight/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA5798",
+      "routeEnd": "DEN",
+      "scheduled": "2026-10-21T10:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Ainitial-overnight/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA1565",
+      "routeEnd": "BOS",
+      "scheduled": "2026-10-21T16:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A1/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA2160",
+      "routeEnd": "PHL",
+      "scheduled": "2026-10-21T16:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A1/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA632",
+      "routeEnd": "JFK",
+      "scheduled": "2026-10-21T18:17:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A10/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA2980",
+      "routeEnd": "DCA",
+      "scheduled": "2026-10-22T01:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A10/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA2590",
+      "routeEnd": "ITO",
+      "scheduled": "2026-10-22T02:50:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A11/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA1708",
+      "routeEnd": "CLT",
+      "scheduled": "2026-10-21T22:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A11/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA9122",
+      "routeEnd": "ITO",
+      "scheduled": "2026-10-21T23:39:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A12/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA7784",
+      "routeEnd": "PHX",
+      "scheduled": "2026-10-22T12:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A12/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA411",
+      "routeEnd": "JFK",
+      "scheduled": "2026-10-22T14:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A2/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA6408",
+      "routeEnd": "PHL",
+      "scheduled": "2026-10-21T21:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A2/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA1246",
+      "routeEnd": "DCA",
+      "scheduled": "2026-10-21T22:46:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A3/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA8266",
+      "routeEnd": "DCA",
+      "scheduled": "2026-10-21T22:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A3/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA4519",
+      "routeEnd": "HNL",
+      "scheduled": "2026-10-21T23:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A4/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA3890",
+      "routeEnd": "OGG",
+      "scheduled": "2026-10-21T22:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A4/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA8902",
+      "routeEnd": "LAX",
+      "scheduled": "2026-10-22T00:07:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A5/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA864",
+      "routeEnd": "JFK",
+      "scheduled": "2026-10-21T23:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A5/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA5988",
+      "routeEnd": "IAD",
+      "scheduled": "2026-10-22T00:46:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A6/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA830",
+      "routeEnd": "CLT",
+      "scheduled": "2026-10-22T02:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A6/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA5573",
+      "routeEnd": "PHX",
+      "scheduled": "2026-10-22T03:24:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A7/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA490",
+      "routeEnd": "ORD",
+      "scheduled": "2026-10-22T00:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A7/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA9572",
+      "routeEnd": "ITO",
+      "scheduled": "2026-10-22T02:29:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A8/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA2351",
+      "routeEnd": "CLT",
+      "scheduled": "2026-10-21T22:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A8/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA534",
+      "routeEnd": "EWR",
+      "scheduled": "2026-10-21T23:11:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A9/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA8845",
+      "routeEnd": "BOS",
+      "scheduled": "2026-10-22T00:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A9/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA4257",
+      "routeEnd": "MSP",
+      "scheduled": "2026-10-22T01:49:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A1/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA3064",
+      "routeEnd": "CDG",
+      "scheduled": "2026-10-21T19:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A1/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA8816",
+      "routeEnd": "ICN",
+      "scheduled": "2026-10-21T21:04:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A2/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA3147",
+      "routeEnd": "HKG",
+      "scheduled": "2026-10-21T22:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A2/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA7385",
+      "routeEnd": "CDG",
+      "scheduled": "2026-10-22T01:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A3/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA952",
+      "routeEnd": "ICN",
+      "scheduled": "2026-10-21T21:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A3/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA5945",
+      "routeEnd": "LHR",
+      "scheduled": "2026-10-21T23:11:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A4/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+      "direction": "arrival",
+      "flight": "AA5336",
+      "routeEnd": "CDG",
+      "scheduled": "2026-10-21T22:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A4/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+      "direction": "departure",
+      "flight": "AA8766",
+      "routeEnd": "FRA",
+      "scheduled": "2026-10-22T00:28:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A1/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA4636",
+      "routeEnd": "EWR",
+      "scheduled": "2026-10-21T19:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A1/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA6255",
+      "routeEnd": "KOA",
+      "scheduled": "2026-10-22T01:02:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A2/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA460",
+      "routeEnd": "OGG",
+      "scheduled": "2026-10-22T03:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A2/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA8926",
+      "routeEnd": "ORD",
+      "scheduled": "2026-10-22T07:55:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A1/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA9468",
+      "routeEnd": "LAX",
+      "scheduled": "2026-10-22T01:00:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A1/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA4803",
+      "routeEnd": "DEN",
+      "scheduled": "2026-10-22T02:02:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A10/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA1598",
+      "routeEnd": "PHX",
+      "scheduled": "2026-10-21T20:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A10/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA9736",
+      "routeEnd": "IAD",
+      "scheduled": "2026-10-21T21:31:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A11/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA8783",
+      "routeEnd": "SAN",
+      "scheduled": "2026-10-21T20:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A11/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA2307",
+      "routeEnd": "IAD",
+      "scheduled": "2026-10-21T21:49:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A12/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA9920",
+      "routeEnd": "LAX",
+      "scheduled": "2026-10-21T14:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A12/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA8612",
+      "routeEnd": "EWR",
+      "scheduled": "2026-10-21T15:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A13/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA8912",
+      "routeEnd": "IAD",
+      "scheduled": "2026-10-21T16:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A13/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA8284",
+      "routeEnd": "ORD",
+      "scheduled": "2026-10-21T17:56:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A14/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA5439",
+      "routeEnd": "MCO",
+      "scheduled": "2026-10-22T00:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A14/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA2639",
+      "routeEnd": "ANC",
+      "scheduled": "2026-10-22T01:34:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A15/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA9542",
+      "routeEnd": "KOA",
+      "scheduled": "2026-10-22T00:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A15/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA7036",
+      "routeEnd": "LAX",
+      "scheduled": "2026-10-22T02:05:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A16/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA6340",
+      "routeEnd": "KOA",
+      "scheduled": "2026-10-21T22:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A16/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA4116",
+      "routeEnd": "LGA",
+      "scheduled": "2026-10-21T23:54:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A2/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA1332",
+      "routeEnd": "DCA",
+      "scheduled": "2026-10-21T19:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A2/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA8562",
+      "routeEnd": "ITO",
+      "scheduled": "2026-10-21T21:03:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A3/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA7133",
+      "routeEnd": "DEN",
+      "scheduled": "2026-10-22T00:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A3/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA6812",
+      "routeEnd": "DEN",
+      "scheduled": "2026-10-22T01:35:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A4/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA5654",
+      "routeEnd": "CLT",
+      "scheduled": "2026-10-21T22:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A4/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA3847",
+      "routeEnd": "EWR",
+      "scheduled": "2026-10-21T23:48:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A5/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA9947",
+      "routeEnd": "EWR",
+      "scheduled": "2026-10-22T01:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A5/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA8840",
+      "routeEnd": "LGA",
+      "scheduled": "2026-10-22T02:59:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A6/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA482",
+      "routeEnd": "IAD",
+      "scheduled": "2026-10-21T22:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A6/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA2128",
+      "routeEnd": "LAX",
+      "scheduled": "2026-10-21T23:31:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A7/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA7748",
+      "routeEnd": "SLC",
+      "scheduled": "2026-10-22T02:45:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A7/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA1352",
+      "routeEnd": "PHX",
+      "scheduled": "2026-10-22T03:48:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A8/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA1919",
+      "routeEnd": "LAX",
+      "scheduled": "2026-10-21T18:15:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A8/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA3839",
+      "routeEnd": "ORD",
+      "scheduled": "2026-10-21T19:41:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A9/arrival",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+      "direction": "arrival",
+      "flight": "UA788",
+      "routeEnd": "EWR",
+      "scheduled": "2026-10-21T15:30:00.000Z"
+    },
+    {
+      "id": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A9/departure",
+      "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+      "direction": "departure",
+      "flight": "UA3308",
+      "routeEnd": "DEN",
+      "scheduled": "2026-10-21T16:32:00.000Z"
+    }
+  ],
+  "variants": {
+    "baseline": {
+      "solver_status": "optimal",
+      "request_fingerprint": "78cbce19c8eeeb0a23d99d60451b3f4fa00dda0f2c8d402f840f968661b9ade5",
+      "covered_flight_count": 80,
+      "generated_movement_count": 0,
+      "stand_validation_passed": true,
+      "stays": [
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+          "rowId": "t1:stand:304",
+          "start": "2026-10-21T20:45:00.000Z",
+          "end": "2026-10-22T02:45:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Along%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Along%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+          "rowId": "t1:stand:303",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T00:15:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+          "rowId": "t1:stand:R07",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T00:15:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+          "rowId": "t1:stand:302",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T00:15:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A3/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A3/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+          "rowId": "t1:stand:113",
+          "start": "2026-10-22T12:00:00.000Z",
+          "end": "2026-10-22T18:00:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Afinal-overnight/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Afinal-overnight/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+          "rowId": "t1:stand:105",
+          "start": "2026-10-21T10:00:00.000Z",
+          "end": "2026-10-21T16:00:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Ainitial-overnight/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Ainitial-overnight/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+          "rowId": "t1:stand:108",
+          "start": "2026-10-21T16:30:00.000Z",
+          "end": "2026-10-21T18:17:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+          "rowId": "t1:stand:108",
+          "start": "2026-10-22T01:30:00.000Z",
+          "end": "2026-10-22T02:50:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A10/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A10/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+          "rowId": "t1:stand:112",
+          "start": "2026-10-21T22:00:00.000Z",
+          "end": "2026-10-21T23:39:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A11/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A11/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+          "rowId": "t1:stand:108",
+          "start": "2026-10-22T12:30:00.000Z",
+          "end": "2026-10-22T14:00:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A12/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A12/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+          "rowId": "t1:stand:109",
+          "start": "2026-10-21T21:00:00.000Z",
+          "end": "2026-10-21T22:46:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+          "rowId": "t1:stand:110",
+          "start": "2026-10-21T22:00:00.000Z",
+          "end": "2026-10-21T23:45:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A3/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A3/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+          "rowId": "t1:stand:R06",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T00:07:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A4/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A4/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+          "rowId": "t1:stand:108",
+          "start": "2026-10-21T23:30:00.000Z",
+          "end": "2026-10-22T00:46:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A5/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A5/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+          "rowId": "t1:stand:109",
+          "start": "2026-10-22T02:15:00.000Z",
+          "end": "2026-10-22T03:24:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A6/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A6/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+          "rowId": "t1:stand:112",
+          "start": "2026-10-22T00:45:00.000Z",
+          "end": "2026-10-22T02:29:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A7/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A7/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+          "rowId": "t1:stand:108",
+          "start": "2026-10-21T22:00:00.000Z",
+          "end": "2026-10-21T23:11:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A8/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A8/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+          "rowId": "t1:stand:109",
+          "start": "2026-10-22T00:15:00.000Z",
+          "end": "2026-10-22T01:49:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A9/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A9/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+          "rowId": "t1:stand:305",
+          "start": "2026-10-21T19:30:00.000Z",
+          "end": "2026-10-21T21:04:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+          "rowId": "t1:stand:305",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T01:15:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+          "rowId": "t1:stand:306",
+          "start": "2026-10-21T21:30:00.000Z",
+          "end": "2026-10-21T23:11:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A3/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A3/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+          "rowId": "t1:stand:307",
+          "start": "2026-10-21T22:15:00.000Z",
+          "end": "2026-10-22T00:28:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A4/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A4/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+          "rowId": "t1:stand:223",
+          "start": "2026-10-21T19:45:00.000Z",
+          "end": "2026-10-22T01:02:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+          "rowId": "t1:stand:104",
+          "start": "2026-10-22T03:30:00.000Z",
+          "end": "2026-10-22T07:55:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+          "rowId": "t1:stand:102",
+          "start": "2026-10-22T01:00:00.000Z",
+          "end": "2026-10-22T02:02:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+          "rowId": "t1:stand:105",
+          "start": "2026-10-21T20:15:00.000Z",
+          "end": "2026-10-21T21:31:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A10/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A10/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+          "rowId": "t1:stand:102",
+          "start": "2026-10-21T20:15:00.000Z",
+          "end": "2026-10-21T21:49:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A11/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A11/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+          "rowId": "t1:stand:102",
+          "start": "2026-10-21T14:45:00.000Z",
+          "end": "2026-10-21T15:45:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A12/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A12/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+          "rowId": "t1:stand:101",
+          "start": "2026-10-21T16:45:00.000Z",
+          "end": "2026-10-21T17:56:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A13/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A13/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+          "rowId": "t1:stand:105",
+          "start": "2026-10-22T00:15:00.000Z",
+          "end": "2026-10-22T01:34:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A14/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A14/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+          "rowId": "t1:stand:107",
+          "start": "2026-10-22T00:30:00.000Z",
+          "end": "2026-10-22T02:05:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A15/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A15/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+          "rowId": "t1:stand:104",
+          "start": "2026-10-21T22:15:00.000Z",
+          "end": "2026-10-21T23:54:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A16/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A16/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+          "rowId": "t1:stand:104",
+          "start": "2026-10-21T19:30:00.000Z",
+          "end": "2026-10-21T21:03:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+          "rowId": "t1:stand:106",
+          "start": "2026-10-22T00:30:00.000Z",
+          "end": "2026-10-22T01:35:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A3/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A3/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+          "rowId": "t1:stand:102",
+          "start": "2026-10-21T22:30:00.000Z",
+          "end": "2026-10-21T23:48:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A4/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A4/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+          "rowId": "t1:stand:231",
+          "start": "2026-10-22T01:45:00.000Z",
+          "end": "2026-10-22T02:59:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A5/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A5/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+          "rowId": "t1:stand:R05",
+          "start": "2026-10-21T22:15:00.000Z",
+          "end": "2026-10-21T23:31:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A6/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A6/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+          "rowId": "t1:stand:102",
+          "start": "2026-10-22T02:45:00.000Z",
+          "end": "2026-10-22T03:48:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A7/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A7/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+          "rowId": "t1:stand:102",
+          "start": "2026-10-21T18:15:00.000Z",
+          "end": "2026-10-21T19:41:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A8/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A8/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+          "rowId": "t1:stand:R05",
+          "start": "2026-10-21T15:30:00.000Z",
+          "end": "2026-10-21T16:32:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A9/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A9/departure",
+          "towIn": false,
+          "towOut": false
+        }
+      ]
+    },
+    "tow-options": {
+      "solver_status": "optimal",
+      "request_fingerprint": "6bc691e80de6e43335ec240965fd8954e65c77dec6b022a0327fb24148737abe",
+      "covered_flight_count": 82,
+      "generated_movement_count": 2,
+      "stand_validation_passed": true,
+      "stays": [
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A1%2Fdeparture",
+          "rowId": "t1:stand:302",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T00:15:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A2%2Fdeparture",
+          "rowId": "t1:stand:R07",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T00:15:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A3%2Fdeparture",
+          "rowId": "t1:stand:303",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T00:15:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A3/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A3/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Ashort%253A4%2Fdeparture",
+          "rowId": "t1:stand:304",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T00:15:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A4/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Ashort%3A4/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Afinal-overnight%2Fdeparture",
+          "rowId": "t1:stand:108",
+          "start": "2026-10-22T12:00:00.000Z",
+          "end": "2026-10-22T18:00:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Afinal-overnight/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Afinal-overnight/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fboundary%253Ainitial-overnight%2Fdeparture",
+          "rowId": "t1:stand:102",
+          "start": "2026-10-21T10:00:00.000Z",
+          "end": "2026-10-21T16:00:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Ainitial-overnight/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/boundary%3Ainitial-overnight/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A1%2Fdeparture",
+          "rowId": "t1:stand:108",
+          "start": "2026-10-21T16:30:00.000Z",
+          "end": "2026-10-21T18:17:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A10%2Fdeparture",
+          "rowId": "t1:stand:109",
+          "start": "2026-10-22T01:30:00.000Z",
+          "end": "2026-10-22T02:50:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A10/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A10/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A11%2Fdeparture",
+          "rowId": "t1:stand:110",
+          "start": "2026-10-21T22:00:00.000Z",
+          "end": "2026-10-21T23:39:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A11/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A11/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A12%2Fdeparture",
+          "rowId": "t1:stand:R06",
+          "start": "2026-10-22T12:30:00.000Z",
+          "end": "2026-10-22T14:00:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A12/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A12/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A2%2Fdeparture",
+          "rowId": "t1:stand:109",
+          "start": "2026-10-21T21:00:00.000Z",
+          "end": "2026-10-21T22:46:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A3%2Fdeparture",
+          "rowId": "t1:stand:112",
+          "start": "2026-10-21T22:00:00.000Z",
+          "end": "2026-10-21T23:45:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A3/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A3/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A4%2Fdeparture",
+          "rowId": "t1:stand:R06",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T00:07:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A4/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A4/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A5%2Fdeparture",
+          "rowId": "t1:stand:109",
+          "start": "2026-10-21T23:30:00.000Z",
+          "end": "2026-10-22T00:46:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A5/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A5/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A6%2Fdeparture",
+          "rowId": "t1:stand:110",
+          "start": "2026-10-22T02:15:00.000Z",
+          "end": "2026-10-22T03:24:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A6/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A6/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A7%2Fdeparture",
+          "rowId": "t1:stand:222",
+          "start": "2026-10-22T00:45:00.000Z",
+          "end": "2026-10-22T02:29:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A7/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A7/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A8%2Fdeparture",
+          "rowId": "t1:stand:108",
+          "start": "2026-10-21T22:00:00.000Z",
+          "end": "2026-10-21T23:11:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A8/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A8/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-domestic-short%253A9%2Fdeparture",
+          "rowId": "t1:stand:108",
+          "start": "2026-10-22T00:15:00.000Z",
+          "end": "2026-10-22T01:49:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A9/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-domestic-short%3A9/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A1%2Fdeparture",
+          "rowId": "t1:stand:305",
+          "start": "2026-10-21T19:30:00.000Z",
+          "end": "2026-10-21T21:04:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A2%2Fdeparture",
+          "rowId": "t1:stand:306",
+          "start": "2026-10-21T22:45:00.000Z",
+          "end": "2026-10-22T01:15:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A3%2Fdeparture",
+          "rowId": "t1:stand:R08",
+          "start": "2026-10-21T21:30:00.000Z",
+          "end": "2026-10-21T23:11:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A3/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A3/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Aoneworld-international%253A4%2Fdeparture",
+          "rowId": "t1:stand:305",
+          "start": "2026-10-21T22:15:00.000Z",
+          "end": "2026-10-22T00:28:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A4/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Aoneworld-international%3A4/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A1%2Fdeparture",
+          "rowId": "t1:stand:102",
+          "start": "2026-10-21T19:45:00.000Z",
+          "end": "2026-10-22T01:02:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-long%253A2%2Fdeparture",
+          "rowId": "t1:stand:102",
+          "start": "2026-10-22T03:30:00.000Z",
+          "end": "2026-10-22T07:55:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-long%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A1%2Fdeparture",
+          "rowId": "t1:stand:106",
+          "start": "2026-10-22T01:00:00.000Z",
+          "end": "2026-10-22T02:02:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A1/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A1/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A10%2Fdeparture",
+          "rowId": "t1:stand:221",
+          "start": "2026-10-21T20:15:00.000Z",
+          "end": "2026-10-21T21:31:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A10/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A10/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A11%2Fdeparture",
+          "rowId": "t1:stand:104",
+          "start": "2026-10-21T20:15:00.000Z",
+          "end": "2026-10-21T21:49:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A11/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A11/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A12%2Fdeparture",
+          "rowId": "t1:stand:107",
+          "start": "2026-10-21T14:45:00.000Z",
+          "end": "2026-10-21T15:45:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A12/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A12/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A13%2Fdeparture",
+          "rowId": "t1:stand:101",
+          "start": "2026-10-21T16:45:00.000Z",
+          "end": "2026-10-21T17:56:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A13/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A13/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A14%2Fdeparture",
+          "rowId": "t1:stand:104",
+          "start": "2026-10-22T00:15:00.000Z",
+          "end": "2026-10-22T01:34:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A14/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A14/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A15%2Fdeparture",
+          "rowId": "t1:stand:105",
+          "start": "2026-10-22T00:30:00.000Z",
+          "end": "2026-10-22T02:05:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A15/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A15/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A16%2Fdeparture",
+          "rowId": "t1:stand:105",
+          "start": "2026-10-21T22:15:00.000Z",
+          "end": "2026-10-21T23:54:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A16/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A16/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A2%2Fdeparture",
+          "rowId": "t1:stand:106",
+          "start": "2026-10-21T19:30:00.000Z",
+          "end": "2026-10-21T21:03:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A2/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A2/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A3%2Fdeparture",
+          "rowId": "t1:stand:221",
+          "start": "2026-10-22T00:30:00.000Z",
+          "end": "2026-10-22T01:35:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A3/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A3/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A4%2Fdeparture",
+          "rowId": "t1:stand:229",
+          "start": "2026-10-21T22:30:00.000Z",
+          "end": "2026-10-21T23:48:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A4/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A4/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A5%2Fdeparture",
+          "rowId": "t1:stand:104",
+          "start": "2026-10-22T01:45:00.000Z",
+          "end": "2026-10-22T02:59:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A5/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A5/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A6%2Fdeparture",
+          "rowId": "t1:stand:104",
+          "start": "2026-10-21T22:15:00.000Z",
+          "end": "2026-10-21T23:31:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A6/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A6/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A7%2Fdeparture",
+          "rowId": "t1:stand:107",
+          "start": "2026-10-22T02:45:00.000Z",
+          "end": "2026-10-22T03:48:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A7/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A7/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A8%2Fdeparture",
+          "rowId": "t1:stand:105",
+          "start": "2026-10-21T18:15:00.000Z",
+          "end": "2026-10-21T19:41:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A8/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A8/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "occupancy:arrival-on-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/departure-off-block%3Ascenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fmix%253Astar-domestic-short%253A9%2Fdeparture",
+          "rowId": "t1:stand:R05",
+          "start": "2026-10-21T15:30:00.000Z",
+          "end": "2026-10-21T16:32:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A9/arrival",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/mix%3Astar-domestic-short%3A9/departure",
+          "towIn": false,
+          "towOut": false
+        },
+        {
+          "id": "tow-proposal:visit%3Ascenario-leg%253Acontoso%25253Ademo-days%25253Av1%252Fbank%25253Astar-international-bank%25253Along%25253A1%252Farrival%2Fscenario-leg%253Acontoso%25253Ademo-days%25253Av1%252Fbank%25253Astar-international-bank%25253Along%25253A1%252Fdeparture/arrival",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+          "rowId": "t1:stand:304",
+          "start": "2026-10-21T20:45:00.000Z",
+          "end": "2026-10-21T21:45:00.000Z",
+          "arrivalFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Along%3A1/arrival",
+          "towIn": false,
+          "towOut": true
+        },
+        {
+          "id": "tow-proposal:visit%3Ascenario-leg%253Acontoso%25253Ademo-days%25253Av1%252Fbank%25253Astar-international-bank%25253Along%25253A1%252Farrival%2Fscenario-leg%253Acontoso%25253Ademo-days%25253Av1%252Fbank%25253Astar-international-bank%25253Along%25253A1%252Fdeparture/departure",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+          "rowId": "t1:stand:304",
+          "start": "2026-10-22T01:45:00.000Z",
+          "end": "2026-10-22T02:45:00.000Z",
+          "departureFlightId": "scenario-leg:contoso%3Ademo-days%3Av1/bank%3Astar-international-bank%3Along%3A1/departure",
+          "towIn": true,
+          "towOut": false
+        },
+        {
+          "id": "tow-proposal:visit%3Ascenario-leg%253Acontoso%25253Ademo-days%25253Av1%252Fbank%25253Astar-international-bank%25253Along%25253A1%252Farrival%2Fscenario-leg%253Acontoso%25253Ademo-days%25253Av1%252Fbank%25253Astar-international-bank%25253Along%25253A1%252Fdeparture/parking",
+          "visitId": "visit:scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Farrival/scenario-leg%3Acontoso%253Ademo-days%253Av1%2Fbank%253Astar-international-bank%253Along%253A1%2Fdeparture",
+          "rowId": "t1:stand:R01",
+          "start": "2026-10-21T21:57:00.000Z",
+          "end": "2026-10-22T01:33:00.000Z",
+          "towIn": true,
+          "towOut": true
+        }
+      ]
+    }
+  }
+}

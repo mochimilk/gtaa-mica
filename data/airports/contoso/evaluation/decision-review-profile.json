@@ -1,0 +1,7 @@
+{
+  "$schema": "../../../schemas/decision-review-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "contoso:decision-review:v1",
+  "metric_id": "airport-decision-review",
+  "metric_version": "1.0.0"
+}

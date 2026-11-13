@@ -1,0 +1,16 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "buffer-evaluation-profile.schema.json",
+  "title": "Reporting-only scheduled stand buffer profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "metric_id", "metric_version", "threshold_minutes"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "id": { "type": "string", "pattern": "\\S" },
+    "metric_id": { "const": "airport-scheduled-stand-buffer" },
+    "metric_version": { "const": "1.0.0" },
+    "threshold_minutes": { "type": "number", "minimum": 0, "maximum": 120 }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:tow-profile:1.0.0",
+  "title": "Selective capacity-repair demo profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "method", "minimum_parking_minutes", "movement_penalty_minutes", "minimum_net_benefit_minutes", "maximum_generated_movements", "parking_stand_kind"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "description": { "type": "string" },
+    "method": { "const": "greedy-marginal-shortfall" },
+    "minimum_parking_minutes": { "type": "integer", "minimum": 1, "maximum": 10080 },
+    "movement_penalty_minutes": { "type": "number", "exclusiveMinimum": 0, "maximum": 1000000 },
+    "minimum_net_benefit_minutes": { "type": "number", "minimum": 0, "maximum": 1000000 },
+    "maximum_generated_movements": { "type": "integer", "minimum": 0, "maximum": 10000 },
+    "parking_stand_kind": { "enum": ["non-contact", "any"] }
+  }
+}

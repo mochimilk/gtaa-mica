@@ -5,7 +5,7 @@
 // header, with Discard and Save at its end, and its canvas centred, the
 // floating toolbar's tools down its left. Drawings are one colour, the text
 // colour around them (see ./drawings).
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { Panel } from "@coral-ai/react";
 import { Button, Tooltip } from "@fluentui/react-components";
 import { Add } from "@coral-ai/bundleicons/Add";
@@ -16,7 +16,7 @@ import { Menu, MenuItem, MenuList, MenuPopover, MenuTrigger } from "../component
 import { PanelHeader } from "../components/panel-header";
 import { SharedPanelLeft } from "../components/panel-left";
 import { DEMO_DATA } from "../stand-timeline-demo/demoData";
-import { AIRCRAFT_MAKER } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET } from "../operations/activeDataset";
 import {
   BLANK,
   discardDraft,
@@ -44,19 +44,22 @@ interface Aircraft {
   count: number;
 }
 
-const counts = new Map<string, number>();
-for (const turn of DEMO_DATA.turnsById.values()) {
-  if (turn.aircraftType) counts.set(turn.aircraftType, (counts.get(turn.aircraftType) ?? 0) + 1);
-}
-const aircraftOf = (type: string): Aircraft => ({
-  type,
-  maker: AIRCRAFT_MAKER[type],
-  name: AIRCRAFT_MAKER[type] ? `${AIRCRAFT_MAKER[type]} ${type}` : type,
-  count: counts.get(type) ?? 0,
-});
 const byName = (a: Aircraft, b: Aircraft) => a.name.localeCompare(b.name);
-/** Every type on the board, or with a maker on record. */
-const ALL_AIRCRAFT = [...new Set([...counts.keys(), ...Object.keys(AIRCRAFT_MAKER)])].map(aircraftOf).sort(byName);
+function aircraftCatalog() {
+  const counts = new Map<string, number>();
+  for (const turn of DEMO_DATA.turnsById.values()) {
+    if (turn.aircraftType) counts.set(turn.aircraftType, (counts.get(turn.aircraftType) ?? 0) + 1);
+  }
+  const aircraftOf = (type: string): Aircraft => ({
+    type, maker: ACTIVE_DATASET.aircraftMakers[type],
+    name: ACTIVE_DATASET.aircraftMakers[type] ? `${ACTIVE_DATASET.aircraftMakers[type]} ${type}` : type,
+    count: counts.get(type) ?? 0,
+  });
+  return {
+    aircraftOf,
+    allAircraft: [...new Set([...counts.keys(), ...Object.keys(ACTIVE_DATASET.aircraftMakers)])].map(aircraftOf).sort(byName),
+  };
+}
 const onBoard = (a: Aircraft) => `${a.count} on the board`;
 
 /** How many strokes undo goes back. */
@@ -76,6 +79,7 @@ export interface StudioPageProps {
 }
 
 export function StudioPage({ panelID, panelClassName }: StudioPageProps) {
+  const { aircraftOf, allAircraft: ALL_AIRCRAFT } = useMemo(aircraftCatalog, []);
   const drawings = useDrawings();
   const drafts = useDrafts();
   // The panel's types: those with a drawing or unsaved edits, by name.
@@ -147,7 +151,7 @@ export function StudioPage({ panelID, panelClassName }: StudioPageProps) {
       <SharedPanelLeft panelID={panelID} className={panelClassName}>
         <PanelHeader title="Studio" />
         <div className="studio-panel">
-          <Panel.NavSection label="Aircraft" collapsible={false} actions={<NewDrawing taken={listed} onPick={setType} />}>
+          <Panel.NavSection label="Aircraft" collapsible={false} actions={<NewDrawing aircraft={ALL_AIRCRAFT} taken={listed} onPick={setType} />}>
             {list.map((a) => {
               const draft = drafts.get(a.type);
               // Edits not saved yet, a new drawing's included: a dot at the item's end.
@@ -258,8 +262,8 @@ function DrawingThumb({ pixels }: { pixels: Pixels; filled?: boolean }) {
 }
 
 /** The panel's New drawing button: a menu of the aircraft types with no drawing yet, to open one blank. */
-function NewDrawing({ taken, onPick }: { taken: ReadonlySet<string>; onPick: (type: string) => void }) {
-  const options = ALL_AIRCRAFT.filter((a) => !taken.has(a.type));
+function NewDrawing({ aircraft, taken, onPick }: { aircraft: readonly Aircraft[]; taken: ReadonlySet<string>; onPick: (type: string) => void }) {
+  const options = aircraft.filter((a) => !taken.has(a.type));
   if (options.length === 0) {
     return (
       <Tooltip content="Every aircraft type has a drawing" relationship="label">

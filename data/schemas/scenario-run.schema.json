@@ -1,0 +1,102 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:scenario-run:1.0.0",
+  "title": "Generated airport scenario solver review and measurements",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "scenario", "comparison", "summary"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "scenario": { "$ref": "urn:gtaa-mica:scenario:1.0.0" },
+    "comparison": { "$ref": "urn:gtaa-mica:local-assignment:1.0.0" },
+    "summary": {
+      "type": "object", "additionalProperties": false,
+      "required": ["total_source_flight_legs", "in_horizon_flight_legs", "context_flight_legs", "expected_visits", "metrics", "coverage_gain", "expectation_checks", "expectations_passed", "operationally_ready", "limitations"],
+      "properties": {
+        "total_source_flight_legs": { "$ref": "#/definitions/count" },
+        "in_horizon_flight_legs": { "$ref": "#/definitions/count" },
+        "context_flight_legs": { "$ref": "#/definitions/count" },
+        "expected_visits": { "$ref": "#/definitions/count" },
+        "metrics": {
+          "type": "object", "additionalProperties": false, "required": ["baseline", "tow-options"],
+          "properties": { "baseline": { "$ref": "#/definitions/metrics" }, "tow-options": { "$ref": "#/definitions/metrics" } }
+        },
+        "coverage_gain": { "type": "integer" },
+        "expectation_checks": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["name", "passed"],
+            "properties": { "name": { "type": "string", "minLength": 1 }, "passed": { "type": "boolean" } }
+          }
+        },
+        "expectations_passed": { "type": "boolean" },
+        "operationally_ready": { "const": false },
+        "limitations": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } }
+      }
+    }
+  },
+  "definitions": {
+    "id": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/id" },
+    "instant": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/instant" },
+    "count": { "type": "integer", "minimum": 0 },
+    "state": {
+      "type": "object", "additionalProperties": false,
+      "required": ["aircraft_registration", "status"],
+      "properties": {
+        "aircraft_registration": { "$ref": "#/definitions/id" },
+        "status": { "enum": ["on-stand", "in-transit", "unassigned"] },
+        "stand_id": { "$ref": "#/definitions/id" },
+        "movement_id": { "$ref": "#/definitions/id" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "status": { "const": "on-stand" } } },
+          "then": { "required": ["stand_id"], "properties": { "movement_id": false } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "in-transit" } } },
+          "then": { "required": ["movement_id"], "properties": { "stand_id": false } }
+        },
+        {
+          "if": { "properties": { "status": { "const": "unassigned" } } },
+          "then": { "properties": { "stand_id": false, "movement_id": false } }
+        }
+      ]
+    },
+    "metrics": {
+      "type": "object", "additionalProperties": false,
+      "required": ["solver_status", "complete_assignment", "assigned_visits", "unassigned_visits", "represented_flight_legs", "assigned_flight_legs", "generated_tows", "contact_service_flight_legs", "remote_service_flight_legs", "unresolved_segment_count", "blocked_source_leg_count", "stand_validation_passed", "initial_state", "final_state", "stands"],
+      "properties": {
+        "solver_status": { "enum": ["optimal", "feasible", "infeasible", "unknown", "modelinvalid"] },
+        "complete_assignment": { "type": "boolean" },
+        "assigned_visits": { "$ref": "#/definitions/count" },
+        "unassigned_visits": { "$ref": "#/definitions/count" },
+        "represented_flight_legs": { "$ref": "#/definitions/count" },
+        "assigned_flight_legs": { "$ref": "#/definitions/count" },
+        "generated_tows": { "type": "integer", "minimum": 0, "multipleOf": 2 },
+        "contact_service_flight_legs": { "$ref": "#/definitions/count" },
+        "remote_service_flight_legs": { "$ref": "#/definitions/count" },
+        "unresolved_segment_count": { "$ref": "#/definitions/count" },
+        "blocked_source_leg_count": { "$ref": "#/definitions/count" },
+        "stand_validation_passed": { "type": "boolean" },
+        "initial_state": { "type": "array", "items": { "$ref": "#/definitions/state" } },
+        "final_state": { "type": "array", "items": { "$ref": "#/definitions/state" } },
+        "stands": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["stand_id", "contact", "occupied_minutes", "utilization_fraction", "unoccupied_minutes", "unoccupied_intervals"],
+            "properties": {
+              "stand_id": { "$ref": "#/definitions/id" },
+              "contact": { "type": "boolean" },
+              "occupied_minutes": { "type": "number", "minimum": 0 },
+              "utilization_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+              "unoccupied_minutes": { "type": "number", "minimum": 0 },
+              "unoccupied_intervals": { "type": "array", "items": { "$ref": "urn:gtaa-mica:linked-demand:2.0.0#/definitions/window" } }
+            }
+          }
+        }
+      }
+    }
+  }
+}

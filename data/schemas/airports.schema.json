@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:airports:1.0.0",
+  "title": "Airport reference catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["airports"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "description": { "type": "string" },
+    "airports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "name", "city", "country"],
+        "properties": {
+          "code": { "type": "string", "pattern": "^[A-Z]{3}$" },
+          "name": { "$ref": "#/definitions/text" },
+          "city": { "$ref": "#/definitions/text" },
+          "country": { "$ref": "#/definitions/text" },
+          "airlines": {
+            "description": "Optional synthetic host roster, not a claim about actual service. Omission leaves route generation unconfigured.",
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["airline_id"],
+              "properties": {
+                "airline_id": { "type": "string", "pattern": "^\\S+$" },
+                "weight": {
+                  "description": "Relative carrier share. Zero disables this entry; omission uses the derived home/foreign default.",
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 1000000
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "text": { "type": "string", "pattern": "\\S", "not": { "pattern": "^\\s|\\s$" } }
+  }
+}

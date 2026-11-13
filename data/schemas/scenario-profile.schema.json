@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:scenario-profile:1.0.0",
+  "title": "Seeded airport demand scenario suite",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "airport_id", "seed", "plan_window", "sampling_step_minutes", "traffic_mix", "boundary_visits", "cases"],
+  "anyOf": [{ "required": ["external_airport_ids"] }, { "required": ["route_generation"] }],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/definitions/id" },
+    "airport_id": { "$ref": "#/definitions/id" },
+    "description": { "type": "string" },
+    "seed": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "plan_window": { "$ref": "urn:gtaa-mica:linked-demand:2.0.0#/definitions/window" },
+    "sampling_step_minutes": { "type": "integer", "minimum": 5, "maximum": 120 },
+    "external_airport_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } },
+    "route_generation": { "$ref": "urn:gtaa-mica:route-generation:1.0.0" },
+    "traffic_targets": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "count", "sector_id"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "count": { "type": "integer", "minimum": 1, "maximum": 200 },
+          "sector_id": { "enum": ["domestic", "international", "transborder"] },
+          "market_id": { "$ref": "#/definitions/id" }
+        }
+      }
+    },
+    "traffic_mix": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "aircraft_id", "operating_airline_id", "arrival_sector_id", "departure_sector_id", "passenger_min", "passenger_max", "minimum_stay_minutes", "maximum_stay_minutes"],
+        "oneOf": [
+          { "required": ["count"], "not": { "anyOf": [{ "required": ["target_id"] }, { "required": ["weight"] }] } },
+          { "required": ["target_id", "weight"], "not": { "required": ["count"] } }
+        ],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "aircraft_id": { "$ref": "#/definitions/id" },
+          "operating_airline_id": { "$ref": "#/definitions/id" },
+          "arrival_sector_id": { "$ref": "#/definitions/id" },
+          "departure_sector_id": { "$ref": "#/definitions/id" },
+          "passenger_min": { "$ref": "#/definitions/pax" },
+          "passenger_max": { "$ref": "#/definitions/pax" },
+          "count": { "type": "integer", "minimum": 0, "maximum": 200 },
+          "target_id": { "$ref": "#/definitions/id" },
+          "weight": { "type": "integer", "minimum": 1, "maximum": 1000000 },
+          "minimum_stay_minutes": { "$ref": "#/definitions/minutes" },
+          "maximum_stay_minutes": { "$ref": "#/definitions/minutes" }
+        }
+      }
+    },
+    "boundary_visits": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "aircraft_id", "operating_airline_id", "arrival_sector_id", "departure_sector_id", "passenger_min", "passenger_max", "anchor", "arrival_offset_minutes", "departure_offset_minutes"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "aircraft_id": { "$ref": "#/definitions/id" },
+          "operating_airline_id": { "$ref": "#/definitions/id" },
+          "arrival_sector_id": { "$ref": "#/definitions/id" },
+          "departure_sector_id": { "$ref": "#/definitions/id" },
+          "passenger_min": { "$ref": "#/definitions/pax" },
+          "passenger_max": { "$ref": "#/definitions/pax" },
+          "anchor": { "enum": ["plan-start", "plan-end"] },
+          "arrival_offset_minutes": { "type": "integer", "minimum": -2880, "maximum": -1 },
+          "departure_offset_minutes": { "$ref": "#/definitions/minutes" }
+        }
+      }
+    },
+    "cases": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["id", "description", "pressure_banks", "expectations"],
+        "properties": {
+          "id": { "$ref": "#/definitions/id" },
+          "description": { "type": "string", "minLength": 1 },
+          "pressure_banks": {
+            "type": "array",
+            "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["id", "aircraft_id", "operating_airline_id", "arrival_sector_id", "departure_sector_id", "passenger_min", "passenger_max", "long_count", "short_count", "short_stay_minutes", "long_lead_minutes", "long_lag_minutes"],
+              "properties": {
+                "id": { "$ref": "#/definitions/id" },
+                "aircraft_id": { "$ref": "#/definitions/id" },
+                "operating_airline_id": { "$ref": "#/definitions/id" },
+                "arrival_sector_id": { "$ref": "#/definitions/id" },
+                "departure_sector_id": { "$ref": "#/definitions/id" },
+                "passenger_min": { "$ref": "#/definitions/pax" },
+                "passenger_max": { "$ref": "#/definitions/pax" },
+                "long_count": { "type": "integer", "minimum": 1, "maximum": 200 },
+                "short_count": { "type": "integer", "minimum": 1, "maximum": 200 },
+                "short_stay_minutes": { "$ref": "#/definitions/minutes" },
+                "long_lead_minutes": { "$ref": "#/definitions/minutes" },
+                "long_lag_minutes": { "$ref": "#/definitions/minutes" }
+              }
+            }
+          },
+          "expectations": {
+            "type": "object", "additionalProperties": false,
+            "required": ["baseline_complete", "variant_complete", "minimum_coverage_gain", "minimum_generated_movements", "maximum_generated_movements"],
+            "properties": {
+              "baseline_complete": { "type": "boolean" },
+              "variant_complete": { "type": "boolean" },
+              "minimum_coverage_gain": { "type": "integer", "minimum": 0 },
+              "minimum_generated_movements": { "type": "integer", "minimum": 0 },
+              "maximum_generated_movements": { "type": "integer", "minimum": 0 }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "pax": { "type": "integer", "minimum": 0, "maximum": 1000 },
+    "minutes": { "type": "integer", "minimum": 1, "maximum": 2880 }
+  }
+}

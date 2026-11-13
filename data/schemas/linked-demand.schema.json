@@ -1,0 +1,183 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:linked-demand:2.0.0",
+  "title": "Derived airport visits and provisional tow requirements",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "airport_id", "demand_id", "synthetic", "plan_window",
+    "connection_search_radius_ms", "context_window", "source_legs", "context_leg_ids",
+    "visits", "tow_requirements", "ground_movement_leg_ids",
+    "unresolved_connection_leg_ids", "ground_movements", "movement_matches", "findings"
+  ],
+  "properties": {
+    "schema_version": { "const": "2.0.0" },
+    "airport_id": { "$ref": "#/definitions/id" },
+    "demand_id": { "$ref": "#/definitions/id" },
+    "synthetic": { "type": "boolean" },
+    "plan_window": { "$ref": "#/definitions/window" },
+    "connection_search_radius_ms": { "type": "integer", "minimum": 1 },
+    "context_window": { "$ref": "#/definitions/window" },
+    "source_legs": {
+      "type": "array",
+      "items": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/leg" }
+    },
+    "context_leg_ids": { "$ref": "#/definitions/ids" },
+    "visits": { "type": "array", "items": { "$ref": "#/definitions/visit" } },
+    "tow_requirements": { "type": "array", "items": { "$ref": "#/definitions/tow" } },
+    "ground_movement_leg_ids": { "$ref": "#/definitions/ids" },
+    "ground_movements": { "type": "array", "items": { "$ref": "#/definitions/movement" } },
+    "movement_matches": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["visit_id", "source_leg_id", "movement_leg_id", "type"],
+        "properties": {
+          "visit_id": { "$ref": "#/definitions/id" },
+          "source_leg_id": { "$ref": "#/definitions/id" },
+          "movement_leg_id": { "$ref": "#/definitions/id" },
+          "type": { "enum": ["tow-in", "tow-out"] }
+        }
+      }
+    },
+    "unresolved_connection_leg_ids": { "$ref": "#/definitions/ids" },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "severity", "leg_ids", "message"],
+        "properties": {
+          "code": { "$ref": "#/definitions/id" },
+          "severity": { "enum": ["warning", "error"] },
+          "leg_ids": { "$ref": "#/definitions/ids" },
+          "message": { "type": "string", "pattern": "\\S" }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "movement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_leg_id", "aircraft_registration", "aircraft_id", "origin_stand_id",
+        "destination_stand_id", "scheduled_off_block", "scheduled_on_block", "timing_source", "status"
+      ],
+      "properties": {
+        "source_leg_id": { "$ref": "#/definitions/id" },
+        "aircraft_registration": { "$ref": "#/definitions/id" },
+        "aircraft_id": { "$ref": "#/definitions/id" },
+        "origin_stand_id": { "$ref": "#/definitions/id" },
+        "destination_stand_id": { "$ref": "#/definitions/id" },
+        "scheduled_off_block": { "$ref": "#/definitions/instant" },
+        "scheduled_on_block": { "$ref": "#/definitions/instant" },
+        "timing_source": { "enum": ["supplied", "inferred-off-block", "inferred-on-block"] },
+        "inferred_duration_minutes": { "type": "integer", "minimum": 1 },
+        "status": { "enum": ["standalone", "associated", "needs-review"] },
+        "visit_id": { "$ref": "#/definitions/id" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "timing_source": { "const": "supplied" } } },
+          "then": { "properties": { "inferred_duration_minutes": false } },
+          "else": { "required": ["inferred_duration_minutes"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "associated" } } },
+          "then": { "required": ["visit_id"] }
+        },
+        {
+          "if": { "properties": { "status": { "const": "standalone" } } },
+          "then": { "properties": { "visit_id": false } }
+        }
+      ]
+    },
+    "id": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/id" },
+    "instant": { "$ref": "urn:gtaa-mica:raw-demand:1.0.0#/definitions/instant" },
+    "ids": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/definitions/id" } },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end"],
+      "properties": {
+        "start": { "$ref": "#/definitions/instant" },
+        "end": { "$ref": "#/definitions/instant" }
+      }
+    },
+    "handling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start", "end", "minimum_minutes"],
+      "properties": {
+        "start": { "$ref": "#/definitions/instant" },
+        "end": { "$ref": "#/definitions/instant" },
+        "minimum_minutes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "visit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "aircraft_registration", "aircraft_id", "status"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "aircraft_registration": { "$ref": "#/definitions/id" },
+        "aircraft_id": { "$ref": "#/definitions/id" },
+        "status": { "enum": ["connected", "arrival-only", "departure-only"] },
+        "arrival_leg_id": { "$ref": "#/definitions/id" },
+        "departure_leg_id": { "$ref": "#/definitions/id" },
+        "arrival_window": { "$ref": "#/definitions/handling" },
+        "departure_window": { "$ref": "#/definitions/handling" }
+      },
+      "oneOf": [
+        {
+          "properties": { "status": { "const": "connected" } },
+          "required": ["arrival_leg_id", "departure_leg_id", "arrival_window", "departure_window"]
+        },
+        {
+          "properties": {
+            "status": { "const": "arrival-only" },
+            "departure_leg_id": false,
+            "departure_window": false
+          },
+          "required": ["arrival_leg_id", "arrival_window"]
+        },
+        {
+          "properties": {
+            "status": { "const": "departure-only" },
+            "arrival_leg_id": false,
+            "arrival_window": false
+          },
+          "required": ["departure_leg_id", "departure_window"]
+        }
+      ]
+    },
+    "tow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "visit_id", "source_leg_id", "type", "status", "reason"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "visit_id": { "$ref": "#/definitions/id" },
+        "source_leg_id": { "$ref": "#/definitions/id" },
+        "type": { "enum": ["tow-in", "tow-out"] },
+        "status": { "const": "provisional" },
+        "reason": { "const": "no-connection-within-plan-duration" },
+        "earliest_off_block": { "$ref": "#/definitions/instant" },
+        "latest_on_block": { "$ref": "#/definitions/instant" },
+        "blocked_by_ground_leg_ids": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "$ref": "#/definitions/id" } }
+      },
+      "oneOf": [
+        {
+          "properties": { "type": { "const": "tow-in" }, "earliest_off_block": false },
+          "required": ["latest_on_block"]
+        },
+        {
+          "properties": { "type": { "const": "tow-out" }, "latest_on_block": false },
+          "required": ["earliest_off_block"]
+        }
+      ]
+    }
+  }
+}
