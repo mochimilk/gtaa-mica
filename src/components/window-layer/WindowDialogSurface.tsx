@@ -3,8 +3,10 @@ import { windowNode, windowPortalNode } from "./index";
 
 export function WindowDialogSurface({ children, ...props }: DialogSurfaceProps) {
   return (
-    <DialogSurface {...props} mountNode={windowNode()}>
-      <PortalMountNodeProvider value={windowPortalNode()}>{children}</PortalMountNodeProvider>
-    </DialogSurface>
+    <PortalMountNodeProvider value={windowNode()}>
+      <DialogSurface {...props}>
+        <PortalMountNodeProvider value={windowPortalNode()}>{children}</PortalMountNodeProvider>
+      </DialogSurface>
+    </PortalMountNodeProvider>
   );
 }
