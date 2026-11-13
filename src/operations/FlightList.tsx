@@ -25,6 +25,7 @@ import { alertsForFlight } from "./boardAlerts";
 import { beginFlightDrag } from "./FlightDrag";
 import type { OpsFlight } from "./operationsData";
 import { OverflowScroll } from "./OverflowScroll";
+import { ACTIVE_DATASET } from "./activeDataset";
 
 export interface FlightListProps {
   flights: readonly OpsFlight[];
@@ -63,6 +64,8 @@ export function FlightList({
   timeHeaderLabel,
   emptyMessage,
 }: FlightListProps) {
+  const displayedTimeHeader = ACTIVE_DATASET.capabilities.fixtureAnalyses ? timeHeader : timeHeader.replace(/^E/, "S");
+  const displayedTimeLabel = ACTIVE_DATASET.capabilities.fixtureAnalyses ? timeHeaderLabel : timeHeaderLabel.replace(/^Estimated/, "Scheduled");
   const { selection, skyeSelection } = useOpsSelections();
   const { selectFlight, assignStands } = useOpsActions();
   const { acknowledged, allocationVersion } = useOpsBoard();
@@ -133,9 +136,9 @@ export function FlightList({
           <TableHeaderCell
             role="columnheader"
             className="ops-cell"
-            aria-label={`${timeHeaderLabel}, UTC, synthetic`}
+            aria-label={`${displayedTimeLabel}, UTC, synthetic`}
           >
-            <abbr title={`${timeHeaderLabel} (UTC, synthetic)`}>{timeHeader}</abbr>
+            <abbr title={`${displayedTimeLabel} (UTC, synthetic)`}>{displayedTimeHeader}</abbr>
           </TableHeaderCell>
           <TableHeaderCell role="columnheader" className="ops-cell">Stand</TableHeaderCell>
           <TableHeaderCell role="columnheader" className="ops-cell" aria-label="Alerts" />
@@ -202,7 +205,7 @@ const FlightRow = memo(function FlightRow({
   const alerts = alertsForFlight(f.id, acknowledged);
   const warning = alerts.some((a) => a.severity === "warning");
   const day = dayOffsetLabel(f.estimate);
-  const draggable = !f.standId && !!f.unplacedStay;
+  const draggable = ACTIVE_DATASET.capabilities.editStands && !f.standId && !!f.unplacedStay;
   return (
     <TableRow
       role="row"

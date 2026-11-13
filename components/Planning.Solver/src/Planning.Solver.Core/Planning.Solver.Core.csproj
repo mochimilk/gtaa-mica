@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Planning.Solver.Core</PackageId>
+    <RootNamespace>Planning.Solver</RootNamespace>
+    <Description>Domain-neutral planning, candidate generation, optimization, validation, and scoring contracts.</Description>
+  </PropertyGroup>
+
+</Project>

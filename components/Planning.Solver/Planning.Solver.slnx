@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Planning.Solver.Airport/Planning.Solver.Airport.csproj" />
+    <Project Path="src/Planning.Solver.Cli/Planning.Solver.Cli.csproj" />
+    <Project Path="src/Planning.Solver.Core/Planning.Solver.Core.csproj" />
+    <Project Path="src/Planning.Solver.Orchestration/Planning.Solver.Orchestration.csproj" />
+    <Project Path="src/Planning.Solver.OrTools/Planning.Solver.OrTools.csproj" />
+    <Project Path="src/Planning.Solver.Worker.Local/Planning.Solver.Worker.Local.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Planning.Solver.Airport.Tests/Planning.Solver.Airport.Tests.csproj" />
+    <Project Path="tests/Planning.Solver.Core.Tests/Planning.Solver.Core.Tests.csproj" />
+    <Project Path="tests/Planning.Solver.Orchestration.Tests/Planning.Solver.Orchestration.Tests.csproj" />
+    <Project Path="tests/Planning.Solver.OrTools.Tests/Planning.Solver.OrTools.Tests.csproj" />
+    <Project Path="tests/Planning.Solver.Worker.Local.Tests/Planning.Solver.Worker.Local.Tests.csproj" />
+  </Folder>
+</Solution>

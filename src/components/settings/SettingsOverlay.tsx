@@ -13,12 +13,14 @@ import { settingsNode, settingsPortalNode } from "../window-layer";
 import { ApiSettings } from "./ApiSettings";
 import { AppearanceSettings } from "./AppearanceSettings";
 import { SignInSettings } from "./SignInSettings";
+import { SourceSettings } from "./SourceSettings";
 
 /** The pages, by the value each opens on. */
-export type SettingsPage = "appearance" | "api" | "sign-in";
+export type SettingsPage = "appearance" | "source" | "api" | "sign-in";
 
 const PAGES: (OverlayMenuItem & { value: SettingsPage })[] = [
   { value: "appearance", label: "Appearance", icon: <Color />, content: <AppearanceSettings /> },
+  { value: "source", label: "Schedule source", content: <SourceSettings /> },
   { value: "api", label: "API", icon: <Key />, content: <ApiSettings /> },
   { value: "sign-in", label: "Sign in", icon: <PersonAccounts />, content: <SignInSettings /> },
 ];

@@ -1,0 +1,177 @@
+{
+  "type": "FeatureCollection",
+  "schema_version": "1.0.0",
+  "airport_id": "contoso",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "t1:connection:domestic-to-lift",
+      "properties": {
+        "name": "domestic-to-lift",
+        "from_node_id": "t1:node:domestic-exit",
+        "to_node_id": "t1:node:main-lift-departures",
+        "from_level_id": "t1:l2",
+        "to_level_id": "t1:l2",
+        "mode": "walk",
+        "direction": "one-way",
+        "purpose": "domestic-egress",
+        "status": "conceptual-requires-review",
+        "access_policy_status": "not-configured",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Connection expresses the user-described vertical/tunnel relationship, not a verified route. Lifts are schematic choices; escalator placement and accessibility remain unverified.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.13883153,
+            47.6489277
+          ],
+          [
+            -122.13883152,
+            47.64920637
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:connection:main-arrivals-lift",
+      "properties": {
+        "name": "main-arrivals-lift",
+        "from_node_id": "t1:node:main-lift-departures",
+        "to_node_id": "t1:node:main-lift-arrivals",
+        "from_level_id": "t1:l2",
+        "to_level_id": "t1:l1",
+        "mode": "lift",
+        "direction": "both",
+        "purpose": "passenger-egress",
+        "status": "conceptual-requires-review",
+        "access_policy_status": "not-configured",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Connection expresses the user-described vertical/tunnel relationship, not a verified route. Lifts are schematic choices; escalator placement and accessibility remain unverified.",
+          "requires_review": true
+        }
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "id": "t1:connection:main-tunnel-lift",
+      "properties": {
+        "name": "main-tunnel-lift",
+        "from_node_id": "t1:node:main-tunnel-arrivals",
+        "to_node_id": "t1:node:main-tunnel-basement",
+        "from_level_id": "t1:l1",
+        "to_level_id": "t1:b1",
+        "mode": "lift",
+        "direction": "both",
+        "purpose": "customs-egress",
+        "status": "conceptual-requires-review",
+        "access_policy_status": "not-configured",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Connection expresses the user-described vertical/tunnel relationship, not a verified route. Lifts are schematic choices; escalator placement and accessibility remain unverified.",
+          "requires_review": true
+        }
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "id": "t1:connection:exit-tunnel",
+      "properties": {
+        "name": "exit-tunnel",
+        "from_node_id": "t1:node:customs-tunnel-basement",
+        "to_node_id": "t1:node:main-tunnel-basement",
+        "from_level_id": "t1:b1",
+        "to_level_id": "t1:b1",
+        "mode": "walk",
+        "direction": "one-way",
+        "purpose": "customs-egress",
+        "status": "conceptual-requires-review",
+        "access_policy_status": "not-configured",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Connection expresses the user-described vertical/tunnel relationship, not a verified route. Lifts are schematic choices; escalator placement and accessibility remain unverified.",
+          "requires_review": true
+        }
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [
+            -122.14,
+            47.64075328
+          ],
+          [
+            -122.14,
+            47.64920638
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "t1:connection:customs-tunnel-lift",
+      "properties": {
+        "name": "customs-tunnel-lift",
+        "from_node_id": "t1:node:customs-tunnel-arrivals",
+        "to_node_id": "t1:node:customs-tunnel-basement",
+        "from_level_id": "t1:l1",
+        "to_level_id": "t1:b1",
+        "mode": "lift",
+        "direction": "both",
+        "purpose": "customs-egress",
+        "status": "conceptual-requires-review",
+        "access_policy_status": "not-configured",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Connection expresses the user-described vertical/tunnel relationship, not a verified route. Lifts are schematic choices; escalator placement and accessibility remain unverified.",
+          "requires_review": true
+        }
+      },
+      "geometry": null
+    },
+    {
+      "type": "Feature",
+      "id": "t1:connection:customs-transfer-lift",
+      "properties": {
+        "name": "customs-transfer-lift",
+        "from_node_id": "t1:node:customs-transfer-arrivals",
+        "to_node_id": "t1:node:customs-transfer-departures",
+        "from_level_id": "t1:l1",
+        "to_level_id": "t1:l2",
+        "mode": "lift",
+        "direction": "one-way",
+        "purpose": "international-transfer-requires-policy-review",
+        "status": "conceptual-requires-review",
+        "access_policy_status": "not-configured",
+        "source": {
+          "method": "inferred-layout",
+          "source_file": "Airport.pdf",
+          "pdf_page": 1,
+          "description": "Connection expresses the user-described vertical/tunnel relationship, not a verified route. Lifts are schematic choices; escalator placement and accessibility remain unverified.",
+          "requires_review": true
+        }
+      },
+      "geometry": null
+    }
+  ],
+  "routing_status": "partial-conceptual-network-not-route-ready",
+  "description": "Lift features have null geometry; referenced node coordinates and level elevations define their vertical displacement without a degenerate 2D line or a misleading geographic altitude. No complete walking routes, checkpoint policy, travel times or accessibility certification are provided."
+}

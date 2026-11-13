@@ -267,7 +267,10 @@ export function makeDemoAccessors(
   const stayName = (o: Occupancy) => {
     const t = o.visitId ? turnsById.get(o.visitId) : undefined;
     if (!t) return o.id;
-    return t.arrFlight && t.depFlight ? `${t.arrFlight}/${t.depFlight.slice(t.carrier.length)}` : t.arrFlight || t.depFlight;
+    const departure = t.arrFlight.startsWith(t.carrier) && t.depFlight.startsWith(t.carrier)
+      ? t.depFlight.slice(t.carrier.length)
+      : t.depFlight;
+    return t.arrFlight && t.depFlight ? `${t.arrFlight}/${departure}` : t.arrFlight || t.depFlight;
   };
   /** Waiting in the No stand lane; else in conflict when either of its delays runs into another stay; else healthy. */
   const statusOf = (bar: BarDatum): FlightStatus =>

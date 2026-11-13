@@ -1,0 +1,19 @@
+{
+  "$schema": "../../schemas/operating-policy.schema.json",
+  "schema_version": "1.0.0",
+  "airport_id": "gtaa",
+  "description": "User-approved synthetic demo assumptions copied from Contoso, not verified GTAA operating procedures. Minimum elapsed stand-handling windows exclude tow travel and do not impose a summed minimum turn duration. The default tow duration completes single-anchor movements; supplied movement intervals are preserved.",
+  "default-tow-minutes": 12,
+  "minimum-leg-windows": [
+    {
+      "aircraft-size-codes": ["A", "B", "C"],
+      "arrival-minutes": 45,
+      "departure-minutes": 45
+    },
+    {
+      "aircraft-size-codes": ["D", "E", "F"],
+      "arrival-minutes": 60,
+      "departure-minutes": 60
+    }
+  ]
+}

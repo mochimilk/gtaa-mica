@@ -1,0 +1,155 @@
+{
+  "$schema": "../../../schemas/scenario-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "gtaa:full-day:v1",
+  "airport_id": "gtaa",
+  "description": "User-approved synthetic baseline for October 28, 2026 in Toronto: 64 domestic, 64 US transborder and 32 international visits. International traffic is split evenly between illustrative Europe and Asia markets, following Contoso's full-day process. Planning-group shares derive from eligible stands, splitting shared credits. Fleet, carrier weights, PAX and stays are illustrative, not verified GTAA traffic or airline fleet/service claims. No boundary visits, artificial pressure banks or elective tows.",
+  "seed": "gtaa-full-day-2026-10-28-v1",
+  "plan_window": { "start": "2026-10-28T04:00:00Z", "end": "2026-10-29T04:00:00Z" },
+  "sampling_step_minutes": 15,
+  "route_generation": {
+    "markets": [
+      {
+        "id": "us", "weight": 1,
+        "airports": [
+          { "airport_code": "ORD", "weight": 4 },
+          { "airport_code": "EWR", "weight": 3 },
+          { "airport_code": "JFK", "weight": 3 },
+          { "airport_code": "ATL", "weight": 3 },
+          { "airport_code": "DFW", "weight": 2 },
+          { "airport_code": "LAX", "weight": 2 },
+          { "airport_code": "SFO", "weight": 2 },
+          { "airport_code": "MIA", "weight": 1 }
+        ]
+      },
+      {
+        "id": "europe", "weight": 1,
+        "airports": [
+          { "airport_code": "LHR", "weight": 5 },
+          { "airport_code": "FRA", "weight": 3 },
+          { "airport_code": "CDG", "weight": 3 }
+        ]
+      },
+      {
+        "id": "asia", "weight": 1,
+        "airports": [
+          { "airport_code": "HND", "weight": 5 },
+          { "airport_code": "ICN", "weight": 3 },
+          { "airport_code": "PVG", "weight": 2 },
+          { "airport_code": "HKG", "weight": 2 },
+          { "airport_code": "TPE", "weight": 1 }
+        ]
+      }
+    ]
+  },
+  "traffic_targets": [
+    { "id": "domestic", "sector_id": "domestic", "count": 64 },
+    { "id": "transborder", "sector_id": "transborder", "market_id": "us", "count": 64 },
+    { "id": "europe", "sector_id": "international", "market_id": "europe", "count": 16 },
+    { "id": "asia", "sector_id": "international", "market_id": "asia", "count": 16 }
+  ],
+  "traffic_mix": [
+    {
+      "id": "domestic-ac-a220", "target_id": "domestic", "weight": 2,
+      "aircraft_id": "gtaa:aircraft:A220-300", "operating_airline_id": "airline:ACA",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 90, "passenger_max": 130, "minimum_stay_minutes": 60, "maximum_stay_minutes": 100
+    },
+    {
+      "id": "domestic-ac-a320", "target_id": "domestic", "weight": 3,
+      "aircraft_id": "gtaa:aircraft:A320", "operating_airline_id": "airline:ACA",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 120, "passenger_max": 180, "minimum_stay_minutes": 60, "maximum_stay_minutes": 100
+    },
+    {
+      "id": "domestic-ac-e175", "target_id": "domestic", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:EMB175", "operating_airline_id": "airline:ACA",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 50, "passenger_max": 78, "minimum_stay_minutes": 60, "maximum_stay_minutes": 100
+    },
+    {
+      "id": "transborder-ac", "target_id": "transborder", "weight": 3,
+      "aircraft_id": "gtaa:aircraft:A320", "operating_airline_id": "airline:ACA",
+      "arrival_sector_id": "transborder", "departure_sector_id": "transborder",
+      "passenger_min": 120, "passenger_max": 180, "minimum_stay_minutes": 65, "maximum_stay_minutes": 110
+    },
+    {
+      "id": "transborder-ua", "target_id": "transborder", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:A320", "operating_airline_id": "airline:UAL",
+      "arrival_sector_id": "transborder", "departure_sector_id": "transborder",
+      "passenger_min": 120, "passenger_max": 180, "minimum_stay_minutes": 65, "maximum_stay_minutes": 110
+    },
+    {
+      "id": "transborder-aa", "target_id": "transborder", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:B737-800-W", "operating_airline_id": "airline:AAL",
+      "arrival_sector_id": "transborder", "departure_sector_id": "transborder",
+      "passenger_min": 120, "passenger_max": 189, "minimum_stay_minutes": 65, "maximum_stay_minutes": 110
+    },
+    {
+      "id": "transborder-dl", "target_id": "transborder", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:B737-800-W", "operating_airline_id": "airline:DAL",
+      "arrival_sector_id": "transborder", "departure_sector_id": "transborder",
+      "passenger_min": 120, "passenger_max": 189, "minimum_stay_minutes": 65, "maximum_stay_minutes": 110
+    },
+    {
+      "id": "europe-ac", "target_id": "europe", "weight": 3,
+      "aircraft_id": "gtaa:aircraft:B787-9", "operating_airline_id": "airline:ACA",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 296, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "europe-lh", "target_id": "europe", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:B787-9", "operating_airline_id": "airline:DLH",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 296, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "europe-ba", "target_id": "europe", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:B787-9", "operating_airline_id": "airline:BAW",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 296, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "europe-af", "target_id": "europe", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:B787-9", "operating_airline_id": "airline:AFR",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 296, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-ac", "target_id": "asia", "weight": 3,
+      "aircraft_id": "gtaa:aircraft:B787-9", "operating_airline_id": "airline:ACA",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 296, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-br", "target_id": "asia", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:B787-9", "operating_airline_id": "airline:EVA",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 296, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-cx", "target_id": "asia", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:B787-9", "operating_airline_id": "airline:CPA",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 296, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-mu", "target_id": "asia", "weight": 1,
+      "aircraft_id": "gtaa:aircraft:B787-9", "operating_airline_id": "airline:CES",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 296, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    }
+  ],
+  "boundary_visits": [],
+  "cases": [
+    {
+      "id": "full-day",
+      "description": "Synthetic Toronto local day using authored ready stands and exact ASM identities. Both plans should cover all visits without elective tows; verify actual solver results rather than relaxing airport permissions.",
+      "pressure_banks": [],
+      "expectations": {
+        "baseline_complete": true, "variant_complete": true, "minimum_coverage_gain": 0,
+        "minimum_generated_movements": 0, "maximum_generated_movements": 0
+      }
+    }
+  ]
+}

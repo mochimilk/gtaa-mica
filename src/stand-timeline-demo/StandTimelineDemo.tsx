@@ -20,7 +20,7 @@ import {
 import { DEMO_DATA as DATA, DEMO_DOMAIN as DOMAIN } from "./demoData";
 import { ghostClashes } from "./delays";
 import { applySelection } from "./selection";
-import { SYNTHETIC_DATE } from "./syntheticFixture";
+import { ACTIVE_DATASET } from "../operations/activeDataset";
 import {
   BAR_INSET,
   BAR_RADIUS,
@@ -186,9 +186,10 @@ export function StandTimelineDemo({
     <div className="demo-timeline">
       <ContentToolbar
         // The fixture is one day, so there is no day before or after to step to.
-        label={<DateStepper date={SYNTHETIC_DATE} />}
+        label={<DateStepper date={ACTIVE_DATASET.date} />}
         actionsStart={toolbarStart}
         actionsEnd={toolbar}
+        styles={{ root: "demo-toolbar", actionsEnd: "demo-toolbar-actions" }}
       />
 
       <StandTimeline

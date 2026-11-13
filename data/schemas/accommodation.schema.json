@@ -1,0 +1,87 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:accommodation:2.0.0",
+  "type": "object", "additionalProperties": false,
+  "required": ["schema_version", "id", "source", "airport_id", "case_id", "demand_id", "plan_window", "snapshot_fingerprint", "airport_fingerprint", "demand_fingerprint", "profile", "approved_at", "received_at", "request", "variants"],
+  "properties": {
+    "schema_version": { "const": "2.0.0" }, "id": { "$ref": "#/definitions/id" }, "source": { "const": "synthetic" },
+    "airport_id": { "$ref": "#/definitions/id" },
+    "case_id": { "$ref": "#/definitions/id" },
+    "demand_id": { "$ref": "#/definitions/id" },
+    "plan_window": {
+      "type": "object", "additionalProperties": false, "required": ["start", "end"],
+      "properties": { "start": { "$ref": "#/definitions/time" }, "end": { "$ref": "#/definitions/time" } }
+    },
+    "snapshot_fingerprint": { "$ref": "#/definitions/hash" },
+    "airport_fingerprint": { "$ref": "#/definitions/hash" },
+    "demand_fingerprint": { "$ref": "#/definitions/hash" },
+    "profile": { "$ref": "urn:gtaa-mica:accommodation-profile:1.0.0" },
+    "approved_at": { "$ref": "#/definitions/time" }, "received_at": { "$ref": "#/definitions/time" },
+    "request": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "reason", "probe", "start", "end", "stay_id", "visit", "flights"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" }, "reason": { "const": "post-approval-service-request" },
+        "probe": { "$ref": "urn:gtaa-mica:capacity-profile:1.0.0#/definitions/probe" },
+        "start": { "$ref": "#/definitions/time" }, "end": { "$ref": "#/definitions/time" },
+        "stay_id": { "$ref": "#/definitions/id" },
+        "visit": { "$ref": "urn:gtaa-mica:demo-scenario:1.0.0#/properties/visits/items" },
+        "flights": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "$ref": "urn:gtaa-mica:demo-scenario:1.0.0#/properties/flights/items" } }
+      }
+    },
+    "variants": {
+      "type": "object", "additionalProperties": false, "required": ["baseline", "tow-options"],
+      "properties": { "baseline": { "$ref": "#/definitions/result" }, "tow-options": { "$ref": "#/definitions/result" } }
+    }
+  },
+  "definitions": {
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "hash": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "time": { "type": "string", "format": "date-time" },
+    "result": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request_fingerprint", "status", "search", "total_options_found", "options", "excluded_stands", "blocked_stands"],
+      "properties": {
+        "request_fingerprint": { "$ref": "#/definitions/hash" },
+        "status": { "enum": ["options-found", "no-acceptable-option-found"] },
+        "search": { "enum": ["direct-placement", "single-whole-turn-relocation"] },
+        "total_options_found": { "type": "integer", "minimum": 0 },
+        "options": { "type": "array", "items": {
+          "type": "object", "additionalProperties": false,
+          "required": ["id", "kind", "target_stand_id", "target_stand_contact", "moves", "stand_validation_passed"],
+          "properties": {
+            "id": { "$ref": "#/definitions/id" },
+            "kind": { "enum": ["direct", "localized-repair"] },
+            "target_stand_id": { "$ref": "#/definitions/id" },
+            "target_stand_contact": { "type": "boolean" },
+            "stand_validation_passed": { "const": true },
+            "moves": { "type": "array", "maxItems": 1, "items": {
+              "type": "object", "additionalProperties": false,
+              "required": ["stay_id", "from_stand_id", "to_stand_id", "to_stand_contact"],
+              "properties": {
+                "stay_id": { "$ref": "#/definitions/id" }, "from_stand_id": { "$ref": "#/definitions/id" }, "to_stand_id": { "$ref": "#/definitions/id" },
+                "to_stand_contact": { "type": "boolean" }
+              }
+            } }
+          }
+        } },
+        "excluded_stands": { "type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["stand_id", "reasons"],
+          "properties": {
+            "stand_id": { "$ref": "#/definitions/id" },
+            "reasons": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/id" } }
+          }
+        } },
+        "blocked_stands": { "type": "array", "items": {
+          "type": "object", "additionalProperties": false, "required": ["stand_id", "blocking_stay_ids", "reasons", "rule_paths"],
+          "properties": {
+            "stand_id": { "$ref": "#/definitions/id" },
+            "blocking_stay_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/id" } },
+            "reasons": { "type": "array", "minItems": 1, "items": { "$ref": "#/definitions/id" } },
+            "rule_paths": { "type": "array", "items": { "type": "string", "pattern": "\\S" } }
+          }
+        } }
+      }
+    }
+  }
+}

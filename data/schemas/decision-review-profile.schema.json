@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "decision-review-profile.schema.json",
+  "title": "Read-only decision summary registration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "metric_id", "metric_version"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "metric_id": { "const": "airport-decision-review" },
+    "metric_version": { "const": "1.0.0" }
+  }
+}

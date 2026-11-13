@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <PackageId>Planning.Solver.Airport</PackageId>
+    <RootNamespace>Planning.Solver.Airport</RootNamespace>
+    <Description>Airport-domain adapters for the domain-neutral planning solver contracts.</Description>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Planning.Solver.Core\Planning.Solver.Core.csproj" />
+  </ItemGroup>
+
+</Project>

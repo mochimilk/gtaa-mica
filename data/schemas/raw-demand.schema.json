@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:gtaa-mica:raw-demand:1.0.0",
+  "title": "Raw airport demand legs",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "airport_id", "synthetic", "legs"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schema_version": { "const": "1.0.0" },
+    "id": { "$ref": "#/definitions/id" },
+    "airport_id": { "$ref": "#/definitions/id" },
+    "synthetic": { "type": "boolean" },
+    "description": { "type": "string", "pattern": "\\S" },
+    "legs": { "type": "array", "items": { "$ref": "#/definitions/leg" } }
+  },
+  "definitions": {
+    "id": { "type": "string", "pattern": "^\\S+$" },
+    "instant": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])T([01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(\\.\\d{3})?Z$"
+    },
+    "leg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "aircraft_id", "aircraft_registration", "operating_airline_id"],
+      "properties": {
+        "id": { "$ref": "#/definitions/id" },
+        "type": { "enum": ["arrival", "departure", "ground-movement"] },
+        "aircraft_id": { "$ref": "#/definitions/id" },
+        "aircraft_registration": { "$ref": "#/definitions/id" },
+        "operating_airline_id": { "$ref": "#/definitions/id" },
+        "flight_number": { "$ref": "#/definitions/id" },
+        "sector_id": { "$ref": "#/definitions/id" },
+        "origin_airport_id": { "$ref": "#/definitions/id" },
+        "destination_airport_id": { "$ref": "#/definitions/id" },
+        "passenger_count": { "type": ["integer", "null"], "minimum": 0, "maximum": 9007199254740991 },
+        "scheduled_on_block": { "$ref": "#/definitions/instant" },
+        "scheduled_off_block": { "$ref": "#/definitions/instant" },
+        "origin_stand_id": { "$ref": "#/definitions/id" },
+        "destination_stand_id": { "$ref": "#/definitions/id" }
+      },
+      "oneOf": [
+        {
+          "properties": {
+            "type": { "const": "arrival" },
+            "scheduled_off_block": false,
+            "origin_stand_id": false,
+            "destination_stand_id": false
+          },
+          "required": ["flight_number", "sector_id", "origin_airport_id", "destination_airport_id", "passenger_count", "scheduled_on_block"]
+        },
+        {
+          "properties": {
+            "type": { "const": "departure" },
+            "scheduled_on_block": false,
+            "origin_stand_id": false,
+            "destination_stand_id": false
+          },
+          "required": ["flight_number", "sector_id", "origin_airport_id", "destination_airport_id", "passenger_count", "scheduled_off_block"]
+        },
+        {
+          "properties": {
+            "type": { "const": "ground-movement" },
+            "flight_number": false,
+            "sector_id": false,
+            "origin_airport_id": false,
+            "destination_airport_id": false,
+            "passenger_count": false
+          },
+          "required": ["origin_stand_id", "destination_stand_id"],
+          "anyOf": [
+            { "required": ["scheduled_off_block"] },
+            { "required": ["scheduled_on_block"] }
+          ]
+        }
+      ]
+    }
+  }
+}

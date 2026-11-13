@@ -1,0 +1,147 @@
+{
+  "$schema": "../../../schemas/scenario-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "contoso:full-day:v1",
+  "airport_id": "contoso",
+  "description": "Illustrative 24-hour US-based day: 136 domestic visits, 12 Europe visits and 12 Asia visits. Planning-group shares derive from eligible stands, dividing shared capacity rather than counting it twice. US carriers dominate within each group; markets are illustrative major hubs, not measured rankings.",
+  "seed": "contoso-full-day-2026-v1",
+  "plan_window": { "start": "2026-10-24T07:00:00Z", "end": "2026-10-25T07:00:00Z" },
+  "sampling_step_minutes": 15,
+  "route_generation": {
+    "markets": [
+      {
+        "id": "europe", "weight": 1,
+        "airports": [
+          { "airport_code": "LHR", "weight": 5 },
+          { "airport_code": "FRA", "weight": 3 },
+          { "airport_code": "CDG", "weight": 3 }
+        ]
+      },
+      {
+        "id": "asia", "weight": 1,
+        "airports": [
+          { "airport_code": "HND", "weight": 5 },
+          { "airport_code": "ICN", "weight": 3 },
+          { "airport_code": "PVG", "weight": 2 },
+          { "airport_code": "HKG", "weight": 2 },
+          { "airport_code": "TPE", "weight": 1 }
+        ]
+      }
+    ]
+  },
+  "traffic_targets": [
+    { "id": "domestic", "sector_id": "domestic", "count": 136 },
+    { "id": "europe", "sector_id": "international", "market_id": "europe", "count": 12 },
+    { "id": "asia", "sector_id": "international", "market_id": "asia", "count": 12 }
+  ],
+  "traffic_mix": [
+    {
+      "id": "domestic-aa", "target_id": "domestic", "weight": 3,
+      "aircraft_id": "B738", "operating_airline_id": "airline:AAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 120, "passenger_max": 189, "minimum_stay_minutes": 65, "maximum_stay_minutes": 110
+    },
+    {
+      "id": "domestic-as", "target_id": "domestic", "weight": 1,
+      "aircraft_id": "B738", "operating_airline_id": "airline:ASA",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 120, "passenger_max": 189, "minimum_stay_minutes": 65, "maximum_stay_minutes": 110
+    },
+    {
+      "id": "domestic-dl", "target_id": "domestic", "weight": 1,
+      "aircraft_id": "A320", "operating_airline_id": "airline:DAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 90, "passenger_max": 146, "minimum_stay_minutes": 60, "maximum_stay_minutes": 100
+    },
+    {
+      "id": "domestic-ua", "target_id": "domestic", "weight": 1,
+      "aircraft_id": "A320", "operating_airline_id": "airline:UAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 90, "passenger_max": 146, "minimum_stay_minutes": 60, "maximum_stay_minutes": 100
+    },
+    {
+      "id": "europe-aa", "target_id": "europe", "weight": 3,
+      "aircraft_id": "B789", "operating_airline_id": "airline:AAL",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "europe-ba", "target_id": "europe", "weight": 1,
+      "aircraft_id": "B789", "operating_airline_id": "airline:BAW",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "europe-dl", "target_id": "europe", "weight": 3,
+      "aircraft_id": "B789", "operating_airline_id": "airline:DAL",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "europe-af", "target_id": "europe", "weight": 1,
+      "aircraft_id": "B789", "operating_airline_id": "airline:AFR",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "europe-ua", "target_id": "europe", "weight": 3,
+      "aircraft_id": "B789", "operating_airline_id": "airline:UAL",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "europe-lh", "target_id": "europe", "weight": 1,
+      "aircraft_id": "B789", "operating_airline_id": "airline:DLH",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-aa", "target_id": "asia", "weight": 3,
+      "aircraft_id": "B789", "operating_airline_id": "airline:AAL",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-jl", "target_id": "asia", "weight": 1,
+      "aircraft_id": "B789", "operating_airline_id": "airline:JAL",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-dl", "target_id": "asia", "weight": 3,
+      "aircraft_id": "B789", "operating_airline_id": "airline:DAL",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-mu", "target_id": "asia", "weight": 1,
+      "aircraft_id": "B789", "operating_airline_id": "airline:CES",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-ua", "target_id": "asia", "weight": 3,
+      "aircraft_id": "B789", "operating_airline_id": "airline:UAL",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    },
+    {
+      "id": "asia-br", "target_id": "asia", "weight": 1,
+      "aircraft_id": "B789", "operating_airline_id": "airline:EVA",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269, "minimum_stay_minutes": 120, "maximum_stay_minutes": 180
+    }
+  ],
+  "boundary_visits": [],
+  "cases": [
+    {
+      "id": "full-day",
+      "description": "A complete local calendar day with independently sampled visits and stand-share-weighted planning groups. No artificial pressure bank or fabricated overnight parking.",
+      "pressure_banks": [],
+      "expectations": {
+        "baseline_complete": false, "variant_complete": false, "minimum_coverage_gain": 0,
+        "minimum_generated_movements": 0, "maximum_generated_movements": 0
+      }
+    }
+  ]
+}

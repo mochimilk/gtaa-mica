@@ -1,0 +1,28 @@
+{
+  "$schema": "../../../schemas/capacity-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "contoso:single-turn-capacity:v1",
+  "metric_id": "airport-single-turn-capacity",
+  "metric_version": "1.0.0",
+  "default_probe_id": "aal-domestic",
+  "probes": [
+    {
+      "id": "aal-domestic", "label": "American · B738 · domestic",
+      "aircraft_id": "B738", "operating_airline_id": "airline:AAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "default_duration_minutes": 75, "separation_minutes": 0
+    },
+    {
+      "id": "ual-domestic", "label": "United · A320 · domestic",
+      "aircraft_id": "A320", "operating_airline_id": "airline:UAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "default_duration_minutes": 75, "separation_minutes": 0
+    },
+    {
+      "id": "baw-international", "label": "British Airways · B789 · international",
+      "aircraft_id": "B789", "operating_airline_id": "airline:BAW",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "default_duration_minutes": 120, "separation_minutes": 0
+    }
+  ]
+}

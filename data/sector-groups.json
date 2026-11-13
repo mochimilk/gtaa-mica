@@ -1,0 +1,46 @@
+{
+  "sector-groups": [
+    {
+      "id": "domestic-general",
+      "name": "Domestic-General",
+      "description": "Description for Domestic-General sector",
+      "sectors": ["domestic"]
+    },
+    {
+      "id": "international-general",
+      "name": "International-General",
+      "description": "Description for International-General sector",
+      "sectors": ["international"]
+    },
+    {
+      "id": "transborder-general",
+      "name": "Transborder-General",
+      "description": "Description for Transborder-General sector",
+      "sectors": ["transborder"]
+    },
+    {
+      "id": "domestic-transborder",
+      "name": "Domestic-Transborder",
+      "description": "Description for Domestic-Transborder sector",
+      "sectors": ["domestic", "transborder"]
+    },
+    {
+      "id": "international-transborder",
+      "name": "International-Transborder",
+      "description": "Description for International-Transborder sector",
+      "sectors": ["international", "transborder"]
+    },
+    {
+      "id": "domestic-international",
+      "name": "Domestic-International",
+      "description": "Description for Domestic-International sector",
+      "sectors": ["domestic", "international"]
+    },
+    {
+      "id": "all-general",
+      "name": "All-General",
+      "description": "Description for All-General sector",
+      "sectors": ["domestic", "international", "transborder"]
+    }
+  ]
+}

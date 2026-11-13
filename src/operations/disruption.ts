@@ -17,7 +17,7 @@ import type { Occupancy } from "../stand-timeline";
 import { DEMO_DATA, formatUtc } from "../stand-timeline-demo/demoData";
 import { formatDelay, ghostClashes, ghostKey, GHOST_SIDES, type GhostClashes } from "../stand-timeline-demo/delays";
 import { AIRPORT_NAMES } from "../stand-timeline-demo/airports";
-import { SYNTHETIC_STANDS } from "../stand-timeline-demo/syntheticFixture";
+import { ACTIVE_DATASET } from "./activeDataset";
 import { boardKpis, type BoardKpis, type GateHold } from "./boardKpis";
 import {
   closedDuring,
@@ -32,6 +32,7 @@ import {
 import { OPS_FLIGHTS_BY_ID, formatDuration } from "./operationsData";
 import { stayLabel, type OutputDecision } from "./outputs";
 import type { ReviewChange } from "./skyeReview";
+import { requireFixtureAnalyses } from "./activeDataset";
 
 /** The disruption: which stay runs late, by how much, and why. */
 export const DISRUPTION = {
@@ -97,6 +98,7 @@ export function subscribeDisruption(listener: () => void): () => void {
  * (announceDisruption). Once only; returns whether it landed now.
  */
 export function landDisruption(now = Date.now()): boolean {
+  requireFixtureAnalyses();
   if (state.landedAt !== null) return false;
   if (!setRunningLate(DISRUPTION.stayId, DISRUPTION.delayIn, DISRUPTION.delayOut)) return false;
   set({ landedAt: now, notice: "none", baseline: boardKpis(standState()), approved: null });
@@ -242,6 +244,7 @@ const overlaps = (a: Occupancy, b: Occupancy) => a.start < b.end && b.start < a.
  * stand. A greedy pass under the sample rules, not an allocator.
  */
 export function planDisruption(stayId: string = DISRUPTION.stayId): DisruptionPlan {
+  requireFixtureAnalyses();
   if (!occupancyById(stayId)) return { stayId, moves: [], stuck: [], considered: [] };
   return planKnockOn(
     stayId,
@@ -256,6 +259,7 @@ export function planDisruption(stayId: string = DISRUPTION.stayId): DisruptionPl
  * stay is on `board`.
  */
 export function planKnockOn(stayId: string, board: Occupancy[]): DisruptionPlan {
+  requireFixtureAnalyses();
   const rowOf = new Map(DEMO_DATA.rows.map((row, index) => [row.id, index]));
   const moves: AreaMove[] = [];
   const stuck: string[] = [];
@@ -266,7 +270,7 @@ export function planKnockOn(stayId: string, board: Occupancy[]): DisruptionPlan 
     if (!stay) continue;
     const area = standArea(stay.rowId);
     const row = rowOf.get(stay.rowId) ?? 0;
-    const nearest = [...SYNTHETIC_STANDS].sort(
+    const nearest = [...ACTIVE_DATASET.stands].sort(
       (a, b) =>
         Number(a.area !== area) - Number(b.area !== area) ||
         Math.abs((rowOf.get(a.code) ?? 0) - row) - Math.abs((rowOf.get(b.code) ?? 0) - row) ||

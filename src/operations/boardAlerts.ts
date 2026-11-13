@@ -10,6 +10,7 @@ import { DEMO_DATA, formatUtc, formatUtcWithDay } from "../stand-timeline-demo/d
 import { formatDelay, ghostClashes, ghostKey, ghostMs, GHOST_SIDES, type GhostSide } from "../stand-timeline-demo/delays";
 import { allocationVersion, flightsAtStay, stayName } from "./allocation";
 import { OPS_FLIGHTS, type OpsFlight } from "./operationsData";
+import { ACTIVE_DATASET } from "./activeDataset";
 
 export type AlertSeverity = "warning" | "info";
 export type AlertKind = "no_stand" | "conflict" | "notice";
@@ -123,7 +124,7 @@ export function currentAlerts(): readonly OpsAlert[] {
         a.estimate - b.estimate ||
         a.flight.localeCompare(b.flight),
     );
-    cached = { version, alerts: [...conflictAlerts(), ...noStand.map(noStandAlert), ...NOTICES] };
+    cached = { version, alerts: [...conflictAlerts(), ...noStand.map(noStandAlert), ...(ACTIVE_DATASET.capabilities.fixtureAnalyses ? NOTICES : [])] };
   }
   return cached.alerts;
 }

@@ -1,0 +1,101 @@
+{
+  "$schema": "../../../schemas/scenario-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "contoso:demo-days:v1",
+  "airport_id": "contoso",
+  "description": "Repeatable synthetic closed-feed demo, not a traffic forecast. Both cases share base demand; constrained adds an illustrative international bank. Scheduled context supplies complete overnight intervals without assuming unknown parking edges.",
+  "seed": "contoso-demo-2026-v1",
+  "plan_window": { "start": "2026-10-21T14:00:00Z", "end": "2026-10-22T14:00:00Z" },
+  "sampling_step_minutes": 15,
+  "external_airport_ids": ["synthetic:airport:north", "synthetic:airport:south", "synthetic:airport:east"],
+  "route_generation": {
+    "markets": [
+      {
+        "id": "europe", "weight": 1,
+        "airports": [
+          { "airport_code": "LHR", "weight": 5 },
+          { "airport_code": "FRA", "weight": 3 },
+          { "airport_code": "CDG", "weight": 3 }
+        ]
+      },
+      {
+        "id": "asia", "weight": 1,
+        "airports": [
+          { "airport_code": "HND", "weight": 5 },
+          { "airport_code": "ICN", "weight": 3 },
+          { "airport_code": "PVG", "weight": 2 },
+          { "airport_code": "HKG", "weight": 2 },
+          { "airport_code": "TPE", "weight": 1 }
+        ]
+      }
+    ]
+  },
+  "traffic_mix": [
+    {
+      "id": "star-domestic-short", "aircraft_id": "A320", "operating_airline_id": "airline:UAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 90, "passenger_max": 146,
+      "count": 16, "minimum_stay_minutes": 60, "maximum_stay_minutes": 100
+    },
+    {
+      "id": "oneworld-domestic-short", "aircraft_id": "B738", "operating_airline_id": "airline:AAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 120, "passenger_max": 189,
+      "count": 12, "minimum_stay_minutes": 65, "maximum_stay_minutes": 110
+    },
+    {
+      "id": "oneworld-international", "aircraft_id": "B789", "operating_airline_id": "airline:AAL",
+      "arrival_sector_id": "international", "departure_sector_id": "international",
+      "passenger_min": 180, "passenger_max": 269,
+      "count": 4, "minimum_stay_minutes": 90, "maximum_stay_minutes": 150
+    },
+    {
+      "id": "star-domestic-long", "aircraft_id": "A320", "operating_airline_id": "airline:UAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 90, "passenger_max": 146,
+      "count": 2, "minimum_stay_minutes": 240, "maximum_stay_minutes": 360
+    }
+  ],
+  "boundary_visits": [
+    {
+      "id": "initial-overnight", "aircraft_id": "A320", "operating_airline_id": "airline:UAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 90, "passenger_max": 146,
+      "anchor": "plan-start", "arrival_offset_minutes": -240, "departure_offset_minutes": 120
+    },
+    {
+      "id": "final-overnight", "aircraft_id": "B738", "operating_airline_id": "airline:AAL",
+      "arrival_sector_id": "domestic", "departure_sector_id": "domestic",
+      "passenger_min": 120, "passenger_max": 189,
+      "anchor": "plan-end", "arrival_offset_minutes": -120, "departure_offset_minutes": 240
+    }
+  ],
+  "cases": [
+    {
+      "id": "comfortable",
+      "description": "Mixed short turns, long stays and overnight context with no intended elective-tow need.",
+      "pressure_banks": [],
+      "expectations": {
+        "baseline_complete": true, "variant_complete": true, "minimum_coverage_gain": 0,
+        "minimum_generated_movements": 0, "maximum_generated_movements": 0
+      }
+    },
+    {
+      "id": "constrained",
+      "description": "Same base demand plus five concurrent Star international E-aircraft visits competing for four statically eligible service stands. One long visit can park in another compatible pool.",
+      "pressure_banks": [
+        {
+          "id": "star-international-bank", "aircraft_id": "B789", "operating_airline_id": "airline:UAL",
+          "arrival_sector_id": "international", "departure_sector_id": "international",
+          "passenger_min": 180, "passenger_max": 269,
+          "long_count": 1, "short_count": 4, "short_stay_minutes": 90,
+          "long_lead_minutes": 120, "long_lag_minutes": 240
+        }
+      ],
+      "expectations": {
+        "baseline_complete": false, "variant_complete": true, "minimum_coverage_gain": 2,
+        "minimum_generated_movements": 2, "maximum_generated_movements": 2
+      }
+    }
+  ]
+}

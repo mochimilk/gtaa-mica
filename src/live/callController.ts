@@ -399,6 +399,7 @@ export class LiveCallController {
    * the microphone released even if the session never answered.
    */
   async hangup(): Promise<void> {
+    this.#executor.cancelAll("call ended");
     if (this.#state.phase === "idle") {
       this.#patch(IDLE_STATE);
       return;
@@ -406,7 +407,6 @@ export class LiveCallController {
     // Invalidate first: anything still in flight belongs to a dead call.
     this.#generation += 1;
     this.#patch({ phase: "closing" });
-    this.#executor.cancelAll("call ended");
     this.#aborter?.abort();
     await this.#release();
     this.#patch(IDLE_STATE);

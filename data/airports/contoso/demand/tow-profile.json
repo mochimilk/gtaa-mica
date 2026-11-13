@@ -1,0 +1,12 @@
+{
+  "$schema": "../../../schemas/tow-profile.schema.json",
+  "schema_version": "1.0.0",
+  "id": "contoso:capacity-selective:v1",
+  "description": "Experimental demo knobs, not operational rules or financial estimates. Charge each proposed movement 15 equivalent shortage-minutes; require positive net relief and at least 60 minutes parked between movements. Never select a tow solely for a peak weight.",
+  "method": "greedy-marginal-shortfall",
+  "minimum_parking_minutes": 60,
+  "movement_penalty_minutes": 15,
+  "minimum_net_benefit_minutes": 0,
+  "maximum_generated_movements": 8,
+  "parking_stand_kind": "non-contact"
+}

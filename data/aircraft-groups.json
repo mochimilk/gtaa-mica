@@ -1,0 +1,24 @@
+{
+  "aircraft-groups": [
+    {
+      "id": "C",
+      "name": "C class",
+      "aircraft-ids": ["A319","A320","A321","B712","B727","B734","B738","B739"]
+    },
+    {
+      "id": "D",
+      "name": "D class",
+      "aircraft-ids": ["A306","A310","B753","B757","B762","B763","B764"]
+    },
+    {
+      "id": "E",
+      "name": "E class",
+      "aircraft-ids": ["A330","A332","A333","A340","A343","A345","A346","A350","B743","B744","B772","B773","B77W","B788","B789","B78X"]
+    },
+    {
+      "id": "F",
+      "name": "F class",
+      "aircraft-ids": ["A380", "A388"]
+    }
+  ]
+}

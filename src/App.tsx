@@ -11,7 +11,7 @@ import { PanelHeader } from "./components/panel-header";
 import { SharedPanelLeft } from "./components/panel-left";
 import { LeftPanelToggle } from "./components/panel-toggle";
 import { DesktopTitleBar, hasDesktopTitleBar } from "./components/title-bar";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { MINUTE, type DropPreview } from "./stand-timeline";
 import { DEMO_DATA } from "./stand-timeline-demo/demoData";
 import { StandTimelineDemo } from "./stand-timeline-demo/StandTimelineDemo";
@@ -28,7 +28,10 @@ import {
 } from "./operations/noStandLane";
 import { AlertsMenu } from "./operations/AlertsMenu";
 import { DisruptionNotice, DisruptionWatch } from "./operations/DisruptionNotice";
-import { KpiStrip } from "./operations/KpiStrip";
+import { SourceSummary } from "./data-sources/SourceSummary";
+import { ScenarioToolbar } from "./data-sources/ScenarioToolbar";
+import { ACTIVE_DATASET } from "./operations/activeDataset";
+import { useAccommodationSession } from "./operations/useAccommodationSession";
 import { ClosureBand, ClosureLabel } from "./operations/ClosureBand";
 import { FlightBarMenu } from "./operations/FlightBarMenu";
 import { FlightDragChip, FlightDropGhost } from "./operations/FlightDrag";
@@ -56,6 +59,8 @@ import { StudioPage } from "./studio/StudioPage";
 import { shareApproval, useOpenApprovals } from "./approvals/ApprovalsCall";
 import { ChatPage, useCallInChat, useCallShare, useCallThread, useUnreadChats } from "./chat/ChatPage";
 import { chatState, openThread } from "./chat/chatThreads";
+import { TimelineOverlayProvider, OverlayToolbar, OverlayLayers, OverlayReviews } from "./overlays/TimelineOverlays";
+import { RequestsProvider, RequestsToolbar } from "./requests/RequestsFeature";
 
 // Each page's left panel: its stable ID, shared with its toggle (in the
 // desktop title bar, or the nav rail in a browser), and its name in the
@@ -185,7 +190,7 @@ function ConnectedTimeline({ away }: { away: boolean }) {
     ),
     [zoom],
   );
-  const summary = useMemo(() => <KpiStrip />, []);
+  const summary = useMemo(() => <SourceSummary />, []);
   // Where FlightBarMenu listens for right-clicks on the bars.
   const boardRef = useRef<HTMLDivElement>(null);
   return (
@@ -204,17 +209,18 @@ function ConnectedTimeline({ away }: { away: boolean }) {
           occupancies={occupancies}
           pinnedRows={lane.rows}
           pinnedLabel={pinnedLabel}
-          previewDrop={previewDrop}
+          previewDrop={ACTIVE_DATASET.capabilities.editStands ? previewDrop : undefined}
           dragSnapMs={DRAG_SNAP_MS}
-          underlay={underlay}
-          overlay={overlay}
-          toolbar={toolbar}
+          underlay={<>{underlay}<OverlayLayers position="underlay" isMatch={matcher.active ? matcher.occupancy : undefined} /></>}
+          overlay={<>{overlay}<OverlayLayers position="overlay" isMatch={matcher.active ? matcher.occupancy : undefined} /></>}
+          toolbar={<>{!away && <><ScenarioToolbar /><RequestsToolbar /><OverlayToolbar /></>}{toolbar}</>}
           summary={summary}
           zoom={zoom}
           flightStyle={flightStyle}
           drawings={drawings}
         />
       </div>
+      <OverlayReviews visible={!away} />
       {!away && (
         <>
           <SelectionPopover />
@@ -338,7 +344,7 @@ function Navbar({ page, onOpenChat }: { page: AppPage; onOpenChat: () => void })
     <AppNavbar
       askActionsEnd={<AlertsMenu />}
       // Skye catching the day's disruption (see docs/disruption-demo.md).
-      askNotices={page === "planner" ? <DisruptionNotice /> : undefined}
+      askNotices={page === "planner" && ACTIVE_DATASET.capabilities.fixtureAnalyses ? <DisruptionNotice /> : undefined}
       callOnPage={page === "chat" && callInChat}
       callToChannel={toChannel}
       callSharing={sharing}
@@ -356,6 +362,10 @@ export default function App() {
   const styles = useStyles();
   // The page on screen, with the pages before it for the title bar's Back and Forward.
   const { page, go: setPage, back, forward } = usePageHistory<AppPage>("planner");
+  const workspace = useAccommodationSession();
+  useEffect(() => {
+    if (workspace.revision) document.querySelector<HTMLButtonElement>("[data-requests-toolbar]")?.focus({ preventScroll: true });
+  }, [workspace.revision]);
   const leftPanel = LEFT_PANELS[page];
   // In the desktop app the left panel's toggle is in the title bar, after
   // Back and Forward; in a browser, at the nav rail's foot.
@@ -383,11 +393,13 @@ export default function App() {
   return (
     // OperationsProvider first: the voice session reaches the app through the
     // same selection, views, filters and acknowledgements the UI uses.
-    <OperationsProvider>
+    <OperationsProvider key={workspace.revision}>
+      <RequestsProvider dataset={workspace.reference} visible={page === "planner"}>
+      <TimelineOverlayProvider dataset={workspace.active}>
       <LiveCallProvider>
         <LumaSkyeBackground />
         {/* Skye catching the day's disruption and speaking up around it, on the board and in the chat alike. */}
-        {page !== "studio" && <DisruptionWatch />}
+        {page !== "studio" && ACTIVE_DATASET.capabilities.fixtureAnalyses && <DisruptionWatch />}
         <div className={styles.window}>
           <DesktopTitleBar onBack={back} onForward={forward} actions={panelToggle} />
           {/* The nav rail runs the full height, beside the content and the app bar. */}
@@ -430,6 +442,8 @@ export default function App() {
         {/* The gradient that outlines Skye's selections on the chart. */}
         <SkyeGlowDefs />
       </LiveCallProvider>
+      </TimelineOverlayProvider>
+      </RequestsProvider>
     </OperationsProvider>
   );
 }
